@@ -1,7 +1,5 @@
 package com.wildbitsfoundry.etk4j.systems.continuoustime.filters;
 
-import com.wildbitsfoundry.etk4j.math.complex.Complex;
-
 public abstract class AnalogFilter {
 
 //	private Complex[] _zeros;

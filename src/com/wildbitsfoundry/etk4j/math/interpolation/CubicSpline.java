@@ -2,8 +2,6 @@ package com.wildbitsfoundry.etk4j.math.interpolation;
 
 public class CubicSpline extends Spline {
 
-	private double[] _coefs = null;
-	
 	private static class TridiagonalSystem {
 		public double[] D;
 		public double[] SD;
@@ -265,5 +263,16 @@ public class CubicSpline extends Spline {
 			dydx[i] = 3.0 * (r0 + r1);
 		}
 		return T;
+	}
+
+	@Override
+	protected double evaluateAntiDerivativeAt(int index, double t) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int getOrder() {
+		return 3;
 	}
 }

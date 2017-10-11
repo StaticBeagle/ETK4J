@@ -2,8 +2,6 @@ package com.wildbitsfoundry.etk4j.math.interpolation;
 
 public class CardinalSpline extends Spline {
 
-	private double[] _coefs = null;
-
 	private CardinalSpline(double[] x, double[] y, double[] dydx) {
 		super(x, y[0], y[y.length - 1]);
 		final int n = _x.length;
@@ -147,5 +145,16 @@ public class CardinalSpline extends Spline {
 	@Override
 	public double integrate(double x0, double x1) {
 		throw new RuntimeException("Method not implemented yet");
+	}
+
+	@Override
+	protected double evaluateAntiDerivativeAt(int index, double t) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int getOrder() {
+		return 3;
 	}
 }

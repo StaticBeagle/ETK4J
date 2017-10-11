@@ -2,7 +2,6 @@ package com.wildbitsfoundry.etk4j.math.interpolation;
 
 public class LinearSpline extends Spline {
 	
-	private double[] _coefs = null;
 
 	protected LinearSpline(double[] x, double[] y) {
 		super(x, y[0], y[y.length - 1]);
@@ -38,15 +37,33 @@ public class LinearSpline extends Spline {
 		throw new RuntimeException("Method not implemented yet");
 	}
 
+	
 	@Override
-	public double integrate(double x0, double x1) {
-		throw new RuntimeException("Method not implemented yet");
+	protected double evaluateAntiDerivativeAt(int index, double t) {
+		index = index << 1;
+		return t * (_coefs[index + 1] + t * _coefs[index] * 0.5);
 	}
 
 	@Override
 	protected double getValueAt(int index, double x) {
 		double t = x - _x[index];
 		index = index << 1;
-		return _coefs[index + 1] + t * _coefs[index];
+		return t * _coefs[index] + _coefs[index + 1];
+	}
+	
+	@Override
+	public int getOrder() {
+		return 1;
+	}
+	
+	public static void main(String[] args) {
+		double[] x = new double[] {1, 2, 3, 4};
+		double[] y = new double[] {1, 4, 9, 16};
+		
+		LinearSpline ls = newLinearSpline(x, y);
+		
+		System.out.println(ls.evaluateAt(4));
+		
+		System.out.println(ls.integrate(1, 4));
 	}
 }

@@ -9,7 +9,6 @@ public abstract class PiecewiseFunction implements UnivariateFunction {
 	}
 
 	protected double[] _x = null;
-	protected final int _size;
 	protected final double _y0, _yn;
 	private double _d0 = 0.0, _dn = 0.0;
 	private ExtrapolationMethod _extrapolationMethod = ExtrapolationMethod.Throw;
@@ -18,7 +17,6 @@ public abstract class PiecewiseFunction implements UnivariateFunction {
 		_x = x;
 		_y0 = y0;
 		_yn = yn;
-		_size = x.length - 1;
 	}
 	
 	protected void setExtrapolationMethod(ExtrapolationMethod method) {
@@ -27,12 +25,16 @@ public abstract class PiecewiseFunction implements UnivariateFunction {
 
 	protected int findIndex(double x) {
 		int index = Arrays.binarySearch(_x, x);
-		return index < 0 ? -(index + 2) : Math.min(index, _size - 1);
+		return index < 0 ? -(index + 2) : Math.min(index, _x.length - 2);
 	}
 	
 	protected final void setEndSlopes(double d0, double dn) {
 		_d0 = d0;
 		_dn = dn;
+	}
+	
+	public int getSize() {
+		return _x.length - 1;
 	}
 
 	@Override
@@ -40,8 +42,8 @@ public abstract class PiecewiseFunction implements UnivariateFunction {
 		if(x < _x[0]) {
 			return this.extrapolate(0, x);
 		}
-		if(x > _x[_size]) {
-			return this.extrapolate(_size - 1, x);
+		if(x > _x[_x.length - 1]) {
+			return this.extrapolate(_x.length - 2, x);
 		}
 		int index = this.findIndex(x);
 		return this.getValueAt(index, x);

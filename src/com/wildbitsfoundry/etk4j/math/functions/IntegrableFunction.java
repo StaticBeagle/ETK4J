@@ -1,5 +1,5 @@
 package com.wildbitsfoundry.etk4j.math.functions;
 
 public interface IntegrableFunction {
-	public double integrate(double x0, double x1);
+	public double integrate(double a, double b);
 }

@@ -3,6 +3,8 @@ package com.wildbitsfoundry.etk4j.math.polynomials;
 import java.util.Arrays;
 
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
+import com.wildbitsfoundry.etk4j.math.functions.DifferentiableFunction;
+import com.wildbitsfoundry.etk4j.math.functions.IntegrableFunction;
 import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.EigenvalueDecomposition;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrices;
@@ -15,7 +17,7 @@ import com.wildbitsfoundry.etk4j.util.ArrayUtils;
  * @version
  *
  */
-public class Polynomial implements UnivariateFunction {
+public class Polynomial implements UnivariateFunction, DifferentiableFunction, IntegrableFunction {
 
 	protected double[] _coefs = null;
 	protected Complex[] _roots = null;
@@ -414,6 +416,10 @@ public class Polynomial implements UnivariateFunction {
 		System.out.println(poly2);
 		System.out.println(poly3);
 		
+		Polynomial integral = poly.integral();
+		System.out.println(integral.toString());
+		System.out.println(poly.integrate(1, 4));
+		
 		System.out.println(Arrays.toString(poly.roots()));
 		System.out.println(Arrays.toString(poly2.roots()));
 		System.out.println(Arrays.toString(poly3.roots()));
@@ -422,5 +428,31 @@ public class Polynomial implements UnivariateFunction {
 		System.out.println(Arrays.toString(new Polynomial(new double[] {1, 2, 1}).roots()));
 		
 		System.out.println(Arrays.toString(new Polynomial(new double[] {8, 6, 7, 5, 3, 0, 9}).roots()));
+	}
+	
+	public Polynomial integral() {
+		return this.integral(0.0);
+	}
+	
+	public Polynomial integral(double constant) {
+		final int length = _coefs.length;
+		double[] integral = new double[length + 1];
+		for (int i = 0, j = length; i < length; ++i, --j) {
+			integral[i] = (_coefs[i] / j);
+		}
+		integral[length] = constant;
+		return new Polynomial(integral);
+	}
+
+	@Override
+	public double integrate(double a, double b) {
+		Polynomial integral = this.integral();
+		return integral.evaluateAt(b) - integral.evaluateAt(a);
+	}
+
+	@Override
+	public double differentiate(double x) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }
