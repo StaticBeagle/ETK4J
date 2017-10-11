@@ -1,7 +1,5 @@
 package com.wildbitsfoundry.etk4j.math.interpolation;
 
-import com.wildbitsfoundry.etk4j.util.ArrayUtils;
-
 public class CubicSpline extends Spline {
 
 	private double[] _coefs = null;
