@@ -66,5 +66,9 @@ public class ArrayUtilsTest {
 		assertEquals(2.0, ArrayUtils.normInf(c), 1e-12);
 	}
 	
-	
+	@Test
+	public void testConcat() {		
+		double[] concat = new double[] { -1.0, -0.5, 0.0, 0.5, 1.0, -2.0, 1.0, -0.5, 0.0, 1.5 };
+		assertArrayEquals(concat, ArrayUtils.concat(a, c), 1e-12);
+	}
 }

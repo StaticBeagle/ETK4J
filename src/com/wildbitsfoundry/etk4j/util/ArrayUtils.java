@@ -1,5 +1,7 @@
 package com.wildbitsfoundry.etk4j.util;
 
+import java.util.Arrays;
+
 public final class ArrayUtils {
 	
 //	 /**
@@ -169,5 +171,28 @@ public final class ArrayUtils {
 			}
 		}
 		return c;
+	}
+	
+	public static double[] concat(double[] a, double[] b) {
+		int aLength = a.length;
+		int bLength = b.length;
+		double[] result = new double[aLength + bLength];
+		System.arraycopy(a, 0, result, 0, aLength);
+		System.arraycopy(b, 0, result, aLength, bLength);
+		return result;
+	}
+
+	public static double[] concatAll(double[] a, double[]... rest) {
+		int totalLength = a.length;
+		for (double[] array : rest) {
+			totalLength += array.length;
+		}
+		double[] result = Arrays.copyOf(a, totalLength);
+		int offset = a.length;
+		for (double[] array : rest) {
+			System.arraycopy(array, 0, result, offset, array.length);
+			offset += array.length;
+		}
+		return result;
 	}
 }
