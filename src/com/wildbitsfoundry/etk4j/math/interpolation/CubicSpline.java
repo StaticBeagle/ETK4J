@@ -217,17 +217,18 @@ public class CubicSpline extends Spline {
 		sb.setLength(Math.max(sb.length() - System.lineSeparator().length(), 0));
 		return sb.toString().replace("+ -", "- ").replace("- -", "+ ");
 	}
-	
-	public static void main(String[] args) {
-		double[] x = new double[] {1,2,3,4};
-		double[] y = new double[] {5,6,7,8};
-		CubicSpline cs = newNotAKnotSpline(x, y);
-		
-		double[] xi = ArrayUtils.linsteps(1.0, 4.0, 0.1);
-		for(double xii : xi) {
-			System.out.printf("y(%.4f) = %.4f%n", xii, cs.evaluateAt(xii));
-		}
-	}
+
+	// move to examples
+//	public static void main(String[] args) {
+//		double[] x = new double[] {1,2,3,4};
+//		double[] y = new double[] {5,6,7,8};
+//		CubicSpline cs = newNotAKnotSpline(x, y);
+//		
+//		double[] xi = ArrayUtils.linsteps(1.0, 4.0, 0.1);
+//		for(double xii : xi) {
+//			System.out.printf("y(%.4f) = %.4f%n", xii, cs.evaluateAt(xii));
+//		}
+//	}
 
 	private static void tridiagonalLDLTSolve(double[] D, double[] L, double[] b, int length, int offset) {
 		int n = length;
