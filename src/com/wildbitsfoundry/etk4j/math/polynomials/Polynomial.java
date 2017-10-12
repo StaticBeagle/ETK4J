@@ -367,6 +367,24 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 		return substituteOp(this, p);
 	}
 	
+	
+	// This should return a rational function?
+	// need to implement rational function class?
+	// I think this justs needs to be well documented
+	public Polynomial substitute(Polynomial num, Polynomial den) {
+		final int deg = this.degree();
+		Polynomial result = num.pow(deg);
+		result.multiplyEquals(this._coefs[0]);
+		Polynomial tmp = null;
+		for(int i = deg - 1, j = 1; i >= 0; --i, ++j) {
+			tmp = num.pow(i);
+			tmp.multiplyEquals(den.pow(j));
+			tmp.multiplyEquals(this._coefs[j]);
+			result.addEquals(tmp);
+		}
+		return result;
+	}
+	
 	private static Polynomial substituteOp(Polynomial src, Polynomial sub) {
 		final int deg = src.degree();
 		Polynomial result = sub.pow(deg);

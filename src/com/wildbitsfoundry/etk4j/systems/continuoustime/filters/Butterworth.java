@@ -7,7 +7,7 @@ import com.wildbitsfoundry.etk4j.util.ArrayUtils;
 
 public class Butterworth extends AnalogFilter {
 
-	private TransferFunction _hs = null;
+	private TransferFunction _tf = null;
 	private int _order;
 	private double _eps;
 
@@ -52,7 +52,7 @@ public class Butterworth extends AnalogFilter {
 				poles[i++] = new Complex(-Math.cos(phik * pid), Math.sin(phik * pid));
 			}
 		}
-		_hs = new TransferFunction(new Complex[0], poles);
+		_tf = new TransferFunction(new Complex[0], poles);
 		_order = n;
 	}
 
@@ -60,7 +60,7 @@ public class Butterworth extends AnalogFilter {
 		final int n = getMinOrderRequired(wp, ws, ap, as);
 		Butterworth lp = new Butterworth(n, ap);
 		double factor = Math.pow(lp._eps, -1.0 / n) * wp;
-		lp._hs.scale(1.0 / factor);
+		lp._tf.scale(1.0 / factor);
 		return lp;
 	}
 
@@ -72,8 +72,8 @@ public class Butterworth extends AnalogFilter {
 		final int n = getMinOrderRequired(ws, wp, ap, as);
 		Butterworth hp = new Butterworth(n, ap);
 		double factor = wp / Math.pow(hp._eps, -1.0 / n);
-		hp._hs.scale(factor);
-		hp._hs = lpTohp(hp._hs.getNumerator(), hp._hs.getDenominator());
+		hp._tf.scale(factor);
+		hp._tf = lpTohp(hp._tf.getNumerator(), hp._tf.getDenominator());
 		return hp;
 	}
 
@@ -93,23 +93,30 @@ public class Butterworth extends AnalogFilter {
 		final int n2 = getMinOrderRequired(1, omega2, ap, as2);
 
 		final int n = Math.max(n1, n2);
-		Butterworth hp = new Butterworth(n, ap);
-		double bw = Q * Math.pow(hp._eps, -1.0 / n) / w0;
-		hp._hs.scale(bw);
-		hp._hs = lpTobp(hp._hs.getNumerator(), hp._hs.getDenominator(), w0, bw);
-		return hp;
+		Butterworth bp = new Butterworth(n, ap);
+		double bw = Q / Math.pow(bp._eps, -1.0 / n) / w0;
+		bp._tf.scale(bw);
+		bp._tf = lpTobp(bp._tf.getNumerator(), bp._tf.getDenominator(), w0, bw);
+		bp._order <<= 1;
+		return bp;
 	}
 
 	public static TransferFunction lpTobp(Polynomial numerator, Polynomial denominator, double w0, double bw) {
-		Polynomial bpNumerator = numerator.substitute(new Polynomial(1, 0, w0 * w0));
-		Polynomial bpDenominator = denominator.substitute(new Polynomial(1, 0, w0 * w0));
+		Polynomial s = new Polynomial(1, 0);
+		Polynomial s2w2 = new Polynomial(1, 0, w0 * w0);
+		
+		Polynomial bpNumerator = numerator.substitute(s2w2, s);
+		Polynomial bpDenominator = denominator.substitute(s2w2, s);
+		
+		bpNumerator.multiplyEquals(s.pow(denominator.degree()));
+		bpDenominator.multiplyEquals(s.pow(numerator.degree()));
 
 		return new TransferFunction(bpNumerator, bpDenominator);
 	}
 
 	public static Butterworth newHighPass(int n, double ap) {
 		Butterworth hp = newLowPass(n, ap);
-		hp._hs = lpTohp(hp._hs.getNumerator(), hp._hs.getDenominator());
+		hp._tf = lpTohp(hp._tf.getNumerator(), hp._tf.getDenominator());
 		return hp;
 	}
 
@@ -156,8 +163,8 @@ public class Butterworth extends AnalogFilter {
 
 		Butterworth highpass = Butterworth.newHighPass(10 * 2 * Math.PI, 1 * 2 * Math.PI, 0.2, 60);
 
-		Butterworth bandpass = newBandPass(190e6 * 2 * Math.PI, 210e6 * 2 * Math.PI, 180e6 * 2 * Math.PI,
-				220e6 * 2 * Math.PI, 0.2, 20, 20);
+		Butterworth bandpass = newBandPass(190 * 2 * Math.PI, 210 * 2 * Math.PI, 180 * 2 * Math.PI,
+				220 * 2 * Math.PI, 0.2, 20, 20);
 
 		Polynomial f = new Polynomial(new double[] { 1, 1 });
 		System.out.println(f.pow(2));
@@ -165,7 +172,8 @@ public class Butterworth extends AnalogFilter {
 		System.out.println(f.substitute(new Polynomial(new double[] { 1, 1 })));
 		System.out.println();
 
-		System.out.printf("Low pass: %n%s%n%n", lowpass._hs.toString());
-		System.out.printf("High pass: %n%s%n", highpass._hs.toString());
+		System.out.printf("Low pass: %n%s%n%n", lowpass._tf.toString());
+		System.out.printf("High pass: %n%s%n%n", highpass._tf.toString());
+		System.out.printf("Band pass: %n%s%n", bandpass._tf.toString());
 	}
 }
