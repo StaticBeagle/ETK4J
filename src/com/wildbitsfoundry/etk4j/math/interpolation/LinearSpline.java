@@ -1,5 +1,7 @@
 package com.wildbitsfoundry.etk4j.math.interpolation;
 
+import java.util.Arrays;
+
 public class LinearSpline extends Spline {
 	
 
@@ -22,9 +24,13 @@ public class LinearSpline extends Spline {
 	}
 	
 	public static LinearSpline newLinearSpline(double[] x, double[] y) {
+		return newLinearSplineInPlace(Arrays.copyOf(x, x.length), y);
+	}
+	
+	public static LinearSpline newLinearSplineInPlace(double[] x, double[] y) {
 		checkXYDimensions(x, y);
 		checkMinkXLength(x, 2);
-		return new LinearSpline(x, y);
+		return new LinearSpline(Arrays.copyOf(x, x.length), y);
 	}
 	
 	@Override
@@ -39,9 +45,9 @@ public class LinearSpline extends Spline {
 
 	
 	@Override
-	protected double evaluateAntiDerivativeAt(int index, double t) {
-		index = index << 1;
-		return t * (_coefs[index + 1] + t * _coefs[index] * 0.5);
+	protected double evaluateAntiDerivativeAt(int i, double t) {
+		i = i << 1;
+		return t * (_coefs[i + 1] + t * _coefs[i] * 0.5);
 	}
 
 	@Override
@@ -61,9 +67,17 @@ public class LinearSpline extends Spline {
 		double[] y = new double[] {1, 4, 9, 16};
 		
 		LinearSpline ls = newLinearSpline(x, y);
+		CubicSpline cs = CubicSpline.newNotAKnotSpline(x, y);
+		NearestNeighbor nh = NearestNeighbor.newNearestNeighbor(x, y);
 		
 		System.out.println(ls.evaluateAt(4));
 		
 		System.out.println(ls.integrate(1, 4));
+		
+		System.out.println(cs.evaluateAt(4));
+		
+		System.out.println(cs.integrate(1, 4));
+		
+		System.out.println(nh.evaluateAt(1.6));
 	}
 }

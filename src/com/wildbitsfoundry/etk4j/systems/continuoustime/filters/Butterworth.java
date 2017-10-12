@@ -6,43 +6,48 @@ import com.wildbitsfoundry.etk4j.systems.continuoustime.TransferFunction;
 import com.wildbitsfoundry.etk4j.util.ArrayUtils;
 
 public class Butterworth extends AnalogFilter {
-	
+
 	private TransferFunction _hs = null;
 	private int _order;
 	private double _eps;
-	
+
 	/***
 	 * Calculate the minimum order required for Low-Pass Butterworth filter
-	 * @param wp passband frequency
-	 * @param ws stopband frequency
-	 * @param Ap passband attenuation
-	 * @param As stopband attenuation
+	 * 
+	 * @param wp
+	 *            passband frequency
+	 * @param ws
+	 *            stopband frequency
+	 * @param Ap
+	 *            passband attenuation
+	 * @param As
+	 *            stopband attenuation
 	 * @return
 	 */
 	public static int getMinOrderRequired(double wp, double ws, double ap, double as) {
 		double amax = Math.pow(10, ap * 0.1) - 1;
 		double amin = Math.pow(10, as * 0.1) - 1;
-		
+
 		double L = Math.log10(amin / amax) / (2 * Math.log10(ws / wp));
-		
-		return (int)Math.ceil(L);
-		
+
+		return (int) Math.ceil(L);
+
 	}
-	
+
 	private Butterworth(int n, double ap) {
 		_eps = Math.sqrt(Math.pow(10, ap * 0.1) - 1);
-		
+
 		final double pid = Math.PI / 180.0;
 		Complex[] poles = new Complex[n];
-		if(n % 2 == 0) {
+		if (n % 2 == 0) {
 			int i = 0;
-			for(double k : ArrayUtils.linsteps(-n * 0.5 + 1.0, n * 0.5, 1)) {
+			for (double k : ArrayUtils.linsteps(-n * 0.5 + 1.0, n * 0.5, 1)) {
 				double phik = 180.0 * (k / n) - 90.0 / n;
 				poles[i++] = new Complex(-Math.cos(phik * pid), Math.sin(phik * pid));
 			}
 		} else {
 			int i = 0;
-			for(double k : ArrayUtils.linsteps(-(n - 1) * 0.5, (n - 1) * 0.5, 1)) {
+			for (double k : ArrayUtils.linsteps(-(n - 1) * 0.5, (n - 1) * 0.5, 1)) {
 				double phik = 180.0 * (k / n);
 				poles[i++] = new Complex(-Math.cos(phik * pid), Math.sin(phik * pid));
 			}
@@ -50,7 +55,7 @@ public class Butterworth extends AnalogFilter {
 		_hs = new TransferFunction(new Complex[0], poles);
 		_order = n;
 	}
-	
+
 	public static Butterworth newLowPass(double wp, double ws, double ap, double as) {
 		final int n = getMinOrderRequired(wp, ws, ap, as);
 		Butterworth lp = new Butterworth(n, ap);
@@ -58,11 +63,11 @@ public class Butterworth extends AnalogFilter {
 		lp._hs.scale(1.0 / factor);
 		return lp;
 	}
-	
+
 	public static Butterworth newLowPass(int n, double ap) {
 		return new Butterworth(n, ap);
 	}
-	
+
 	public static Butterworth newHighPass(double wp, double ws, double ap, double as) {
 		final int n = getMinOrderRequired(ws, wp, ap, as);
 		Butterworth hp = new Butterworth(n, ap);
@@ -71,63 +76,95 @@ public class Butterworth extends AnalogFilter {
 		hp._hs = lpTohp(hp._hs.getNumerator(), hp._hs.getDenominator());
 		return hp;
 	}
-	
-	
+
+	public static Butterworth newBandPass(double wp1, double wp2, double ws1, double ws2, double ap, double as1,
+			double as2) {
+
+		double w0 = Math.sqrt(wp1 * wp2);
+		double Q = w0 / (wp2 - wp1);
+
+		double whs1 = ws1 / w0;
+		double whs2 = ws2 / w0;
+
+		double omega1 = Q * Math.abs((whs1 * whs1 - 1) / whs1);
+		double omega2 = Q * Math.abs((whs2 * whs2 - 1) / whs2);
+
+		final int n1 = getMinOrderRequired(1, omega1, ap, as1);
+		final int n2 = getMinOrderRequired(1, omega2, ap, as2);
+
+		final int n = Math.max(n1, n2);
+		Butterworth hp = new Butterworth(n, ap);
+		double bw = Q * Math.pow(hp._eps, -1.0 / n) / w0;
+		hp._hs.scale(bw);
+		hp._hs = lpTobp(hp._hs.getNumerator(), hp._hs.getDenominator(), w0, bw);
+		return hp;
+	}
+
+	public static TransferFunction lpTobp(Polynomial numerator, Polynomial denominator, double w0, double bw) {
+		Polynomial bpNumerator = numerator.substitute(new Polynomial(1, 0, w0 * w0));
+		Polynomial bpDenominator = denominator.substitute(new Polynomial(1, 0, w0 * w0));
+
+		return new TransferFunction(bpNumerator, bpDenominator);
+	}
+
 	public static Butterworth newHighPass(int n, double ap) {
 		Butterworth hp = newLowPass(n, ap);
 		hp._hs = lpTohp(hp._hs.getNumerator(), hp._hs.getDenominator());
 		return hp;
 	}
-	
+
 	public static TransferFunction lpTohp(Polynomial numerator, Polynomial denominator) {
 		return lpTohp(numerator.getCoefficients(), denominator.getCoefficients());
 	}
-	
+
 	public static TransferFunction lpTohp(double[] numerator, double[] denominator) {
 		final int numDegree = numerator.length - 1;
 		final int denDegree = denominator.length - 1;
 		final int filterOrder = numDegree + denDegree + 1;
-		
-		// Reverse coefficients then scale them by the 
+
+		// Reverse coefficients then scale them by the
 		// order of the denominator i.e. pad with zeros
 		double[] hpNumerator = new double[filterOrder];
-		for(int i = numDegree, j = 0; i >= 0; --i, ++j) {
+		for (int i = numDegree, j = 0; i >= 0; --i, ++j) {
 			hpNumerator[j] = numerator[i];
 		}
-		
-		// Reverse coefficients then scale them by the 
+
+		// Reverse coefficients then scale them by the
 		// order of the numerator i.e. pad with zeros
 		double[] hpDenominator = new double[filterOrder];
-		for(int i = denDegree, j = 0; i >= 0; --i, ++j) {
+		for (int i = denDegree, j = 0; i >= 0; --i, ++j) {
 			hpDenominator[j] = denominator[i];
 		}
-		
+
 		return new TransferFunction(hpNumerator, hpDenominator);
 	}
-	
+
 	public double getEpsilon() {
 		return _eps;
 	}
-	
+
 	public int getOrder() {
 		return _order;
 	}
-	
-//	public TransferFunction getTF() {
-//		return _hs;
-//	}
-	
+
+	// public TransferFunction getTF() {
+	// return _hs;
+	// }
+
 	public static void main(String[] args) {
 		Butterworth lowpass = Butterworth.newLowPass(1 * 2 * Math.PI, 10 * 2 * Math.PI, 0.2, 60);
-		
+
 		Butterworth highpass = Butterworth.newHighPass(10 * 2 * Math.PI, 1 * 2 * Math.PI, 0.2, 60);
-		
-		Polynomial f = new Polynomial(new double[] {1, 1});
+
+		Butterworth bandpass = newBandPass(190e6 * 2 * Math.PI, 210e6 * 2 * Math.PI, 180e6 * 2 * Math.PI,
+				220e6 * 2 * Math.PI, 0.2, 20, 20);
+
+		Polynomial f = new Polynomial(new double[] { 1, 1 });
 		System.out.println(f.pow(2));
 		System.out.println(f.pow(3));
-		System.out.println(f.substitute(new Polynomial(new double[] {1, 1})));
+		System.out.println(f.substitute(new Polynomial(new double[] { 1, 1 })));
 		System.out.println();
-		
+
 		System.out.printf("Low pass: %n%s%n%n", lowpass._hs.toString());
 		System.out.printf("High pass: %n%s%n", highpass._hs.toString());
 	}

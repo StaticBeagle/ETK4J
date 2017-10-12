@@ -8,54 +8,57 @@ public abstract class Spline extends PiecewiseFunction implements Differentiable
 
 	private double[] _indefiniteIntegral = null;
 	protected double[] _coefs = null;
-	
+
 	protected Spline(double[] x, double y0, double yn) {
 		super(x, y0, yn);
 	}
-	
-	protected abstract double evaluateAntiDerivativeAt(int index, double t);
-	
+
+	protected abstract double evaluateAntiDerivativeAt(int i, double t);
+
 	public abstract int getOrder();
-	
+
 	@Override
 	public double integrate(double a, double b) {
+		if (a < _x[0] || b > _x[_x.length - 1]) {
+			throw new IllegalArgumentException(
+					String.format("The spline is not defined outside of [%.4f, %.4f]", _x[0], _x[_x.length - 1]));
+		}
 		return integrate(b) - integrate(a);
 	}
-	
+
 	private double integrate(double x) {
 		// Lazy creating of values
-		if(_indefiniteIntegral == null) {
+		if (_indefiniteIntegral == null) {
 			this.calcuateIntegral();
 		}
-		
+
 		int i = this.findIndex(x);
 		double t = x - _x[i];
 		return _indefiniteIntegral[i] + this.evaluateAntiDerivativeAt(i, t);
 	}
-	
-	
+
 	private void calcuateIntegral() {
 		// Lazy creating the values
-		if(_indefiniteIntegral != null) {
+		if (_indefiniteIntegral != null) {
 			return;
 		}
-		
+
 		final int size = _coefs.length / (this.getOrder() + 1);
 		_indefiniteIntegral = new double[size];
-		for(int i = 0; i < size - 1; ++i) {
-			double t = _x[i + 1] -_x[i];
+		for (int i = 0; i < size - 1; ++i) {
+			double t = _x[i + 1] - _x[i];
 			_indefiniteIntegral[i + 1] = _indefiniteIntegral[i] + this.evaluateAntiDerivativeAt(i, t);
 		}
 	}
 
 	protected static void checkXYDimensions(double[] x, double[] y) {
-		if(x.length != y.length) {
+		if (x.length != y.length) {
 			throw new IllegalArgumentException("x and y dimensions must be the same");
 		}
 	}
-	
+
 	protected static void checkMinkXLength(double[] x, int size) {
-		if(x.length < size) {
+		if (x.length < size) {
 			throw new IllegalArgumentException(String.format("x length must be >= %d", size));
 		}
 	}

@@ -1,5 +1,7 @@
 package com.wildbitsfoundry.etk4j.math.interpolation;
 
+import java.util.Arrays;
+
 public class CardinalSpline extends Spline {
 
 	private CardinalSpline(double[] x, double[] y, double[] dydx) {
@@ -7,7 +9,7 @@ public class CardinalSpline extends Spline {
 		final int n = _x.length;
 		_coefs = new double[(n - 1) * 4]; // 4 coefficients and n - 1 segments
 		for (int i = 0, j = 0, k = 0; i < n - 1; ++i, ++j, ++k) {
-//			double hx = x[i + 1] - x[i];
+			// double hx = x[i + 1] - x[i];
 			double m0 = dydx[k];
 			double m1 = dydx[++k];
 			double a = (2 * y[i] + m0 - 2 * y[i + 1] + m1);
@@ -22,7 +24,12 @@ public class CardinalSpline extends Spline {
 	}
 
 	public static CardinalSpline newCardinalSpline(double[] x, double[] y, double tau, double alpha) {
+		return newCardinalSplineInPlace(Arrays.copyOf(x, x.length), y, tau, alpha);
+	}
+	
+	public static CardinalSpline newCardinalSplineInPlace(double[] x, double[] y, double tau, double alpha) {
 		checkXYDimensions(x, y);
+		checkMinkXLength(x, 4);
 		final int n = x.length;
 		double[] d = new double[n + 2];
 		double cp = 1 - tau;
@@ -92,8 +99,9 @@ public class CardinalSpline extends Spline {
 		return new CardinalSpline(x, y, d);
 	}
 	
+
 	public static CardinalSpline newCatmullRomSpline(double[] x, double[] y) {
-		return newCentripetalCatmullRomSpline(x, y);
+		return newUniformCatmullRomSpline(x, y);
 	}
 
 	public static CardinalSpline newCentripetalCatmullRomSpline(double[] x, double[] y) {
@@ -142,15 +150,12 @@ public class CardinalSpline extends Spline {
 		throw new RuntimeException("Method not implemented yet");
 	}
 
-	@Override
-	public double integrate(double x0, double x1) {
-		throw new RuntimeException("Method not implemented yet");
-	}
+	private final double a = 1.0 / 2.0, b = 1.0 / 3.0, c = 1.0 / 4.0;
 
 	@Override
-	protected double evaluateAntiDerivativeAt(int index, double t) {
-		// TODO Auto-generated method stub
-		return 0;
+	protected double evaluateAntiDerivativeAt(int i, double t) {
+		i = i << 2;
+		return t * (_coefs[i + 3] + t * (_coefs[i + 2] * a + t * (_coefs[i + 1] * b + t * _coefs[i] * c)));
 	}
 
 	@Override

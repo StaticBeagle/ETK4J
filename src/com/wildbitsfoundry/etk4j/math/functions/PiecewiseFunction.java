@@ -51,22 +51,22 @@ public abstract class PiecewiseFunction implements UnivariateFunction {
 	
 	//public abstract <T extends UnivariateFunction> T getSegment(int index); 
 
-	protected abstract double getValueAt(int index, double x);
+	protected abstract double getValueAt(int i, double x);
 	
-	protected double extrapolate(int index, double x) {
+	protected double extrapolate(int i, double x) {
 		switch (_extrapolationMethod) {
 		case ClampToZero:
 			return 0.0;
 		case ClampToNaN:
 			return Double.NaN;
 		case ClampToEndPoint:
-			return index == 0 ? _y0 : _yn;
+			return i == 0 ? _y0 : _yn;
 		case Natural:
-			return this.getValueAt(index, x);
+			return this.getValueAt(i, x);
 		case Linear:
 			int n = _x.length;
 			double xi = _x[0], yi = _y0, di = _d0;
-			if (index != 0) {
+			if (i != 0) {
 				xi = _x[n - 1];
 				yi = _yn;
 				di =_dn;
@@ -80,7 +80,7 @@ public abstract class PiecewiseFunction implements UnivariateFunction {
 			return this.evaluateAt(xp);
 		default:
 			// x is smaller than the smaller value in the sequence
-			if (index == 0) {
+			if (i == 0) {
 				throw new ArrayIndexOutOfBoundsException(
 						String.format("x = %.4f is smaller than every number in x[]", x));
 			}
