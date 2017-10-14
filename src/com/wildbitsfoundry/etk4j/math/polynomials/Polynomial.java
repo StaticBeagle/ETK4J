@@ -76,7 +76,7 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 		Complex[] tmp = new Complex[size];
 		Complex[] result = new Complex[size + 1];
 
-		for(int i = 1; i <= size; ++i) {
+		for (int i = 1; i <= size; ++i) {
 			result[i] = new Complex();
 		}
 		result[0] = new Complex(1.0, 0.0);
@@ -161,46 +161,44 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 	}
 
 	public Polynomial add(final Polynomial p) {
-		double[] result = new double[Math.max(_coefs.length, p._coefs.length)];
-		addOp(this, p, result);
+		double[] result = addOp(this, p);
 		return new Polynomial(result);
 	}
 
 	public void addEquals(final Polynomial p) {
-		addOp(this, p, _coefs);
+		_coefs = addOp(this, p);
 		_roots = null;
 	}
 
-	private static final void addOp(Polynomial p1, Polynomial p2, double[] result) {
-		final int p1Length = p1._coefs.length - 1;
-		final int p2Length = p2._coefs.length - 1;
-		final int rLength = result.length - 1;
-		for(int i = p1Length, j = p2Length, k = rLength; i >= 0 && j >= 0; --i, --j, --k) {
+	private static final double[] addOp(Polynomial p1, Polynomial p2) {
+		final int p1Length = p1._coefs.length;
+		final int p2Length = p2._coefs.length;
+		double[] result = p1Length > p2Length ? Arrays.copyOf(p1._coefs, p1Length) : Arrays.copyOf(p2._coefs, p2Length);
+		for (int i = p1Length - 1, j = p2Length - 1, k = result.length - 1; i >= 0 && j >= 0; --i, --j, --k) {
 			result[k] = p1._coefs[i] + p2._coefs[j];
 		}
+		return result;
 	}
-
 
 	public Polynomial subtract(final Polynomial p) {
-		double[] result = new double[Math.max(_coefs.length, p._coefs.length)];
-		subtractOp(this, p, result);
+		double[] result = subtractOp(this, p);
 		return new Polynomial(result);
 	}
-	
+
 	public void subtractEquals(final Polynomial p) {
-		subtractOp(this, p, _coefs);
+		_coefs = subtractOp(this, p);
 		_roots = null;
 	}
-	
-	private static final void subtractOp(Polynomial p1, Polynomial p2, double[] result) {
-		final int p1Length = p1._coefs.length - 1;
-		final int p2Length = p2._coefs.length - 1;
-		final int rLength = result.length - 1;
-		for(int i = p1Length, j = p2Length, k = rLength; i >= 0 && j >= 0; --i, --j, --k) {
+
+	private static final double[] subtractOp(Polynomial p1, Polynomial p2) {
+		final int p1Length = p1._coefs.length;
+		final int p2Length = p2._coefs.length;
+		double[] result = p1Length > p2Length ? Arrays.copyOf(p1._coefs, p1Length) : Arrays.copyOf(p2._coefs, p2Length);
+		for (int i = p1Length - 1, j = p2Length - 1, k = result.length - 1; i >= 0 && j >= 0; --i, --j, --k) {
 			result[k] = p1._coefs[i] - p2._coefs[j];
 		}
+		return result;
 	}
-
 
 	/***
 	 * 
@@ -242,6 +240,7 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 
 	/***
 	 * Get polynomial coefficients
+	 * 
 	 * @return Array containing the coefficients in descending order
 	 */
 	public double[] getCoefficients() {
@@ -268,18 +267,22 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 		// Horner's method
 		double[] result = new double[x.length];
 		for (int i = 0; i < x.length; i++) {
-			for (double coefficient : this._coefs) {
-				result[i] = result[i] * x[i] + coefficient;
-			}
+			result[i] = this.evaluateAt(x[i]);
 		}
 		return result;
 	}
-	
-	/***		
+
+	public void reverseInPlace() {
+		_coefs = ArrayUtils.reverse(_coefs);
+	}
+
+	/***
 	 * Evaluates the polynomial at real + j * imag using Horner's method
 	 * 
-	 * @param real part of the complex number
-	 * @param imaginary part of the complex number
+	 * @param real
+	 *            part of the complex number
+	 * @param imaginary
+	 *            part of the complex number
 	 * @return The value of the polynomial at real + j * imag
 	 */
 	public Complex evaluateAt(double real, double imag) {
@@ -321,93 +324,75 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 			}
 		}
 		Complex[] result = new Complex[_roots.length];
-		for(int i = 0; i < _roots.length; ++i) {
+		for (int i = 0; i < _roots.length; ++i) {
 			result[i] = new Complex(_roots[i]);
 		}
 		return result;
 	}
-	
+
 	/***
 	 * Scales polynomial coefficients
+	 * 
 	 * @param d
 	 */
-	public void substituteEquals(double d) {
+	public void substituteInPlace(double d) {
 		final int deg = this.degree();
-		for(int i = 0; i < deg; ++i) {
-			for(int j = i; j < deg; ++j) {
+		for (int i = 0; i < deg; ++i) {
+			for (int j = i; j < deg; ++j) {
 				_coefs[i] *= d;
 			}
 		}
 		_roots = null;
 	}
-	
+
 	/***
 	 * Scales polynomial coefficients
+	 * 
 	 * @param d
 	 */
 	public Polynomial substitute(double d) {
 		final int deg = this.degree();
 		double[] result = Arrays.copyOf(_coefs, _coefs.length);
-		for(int i = 0; i < deg; ++i) {
-			for(int j = i; j < deg; ++j) {
+		for (int i = 0; i < deg; ++i) {
+			for (int j = i; j < deg; ++j) {
 				result[i] *= d;
 			}
 		}
 		return new Polynomial(result);
 	}
-	
-	public void substituteEquals(Polynomial p) {
+
+	public void substituteInPlace(Polynomial p) {
 		Polynomial result = substituteOp(this, p);
 		_coefs = result._coefs;
 		_roots = null;
 	}
 
-	
 	public Polynomial substitute(Polynomial p) {
 		return substituteOp(this, p);
 	}
-	
-	
-	// This should return a rational function?
-	// need to implement rational function class?
-	// I think this justs needs to be well documented
-	public Polynomial substitute(Polynomial num, Polynomial den) {
-		final int deg = this.degree();
-		Polynomial result = num.pow(deg);
-		result.multiplyEquals(this._coefs[0]);
-		Polynomial tmp = null;
-		for(int i = deg - 1, j = 1; i >= 0; --i, ++j) {
-			tmp = num.pow(i);
-			tmp.multiplyEquals(den.pow(j));
-			tmp.multiplyEquals(this._coefs[j]);
-			result.addEquals(tmp);
-		}
-		return result;
-	}
-	
+
 	private static Polynomial substituteOp(Polynomial src, Polynomial sub) {
 		final int deg = src.degree();
 		Polynomial result = sub.pow(deg);
 		result.multiplyEquals(src._coefs[0]);
 		Polynomial tmp = null;
-		for(int i = deg - 1, j = 1; i >= 0; --i, ++j) {
+		for (int i = deg - 1, j = 1; i >= 0; --i, ++j) {
 			tmp = sub.pow(i);
 			tmp.multiplyEquals(src._coefs[j]);
 			result.addEquals(tmp);
 		}
 		return result;
 	}
-	
-	
+
 	public Polynomial pow(int n) {
-		if(n < 0) {
+		if (n < 0) {
 			throw new IllegalArgumentException("Power must be >= 0");
 		}
-		if(n == 0) {
+		if (n == 0) {
 			return new Polynomial(new double[] { 1.0 });
 		}
 		double[] tmp = Arrays.copyOf(_coefs, _coefs.length);
-		while(--n > 0) {
+		while (--n > 0) {
 			tmp = ArrayUtils.conv(tmp, _coefs);
 		}
 		return new Polynomial(tmp);
@@ -433,25 +418,25 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 		System.out.println(poly);
 		System.out.println(poly2);
 		System.out.println(poly3);
-		
+
 		Polynomial integral = poly.integral();
 		System.out.println(integral.toString());
 		System.out.println(poly.integrate(1, 4));
-		
+
 		System.out.println(Arrays.toString(poly.roots()));
 		System.out.println(Arrays.toString(poly2.roots()));
 		System.out.println(Arrays.toString(poly3.roots()));
-		
-		System.out.println(Arrays.toString(new Polynomial(new double[] {1, 1, 1}).roots()));
-		System.out.println(Arrays.toString(new Polynomial(new double[] {1, 2, 1}).roots()));
-		
-		System.out.println(Arrays.toString(new Polynomial(new double[] {8, 6, 7, 5, 3, 0, 9}).roots()));
+
+		System.out.println(Arrays.toString(new Polynomial(new double[] { 1, 1, 1 }).roots()));
+		System.out.println(Arrays.toString(new Polynomial(new double[] { 1, 2, 1 }).roots()));
+
+		System.out.println(Arrays.toString(new Polynomial(new double[] { 8, 6, 7, 5, 3, 0, 9 }).roots()));
 	}
-	
+
 	public Polynomial integral() {
 		return this.integral(0.0);
 	}
-	
+
 	public Polynomial integral(double constant) {
 		final int length = _coefs.length;
 		double[] integral = new double[length + 1];
@@ -470,7 +455,6 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 
 	@Override
 	public double differentiate(double x) {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.derivative().evaluateAt(x);
 	}
 }

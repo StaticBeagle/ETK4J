@@ -195,4 +195,13 @@ public final class ArrayUtils {
 		}
 		return result;
 	}
+	
+	public static double[] reverse(double[] a) {
+		final int length = a.length;
+		double[] result = new double[a.length];
+		for(int i = length - 1, j = 0; i >= 0; --i, ++j) {
+			result[j] = a[i];
+		}
+		return result;
+	}
 }

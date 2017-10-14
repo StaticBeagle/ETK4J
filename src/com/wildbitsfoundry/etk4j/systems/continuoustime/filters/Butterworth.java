@@ -2,6 +2,7 @@ package com.wildbitsfoundry.etk4j.systems.continuoustime.filters;
 
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
+import com.wildbitsfoundry.etk4j.math.polynomials.RationalFunction;
 import com.wildbitsfoundry.etk4j.systems.continuoustime.TransferFunction;
 import com.wildbitsfoundry.etk4j.util.ArrayUtils;
 
@@ -60,7 +61,7 @@ public class Butterworth extends AnalogFilter {
 		final int n = getMinOrderRequired(wp, ws, ap, as);
 		Butterworth lp = new Butterworth(n, ap);
 		double factor = Math.pow(lp._eps, -1.0 / n) * wp;
-		lp._tf.scale(1.0 / factor);
+		lp._tf.substituteInPlace(1.0 / factor);
 		return lp;
 	}
 
@@ -72,7 +73,7 @@ public class Butterworth extends AnalogFilter {
 		final int n = getMinOrderRequired(ws, wp, ap, as);
 		Butterworth hp = new Butterworth(n, ap);
 		double factor = wp / Math.pow(hp._eps, -1.0 / n);
-		hp._tf.scale(factor);
+		hp._tf.substituteInPlace(factor);
 		hp._tf = lpTohp(hp._tf.getNumerator(), hp._tf.getDenominator());
 		return hp;
 	}
@@ -95,23 +96,20 @@ public class Butterworth extends AnalogFilter {
 		final int n = Math.max(n1, n2);
 		Butterworth bp = new Butterworth(n, ap);
 		double bw = Q / Math.pow(bp._eps, -1.0 / n) / w0;
-		bp._tf.scale(bw);
+		bp._tf.substituteInPlace(bw);
 		bp._tf = lpTobp(bp._tf.getNumerator(), bp._tf.getDenominator(), w0, bw);
 		bp._order <<= 1;
 		return bp;
 	}
 
-	public static TransferFunction lpTobp(Polynomial numerator, Polynomial denominator, double w0, double bw) {
+	public static TransferFunction lpTobp(Polynomial num, Polynomial den, double w0, double bw) {
 		Polynomial s = new Polynomial(1, 0);
-		Polynomial s2w2 = new Polynomial(1, 0, w0 * w0);
+		Polynomial s2w02 = new Polynomial(1, 0, w0 * w0);
 		
-		Polynomial bpNumerator = numerator.substitute(s2w2, s);
-		Polynomial bpDenominator = denominator.substitute(s2w2, s);
+		RationalFunction bp = new RationalFunction(num, den);
+		bp.substituteInPlace(new RationalFunction(s2w02, s));
 		
-		bpNumerator.multiplyEquals(s.pow(denominator.degree()));
-		bpDenominator.multiplyEquals(s.pow(numerator.degree()));
-
-		return new TransferFunction(bpNumerator, bpDenominator);
+		return new TransferFunction(bp);
 	}
 
 	public static Butterworth newHighPass(int n, double ap) {

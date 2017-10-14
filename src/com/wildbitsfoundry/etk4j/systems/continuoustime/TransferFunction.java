@@ -4,61 +4,61 @@ import java.util.Arrays;
 
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
+import com.wildbitsfoundry.etk4j.math.polynomials.RationalFunction;
 import com.wildbitsfoundry.etk4j.util.ArrayUtils;
 
 public class TransferFunction {
-	private Polynomial _numerator;
-	private Polynomial _denominator;
+	private RationalFunction _rf;
 
 	private static final double radToDeg = 57.295779513082320;
 	//private static final double rad2Hz = 6.283185307179586;
 
 	public TransferFunction(Complex[] zeros, Complex[] poles) {
-		this._numerator = new Polynomial(zeros);
-		this._denominator = new Polynomial(poles);
+		_rf = new RationalFunction(zeros, poles);
 	}
 	
 	public TransferFunction(double gain, Complex[] poles) {
-		this._numerator = new Polynomial(new double[] { gain });
-		this._denominator = new Polynomial(poles);
+		Polynomial num = new Polynomial(new double[] { gain });
+		Polynomial den = new Polynomial(poles);
+		
+		_rf = new RationalFunction(num, den);
 	}
 
 	public TransferFunction(TransferFunction tf) {
-		this._numerator = new Polynomial(tf._numerator);
-		this._denominator = new Polynomial(tf._denominator);
+		_rf = new RationalFunction(tf._rf);
 	}
 
 	public TransferFunction(Polynomial numerator, Polynomial denominator) {
-		this._numerator = new Polynomial(numerator);
-		this._denominator = new Polynomial(denominator);
+		_rf = new RationalFunction(numerator, denominator);
 	}
 
 	public TransferFunction(double[] numerator, double[] denominator) {
-		this._numerator = new Polynomial(numerator);
-		this._denominator = new Polynomial(denominator);
+		_rf = new RationalFunction(numerator, denominator);
+	}
+	
+	public TransferFunction(RationalFunction rf) {
+		_rf = rf;
 	}
 
+
 	public Complex[] getZeros() {
-		return _numerator.roots();
+		return _rf.getZeros();
 	}
 
 	public Complex[] getPoles() {
-		return _denominator.roots();
+		return _rf.getPoles();
 	}
 
 	public Polynomial getNumerator() {
-		return _numerator;
+		return _rf.getNumerator();
 	}
 
 	public Polynomial getDenominator() {
-		return _denominator;
+		return _rf.getDenominator();
 	}
 
 	public double getMagnitudeAt(double f) {
-		Complex resultNum = _numerator.evaluateAt(0.0, f);
-		Complex resultDen = _denominator.evaluateAt(0.0, f);
-		resultNum.divideEquals(resultDen);
-		return resultNum.abs();
+		return _rf.evaluateAt(0.0, f).abs();
 	}
 
 	public double[] getMagnitudeAt(final double[] f) {
@@ -71,10 +71,7 @@ public class TransferFunction {
 	}
 
 	public double getPhaseAt(double f) {
-		Complex resultNum = _numerator.evaluateAt(0.0, f);
-		Complex resultDen = _denominator.evaluateAt(0.0, f);
-		resultNum.divideEquals(resultDen);
-		return resultNum.arg() * radToDeg;
+		return _rf.evaluateAt(0.0, f).arg() * radToDeg;
 	}
 	
 	public double[] getPhaseWrappedAt(double[] f) {
@@ -139,41 +136,32 @@ public class TransferFunction {
 	}
 
 	public TransferFunction add(final TransferFunction tf) {
-		Polynomial numeratorLeftSide = new Polynomial(_numerator.multiply(tf._denominator));
-		Polynomial numeratorRightSide = new Polynomial(_denominator.multiply(tf._numerator));
-		Polynomial denominator = _denominator.multiply(tf._denominator);
-
-		return new TransferFunction(numeratorLeftSide.add(numeratorRightSide), denominator);
+		return new TransferFunction(_rf.add(tf._rf));
 	}
 
-	public TransferFunction add(double scalar) {
-		return new TransferFunction(_numerator.add(_denominator.multiply(scalar)), _denominator);
+	public TransferFunction add(double d) {
+		return new TransferFunction(_rf.add(d));
 	}
 
-	public TransferFunction subtract(final TransferFunction tf) {
-		Polynomial numeratorLeftSide = new Polynomial(this._numerator.multiply(tf._denominator));
-		Polynomial numeratorRightSide = new Polynomial(this._denominator.multiply(tf._numerator));
-		Polynomial denominator = this._denominator.multiply(tf._denominator);
-
-		return new TransferFunction(numeratorLeftSide.subtract(numeratorRightSide), denominator);
+	public TransferFunction subtract(TransferFunction tf) {
+		return new TransferFunction(_rf.subtract(tf._rf));
 	}
 
-	public TransferFunction multiply(final TransferFunction tf) {
-		Polynomial numerator = this._numerator.multiply(tf._numerator);
-		Polynomial denominator = this._denominator.multiply(tf._denominator);
-		return new TransferFunction(numerator, denominator);
+	public TransferFunction multiply(TransferFunction tf) {
+		return new TransferFunction(_rf.multiply(tf._rf));
 	}
 
-	public TransferFunction multiply(double scalar) {
-		Polynomial numerator = this._numerator.multiply(scalar);
-		Polynomial denominator = this._denominator.multiply(1.0);
-		return new TransferFunction(numerator, denominator);
+	public TransferFunction multiply(double d) {
+		return new TransferFunction(_rf.multiply(d));
 	}
 
 	@Override
 	public String toString() {
-		int lengthNumerator = this._numerator.toString().length();
-		int lengthDenominator = this._denominator.toString().length();
+		Polynomial numerator = _rf.getNumerator();
+		Polynomial denominator = _rf.getDenominator();
+		
+		int lengthNumerator = numerator.toString().length();
+		int lengthDenominator = denominator.toString().length();
 		java.lang.StringBuilder sb = new java.lang.StringBuilder();
 		char[] divider = new char[Math.max(lengthNumerator, lengthDenominator) + 2];
 		Arrays.fill(divider, '-');
@@ -182,19 +170,19 @@ public class TransferFunction {
 				.floor((divider.length - Math.min(lengthNumerator, lengthDenominator)) * 0.5)];
 		Arrays.fill(padding, ' ');
 		if (lengthNumerator > lengthDenominator) {
-			sb.append(" ").append(this._numerator.toString()).append(System.getProperty("line.separator"))
+			sb.append(" ").append(numerator.toString()).append(System.getProperty("line.separator"))
 					.append(divider).append(System.getProperty("line.separator")).append(padding)
-					.append(this._denominator.toString());
+					.append(denominator.toString());
 			return sb.toString().replace('x', 's');
 		} else if (lengthNumerator < lengthDenominator) {
-			sb.append(padding).append(this._numerator.toString()).append(System.getProperty("line.separator"))
+			sb.append(padding).append(numerator.toString()).append(System.getProperty("line.separator"))
 					.append(divider).append(System.getProperty("line.separator")).append(" ")
-					.append(this._denominator.toString());
+					.append(denominator.toString());
 			return sb.toString().replace('x', 's');
 		} else {
-			sb.append(" ").append(this._numerator.toString()).append(System.getProperty("line.separator"))
+			sb.append(" ").append(numerator.toString()).append(System.getProperty("line.separator"))
 					.append(divider).append(System.getProperty("line.separator")).append(" ")
-					.append(this._denominator.toString());
+					.append(denominator.toString());
 			return sb.toString().replace('x', 's');
 		}
 	}
@@ -268,8 +256,8 @@ public class TransferFunction {
 
 	public double[] getAllGainCrossoverFrequencies() {
 
-		Polynomial magPolyNum = getPolynomialMagnitude(_numerator);
-		Polynomial magPolyDen = getPolynomialMagnitude(_denominator);
+		Polynomial magPolyNum = getPolynomialMagnitude(_rf.getNumerator());
+		Polynomial magPolyDen = getPolynomialMagnitude(_rf.getDenominator());
 
 		Complex[] solution = magPolyDen.subtract(magPolyNum).roots();
 		double[] wgc = new double[solution.length];
@@ -305,7 +293,7 @@ public class TransferFunction {
 	 * into account from this point on. We can also drop Num'(jw) * Den'(jw) since
 	 * it's there to zero out the real part of Num(jw) * Den'(jw) - Num'(jw) * Den'(jw), 
 	 * which can be also accomplished by setting the real part of Num(jw) * Den'(jw)
-	 * to zero. The proof is left to the reader.
+	 * to zero.
 	 * 
 	 * Let Nump(jw) = Num(jw) * Den'(jw) thus
 	 *     Nump(jw) = Real(Nump(jw)) + j * Imag(Nump(jw))
@@ -319,8 +307,8 @@ public class TransferFunction {
 	 *         frequencies
 	 */
 	public double[] getAllPhaseCrossoverFrequencies() {
-		Complex[] num = evalAtjw(_numerator.getCoefficients());
-		Complex[] conjDen = conj(evalAtjw(_denominator.getCoefficients()));
+		Complex[] num = evalAtjw(_rf.getNumerator().getCoefficients());
+		Complex[] conjDen = conj(evalAtjw(_rf.getDenominator().getCoefficients()));
 		
 		Complex[] conv = conv(num, conjDen);
 		double[] imag = new double[conv.length];
@@ -359,9 +347,8 @@ public class TransferFunction {
 		return new Margins(wcg, wcp, pm, gm);
 	}
 	
-	public void scale(double d) {
-		_numerator.substituteEquals(d);
-		_denominator.substituteEquals(d);
+	public void substituteInPlace(double d) {
+		_rf.substituteInPlace(d);
 	}
 
 	public static void main(String[] args) {
