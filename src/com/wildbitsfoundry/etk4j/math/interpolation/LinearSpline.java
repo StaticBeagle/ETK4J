@@ -6,7 +6,7 @@ public class LinearSpline extends Spline {
 	
 
 	protected LinearSpline(double[] x, double[] y) {
-		super(x, y[0], y[y.length - 1]);
+		super(x, 1, y[0], y[y.length - 1]);
 		
 		final int n = _x.length;
 		// compute coefficients
@@ -48,18 +48,6 @@ public class LinearSpline extends Spline {
 	protected double evaluateAntiDerivativeAt(int i, double t) {
 		i = i << 1;
 		return t * (_coefs[i + 1] + t * _coefs[i] * 0.5);
-	}
-
-	@Override
-	protected double getValueAt(int index, double x) {
-		double t = x - _x[index];
-		index <<= 1;
-		return t * _coefs[index] + _coefs[index + 1];
-	}
-	
-	@Override
-	public int getOrder() {
-		return 1;
 	}
 	
 	public static void main(String[] args) {

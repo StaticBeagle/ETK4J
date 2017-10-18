@@ -17,7 +17,7 @@ public class CubicSpline extends Spline {
 	}
 
 	private CubicSpline(double[] x, double[] y, double[] dydx) {
-		super(x, y[0], y[y.length - 1]);
+		super(x, 3, y[0], y[y.length - 1]);
 
 		final int n = _x.length;
 		// compute coefficients
@@ -197,13 +197,6 @@ public class CubicSpline extends Spline {
 	}
 
 	@Override
-	protected double getValueAt(int index, double x) {
-		double t = x - _x[index];
-		index <<= 2;
-		return _coefs[index + 3] + t * (_coefs[index + 2] + t * (_coefs[index + 1] + t * _coefs[index]));
-	}
-
-	@Override
 	public double differentiate(double x) {
 		throw new RuntimeException("Method not implemented yet");
 	}
@@ -282,12 +275,7 @@ public class CubicSpline extends Spline {
 
 	@Override
 	protected double evaluateAntiDerivativeAt(int i, double t) {
-		i = i << 2;
+		i <<= 2;
 		return t * (_coefs[i + 3] + t * (_coefs[i + 2] * a + t * (_coefs[i + 1] * b + t * _coefs[i] * c)));
-	}
-
-	@Override
-	public int getOrder() {
-		return 3;
 	}
 }

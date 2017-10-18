@@ -8,20 +8,36 @@ public abstract class Spline extends PiecewiseFunction implements Differentiable
 
 	private double[] _indefiniteIntegral = null;
 	protected double[] _coefs = null;
+	private final int _order;
 
-	protected Spline(double[] x, double y0, double yn) {
+	protected Spline(double[] x, int order, double y0, double yn) {
 		super(x, y0, yn);
+		_order = order + 1;
 	}
 
 	protected abstract double evaluateAntiDerivativeAt(int i, double t);
 
-	public abstract int getOrder();
+	public int getOrder() {
+		return _order - 1;
+	}
+	
+	@Override
+	protected double getValueAt(int i, double x) {
+		
+		double t = x - _x[i];
+		i *= _order;
+		double result = 0;
+		for (int j = 0; j < _order; ++j) {
+			result = result * t + _coefs[i++];
+		}
+		return result;
+	}
 
 	@Override
 	public double integrate(double a, double b) {
 		if (a < _x[0] || b > _x[_x.length - 1]) {
 			throw new IllegalArgumentException(
-					String.format("The spline is not defined outside of [%.4f, %.4f]", _x[0], _x[_x.length - 1]));
+					String.format("The spline is not defined outside of [%.4g, %.4g]", _x[0], _x[_x.length - 1]));
 		}
 		return integrate(b) - integrate(a);
 	}
@@ -43,7 +59,7 @@ public abstract class Spline extends PiecewiseFunction implements Differentiable
 			return;
 		}
 
-		final int size = _coefs.length / (this.getOrder() + 1);
+		final int size = _coefs.length / _order;
 		_indefiniteIntegral = new double[size];
 		for (int i = 0; i < size - 1; ++i) {
 			double t = _x[i + 1] - _x[i];

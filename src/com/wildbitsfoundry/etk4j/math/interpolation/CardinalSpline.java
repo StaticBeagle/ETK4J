@@ -5,16 +5,16 @@ import java.util.Arrays;
 public class CardinalSpline extends Spline {
 
 	private CardinalSpline(double[] x, double[] y, double[] dydx) {
-		super(x, y[0], y[y.length - 1]);
+		super(x, 3, y[0], y[y.length - 1]);
 		final int n = _x.length;
 		_coefs = new double[(n - 1) * 4]; // 4 coefficients and n - 1 segments
 		for (int i = 0, j = 0, k = 0; i < n - 1; ++i, ++j, ++k) {
-			// double hx = x[i + 1] - x[i];
+			double hx = _x[i + 1] - _x[i];
 			double m0 = dydx[k];
 			double m1 = dydx[++k];
-			double a = (2 * y[i] + m0 - 2 * y[i + 1] + m1);
-			double b = (-3 * y[i] - 2 * m0 + 3 * y[i + 1] - m1);
-			double c = m0;
+			double a = (2 * y[i] + m0 - 2 * y[i + 1] + m1) / (hx * hx * hx);
+			double b = (-3 * y[i] - 2 * m0 + 3 * y[i + 1] - m1) / (hx * hx);
+			double c = m0 / hx;
 			double d = y[i];
 			_coefs[j] = a;
 			_coefs[++j] = b;
@@ -138,12 +138,6 @@ public class CardinalSpline extends Spline {
 	// return sb.toString().replace("+ -", "- ");
 	// }
 
-	@Override
-	protected double getValueAt(int index, double x) {
-		double t = (x - _x[index]) / (_x[index + 1] - _x[index]);
-		index <<= 2;
-		return _coefs[index + 3] + t * (_coefs[index + 2] + t * (_coefs[index + 1] + t * _coefs[index]));
-	}
 
 	@Override
 	public double differentiate(double x) {
@@ -154,12 +148,7 @@ public class CardinalSpline extends Spline {
 
 	@Override
 	protected double evaluateAntiDerivativeAt(int i, double t) {
-		i = i << 2;
+		i <<= 2;
 		return t * (_coefs[i + 3] + t * (_coefs[i + 2] * a + t * (_coefs[i + 1] * b + t * _coefs[i] * c)));
-	}
-
-	@Override
-	public int getOrder() {
-		return 3;
 	}
 }
