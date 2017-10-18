@@ -96,18 +96,52 @@ public class Butterworth extends AnalogFilter {
 		final int n = Math.max(n1, n2);
 		Butterworth bp = new Butterworth(n, ap);
 		double bw = Q / Math.pow(bp._eps, -1.0 / n) / w0;
-		bp._tf.substituteInPlace(bw);
 		bp._tf = lpTobp(bp._tf.getNumerator(), bp._tf.getDenominator(), w0, bw);
+		bp._order <<= 1;
+		return bp;
+	}
+
+	public static Butterworth newBandStop(double wp1, double wp2, double ws1, double ws2, double amax, double amin) {
+		double w0 = Math.sqrt(wp1 * wp2);
+		double Q = w0 / (wp2 - wp1);
+		
+		double whs1 = ws1 / w0;
+		double whs2 = ws2 / w0;
+		
+		double omegas1 = 1 / (Q * Math.abs((whs1 * whs1 - 1) / whs1));
+		double omegas2 = 1 / (Q * Math.abs((whs2 * whs2 - 1) / whs2));
+		
+		final int n1 = getMinOrderRequired(1, omegas1, amax, amin);
+		final int n2 = getMinOrderRequired(1, omegas2, amax, amin);
+		
+		final int n = Math.max(n1, n2);
+		Butterworth bp = new Butterworth(n, amax);
+		double bw = Q * Math.pow(bp._eps, -1.0 / n) / w0;
+		bp._tf = lpTobs(bp._tf.getNumerator(), bp._tf.getDenominator(), w0, bw);
 		bp._order <<= 1;
 		return bp;
 	}
 
 	public static TransferFunction lpTobp(Polynomial num, Polynomial den, double w0, double bw) {
 		Polynomial s = new Polynomial(1, 0);
-		Polynomial s2w02 = new Polynomial(1, 0, w0 * w0);
+		Polynomial s2w02 = new Polynomial(bw, 0, bw * w0 * w0);
 		
 		RationalFunction bp = new RationalFunction(num, den);
 		bp.substituteInPlace(new RationalFunction(s2w02, s));
+		
+		bp.normalize();
+		
+		return new TransferFunction(bp);
+	}
+	
+	public static TransferFunction lpTobs(Polynomial num, Polynomial den, double w0, double bw) {
+		Polynomial s = new Polynomial(1, 0);
+		Polynomial s2w02 = new Polynomial(bw, 0, bw * w0 * w0);
+		
+		RationalFunction bp = new RationalFunction(num, den);
+		bp.substituteInPlace(new RationalFunction(s, s2w02));
+		
+		bp.normalize();
 		
 		return new TransferFunction(bp);
 	}
@@ -163,6 +197,17 @@ public class Butterworth extends AnalogFilter {
 
 		Butterworth bandpass = newBandPass(190 * 2 * Math.PI, 210 * 2 * Math.PI, 180 * 2 * Math.PI,
 				220 * 2 * Math.PI, 0.2, 20, 20);
+//		Enter the pass band attenuation amax in dB: 1.5
+//		Enter the stop band attenuation amin in dB: 38
+//		Enter the pass band corner frequency f1 in Hz: 3.6e3
+//		Enter the pass band corner frequency f2 in Hz: 9.1e3
+//		Enter the stop band corner frequency fs1 in Hz: 5.45e3
+//		Enter the stop band corner frequency fs2 in Hz: 5.90e3	
+//	    s^6 + 3.88e09 s^4 + 5.018e18 s^2 + 2.163e27
+	//---------------------------------------------------------------------------------------
+	//s^6 + 5.963e04 s^5 + 5.658e09 s^4 + 1.808e14 s^3 + 7.318e18 s^2 + 9.974e22 s + 2.163e27
+		Butterworth bandstop = newBandStop(3.6e3 * 2 * Math.PI, 9.1e3 * 2 * Math.PI, 5.45e3 * 2 * Math.PI,
+				5.90e3 * 2 * Math.PI, 1.5, 38);
 
 		Polynomial f = new Polynomial(new double[] { 1, 1 });
 		System.out.println(f.pow(2));
@@ -172,6 +217,7 @@ public class Butterworth extends AnalogFilter {
 
 		System.out.printf("Low pass: %n%s%n%n", lowpass._tf.toString());
 		System.out.printf("High pass: %n%s%n%n", highpass._tf.toString());
-		System.out.printf("Band pass: %n%s%n", bandpass._tf.toString());
+		System.out.printf("Band pass: %n%s%n%n", bandpass._tf.toString());
+		System.out.printf("Band stop: %n%s%n", bandstop._tf.toString());
 	}
 }

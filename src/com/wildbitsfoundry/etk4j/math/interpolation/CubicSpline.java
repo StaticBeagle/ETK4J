@@ -199,7 +199,7 @@ public class CubicSpline extends Spline {
 	@Override
 	protected double getValueAt(int index, double x) {
 		double t = x - _x[index];
-		index = index << 2;
+		index <<= 2;
 		return _coefs[index + 3] + t * (_coefs[index + 2] + t * (_coefs[index + 1] + t * _coefs[index]));
 	}
 

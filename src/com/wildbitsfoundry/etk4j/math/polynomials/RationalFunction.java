@@ -119,6 +119,12 @@ public class RationalFunction implements UnivariateFunction {
 		_numerator = num;
 		_denominator = den;
 	}
+	
+	public double normalize() {
+		double norm = _denominator.normalize();
+		_numerator.multiplyEquals(1 / norm);
+		return norm;
+	}
 
 	private static Polynomial subPolyOp(Polynomial src, RationalFunction sub) {
 		final int deg = src.degree();

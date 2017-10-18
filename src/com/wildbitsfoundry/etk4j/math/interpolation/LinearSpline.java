@@ -53,7 +53,7 @@ public class LinearSpline extends Spline {
 	@Override
 	protected double getValueAt(int index, double x) {
 		double t = x - _x[index];
-		index = index << 1;
+		index <<= 1;
 		return t * _coefs[index] + _coefs[index + 1];
 	}
 	

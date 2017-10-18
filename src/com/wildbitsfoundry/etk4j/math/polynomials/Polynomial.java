@@ -115,9 +115,11 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 	}
 
 	/***
-	 * Forces the highest order coefficient of the polynomial to be unity by
-	 * dividing all the other coefficients by the highest order coefficient.
+	 * Convert to monic Polynomial. Forces the highest order coefficient of 
+	 * the polynomial to be unity by dividing all the other coefficients by 
+	 * the highest order coefficient.
 	 * 
+	 * @return normalizing factor
 	 */
 	public double normalize() {
 		double cn = this._coefs[0];
@@ -212,12 +214,12 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 	public String toString() {
 		java.lang.StringBuilder sb = new java.lang.StringBuilder();
 		int order = this.degree();
-		sb.append(String.format("%.4f", this._coefs[0]));
+		sb.append(String.format("%.4g", this._coefs[0]));
 		sb.append(" * x^").append(order);
 		for (int i = order - 1; i >= 0; i--) {
 			if (this._coefs[order - i] != 0.0) {
 				sb.append(i < order ? Math.signum(this._coefs[order - i]) < 0 ? " - " : " + " : "")
-						.append(String.format("%.4f", Math.abs(this._coefs[order - i]))).append(" * x")
+						.append(String.format("%.4g", Math.abs(this._coefs[order - i]))).append(" * x")
 						.append(i == 1 ? "" : "^" + i);
 			}
 
@@ -226,7 +228,7 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 		if (sb.lastIndexOf("^0") > 0) {
 			sb.setLength(sb.length() - 6);
 		}
-		return sb.toString();
+		return sb.toString().replace("1.000 * ", "");
 	}
 
 	public Polynomial derivative() {
