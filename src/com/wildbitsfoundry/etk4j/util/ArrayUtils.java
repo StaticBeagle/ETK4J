@@ -4,15 +4,6 @@ import java.util.Arrays;
 
 public final class ArrayUtils {
 	
-//	 /**
-//	  * Updates MACHEPS for the executing machine.
-//	  */
-//	 public static void updateMacheps() {
-//	  MACHEPS = 1;
-//	  do
-//	   MACHEPS /= 2;
-//	  while (1 + MACHEPS / 2 != 1);
-//	 }
 	private ArrayUtils() {}
 	
 	/***
@@ -201,6 +192,25 @@ public final class ArrayUtils {
 		double[] result = new double[a.length];
 		for(int i = length - 1, j = 0; i >= 0; --i, ++j) {
 			result[j] = a[i];
+		}
+		return result;
+	}
+	
+	public static double sum(double[] a) {
+		final int length = a.length;
+		double result = 0;
+		for(int i = 0; i < length; ++i) {
+			result += a[i];
+		}
+		return result;
+	}
+	
+	public static double[] cummulativeSum(double[] a) {
+		final int length = a.length;
+		double[] result = new double[length];
+		result[0] = a[0];
+		for(int i = 1; i < length; ++i) {
+			result[i] = result[i - 1] + a[i];
 		}
 		return result;
 	}
