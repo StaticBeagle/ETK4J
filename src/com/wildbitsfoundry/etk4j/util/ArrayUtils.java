@@ -214,4 +214,9 @@ public final class ArrayUtils {
 		}
 		return result;
 	}
+	
+	public static double rms(double[] a) {
+		final int N = a.length;
+		return norm(a) / Math.sqrt(N);
+	}
 }

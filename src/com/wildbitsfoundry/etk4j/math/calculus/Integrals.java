@@ -26,11 +26,13 @@ public final class Integrals {
 	}
 	
 	public static void main(String[] args) {
-		double[] a = new double[] {1, 2, 3,4 ,5 ,6};
+		double[] a = new double[] {1, 2, 3, 4 ,5 ,6};
 		
 		System.out.println(Arrays.toString(cummulativeTrapz(a)));
 		System.out.println((trapz(a)));
 		System.out.println(Arrays.toString(ArrayUtils.cummulativeSum(a)));
 		System.out.println(ArrayUtils.sum(a));
+		System.out.println(ArrayUtils.rms(a));
+		
 	}
 }
