@@ -6,74 +6,33 @@ import com.wildbitsfoundry.etk4j.util.ArrayUtils;
 
 public class FFT {
 	
+	public enum FFTScaling {
+		STANDARD,
+		UNITARY,
+		NONE
+	}
+
 	private int _n;
 	private int _m;
-	
+
 	private double[] _cos;
 	private double[] _sin;
-	
-	public FFT(int N) {
-		_n = N;
-		_m = (int) (Math.log(N) / Math.log(2.0));
 
-		_cos = new double[N / 2];
-		_sin = new double[N / 2];
+	public FFT(int n) {
+		_n = n;
+		_m = (int) (Math.log(n) / Math.log(2.0));
+		
+		if(_n != (1 << _m)) {
+			throw new IllegalArgumentException("n must be a power of 2");
+		}
 
-		double t = -2 * Math.PI / N;
-		for (int i = 0; i < N / 2; i++) {
+		_cos = new double[n / 2];
+		_sin = new double[n / 2];
+
+		double t = -2 * Math.PI / n;
+		for (int i = 0; i < n / 2; ++i) {
 			_cos[i] = Math.cos(i * t);
 			_sin[i] = Math.sin(i * t);
-		}
-	}
-	
-	public void direct(double[] x, double[] y) {
-		int i, j, k, n1, n2, a;
-		double c, s, t1, t2;
-
-		// Bit-reverse
-		j = 0;
-		n2 = _n / 2;
-		for (i = 1; i < _n - 1; i++) {
-			n1 = n2;
-			while (j >= n1) {
-				j = j - n1;
-				n1 = n1 / 2;
-			}
-			j = j + n1;
-
-			if (i < j) {
-				t1 = x[i];
-				x[i] = x[j];
-				x[j] = t1;
-				t1 = y[i];
-				y[i] = y[j];
-				y[j] = t1;
-			}
-		}
-
-		// FFT
-		n1 = 0;
-		n2 = 1;
-		
-		for (i = 0; i < _m; i++) {
-			n1 = n2;
-			n2 = n2 + n2;
-			a = 0;
-
-			for (j = 0; j < n1; j++) {
-				c = _cos[a];
-				s = _sin[a];
-				a += 1 << (_m - i - 1);
-
-				for (k = j; k < _n; k = k + n2) {
-					t1 = c * x[k + n1] - s * y[k + n1];
-					t2 = s * x[k + n1] + c * y[k + n1];
-					x[k + n1] = x[k] - t1;
-					y[k + n1] = y[k] - t2;
-					x[k] = x[k] + t1;
-					y[k] = y[k] + t2;
-				}
-			}
 		}
 	}
 
@@ -90,17 +49,18 @@ public class FFT {
 	 * Permission to copy and use this program is granted as long as this header
 	 * is included.
 	 ****************************************************************/
-	public static void fft(double[] x, double[] y) {
+	public void direct(double[] real, double[] imag) {
+		if(real.length != imag.length) {
+			throw new IllegalArgumentException("Length mismatch between real and imag");
+		}
+		
 		int i, j, k, n1, n2, a;
-		double c, s, t, t1, t2;
-
-		int n = x.length;
-		int m = (int) (Math.log(n) / Math.log(2.0));
+		double c, s, t1, t2;
 
 		// Bit-reverse
 		j = 0;
-		n2 = n / 2;
-		for (i = 1; i < n - 1; i++) {
+		n2 = _n / 2;
+		for (i = 1; i < _n - 1; i++) {
 			n1 = n2;
 			while (j >= n1) {
 				j = j - n1;
@@ -109,47 +69,64 @@ public class FFT {
 			j = j + n1;
 
 			if (i < j) {
-				t1 = x[i];
-				x[i] = x[j];
-				x[j] = t1;
-				t1 = y[i];
-				y[i] = y[j];
-				y[j] = t1;
+				t1 = real[i];
+				real[i] = real[j];
+				real[j] = t1;
+				t1 = imag[i];
+				imag[i] = imag[j];
+				imag[j] = t1;
 			}
 		}
 
 		// FFT
 		n1 = 0;
 		n2 = 1;
-		t = -2 * Math.PI / n;
-		
-		for (i = 0; i < m; i++) {
+
+		for (i = 0; i < _m; i++) {
 			n1 = n2;
 			n2 = n2 + n2;
 			a = 0;
 
 			for (j = 0; j < n1; j++) {
-				c = Math.cos(t * a);
-				s = Math.sin(t * a);
-				a += 1 << (m - i - 1);
+				c = _cos[a];
+				s = _sin[a];
+				a += 1 << (_m - i - 1);
 
-				for (k = j; k < n; k = k + n2) {
-					t1 = c * x[k + n1] - s * y[k + n1];
-					t2 = s * x[k + n1] + c * y[k + n1];
-					x[k + n1] = x[k] - t1;
-					y[k + n1] = y[k] - t2;
-					x[k] = x[k] + t1;
-					y[k] = y[k] + t2;
+				for (k = j; k < _n; k = k + n2) {
+					t1 = c * real[k + n1] - s * imag[k + n1];
+					t2 = s * real[k + n1] + c * imag[k + n1];
+					real[k + n1] = real[k] - t1;
+					imag[k + n1] = imag[k] - t2;
+					real[k] = real[k] + t1;
+					imag[k] = imag[k] + t2;
 				}
 			}
 		}
 	}
-	
-	public static void ifft(double[] x, double[] y) {
-		final double n = 1.0 / x.length;
-		fft(y, x);
-		ArrayUtils.multiplyInPlace(x, n);
-		ArrayUtils.multiplyInPlace(y, n);
+
+	public void inverse(double[] real, double[] imag) {
+		this.inverse(real, imag, FFTScaling.STANDARD);
+	}
+		
+	public void inverse(double[] real, double[] imag, FFTScaling scaling) {
+		
+		this.direct(imag, real);
+		switch(scaling) {
+		case STANDARD:
+			double factor = 1.0 / _n;
+			ArrayUtils.multiplyInPlace(real, factor);
+			ArrayUtils.multiplyInPlace(imag, factor);
+			break;
+		case UNITARY:
+			factor = 1.0 / Math.sqrt(_n);
+			ArrayUtils.multiplyInPlace(real, factor);
+			ArrayUtils.multiplyInPlace(imag, factor);
+		case NONE:
+			break;
+		default:
+			throw new IllegalStateException("FFT inverse DFTScaling missing");
+		}
+
 	}
 
 	public static int uniform(int a, int b) {
@@ -188,6 +165,7 @@ public class FFT {
 
 	public static void main(String[] args) {
 
+		// benchMark();
 		int n = 32;
 		// double[] real = new double[n];
 		// double[] imag = new double[n];
@@ -215,20 +193,39 @@ public class FFT {
 		for (int i = 0; i < n; ++i) {
 			System.out.printf("(%.4f, %.4f)%n", real[i], imag[i]);
 		}
-
-		fft(real, imag);
+		FFT fft = new FFT(n);
+		fft.direct(real, imag);
 
 		System.out.println("FFT(x)");
 		for (int i = 0; i < n; ++i) {
 			System.out.printf("%d: (%.4f, %.4f)%n", i, real[i], imag[i]);
 		}
-		
-		ifft(real, imag);
+
+		fft.inverse(real, imag);
 		System.out.println("IFFT(x)");
 		for (int i = 0; i < n; ++i) {
 			System.out.printf("%d: (%.4f, %.4f)%n", i, real[i], imag[i]);
 		}
 	}
-	
-	//public void benchMa
+
+	public static void benchMark() {
+		int n = 2048;
+		double[] real = new double[n];
+		double[] imag = new double[n];
+		for (int i = 0; i < n; ++i) {
+			real[i] = uniform(-1.0, 1.0);
+			imag[i] = uniform(-1.0, 1.0);
+		}
+
+		long startTime = System.currentTimeMillis();
+		FFT fft = new FFT(n);
+		for (int i = 0; i < 100000; ++i) {
+			// fft(real, imag);
+			fft.direct(real, imag);
+		}
+
+		long endTime = System.currentTimeMillis();
+		long totalTime = endTime - startTime;
+		System.out.println(totalTime);
+	}
 }
