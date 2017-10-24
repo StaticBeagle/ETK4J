@@ -153,7 +153,7 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 	}
 
 	public Polynomial multiply(double d) {
-		return new Polynomial(ArrayUtils.conv(_coefs, d));
+		return new Polynomial(ArrayUtils.multiply(_coefs, d));
 	}
 
 	public void multiplyEquals(double d) {

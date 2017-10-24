@@ -2,7 +2,80 @@ package com.wildbitsfoundry.etk4j.signals;
 
 import java.util.Random;
 
+import com.wildbitsfoundry.etk4j.util.ArrayUtils;
+
 public class FFT {
+	
+	private int _n;
+	private int _m;
+	
+	private double[] _cos;
+	private double[] _sin;
+	
+	public FFT(int N) {
+		_n = N;
+		_m = (int) (Math.log(N) / Math.log(2.0));
+
+		_cos = new double[N / 2];
+		_sin = new double[N / 2];
+
+		double t = -2 * Math.PI / N;
+		for (int i = 0; i < N / 2; i++) {
+			_cos[i] = Math.cos(i * t);
+			_sin[i] = Math.sin(i * t);
+		}
+	}
+	
+	public void direct(double[] x, double[] y) {
+		int i, j, k, n1, n2, a;
+		double c, s, t1, t2;
+
+		// Bit-reverse
+		j = 0;
+		n2 = _n / 2;
+		for (i = 1; i < _n - 1; i++) {
+			n1 = n2;
+			while (j >= n1) {
+				j = j - n1;
+				n1 = n1 / 2;
+			}
+			j = j + n1;
+
+			if (i < j) {
+				t1 = x[i];
+				x[i] = x[j];
+				x[j] = t1;
+				t1 = y[i];
+				y[i] = y[j];
+				y[j] = t1;
+			}
+		}
+
+		// FFT
+		n1 = 0;
+		n2 = 1;
+		
+		for (i = 0; i < _m; i++) {
+			n1 = n2;
+			n2 = n2 + n2;
+			a = 0;
+
+			for (j = 0; j < n1; j++) {
+				c = _cos[a];
+				s = _sin[a];
+				a += 1 << (_m - i - 1);
+
+				for (k = j; k < _n; k = k + n2) {
+					t1 = c * x[k + n1] - s * y[k + n1];
+					t2 = s * x[k + n1] + c * y[k + n1];
+					x[k + n1] = x[k] - t1;
+					y[k + n1] = y[k] - t2;
+					x[k] = x[k] + t1;
+					y[k] = y[k] + t2;
+				}
+			}
+		}
+	}
 
 	/***************************************************************
 	 * fft.c Douglas L. Jones University of Illinois at Urbana-Champaign January
@@ -19,20 +92,10 @@ public class FFT {
 	 ****************************************************************/
 	public static void fft(double[] x, double[] y) {
 		int i, j, k, n1, n2, a;
-		double c, s, t1, t2;
+		double c, s, t, t1, t2;
 
 		int n = x.length;
 		int m = (int) (Math.log(n) / Math.log(2.0));
-
-		// need to do lazy evaluation and cache this
-		// tables to optimize this
-		double[] cos = new double[n / 2];
-		double[] sin = new double[n / 2];
-
-		for (int ii = 0; ii < n / 2; ii++) {
-			cos[ii] = Math.cos(-2 * Math.PI * ii / n);
-			sin[ii] = Math.sin(-2 * Math.PI * ii / n);
-		}
 
 		// Bit-reverse
 		j = 0;
@@ -58,15 +121,16 @@ public class FFT {
 		// FFT
 		n1 = 0;
 		n2 = 1;
-
+		t = -2 * Math.PI / n;
+		
 		for (i = 0; i < m; i++) {
 			n1 = n2;
 			n2 = n2 + n2;
 			a = 0;
 
 			for (j = 0; j < n1; j++) {
-				c = cos[a];
-				s = sin[a];
+				c = Math.cos(t * a);
+				s = Math.sin(t * a);
 				a += 1 << (m - i - 1);
 
 				for (k = j; k < n; k = k + n2) {
@@ -80,18 +144,13 @@ public class FFT {
 			}
 		}
 	}
-
-	private static final double[] W_SUB_N_R = { 0x1.0p0, -0x1.0p0, 0x1.1a62633145c07p-54, 0x1.6a09e667f3bcdp-1,
-			0x1.d906bcf328d46p-1, 0x1.f6297cff75cbp-1, 0x1.fd88da3d12526p-1, 0x1.ff621e3796d7ep-1, 0x1.ffd886084cd0dp-1,
-			0x1.fff62169b92dbp-1, 0x1.fffd8858e8a92p-1, 0x1.ffff621621d02p-1, 0x1.ffffd88586ee6p-1,
-			0x1.fffff62161a34p-1, 0x1.fffffd8858675p-1, 0x1.ffffff621619cp-1, 0x1.ffffffd885867p-1,
-			0x1.fffffff62161ap-1, 0x1.fffffffd88586p-1, 0x1.ffffffff62162p-1, 0x1.ffffffffd8858p-1,
-			0x1.fffffffff6216p-1, 0x1.fffffffffd886p-1, 0x1.ffffffffff621p-1, 0x1.ffffffffffd88p-1,
-			0x1.fffffffffff62p-1, 0x1.fffffffffffd9p-1, 0x1.ffffffffffff6p-1, 0x1.ffffffffffffep-1,
-			0x1.fffffffffffffp-1, 0x1.0p0, 0x1.0p0, 0x1.0p0, 0x1.0p0, 0x1.0p0, 0x1.0p0, 0x1.0p0, 0x1.0p0, 0x1.0p0,
-			0x1.0p0, 0x1.0p0, 0x1.0p0, 0x1.0p0, 0x1.0p0, 0x1.0p0, 0x1.0p0, 0x1.0p0, 0x1.0p0, 0x1.0p0, 0x1.0p0, 0x1.0p0,
-			0x1.0p0, 0x1.0p0, 0x1.0p0, 0x1.0p0, 0x1.0p0, 0x1.0p0, 0x1.0p0, 0x1.0p0, 0x1.0p0, 0x1.0p0, 0x1.0p0,
-			0x1.0p0 };
+	
+	public static void ifft(double[] x, double[] y) {
+		final double n = 1.0 / x.length;
+		fft(y, x);
+		ArrayUtils.multiplyInPlace(x, n);
+		ArrayUtils.multiplyInPlace(y, n);
+	}
 
 	public static int uniform(int a, int b) {
 		if ((b <= a) || ((long) b - a >= Integer.MAX_VALUE)) {
@@ -163,5 +222,13 @@ public class FFT {
 		for (int i = 0; i < n; ++i) {
 			System.out.printf("%d: (%.4f, %.4f)%n", i, real[i], imag[i]);
 		}
+		
+		ifft(real, imag);
+		System.out.println("IFFT(x)");
+		for (int i = 0; i < n; ++i) {
+			System.out.printf("%d: (%.4f, %.4f)%n", i, real[i], imag[i]);
+		}
 	}
+	
+	//public void benchMa
 }

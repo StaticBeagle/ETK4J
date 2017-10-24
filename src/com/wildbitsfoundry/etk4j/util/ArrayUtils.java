@@ -87,13 +87,20 @@ public final class ArrayUtils {
 		return result;
 	}
 	
-	public static double[] conv(double[] a, double d) {
+	public static double[] multiply(double[] a, double d) {
 		double[] result = new double[a.length];
 
 		for (int i = 0; i < result.length; ++i) {
 			result[i] = a[i] * d;
 		}
 		return result;
+	}
+	
+	public static void multiplyInPlace(double[] a, double d) {
+		final int length = a.length;
+		for (int i = 0; i < length; ++i) {
+			a[i] *= d;
+		}
 	}
 	
 	public static double normFast(double[] a) {
@@ -151,10 +158,10 @@ public final class ArrayUtils {
 		int bLength = b.length;
 		double[] c = new double[aLength * bLength];
 		if (a.length == 1) {
-			return ArrayUtils.conv(b, a[0]);
+			return ArrayUtils.multiply(b, a[0]);
 		}
 		if (b.length == 1) {
-			return ArrayUtils.conv(a, b[0]);
+			return ArrayUtils.multiply(a, b[0]);
 		}
 		for (int i = 0; i < aLength; i++) {
 			for (int j = 0; j < bLength; j++) {
