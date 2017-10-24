@@ -226,4 +226,14 @@ public final class ArrayUtils {
 		final int N = a.length;
 		return norm(a) / Math.sqrt(N);
 	}
+	
+	public static boolean isAscending(double[] a) {
+		final int n = a.length;
+		for(int i = 0; i < n - 1; ++i) {
+			if(a[i] > a[i + 1]) {
+				return false;
+			}
+		}
+		return true;
+	}
 }

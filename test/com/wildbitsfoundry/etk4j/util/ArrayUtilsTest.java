@@ -2,6 +2,8 @@ package com.wildbitsfoundry.etk4j.util;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -70,5 +72,11 @@ public class ArrayUtilsTest {
 	public void testConcat() {		
 		double[] concat = new double[] { -1.0, -0.5, 0.0, 0.5, 1.0, -2.0, 1.0, -0.5, 0.0, 1.5 };
 		assertArrayEquals(concat, ArrayUtils.concat(a, c), 1e-12);
+	}
+	
+	@Test
+	public void testAscending() {		
+		assertTrue(ArrayUtils.isAscending(a));
+		assertFalse(ArrayUtils.isAscending(ArrayUtils.reverse(a)));
 	}
 }

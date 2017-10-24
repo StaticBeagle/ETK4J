@@ -24,6 +24,9 @@ public class CubicSpline extends Spline {
 		_coefs = new double[(n - 1) * 4]; // 4 coefficients and n - 1 segments
 		for (int i = 0, j = 0; i < n - 1; ++i, ++j) {
 			double hx = _x[i + 1] - _x[i];
+			if(hx <= 0.0) {
+				throw new IllegalArgumentException("x must be monotonically increasing");
+			}
 			double m0 = dydx[i] * hx;
 			double m1 = dydx[i + 1] * hx;
 			double a = (2 * y[i] + m0 - 2 * y[i + 1] + m1) / (hx * hx * hx);
