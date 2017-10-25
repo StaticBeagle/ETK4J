@@ -48,7 +48,7 @@ public class CubicSpline extends Spline {
 	}
 
 	private CubicSpline(double[] x, double[] y, double[] dydx) {
-		super(x, 3, y[0], y[y.length - 1]);
+		super(x, 4, y[0], y[y.length - 1]);
 
 		final int n = _x.length;
 		// compute coefficients
@@ -125,7 +125,7 @@ public class CubicSpline extends Spline {
 		r0 = (y[n - 1] - y[n - 2]) * T.SD[n - 2] * T.SD[n - 2];
 		T.dydx[n - 1] = 2.0 * r0;
 
-		return new CubicSpline(Arrays.copyOf(x, x.length), y, T.solve());
+		return new CubicSpline(x, y, T.solve());
 	}
 
 	public static CubicSpline newClampedSpline(double[] x, double[] y, double d0, double dn) {
@@ -144,7 +144,7 @@ public class CubicSpline extends Spline {
 		T.dydx[1] = T.dydx[1] - T.dydx[0] * T.SD[0];
 		T.dydx[n - 2] = T.dydx[n - 2] - T.dydx[n - 1] * T.SD[n - 2];
 
-		return new CubicSpline(Arrays.copyOf(x, x.length), y, T.solve(T.dydx.length - 1, 1));
+		return new CubicSpline(x, y, T.solve(T.dydx.length - 1, 1));
 	}
 
 	public static CubicSpline newNotAKnotSpline(double[] x, double[] y) {
@@ -168,11 +168,11 @@ public class CubicSpline extends Spline {
 		b = 1 / (1 + a);
 		T.D[n - 1] = T.SD[n - 2] * b;
 		r0 = (y[n - 1] - y[n - 2]) * T.SD[n - 2] * T.SD[n - 2];
-		;
+		
 		r1 = (y[n - 2] - y[n - 3]) * T.SD[n - 3] * T.SD[n - 3];
 		T.dydx[n - 1] = ((3.0 * a + 2.0) * r0 + a * r1) * b * b;
 
-		return new CubicSpline(Arrays.copyOf(x, x.length), y, T.solve());
+		return new CubicSpline(x, y, T.solve());
 	}
 
 	public static CubicSpline newAkimaSpline(double[] x, double[] y) {
@@ -214,7 +214,7 @@ public class CubicSpline extends Spline {
 				d[i] = 0.5 * (t[i + 2] + t[i + 1]);
 			}
 		}
-		return new CubicSpline(Arrays.copyOf(x, x.length), y, d);
+		return new CubicSpline(x, y, d);
 	}
 
 	@Override
@@ -243,14 +243,15 @@ public class CubicSpline extends Spline {
 
 	// move to examples
 	public static void main(String[] args) {
-		double[] x = new double[] { 1, 2, 3, 4 };
-		double[] y = new double[] { 5, 6, 7, 8 };
+		double[] x = new double[] { 1, 2, 3};
+		double[] y = new double[] { 5, 6, 7 };
 		CubicSpline cs = newNotAKnotSpline(x, y);
 
-		double[] xi = ArrayUtils.linsteps(1.0, 4.0, 0.1);
+		double[] xi = ArrayUtils.linsteps(1.0, 3.0, 0.1);
 		for (double xii : xi) {
 			System.out.printf("y(%.4f) = %.4f%n", xii, cs.evaluateAt(xii));
 		}
+		
 	}
 
 	private static TridiagonalSystem setupC2Spline(double[] x, double[] y) {

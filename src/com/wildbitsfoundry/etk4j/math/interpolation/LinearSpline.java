@@ -6,7 +6,7 @@ public class LinearSpline extends Spline {
 	
 
 	protected LinearSpline(double[] x, double[] y) {
-		super(x, 1, y[0], y[y.length - 1]);
+		super(x, 2, y[0], y[y.length - 1]);
 		
 		final int n = _x.length;
 		// compute coefficients
@@ -33,7 +33,7 @@ public class LinearSpline extends Spline {
 	public static LinearSpline newLinearSplineInPlace(double[] x, double[] y) {
 		Splines.checkXYDimensions(x, y);
 		Splines.checkMinkXLength(x, 2);
-		return new LinearSpline(Arrays.copyOf(x, x.length), y);
+		return new LinearSpline(x, y);
 	}
 	
 	@Override

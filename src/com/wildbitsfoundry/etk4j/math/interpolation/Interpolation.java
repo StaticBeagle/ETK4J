@@ -37,6 +37,9 @@ public final class Interpolation {
 	}
 	
 	public static double spline(double[] x, double[] y, double xi) {
+		if(x.length < 4) {
+			return neville(x, y, xi);
+		}
 		Spline sp = CubicSpline.newCubicSpline(x, y);
 		return sp.evaluateAt(xi);
 	}

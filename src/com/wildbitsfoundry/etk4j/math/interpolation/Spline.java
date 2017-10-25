@@ -12,13 +12,13 @@ public abstract class Spline extends PiecewiseFunction implements Differentiable
 
 	protected Spline(double[] x, int order, double y0, double yn) {
 		super(x, y0, yn);
-		_order = order + 1;
+		_order = order;
 	}
 
 	protected abstract double evaluateAntiDerivativeAt(int i, double t);
 
 	public int getOrder() {
-		return _order - 1;
+		return _order;
 	}
 	
 	@Override
