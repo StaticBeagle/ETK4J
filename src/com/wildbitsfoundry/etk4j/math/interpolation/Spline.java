@@ -48,7 +48,7 @@ public abstract class Spline extends PiecewiseFunction implements Differentiable
 			this.calcuateIntegral();
 		}
 
-		int i = this.findIndex(x);
+		int i = this.findLeftIndex(x);
 		double t = x - _x[i];
 		return _indefiniteIntegral[i] + this.evaluateAntiDerivativeAt(i, t);
 	}
@@ -64,18 +64,6 @@ public abstract class Spline extends PiecewiseFunction implements Differentiable
 		for (int i = 0; i < size - 1; ++i) {
 			double t = _x[i + 1] - _x[i];
 			_indefiniteIntegral[i + 1] = _indefiniteIntegral[i] + this.evaluateAntiDerivativeAt(i, t);
-		}
-	}
-
-	protected static void checkXYDimensions(double[] x, double[] y) {
-		if (x.length != y.length) {
-			throw new IllegalArgumentException("x and y dimensions must be the same");
-		}
-	}
-
-	protected static void checkMinkXLength(double[] x, int size) {
-		if (x.length < size) {
-			throw new IllegalArgumentException(String.format("x length must be >= %d", size));
 		}
 	}
 }

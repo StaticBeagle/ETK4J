@@ -31,8 +31,8 @@ public class LinearSpline extends Spline {
 	}
 	
 	public static LinearSpline newLinearSplineInPlace(double[] x, double[] y) {
-		checkXYDimensions(x, y);
-		checkMinkXLength(x, 2);
+		Splines.checkXYDimensions(x, y);
+		Splines.checkMinkXLength(x, 2);
 		return new LinearSpline(Arrays.copyOf(x, x.length), y);
 	}
 	

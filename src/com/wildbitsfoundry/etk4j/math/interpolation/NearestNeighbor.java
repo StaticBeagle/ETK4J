@@ -27,8 +27,8 @@ public class NearestNeighbor extends PiecewiseFunction {
 	}
 	
 	public static NearestNeighbor newNearestNeighborInPlace(double[] x, double[] y) {
-		Spline.checkXYDimensions(x, y);
-		Spline.checkMinkXLength(x, 2);
+		Splines.checkXYDimensions(x, y);
+		Splines.checkMinkXLength(x, 2);
 		
 		NearestNeighbor nh = new NearestNeighbor(x, y);
 		nh._calculator = new NeighborCalculator() {
@@ -42,8 +42,8 @@ public class NearestNeighbor extends PiecewiseFunction {
 	}
 	
 	public static NearestNeighbor newNextNeighbor(double[] x, double[] y) {
-		Spline.checkXYDimensions(x, y);
-		Spline.checkMinkXLength(x, 2);
+		Splines.checkXYDimensions(x, y);
+		Splines.checkMinkXLength(x, 2);
 		
 		NearestNeighbor nh = new NearestNeighbor(Arrays.copyOf(x, x.length), y);
 		nh._calculator = new NeighborCalculator() {
@@ -57,8 +57,8 @@ public class NearestNeighbor extends PiecewiseFunction {
 	}
 	
 	public static NearestNeighbor newPreviousNeighbor(double[] x, double[] y) {
-		Spline.checkXYDimensions(x, y);
-		Spline.checkMinkXLength(x, 2);
+		Splines.checkXYDimensions(x, y);
+		Splines.checkMinkXLength(x, 2);
 		
 		NearestNeighbor nh = new NearestNeighbor(Arrays.copyOf(x, x.length), y);
 		nh._calculator = new NeighborCalculator() {

@@ -23,7 +23,7 @@ public abstract class PiecewiseFunction implements UnivariateFunction {
 		_extrapolationMethod = method;
 	}
 
-	protected int findIndex(double x) {
+	protected int findLeftIndex(double x) {
 		int index = Arrays.binarySearch(_x, x);
 		return index < 0 ? -(index + 2) : Math.min(index, _x.length - 2);
 	}
@@ -45,7 +45,7 @@ public abstract class PiecewiseFunction implements UnivariateFunction {
 		if(x > _x[_x.length - 1]) {
 			return this.extrapolate(_x.length - 2, x);
 		}
-		int index = this.findIndex(x);
+		int index = this.findLeftIndex(x);
 		return this.getValueAt(index, x);
 	}
 	

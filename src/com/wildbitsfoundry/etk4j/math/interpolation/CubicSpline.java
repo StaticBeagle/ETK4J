@@ -57,8 +57,8 @@ public class CubicSpline extends Spline {
 	}
 	
 	public static CubicSpline newHermiteSplineInPlace(double[] x, double[] y, double[] dydx) {
-		checkXYDimensions(x, y);
-		checkMinkXLength(x, 2);
+		Splines.checkXYDimensions(x, y);
+		Splines.checkMinkXLength(x, 2);
 		if(x.length != dydx.length) {
 			throw new IllegalArgumentException("x and dydx dimensions must be the same");
 		}
@@ -66,8 +66,8 @@ public class CubicSpline extends Spline {
 	}
 
 	public static double[] buildNaturalSpline(double[] x, double[] y) {
-		checkXYDimensions(x, y);
-		checkMinkXLength(x, 2);
+		Splines.checkXYDimensions(x, y);
+		Splines.checkMinkXLength(x, 2);
 		final int n = x.length;
 		TridiagonalSystem T = setupC2Spline(x, y);
 
@@ -88,8 +88,8 @@ public class CubicSpline extends Spline {
 	}
 
 	public static double[] buildParabolicallyTerminatedSpline(double[] x, double[] y) {
-		checkXYDimensions(x, y);
-		checkMinkXLength(x, 2);
+		Splines.checkXYDimensions(x, y);
+		Splines.checkMinkXLength(x, 2);
 		final int n = x.length;
 		TridiagonalSystem T = setupC2Spline(x, y);
 
@@ -110,8 +110,8 @@ public class CubicSpline extends Spline {
 	}
 
 	public static double[] buildClampledSpline(double[] x, double[] y, double d0, double dn) {
-		checkXYDimensions(x, y);
-		checkMinkXLength(x, 2);
+		Splines.checkXYDimensions(x, y);
+		Splines.checkMinkXLength(x, 2);
 		final int n = x.length;
 		TridiagonalSystem T = setupC2Spline(x, y);
 
@@ -131,8 +131,8 @@ public class CubicSpline extends Spline {
 	}
 
 	public static double[] buildNotAKnotSpline(double[] x, double[] y) {
-		checkXYDimensions(x, y);
-		checkMinkXLength(x, 2);
+		Splines.checkXYDimensions(x, y);
+		Splines.checkMinkXLength(x, 2);
 		final int n = x.length;
 		TridiagonalSystem T = setupC2Spline(x, y);
 
@@ -161,8 +161,8 @@ public class CubicSpline extends Spline {
 	}
 
 	public static double[] buildAkimaSpline(double[] x, double[] y, double ep) {
-		checkXYDimensions(x, y);
-		checkMinkXLength(x, 5);
+		Splines.checkXYDimensions(x, y);
+		Splines.checkMinkXLength(x, 5);
 		final int n = x.length;
 		double[] d = new double[n];
 		double[] t = new double[n + 3];
