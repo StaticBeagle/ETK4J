@@ -2,6 +2,8 @@ package com.wildbitsfoundry.etk4j.math.interpolation;
 
 import java.util.Arrays;
 
+import com.wildbitsfoundry.etk4j.util.ArrayUtils;
+
 public class CubicSpline extends Spline {
 
 	private static class TridiagonalSystem {
@@ -14,6 +16,35 @@ public class CubicSpline extends Spline {
 			D = new double[n];
 			dydx = new double[n];
 		}
+
+		public double[] solve() {
+			tridiagonalLDLTSolve(D, SD, dydx);
+			return dydx;
+		}
+
+		public double[] solve(int length, int offset) {
+			tridiagonalLDLTSolve(D, SD, dydx, length, offset);
+			return dydx;
+		}
+
+		private static void tridiagonalLDLTSolve(double[] D, double[] L, double[] b, int length, int offset) {
+			int n = length;
+			for (int i = offset; i < n - 1; ++i) {
+				double ui = L[i];
+				L[i] /= D[i];
+				D[i + 1] -= ui * L[i];
+				b[i + 1] -= L[i] * b[i];
+			}
+
+			b[n - 1] /= D[n - 1];
+			for (int i = n - 2; i >= offset; --i) {
+				b[i] = b[i] / D[i] - L[i] * b[i + 1];
+			}
+		}
+
+		private static void tridiagonalLDLTSolve(double[] D, double[] L, double[] b) {
+			tridiagonalLDLTSolve(D, L, b, b.length, 0);
+		}
 	}
 
 	private CubicSpline(double[] x, double[] y, double[] dydx) {
@@ -24,7 +55,7 @@ public class CubicSpline extends Spline {
 		_coefs = new double[(n - 1) * 4]; // 4 coefficients and n - 1 segments
 		for (int i = 0, j = 0; i < n - 1; ++i, ++j) {
 			double hx = _x[i + 1] - _x[i];
-			if(hx <= 0.0) {
+			if (hx <= 0.0) {
 				throw new IllegalArgumentException("x must be monotonically increasing");
 			}
 			double m0 = dydx[i] * hx;
@@ -42,30 +73,25 @@ public class CubicSpline extends Spline {
 		double dn = dydx[dydx.length - 1];
 		super.setEndSlopes(d0, dn);
 	}
-	
+
 	@Override
 	public void setExtrapolationMethod(ExtrapolationMethod method) {
 		super.setExtrapolationMethod(method);
 	}
-	
+
 	public static CubicSpline newCubicSpline(double[] x, double[] y) {
 		return newNotAKnotSpline(x, y);
 	}
-	
-	public static CubicSpline newHermiteSpline(double[] x, double[] y, double[] dydx) {
-		return newHermiteSplineInPlace(Arrays.copyOf(x, x.length), y, dydx);
-	}
-	
-	public static CubicSpline newHermiteSplineInPlace(double[] x, double[] y, double[] dydx) {
-		Splines.checkXYDimensions(x, y);
-		Splines.checkMinkXLength(x, 2);
-		if(x.length != dydx.length) {
-			throw new IllegalArgumentException("x and dydx dimensions must be the same");
-		}
-		return new CubicSpline(x, y, dydx);
+
+	public static CubicSpline newCubicSplineInPlace(double[] x, double[] y) {
+		return newNotAKnotSplineInPlace(x, y);
 	}
 
-	public static double[] buildNaturalSpline(double[] x, double[] y) {
+	public static CubicSpline newNaturalSpline(double[] x, double[] y) {
+		return newNaturalSplineInPlace(Arrays.copyOf(x, x.length), y);
+	}
+
+	public static CubicSpline newNaturalSplineInPlace(double[] x, double[] y) {
 		Splines.checkXYDimensions(x, y);
 		Splines.checkMinkXLength(x, 2);
 		final int n = x.length;
@@ -78,16 +104,15 @@ public class CubicSpline extends Spline {
 		r0 = (y[n - 1] - y[n - 2]) * T.SD[n - 2] * T.SD[n - 2];
 		T.dydx[n - 1] = 3.0 * r0;
 
-		tridiagonalLDLTSolve(T.D, T.SD, T.dydx);
-		return T.dydx;
+		return new CubicSpline(x, y, T.solve());
 	}
 
-	public static CubicSpline newNaturalSpline(double[] x, double[] y) {
-		double[] d = buildNaturalSpline(x, y);
-		return new CubicSpline(Arrays.copyOf(x, x.length), y, d);
+	public static CubicSpline newParabolicallyTerminatedSpline(double[] x, double[] y) {
+
+		return newParabolicallyTerminatedSplineInPlace(Arrays.copyOf(x, x.length), y);
 	}
 
-	public static double[] buildParabolicallyTerminatedSpline(double[] x, double[] y) {
+	public static CubicSpline newParabolicallyTerminatedSplineInPlace(double[] x, double[] y) {
 		Splines.checkXYDimensions(x, y);
 		Splines.checkMinkXLength(x, 2);
 		final int n = x.length;
@@ -100,16 +125,14 @@ public class CubicSpline extends Spline {
 		r0 = (y[n - 1] - y[n - 2]) * T.SD[n - 2] * T.SD[n - 2];
 		T.dydx[n - 1] = 2.0 * r0;
 
-		tridiagonalLDLTSolve(T.D, T.SD, T.dydx);
-		return T.dydx;
+		return new CubicSpline(Arrays.copyOf(x, x.length), y, T.solve());
 	}
 
-	public static CubicSpline newParabolicallyTerminatedSpline(double[] x, double[] y) {
-		double[] d = buildParabolicallyTerminatedSpline(x, y);
-		return new CubicSpline(Arrays.copyOf(x, x.length), y, d);
+	public static CubicSpline newClampedSpline(double[] x, double[] y, double d0, double dn) {
+		return newClampedSplineInPlace(Arrays.copyOf(x, x.length), y, d0, dn);
 	}
 
-	public static double[] buildClampledSpline(double[] x, double[] y, double d0, double dn) {
+	public static CubicSpline newClampedSplineInPlace(double[] x, double[] y, double d0, double dn) {
 		Splines.checkXYDimensions(x, y);
 		Splines.checkMinkXLength(x, 2);
 		final int n = x.length;
@@ -121,16 +144,14 @@ public class CubicSpline extends Spline {
 		T.dydx[1] = T.dydx[1] - T.dydx[0] * T.SD[0];
 		T.dydx[n - 2] = T.dydx[n - 2] - T.dydx[n - 1] * T.SD[n - 2];
 
-		tridiagonalLDLTSolve(T.D, T.SD, T.dydx, T.dydx.length - 1, 1);
-		return T.dydx;
+		return new CubicSpline(Arrays.copyOf(x, x.length), y, T.solve(T.dydx.length - 1, 1));
 	}
 
-	public static CubicSpline newClampedSpline(double[] x, double[] y, double d0, double dn) {
-		double[] d = buildClampledSpline(x, y, d0, dn);
-		return new CubicSpline(Arrays.copyOf(x, x.length), y, d);
+	public static CubicSpline newNotAKnotSpline(double[] x, double[] y) {
+		return newNotAKnotSplineInPlace(Arrays.copyOf(x, x.length), y);
 	}
 
-	public static double[] buildNotAKnotSpline(double[] x, double[] y) {
+	public static CubicSpline newNotAKnotSplineInPlace(double[] x, double[] y) {
 		Splines.checkXYDimensions(x, y);
 		Splines.checkMinkXLength(x, 2);
 		final int n = x.length;
@@ -151,16 +172,22 @@ public class CubicSpline extends Spline {
 		r1 = (y[n - 2] - y[n - 3]) * T.SD[n - 3] * T.SD[n - 3];
 		T.dydx[n - 1] = ((3.0 * a + 2.0) * r0 + a * r1) * b * b;
 
-		tridiagonalLDLTSolve(T.D, T.SD, T.dydx);
-		return T.dydx;
+		return new CubicSpline(Arrays.copyOf(x, x.length), y, T.solve());
 	}
 
-	public static CubicSpline newNotAKnotSpline(double[] x, double[] y) {
-		double[] d = buildNotAKnotSpline(x, y);
-		return new CubicSpline(Arrays.copyOf(x, x.length), y, d);
+	public static CubicSpline newAkimaSpline(double[] x, double[] y) {
+		return newAkimaSpline(x, y, 1e-12);
 	}
 
-	public static double[] buildAkimaSpline(double[] x, double[] y, double ep) {
+	public static CubicSpline newAkimaSplineInPlace(double[] x, double[] y) {
+		return newAkimaSplineInPlace(x, y, 1e-12);
+	}
+
+	public static CubicSpline newAkimaSpline(double[] x, double[] y, double ep) {
+		return newAkimaSplineInPlace(Arrays.copyOf(x, x.length), y, ep);
+	}
+
+	public static CubicSpline newAkimaSplineInPlace(double[] x, double[] y, double ep) {
 		Splines.checkXYDimensions(x, y);
 		Splines.checkMinkXLength(x, 5);
 		final int n = x.length;
@@ -187,16 +214,7 @@ public class CubicSpline extends Spline {
 				d[i] = 0.5 * (t[i + 2] + t[i + 1]);
 			}
 		}
-		return d;
-	}
-
-	public static CubicSpline newAkimaSpline(double[] x, double[] y, double ep) {
-		double[] d = buildAkimaSpline(x, y, ep);
 		return new CubicSpline(Arrays.copyOf(x, x.length), y, d);
-	}
-
-	public static CubicSpline newAkimaSpline(double[] x, double[] y) {
-		return newAkimaSpline(x, y, 1e-12);
 	}
 
 	@Override
@@ -224,34 +242,15 @@ public class CubicSpline extends Spline {
 	}
 
 	// move to examples
-	// public static void main(String[] args) {
-	// double[] x = new double[] {1,2,3,4};
-	// double[] y = new double[] {5,6,7,8};
-	// CubicSpline cs = newNotAKnotSpline(x, y);
-	//
-	// double[] xi = ArrayUtils.linsteps(1.0, 4.0, 0.1);
-	// for(double xii : xi) {
-	// System.out.printf("y(%.4f) = %.4f%n", xii, cs.evaluateAt(xii));
-	// }
-	// }
+	public static void main(String[] args) {
+		double[] x = new double[] { 1, 2, 3, 4 };
+		double[] y = new double[] { 5, 6, 7, 8 };
+		CubicSpline cs = newNotAKnotSpline(x, y);
 
-	private static void tridiagonalLDLTSolve(double[] D, double[] L, double[] b, int length, int offset) {
-		int n = length;
-		for (int i = offset; i < n - 1; ++i) {
-			double ui = L[i];
-			L[i] /= D[i];
-			D[i + 1] -= ui * L[i];
-			b[i + 1] -= L[i] * b[i];
+		double[] xi = ArrayUtils.linsteps(1.0, 4.0, 0.1);
+		for (double xii : xi) {
+			System.out.printf("y(%.4f) = %.4f%n", xii, cs.evaluateAt(xii));
 		}
-
-		b[n - 1] /= D[n - 1];
-		for (int i = n - 2; i >= offset; --i) {
-			b[i] = b[i] / D[i] - L[i] * b[i + 1];
-		}
-	}
-
-	private static void tridiagonalLDLTSolve(double[] D, double[] L, double[] b) {
-		tridiagonalLDLTSolve(D, L, b, b.length, 0);
 	}
 
 	private static TridiagonalSystem setupC2Spline(double[] x, double[] y) {
