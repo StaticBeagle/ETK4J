@@ -153,7 +153,7 @@ public class CubicSpline extends Spline {
 
 	public static CubicSpline newNotAKnotSplineInPlace(double[] x, double[] y) {
 		Splines.checkXYDimensions(x, y);
-		Splines.checkMinkXLength(x, 2);
+		Splines.checkMinkXLength(x, 4);
 		final int n = x.length;
 		TridiagonalSystem T = setupC2Spline(x, y);
 
@@ -243,11 +243,11 @@ public class CubicSpline extends Spline {
 
 	// move to examples
 	public static void main(String[] args) {
-		double[] x = new double[] { 1, 2, 3};
-		double[] y = new double[] { 5, 6, 7 };
+		double[] x = new double[] { 1, 2, 3, 4 };
+		double[] y = new double[] { 5, 6, 7, 8 };
 		CubicSpline cs = newNotAKnotSpline(x, y);
 
-		double[] xi = ArrayUtils.linsteps(1.0, 3.0, 0.1);
+		double[] xi = ArrayUtils.linsteps(1.0, 4.0, 0.1);
 		for (double xii : xi) {
 			System.out.printf("y(%.4f) = %.4f%n", xii, cs.evaluateAt(xii));
 		}

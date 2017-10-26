@@ -84,11 +84,12 @@ public class Spline2d {
 
 	protected int findLeftIndex(double y) {
 		int index = Arrays.binarySearch(_y, y);
-		if (index >= 0) {
+		if(index >= 0) {
 			return _order * (index / _order);
 		}
 		index = -(index + 2);
-		return _order * (index / _order);//return (_order - 1) * (int) Math.floor(1.0 * index / (_order - 1));//return (_order - 1) * index / (_order - 1);
+		boolean edge = (index + 1) % _order == 0;
+		return edge ? index : _order * (index / _order);
 	}
 
 	public static void main(String[] args) {

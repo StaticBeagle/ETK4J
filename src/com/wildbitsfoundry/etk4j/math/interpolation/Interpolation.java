@@ -43,4 +43,11 @@ public final class Interpolation {
 		Spline sp = CubicSpline.newCubicSpline(x, y);
 		return sp.evaluateAt(xi);
 	}
+	
+	public static void main(String[] args) {
+		double[] x = new double[] {1,2, 3};
+		double[] y = new double[] {1,3, 10};
+		
+		System.out.println(neville(x, y, 2.5));
+	}
 }
