@@ -2,6 +2,7 @@ package com.wildbitsfoundry.etk4j.math.interpolation;
 
 import java.util.Arrays;
 
+import com.wildbitsfoundry.etk4j.math.polynomials.Polynomials;
 import com.wildbitsfoundry.etk4j.util.ArrayUtils;
 
 public class CubicSpline extends Spline {
@@ -46,7 +47,7 @@ public class CubicSpline extends Spline {
 			tridiagonalLDLTSolve(D, L, b, b.length, 0);
 		}
 	}
-	
+
 	private interface CubicSplineBuilder {
 		double[] build(TridiagonalLDLTSystem T, double[] x, double[] y, int n);
 	}
@@ -77,6 +78,7 @@ public class CubicSpline extends Spline {
 		double dn = dydx[dydx.length - 1];
 		super.setEndSlopes(d0, dn);
 	}
+
 	private CubicSpline(double[] x, double[] y, double[] coefs, double d0, double dn) {
 		super(x, 4, y[0], y[y.length - 1]);
 		_coefs = coefs;
@@ -99,13 +101,28 @@ public class CubicSpline extends Spline {
 	public static CubicSpline newNaturalSpline(double[] x, double[] y) {
 		return newNaturalSplineInPlace(Arrays.copyOf(x, x.length), y);
 	}
-	
+
 	private static CubicSpline buildSpline(double[] x, double[] y, int minLength, CubicSplineBuilder builder) {
 		Splines.checkXYDimensions(x, y);
 		Splines.checkMinkXLength(x, minLength);
+		Polynomials.polyfit(x, y, 2);
+		// double[] coefficients = parabola.GetCoefficients();
+		// double a = coefficients[0];
+		// double b = coefficients[1] - 2 * a * x[0];
+		// double c = coefficients[2] - b * x[0] + a * x[0] * x[0];
 		final int n = x.length;
 		TridiagonalLDLTSystem T = setupC2Spline(x, y);
 		return new CubicSpline(x, y, builder.build(T, x, y, n));
+	}
+
+	public static double[] parabolaFit(double x0, double x1, double x2, double y0, double y1, double y2) {
+		double denom = (x0 - x1) * (x0 - x2) * (x1 - x2);
+		double a = (x2 * (y1 - y0) + x1 * (y0 - y2) + x0 * (y2 - y1)) / denom;
+		double b = (x2 * x2 * (y0 - y1) + x1 * x1 * (y2 - y0) + x0 * x0 * (y1 - y2)) / denom;
+		double c = (x1 * x2 * (x1 - x2) * y0 + x2 * x0 * (x2 - x0) * y1 + x0 * x1 * (x0 - x1) * y2) / denom;
+
+		return new double[] { a, b, c };
+
 	}
 
 	public static CubicSpline newNaturalSplineInPlace(double[] x, double[] y) {
@@ -182,7 +199,7 @@ public class CubicSpline extends Spline {
 				b = 1 / (1 + a);
 				T.D[n - 1] = T.SD[n - 2] * b;
 				r0 = (y[n - 1] - y[n - 2]) * T.SD[n - 2] * T.SD[n - 2];
-				
+
 				r1 = (y[n - 2] - y[n - 3]) * T.SD[n - 3] * T.SD[n - 3];
 				T.dydx[n - 1] = ((3.0 * a + 2.0) * r0 + a * r1) * b * b;
 				return T.solve();
@@ -233,8 +250,6 @@ public class CubicSpline extends Spline {
 		return new CubicSpline(x, y, d);
 	}
 
-
-
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
@@ -264,7 +279,7 @@ public class CubicSpline extends Spline {
 		for (double xii : xi) {
 			System.out.printf("y(%.4f) = %.4f%n", xii, cs.evaluateAt(xii));
 		}
-		
+
 	}
 
 	private static TridiagonalLDLTSystem setupC2Spline(double[] x, double[] y) {
@@ -286,14 +301,14 @@ public class CubicSpline extends Spline {
 		}
 		return T;
 	}
-	
+
 	@Override
 	protected double getValueAt(int i, double x) {
 		double t = x - _x[i];
 		i <<= 2;
 		return _coefs[i + 3] + t * (_coefs[i + 2] + t * (_coefs[i + 1] + t * _coefs[i]));
 	}
-	
+
 	@Override
 	public double evaluateDerivativeAt(int i, double t) {
 		i <<= 2;
