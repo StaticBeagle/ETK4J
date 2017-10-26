@@ -42,16 +42,24 @@ public class LinearSpline extends Spline {
 	}
 
 	@Override
-	public double differentiate(double x) {
-		throw new RuntimeException("Method not implemented yet");
+	protected double getValueAt(int i, double x) {
+		double t = x - _x[i];
+		i <<= 1;
+		return _coefs[i + 1] + t * _coefs[i];
 	}
-
+	
+	@Override
+	protected double evaluateDerivativeAt(int i, double t) {
+		i = i << 1;
+		return _coefs[i];
+	}
 	
 	@Override
 	protected double evaluateAntiDerivativeAt(int i, double t) {
 		i = i << 1;
 		return t * (_coefs[i + 1] + t * _coefs[i] * 0.5);
 	}
+	
 	
 	public static void main(String[] args) {
 		double[] x = new double[] {1, 2, 3, 4};

@@ -14,6 +14,8 @@ public abstract class Spline extends PiecewiseFunction implements Differentiable
 		super(x, y0, yn);
 		_order = order;
 	}
+	
+	protected abstract double evaluateDerivativeAt(int i, double t);
 
 	protected abstract double evaluateAntiDerivativeAt(int i, double t);
 
@@ -31,6 +33,13 @@ public abstract class Spline extends PiecewiseFunction implements Differentiable
 			result = result * t + _coefs[i++];
 		}
 		return result;
+	}
+	
+	@Override
+	public double differentiate(double x) {
+		int i = this.findLeftIndex(x);
+		double t = x - _x[i];
+		return this.evaluateDerivativeAt(i, t);
 	}
 
 	@Override

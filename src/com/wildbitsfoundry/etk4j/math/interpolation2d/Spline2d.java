@@ -89,7 +89,7 @@ public class Spline2d {
 		}
 		index = -(index + 2);
 		boolean edge = (index + 1) % _order == 0;
-		return edge ? index : _order * (index / _order);
+		return edge ? (index + 1) - (_order >> 1) : _order * (index / _order);
 	}
 
 	public static void main(String[] args) {
@@ -101,7 +101,7 @@ public class Spline2d {
 				{ 25, 100, 225, 400, 625, 900, 1225, 1600 }, { 36, 144, 324, 576, 900, 1296, 1764, 2304 },
 				{ 49, 196, 441, 784, 1225, 1764, 2401, 3136 }, { 64, 256, 576, 1024, 1600, 2304, 3136, 4096 } };
 
-		Spline2d sp = newBicubicSpline(x, y, z);
+		Spline2d sp = newBilinearSpline(x, y, z);
 
 		System.out.println(sp.evaluateAt(1, 1));
 		System.out.println(sp.evaluateAt(2, 1));

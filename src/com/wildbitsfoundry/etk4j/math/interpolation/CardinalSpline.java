@@ -137,11 +137,17 @@ public class CardinalSpline extends Spline {
 	// sb.setLength(Math.max(sb.length() - System.lineSeparator().length(), 0));
 	// return sb.toString().replace("+ -", "- ");
 	// }
-
-
+	
+	protected double getValueAt(int i, double x) {
+		double t = x - _x[i];
+		i <<= 2;
+		return _coefs[i + 3] + t * (_coefs[i + 2] + t * (_coefs[i + 1] + t * _coefs[i]));
+	}
+	
 	@Override
-	public double differentiate(double x) {
-		throw new RuntimeException("Method not implemented yet");
+	public double evaluateDerivativeAt(int i, double t) {
+		i <<= 2;
+		return _coefs[i + 2] + t * (_coefs[i + 1] + t * _coefs[i]);
 	}
 
 	private final double a = 1.0 / 2.0, b = 1.0 / 3.0, c = 1.0 / 4.0;
