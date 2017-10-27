@@ -3,49 +3,38 @@ package com.wildbitsfoundry.etk4j.math.interpolation;
 import java.util.Arrays;
 
 import com.wildbitsfoundry.etk4j.curvefitting.CurveFitting;
-import com.wildbitsfoundry.etk4j.math.polynomials.Polynomials;
 import com.wildbitsfoundry.etk4j.util.ArrayUtils;
 
 public class CubicSpline extends Spline {
 
 	private static class TridiagonalLDLTSystem {
 		public double[] D;
-		public double[] SD;
-		public double[] dydx;
+		public double[] L;
+		public double[] b;
 
 		public TridiagonalLDLTSystem(int n) {
-			SD = new double[n - 1];
+			L = new double[n - 1];
 			D = new double[n];
-			dydx = new double[n];
+			b = new double[n];
 		}
 
 		public double[] solve() {
-			tridiagonalLDLTSolve(D, SD, dydx);
-			return dydx;
+			return this.solve(b.length, 0);
 		}
 
 		public double[] solve(int length, int offset) {
-			tridiagonalLDLTSolve(D, SD, dydx, length, offset);
-			return dydx;
-		}
-
-		private static void tridiagonalLDLTSolve(double[] D, double[] L, double[] b, int length, int offset) {
-			int n = length;
-			for (int i = offset; i < n - 1; ++i) {
+			for (int i = offset; i < length - 1; ++i) {
 				double ui = L[i];
 				L[i] /= D[i];
 				D[i + 1] -= ui * L[i];
 				b[i + 1] -= L[i] * b[i];
 			}
 
-			b[n - 1] /= D[n - 1];
-			for (int i = n - 2; i >= offset; --i) {
+			b[length - 1] /= D[length - 1];
+			for (int i = length - 2; i >= offset; --i) {
 				b[i] = b[i] / D[i] - L[i] * b[i + 1];
 			}
-		}
-
-		private static void tridiagonalLDLTSolve(double[] D, double[] L, double[] b) {
-			tridiagonalLDLTSolve(D, L, b, b.length, 0);
+			return b;
 		}
 	}
 
@@ -123,7 +112,7 @@ public class CubicSpline extends Spline {
 			parabola[2] = parabola[2] - parabola[1] * x[0] + parabola[0] * x[0] * x[0];
 			return new CubicSpline(x, y, parabola, parabola[1], 2 * parabola[0] * hx + parabola[1]);
 		}
-		TridiagonalLDLTSystem T = setupC2Spline(x, y);
+		TridiagonalLDLTSystem T = setupSpline(x, y);
 		return new CubicSpline(x, y, builder.build(T, x, y, n));
 	}
 
@@ -131,12 +120,12 @@ public class CubicSpline extends Spline {
 		CubicSplineBuilder builder = new CubicSplineBuilder() {
 			@Override
 			public double[] build(TridiagonalLDLTSystem T, double[] x, double[] y, int n) {
-				T.D[0] = 2.0 * T.SD[0];
-				double r0 = (y[1] - y[0]) * T.SD[0] * T.SD[0];
-				T.dydx[0] = 3.0 * r0;
-				T.D[n - 1] = 2.0 * T.SD[n - 2];
-				r0 = (y[n - 1] - y[n - 2]) * T.SD[n - 2] * T.SD[n - 2];
-				T.dydx[n - 1] = 3.0 * r0;
+				T.D[0] = 2.0 * T.L[0];
+				double r0 = (y[1] - y[0]) * T.L[0] * T.L[0];
+				T.b[0] = 3.0 * r0;
+				T.D[n - 1] = 2.0 * T.L[n - 2];
+				r0 = (y[n - 1] - y[n - 2]) * T.L[n - 2] * T.L[n - 2];
+				T.b[n - 1] = 3.0 * r0;
 				return T.solve();
 			}
 		};
@@ -152,12 +141,12 @@ public class CubicSpline extends Spline {
 		CubicSplineBuilder builder = new CubicSplineBuilder() {
 			@Override
 			public double[] build(TridiagonalLDLTSystem T, double[] x, double[] y, int n) {
-				T.D[0] = T.SD[0];
-				double r0 = (y[1] - y[0]) * T.SD[0] * T.SD[0];
-				T.dydx[0] = 2.0 * r0;
-				T.D[n - 1] = T.SD[n - 2];
-				r0 = (y[n - 1] - y[n - 2]) * T.SD[n - 2] * T.SD[n - 2];
-				T.dydx[n - 1] = 2.0 * r0;
+				T.D[0] = T.L[0];
+				double r0 = (y[1] - y[0]) * T.L[0] * T.L[0];
+				T.b[0] = 2.0 * r0;
+				T.D[n - 1] = T.L[n - 2];
+				r0 = (y[n - 1] - y[n - 2]) * T.L[n - 2] * T.L[n - 2];
+				T.b[n - 1] = 2.0 * r0;
 				return T.solve();
 			}
 		};
@@ -172,11 +161,11 @@ public class CubicSpline extends Spline {
 		CubicSplineBuilder builder = new CubicSplineBuilder() {
 			@Override
 			public double[] build(TridiagonalLDLTSystem T, double[] x, double[] y, int n) {
-				T.dydx[0] = d0;
-				T.dydx[T.dydx.length - 1] = dn;
-				T.dydx[1] = T.dydx[1] - T.dydx[0] * T.SD[0];
-				T.dydx[n - 2] = T.dydx[n - 2] - T.dydx[n - 1] * T.SD[n - 2];
-				return T.solve(T.dydx.length - 1, 1);
+				T.b[0] = d0;
+				T.b[T.b.length - 1] = dn;
+				T.b[1] = T.b[1] - T.b[0] * T.L[0];
+				T.b[n - 2] = T.b[n - 2] - T.b[n - 1] * T.L[n - 2];
+				return T.solve(T.b.length - 1, 1);
 			}
 		};
 		return buildSpline(x, y, builder);
@@ -190,20 +179,20 @@ public class CubicSpline extends Spline {
 		CubicSplineBuilder builder = new CubicSplineBuilder() {
 			@Override
 			public double[] build(TridiagonalLDLTSystem T, double[] x, double[] y, int n) {
-				double a = T.SD[1] / T.SD[0];
+				double a = T.L[1] / T.L[0];
 				double b = 1 / (1 + a);
-				T.D[0] = T.SD[0] * b;
-				double r0 = (y[1] - y[0]) * T.SD[0] * T.SD[0];
-				double r1 = (y[2] - y[1]) * T.SD[1] * T.SD[1];
-				T.dydx[0] = ((3.0 * a + 2.0) * r0 + a * r1) * b * b;
+				T.D[0] = T.L[0] * b;
+				double r0 = (y[1] - y[0]) * T.L[0] * T.L[0];
+				double r1 = (y[2] - y[1]) * T.L[1] * T.L[1];
+				T.b[0] = ((3.0 * a + 2.0) * r0 + a * r1) * b * b;
 
-				a = T.SD[n - 3] / T.SD[n - 2];
+				a = T.L[n - 3] / T.L[n - 2];
 				b = 1 / (1 + a);
-				T.D[n - 1] = T.SD[n - 2] * b;
-				r0 = (y[n - 1] - y[n - 2]) * T.SD[n - 2] * T.SD[n - 2];
+				T.D[n - 1] = T.L[n - 2] * b;
+				r0 = (y[n - 1] - y[n - 2]) * T.L[n - 2] * T.L[n - 2];
 
-				r1 = (y[n - 2] - y[n - 3]) * T.SD[n - 3] * T.SD[n - 3];
-				T.dydx[n - 1] = ((3.0 * a + 2.0) * r0 + a * r1) * b * b;
+				r1 = (y[n - 2] - y[n - 3]) * T.L[n - 3] * T.L[n - 3];
+				T.b[n - 1] = ((3.0 * a + 2.0) * r0 + a * r1) * b * b;
 				return T.solve();
 			}
 		};
@@ -284,12 +273,12 @@ public class CubicSpline extends Spline {
 
 	}
 
-	private static TridiagonalLDLTSystem setupC2Spline(double[] x, double[] y) {
+	private static TridiagonalLDLTSystem setupSpline(double[] x, double[] y) {
 		final int n = x.length - 1;
 		TridiagonalLDLTSystem T = new TridiagonalLDLTSystem(n + 1);
 		double[] D = T.D;
-		double[] SD = T.SD;
-		double[] dydx = T.dydx;
+		double[] SD = T.L;
+		double[] dydx = T.b;
 
 		SD[0] = 1.0 / (x[1] - x[0]);
 		double r1 = (y[1] - y[0]) * SD[0] * SD[0];
