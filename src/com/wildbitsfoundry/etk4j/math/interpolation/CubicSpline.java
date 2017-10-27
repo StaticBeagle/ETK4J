@@ -2,6 +2,7 @@ package com.wildbitsfoundry.etk4j.math.interpolation;
 
 import java.util.Arrays;
 
+import com.wildbitsfoundry.etk4j.curvefitting.CurveFitting;
 import com.wildbitsfoundry.etk4j.math.polynomials.Polynomials;
 import com.wildbitsfoundry.etk4j.util.ArrayUtils;
 
@@ -102,27 +103,28 @@ public class CubicSpline extends Spline {
 		return newNaturalSplineInPlace(Arrays.copyOf(x, x.length), y);
 	}
 
-	private static CubicSpline buildSpline(double[] x, double[] y, int minLength, CubicSplineBuilder builder) {
+	private static CubicSpline buildSpline(double[] x, double[] y, CubicSplineBuilder builder) {
 		Splines.checkXYDimensions(x, y);
-		Splines.checkMinkXLength(x, minLength);
-		Polynomials.polyfit(x, y, 2);
-		// double[] coefficients = parabola.GetCoefficients();
-		// double a = coefficients[0];
-		// double b = coefficients[1] - 2 * a * x[0];
-		// double c = coefficients[2] - b * x[0] + a * x[0] * x[0];
+		Splines.checkMinkXLength(x, 2);
 		final int n = x.length;
+		// need to double check these equations
+		if (n == 2) {
+			double[] line = CurveFitting.line(x[0], x[1], y[0], y[1]);
+			double hx = x[1] - x[0];
+			line[0] /= hx;
+			line[1] = line[1] - line[0] * x[0];
+			return new CubicSpline(x, y, line, line[0], line[0]);
+		}
+		if (n == 3) {
+			double[] parabola = CurveFitting.parabola(x[0], x[1], x[2], y[0], y[1], y[2]);
+			double hx = x[2] - x[0];
+			parabola[0] /= (hx * hx);
+			parabola[1] = parabola[1] / hx - 2 * parabola[0] * x[0];
+			parabola[2] = parabola[2] - parabola[1] * x[0] + parabola[0] * x[0] * x[0];
+			return new CubicSpline(x, y, parabola, parabola[1], 2 * parabola[0] * hx + parabola[1]);
+		}
 		TridiagonalLDLTSystem T = setupC2Spline(x, y);
 		return new CubicSpline(x, y, builder.build(T, x, y, n));
-	}
-
-	public static double[] parabolaFit(double x0, double x1, double x2, double y0, double y1, double y2) {
-		double denom = (x0 - x1) * (x0 - x2) * (x1 - x2);
-		double a = (x2 * (y1 - y0) + x1 * (y0 - y2) + x0 * (y2 - y1)) / denom;
-		double b = (x2 * x2 * (y0 - y1) + x1 * x1 * (y2 - y0) + x0 * x0 * (y1 - y2)) / denom;
-		double c = (x1 * x2 * (x1 - x2) * y0 + x2 * x0 * (x2 - x0) * y1 + x0 * x1 * (x0 - x1) * y2) / denom;
-
-		return new double[] { a, b, c };
-
 	}
 
 	public static CubicSpline newNaturalSplineInPlace(double[] x, double[] y) {
@@ -138,7 +140,7 @@ public class CubicSpline extends Spline {
 				return T.solve();
 			}
 		};
-		return buildSpline(x, y, 2, builder);
+		return buildSpline(x, y, builder);
 	}
 
 	public static CubicSpline newParabolicallyTerminatedSpline(double[] x, double[] y) {
@@ -159,7 +161,7 @@ public class CubicSpline extends Spline {
 				return T.solve();
 			}
 		};
-		return buildSpline(x, y, 2, builder);
+		return buildSpline(x, y, builder);
 	}
 
 	public static CubicSpline newClampedSpline(double[] x, double[] y, double d0, double dn) {
@@ -177,7 +179,7 @@ public class CubicSpline extends Spline {
 				return T.solve(T.dydx.length - 1, 1);
 			}
 		};
-		return buildSpline(x, y, 2, builder);
+		return buildSpline(x, y, builder);
 	}
 
 	public static CubicSpline newNotAKnotSpline(double[] x, double[] y) {
@@ -205,7 +207,7 @@ public class CubicSpline extends Spline {
 				return T.solve();
 			}
 		};
-		return buildSpline(x, y, 4, builder);
+		return buildSpline(x, y, builder);
 	}
 
 	public static CubicSpline newAkimaSpline(double[] x, double[] y) {

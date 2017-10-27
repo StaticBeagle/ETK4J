@@ -2,6 +2,7 @@ package com.wildbitsfoundry.etk4j.math.polynomials;
 
 import java.util.Arrays;
 
+import com.wildbitsfoundry.etk4j.math.Formulas;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.functions.DifferentiableFunction;
 import com.wildbitsfoundry.etk4j.math.functions.IntegrableFunction;
@@ -309,10 +310,10 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 				_roots = new Complex[] { new Complex(-_coefs[1] / _coefs[0], 0) };
 				break;
 			case 2:
-				_roots = Polynomials.quadraticFormula(_coefs[0], _coefs[1], _coefs[2]);
+				_roots = Formulas.quadraticFormula(_coefs[0], _coefs[1], _coefs[2]);
 				break;
 			case 3:
-				_roots = Polynomials.cubicFormula(_coefs[0], _coefs[1], _coefs[2], _coefs[3]);
+				_roots = Formulas.cubicFormula(_coefs[0], _coefs[1], _coefs[2], _coefs[3]);
 				break;
 			default:
 				// Use generalized eigenvalue decomposition to find the roots
@@ -403,15 +404,49 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 	public double getCoefficientAt(int index) {
 		return _coefs[index];
 	}
+	
+	/***
+	 * Polynomial fit
+	 * <pre>
+	 * Finds a polynomial P(x) = c0 + c1*x + * c2*x^2 + ... + cn*x^n 
+	 * of degree n that fits the data in y best in a least-square sense.
+	 * </pre>
+	 * @param x
+	 *            Array of points for the independent variable x
+	 * @param y
+	 *            Array of solutions to y(x)
+	 * @param n
+	 *            Order of the polynomial
+	 * @return Returns a polynomial of degree n fits the data y best in a
+	 *         least-square sense
+	 */
+	public static Polynomial polyfit(double[] x, double[] y, int n) {
+		int dim = x.length;
+		if (dim != y.length) {
+			throw new IllegalArgumentException("x and y dimensions must match!");
+		}
+		// Building the coefficient matrix
+		Matrix A = Matrices.Vandermonde(x, dim, n);
+		// Building the solution vector
+		Matrix b = new Matrix(y, dim);
+		Matrix c = A.solve(b);
+
+		double[] coeffs = new double[n + 1];
+		for (int i = 0; i <= n; i++) {
+			coeffs[i] = c.get(n - i, 0);
+		}
+		Polynomial result = new Polynomial(coeffs);
+		return result;
+	}
 
 	public static void main(String[] args) {
 		// everything here is correct. It just needs to
 		// be moved to an unit test
 		double[] x = new double[] { 1, 2, 3, 4 };
 		double[] y = new double[] { 1, 10, 12, 15 };
-		Polynomial poly = Polynomials.polyfit(x, y, 2);
-		Polynomial poly2 = Polynomials.polyfit(x, y, 3);
-		Polynomial poly3 = Polynomials.polyfit(x, y, 4);
+		Polynomial poly = Polynomial.polyfit(x, y, 2);
+		Polynomial poly2 = Polynomial.polyfit(x, y, 3);
+		Polynomial poly3 = Polynomial.polyfit(x, y, 4);
 
 		System.out.println(poly.evaluateAt(2.5));
 		System.out.println(poly2.evaluateAt(2.5));
