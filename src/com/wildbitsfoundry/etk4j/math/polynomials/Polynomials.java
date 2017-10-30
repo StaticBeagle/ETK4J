@@ -2,7 +2,6 @@ package com.wildbitsfoundry.etk4j.math.polynomials;
 
 import java.util.Arrays;
 
-import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrices;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
 import com.wildbitsfoundry.etk4j.util.ArrayUtils;
 

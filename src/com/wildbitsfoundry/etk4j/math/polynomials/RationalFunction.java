@@ -11,20 +11,31 @@ public class RationalFunction implements UnivariateFunction {
 		_numerator = new Polynomial(zeros);
 		_denominator = new Polynomial(poles);
 	}
+	
+	public RationalFunction(double num, Complex[] poles) {
+		_numerator = new Polynomial(num);
+		_denominator = new Polynomial(poles);
+	}
 
 	public RationalFunction(RationalFunction rf) {
 		_numerator = new Polynomial(rf._numerator);
 		_denominator = new Polynomial(rf._denominator);
 	}
+	
 
-	public RationalFunction(Polynomial numerator, Polynomial denominator) {
-		_numerator = new Polynomial(numerator);
-		_denominator = new Polynomial(denominator);
+	public RationalFunction(Polynomial num, Polynomial den) {
+		_numerator = new Polynomial(num);
+		_denominator = new Polynomial(den);
 	}
 
-	public RationalFunction(double[] numerator, double[] denominator) {
-		_numerator = new Polynomial(numerator);
-		_denominator = new Polynomial(denominator);
+	public RationalFunction(double num, Polynomial den) {
+		_numerator = new Polynomial(num);
+		_denominator = new Polynomial(den);
+	}
+	
+	public RationalFunction(double[] num, double[] den) {
+		_numerator = new Polynomial(num);
+		_denominator = new Polynomial(den);
 	}
 
 	public Complex[] getZeros() {

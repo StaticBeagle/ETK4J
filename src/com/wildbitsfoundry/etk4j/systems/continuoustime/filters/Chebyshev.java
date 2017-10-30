@@ -1,26 +1,27 @@
 package com.wildbitsfoundry.etk4j.systems.continuoustime.filters;
 
+import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
 import com.wildbitsfoundry.etk4j.systems.continuoustime.TransferFunction;
 import com.wildbitsfoundry.etk4j.util.ArrayUtils;
 
-public class Butterworth extends AnalogFilter {
+public class Chebyshev extends AnalogFilter {
 
 	private TransferFunction _tf = null;
 	private double _eps;
 
 	/***
-	 * Calculate the minimum order required for Low-Pass Butterworth filter
+	 * Calculate the minimum order required for Low-Pass Chebyshev filter
 	 * 
-	 * @param wp
-	 *            passband frequency
-	 * @param ws
-	 *            stopband frequency
-	 * @param Ap
-	 *            passband attenuation
-	 * @param As
-	 *            stopband attenuation
+	 * @param fp
+	 *            passband frequency in Hertz
+	 * @param fs
+	 *            stopband frequency in Hertz
+	 * @param ap
+	 *            passband attenuation in dB
+	 * @param as
+	 *            stopband attenuation in dB
 	 * @return
 	 */
 	public static int getMinOrderRequired(double fp, double fs, double ap, double as) {
@@ -29,14 +30,17 @@ public class Butterworth extends AnalogFilter {
 		double amax = Math.pow(10, ap * 0.1) - 1;
 		double amin = Math.pow(10, as * 0.1) - 1;
 
-		double L = Math.log10(amin / amax) / (2 * Math.log10(ws / wp));
+		double L = MathETK.acosh(Math.sqrt(amin / amax)) / MathETK.acosh(ws / wp);
 
 		return (int) Math.ceil(L);
-
 	}
 
-	private Butterworth(int n, double ap) {
+	private Chebyshev(int n, double ap) {
 		_eps = Math.sqrt(Math.pow(10, ap * 0.1) - 1);
+
+		double a = 1.0 / n * MathETK.asinh(1 / _eps);
+		double sinha = Math.sinh(a);
+		double cosha = Math.cosh(a);
 
 		final double pid = Math.PI / 180.0;
 		Complex[] poles = new Complex[n];
@@ -44,51 +48,60 @@ public class Butterworth extends AnalogFilter {
 			int i = 0;
 			for (double k : ArrayUtils.linsteps(-n * 0.5 + 1.0, n * 0.5, 1)) {
 				double phik = 180.0 * (k / n) - 90.0 / n;
-				poles[i++] = new Complex(-Math.cos(phik * pid), Math.sin(phik * pid));
+				poles[i++] = new Complex(-sinha * Math.cos(phik * pid), cosha * Math.sin(phik * pid));
 			}
 		} else {
 			int i = 0;
 			for (double k : ArrayUtils.linsteps(-(n - 1) * 0.5, (n - 1) * 0.5, 1)) {
 				double phik = 180.0 * (k / n);
-				poles[i++] = new Complex(-Math.cos(phik * pid), Math.sin(phik * pid));
+				poles[i++] = new Complex(-sinha * Math.cos(phik * pid), cosha * Math.sin(phik * pid));
 			}
 		}
-		_tf = new TransferFunction(new Complex[0], poles);
+
+		double N = 1;
+		for (int k = 0; k < (int) Math.ceil(n / 2.0); ++k) {
+			if (poles[k].imag() != 0.0) {
+				N *= poles[k].real() * poles[k].real() + poles[k].imag() * poles[k].imag();
+			} else {
+				N *= -poles[k].real();
+			}
+		}
+		_tf = new TransferFunction(N, poles);
 		_order = n;
 	}
-	
-	public static Butterworth newLowPass(int n, double ap) {
-		return new Butterworth(n, ap);
+
+	public static Chebyshev newLowPass(int n, double ap) {
+		return new Chebyshev(n, ap);
 	}
 
-	public static Butterworth newLowPass(double fp, double fs, double ap, double as) {
+	public static Chebyshev newLowPass(double fp, double fs, double ap, double as) {
 		double wp = 2 * Math.PI * fp;
 		double ws = 2 * Math.PI * fs;
 		final int n = getMinOrderRequired(wp, ws, ap, as);
-		Butterworth lp = new Butterworth(n, ap);
+		Chebyshev lp = new Chebyshev(n, ap);
 		double factor = Math.pow(lp._eps, -1.0 / n) * wp;
 		lp._tf.substituteInPlace(1.0 / factor);
 		return lp;
 	}
 
-	public static Butterworth newHighPass(int n, double ap) {
-		Butterworth hp = newLowPass(n, ap);
+	public static Chebyshev newHighPass(int n, double ap) {
+		Chebyshev hp = newLowPass(n, ap);
 		hp._tf = lpTohp(hp._tf.getNumerator(), hp._tf.getDenominator());
 		return hp;
 	}
 
-	public static Butterworth newHighPass(double fp, double fs, double ap, double as) {
+	public static Chebyshev newHighPass(double fp, double fs, double ap, double as) {
 		double wp = 2 * Math.PI * fp;
 		double ws = 2 * Math.PI * fs;
 		final int n = getMinOrderRequired(ws, wp, ap, as);
-		Butterworth hp = new Butterworth(n, ap);
+		Chebyshev hp = new Chebyshev(n, ap);
 		double factor = wp / Math.pow(hp._eps, -1.0 / n);
 		hp._tf.substituteInPlace(factor);
 		hp._tf = lpTohp(hp._tf.getNumerator(), hp._tf.getDenominator());
 		return hp;
 	}
 
-	public static Butterworth newBandPass(double fp1, double fp2, double fs1, double fs2, double ap, double as1,
+	public static Chebyshev newBandPass(double fp1, double fp2, double fs1, double fs2, double ap, double as1,
 			double as2) {
 		double wp1 = 2 * Math.PI * fp1;
 		double wp2 = 2 * Math.PI * fp2;
@@ -108,14 +121,14 @@ public class Butterworth extends AnalogFilter {
 		final int n2 = getMinOrderRequired(1, omega2, ap, as2);
 
 		final int n = Math.max(n1, n2);
-		Butterworth bp = new Butterworth(n, ap);
+		Chebyshev bp = new Chebyshev(n, ap);
 		double bw = Q / Math.pow(bp._eps, -1.0 / n) / w0;
 		bp._tf = lpTobp(bp._tf.getNumerator(), bp._tf.getDenominator(), w0, bw);
 		bp._order <<= 1;
 		return bp;
 	}
 
-	public static Butterworth newBandStop(double fp1, double fp2, double fs1, double fs2, double amax, double amin) {
+	public static Chebyshev newBandStop(double fp1, double fp2, double fs1, double fs2, double amax, double amin) {
 		double wp1 = 2 * Math.PI * fp1;
 		double wp2 = 2 * Math.PI * fp2;
 		double ws1 = 2 * Math.PI * fs1;
@@ -133,7 +146,7 @@ public class Butterworth extends AnalogFilter {
 		final int n2 = getMinOrderRequired(1, omegas2, amax, amin);
 
 		final int n = Math.max(n1, n2);
-		Butterworth bp = new Butterworth(n, amax);
+		Chebyshev bp = new Chebyshev(n, amax);
 		double bw = Q * Math.pow(bp._eps, -1.0 / n) / w0;
 		bp._tf = lpTobs(bp._tf.getNumerator(), bp._tf.getDenominator(), w0, bw);
 		bp._order <<= 1;
@@ -141,13 +154,13 @@ public class Butterworth extends AnalogFilter {
 	}
 
 	public static void main(String[] args) {
-		Butterworth lowpass = newLowPass(1, 10, 0.2, 60);
+		Chebyshev lowpass = newLowPass(1, 2, 1, 20);
 
-		Butterworth highpass = newHighPass(10, 1, 0.2, 60);
+		Chebyshev highpass = newHighPass(10, 1, 0.2, 60);
 
-		Butterworth bandpass = newBandPass(190, 210, 180, 220, 0.2, 20, 20);
+		Chebyshev bandpass = newBandPass(190, 210, 180, 220, 0.2, 20, 20);
 
-		Butterworth bandstop = newBandStop(3.6e3, 9.1e3, 5.45e3, 5.90e3, 1.5, 38);
+		Chebyshev bandstop = newBandStop(3.6e3, 9.1e3, 5.45e3, 5.90e3, 1.5, 38);
 
 		Polynomial f = new Polynomial(new double[] { 1, 1 });
 		System.out.println(f.pow(2));

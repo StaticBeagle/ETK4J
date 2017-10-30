@@ -18,7 +18,7 @@ public class TransferFunction {
 	}
 	
 	public TransferFunction(double gain, Complex[] poles) {
-		Polynomial num = new Polynomial(new double[] { gain });
+		Polynomial num = new Polynomial(gain);
 		Polynomial den = new Polynomial(poles);
 		
 		_rf = new RationalFunction(num, den);
