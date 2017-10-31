@@ -194,6 +194,15 @@ public final class ArrayUtils {
 		return result;
 	}
 	
+	public static double[] repeat(double[] a, int n) {
+		final int length = a.length;
+		double[] result = new double[length * n];
+		for(int i = 0; i < n; ++i) {
+			System.arraycopy(a, 0, result, i * length, length);
+		}
+		return result;
+	}
+	
 	public static double[] reverse(double[] a) {
 		final int length = a.length;
 		double[] result = new double[a.length];
@@ -235,5 +244,22 @@ public final class ArrayUtils {
 			}
 		}
 		return true;
+	}
+	
+	/**
+	 * Helper method to copy a 2 dimensional array
+	 * 
+	 * @param array
+	 *            to copy
+	 * @return a newly created array containing the copy of array
+	 */
+	public static double[] flatten(double[][] a) {
+		int rows = a.length;
+		int cols = a[0].length;
+		double[] result = new double[rows * cols];
+		for (int i = 0; i < rows; i++) {
+			System.arraycopy(a[i], 0, result, i * cols, cols);
+		}
+		return result;
 	}
 }

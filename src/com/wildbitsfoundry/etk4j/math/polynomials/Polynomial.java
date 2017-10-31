@@ -420,7 +420,7 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 	 * @return Returns a polynomial of degree n fits the data y best in a
 	 *         least-square sense
 	 */
-	public static Polynomial polyfit(double[] x, double[] y, int n) {
+	public static Polynomial polyFit(double[] x, double[] y, int n) {
 		int dim = x.length;
 		if (dim != y.length) {
 			throw new IllegalArgumentException("x and y dimensions must match!");
@@ -444,9 +444,9 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 		// be moved to an unit test
 		double[] x = new double[] { 1, 2, 3, 4 };
 		double[] y = new double[] { 1, 10, 12, 15 };
-		Polynomial poly = Polynomial.polyfit(x, y, 2);
-		Polynomial poly2 = Polynomial.polyfit(x, y, 3);
-		Polynomial poly3 = Polynomial.polyfit(x, y, 4);
+		Polynomial poly = Polynomial.polyFit(x, y, 2);
+		Polynomial poly2 = Polynomial.polyFit(x, y, 3);
+		Polynomial poly3 = Polynomial.polyFit(x, y, 4);
 
 		System.out.println(poly.evaluateAt(2.5));
 		System.out.println(poly2.evaluateAt(2.5));

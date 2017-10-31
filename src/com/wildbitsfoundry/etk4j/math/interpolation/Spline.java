@@ -6,6 +6,12 @@ import com.wildbitsfoundry.etk4j.math.functions.PiecewiseFunction;
 
 public abstract class Spline extends PiecewiseFunction implements DifferentiableFunction, IntegrableFunction {
 
+	public enum SplineType {
+		CUBIC,
+		LINEAR,
+		MONOTONIC
+	}
+	
 	private double[] _indefiniteIntegral = null;
 	protected double[] _coefs = null;
 	private final int _order;
@@ -73,6 +79,31 @@ public abstract class Spline extends PiecewiseFunction implements Differentiable
 		for (int i = 0; i < size - 1; ++i) {
 			double t = _x[i + 1] - _x[i];
 			_indefiniteIntegral[i + 1] = _indefiniteIntegral[i] + this.evaluateAntiDerivativeAt(i, t);
+		}
+	}
+	
+	public Spline newSpline(double[] x, double[] y, SplineType type) {
+		switch (type) {
+		case CUBIC:
+			return CubicSpline.newCubicSpline(x, y);
+		case LINEAR:
+			return LinearSpline.newLinearSpline(x, y);
+		case MONOTONIC:
+			return CubicSpline.newAkimaSpline(x, y);
+		default:
+			throw new IllegalStateException();
+		}
+	}
+	
+	protected static void checkXYDimensions(double[] x, double[] y) {
+		if (x.length != y.length) {
+			throw new IllegalArgumentException("x and y dimensions must be the same");
+		}
+	}
+
+	protected static void checkMinkXLength(double[] x, int size) {
+		if (x.length < size) {
+			throw new IllegalArgumentException(String.format("x length must be >= %d", size));
 		}
 	}
 }

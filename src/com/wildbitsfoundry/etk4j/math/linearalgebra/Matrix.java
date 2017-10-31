@@ -3,6 +3,7 @@ package com.wildbitsfoundry.etk4j.math.linearalgebra;
 import java.util.Arrays;
 
 import com.wildbitsfoundry.etk4j.math.MathETK;
+import com.wildbitsfoundry.etk4j.util.ArrayUtils;
 
 public class Matrix {
 	private double[] _data;
@@ -28,13 +29,13 @@ public class Matrix {
 	public Matrix(double[][] data) {
 		_rows = data.length;
 		_cols = data[0].length;
-		_data = Matrix.arrayflatten(data);
+		_data = ArrayUtils.flatten(data);
 	}
 
 	public Matrix(double[][] data, int rows, int cols) {
 		_rows = rows;
 		_cols = cols;
-		_data = Matrix.arrayflatten(data);
+		_data = ArrayUtils.flatten(data);
 	}
 
 	public Matrix(double[] data, int rows, int cols) {
@@ -70,23 +71,6 @@ public class Matrix {
 		double[][] copy = new double[rows][cols];
 		for (int i = 0; i < rows; i++) {
 			System.arraycopy(array[i], 0, copy[i], 0, cols);
-		}
-		return copy;
-	}
-
-	/**
-	 * Helper method to copy a 2 dimensional array
-	 * 
-	 * @param array
-	 *            to copy
-	 * @return a newly created array containing the copy of array
-	 */
-	protected static double[] arrayflatten(final double[][] array) {
-		int rows = array.length;
-		int cols = array[0].length;
-		double[] copy = new double[rows * cols];
-		for (int i = 0; i < rows; i++) {
-			System.arraycopy(array[i], 0, copy, i * cols, cols);
 		}
 		return copy;
 	}

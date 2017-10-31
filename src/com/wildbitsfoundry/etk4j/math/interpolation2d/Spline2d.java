@@ -14,7 +14,7 @@ public class Spline2d {
 
 	private int _order;
 
-	protected Spline2d(double[] x, double[] y, Spline[] splines, int order) {
+	protected Spline2d(double[] y, Spline[] splines, int order) {
 		_y = y;
 		_order = order;
 		_splines = splines;
@@ -34,16 +34,15 @@ public class Spline2d {
 			throw new IllegalArgumentException(
 					String.format("The number of arrays in z has to be a multiple of %d", order));
 		}
-		double[] xt = Arrays.copyOf(x, cols);
 		double[] yt = Arrays.copyOf(y, rows);
 		Spline[] splines = new Spline[rows];
 		for (int i = 0; i < rows; ++i) {
 			if (cols != z[i].length) {
 				throw new IllegalArgumentException("all arrays in z must have the same length");
 			}
-			splines[i] = CubicSpline.newCubicSplineInPlace(xt, z[i]);
+			splines[i] = CubicSpline.newCubicSplineInPlace(x, z[i]);
 		}
-		return new Spline2d(xt, yt, splines, order);
+		return new Spline2d(yt, splines, order);
 	}
 
 	public static Spline2d newBilinearSpline(double[] x, double[] y, double[][] z) {
@@ -60,16 +59,15 @@ public class Spline2d {
 			throw new IllegalArgumentException(
 					String.format("The number of arrays in z has to be a multiple of %d", order));
 		}
-		double[] xt = Arrays.copyOf(x, cols);
 		double[] yt = Arrays.copyOf(y, rows);
 		Spline[] splines = new Spline[rows];
 		for (int i = 0; i < rows; ++i) {
 			if (cols != z[i].length) {
 				throw new IllegalArgumentException("all arrays in z must have the same length");
 			}
-			splines[i] = LinearSpline.newLinearSplineInPlace(xt, z[i]);
+			splines[i] = LinearSpline.newLinearSplineInPlace(x, z[i]);
 		}
-		return new Spline2d(xt, yt, splines, order);
+		return new Spline2d(yt, splines, order);
 	}
 
 	public double evaluateAt(double x, double y) {
@@ -101,7 +99,7 @@ public class Spline2d {
 				{ 25, 100, 225, 400, 625, 900, 1225, 1600 }, { 36, 144, 324, 576, 900, 1296, 1764, 2304 },
 				{ 49, 196, 441, 784, 1225, 1764, 2401, 3136 }, { 64, 256, 576, 1024, 1600, 2304, 3136, 4096 } };
 
-		Spline2d sp = newBilinearSpline(x, y, z);
+		Spline2d sp = newBicubicSpline(x, y, z);
 
 		System.out.println(sp.evaluateAt(1, 1));
 		System.out.println(sp.evaluateAt(2, 1));

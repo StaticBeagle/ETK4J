@@ -21,24 +21,59 @@ public final class CurveFitting {
 	}
 
 	public double[] polynomial(double[] x, double[] y, int n) {
-		return Polynomial.polyfit(x, y, n).getCoefficients();
+		return Polynomial.polyFit(x, y, n).getCoefficients();
 	}
 
+	/***
+	 * Exponential least squares fit <br />
+	 * Fits x and y to a function a * e^(b * x) in a least square sense
+	 * @param x
+	 * @param y
+	 * @return [a, b]
+	 */
 	public double[] exponential(double[] x, double[] y) {
-		double a = 0.0, b = 0.0, c = 0.0, d = 0.0, r0 = 0.0, r1 = 0.0;
-		for (int i = 0; i < x.length; i++) {
-			a += y[i];
-			d = x[i] * y[i];
-			b += d;
-			c += d * x[i];
-			d = y[i] * Math.log(y[i]);
-			r0 += d;
-			r1 += x[i] * d;
+		if(x.length != y.length) {
+			throw new IllegalArgumentException("x and y dimensions must match");
 		}
-		double det = 1 / (a * c - b * b);
-		double alpha = Math.exp((c * r0 - b * r1) * det);
-		double beta = (a * r1 - b * r0) * det;
-		return new double[] { alpha, beta };
+		final int n = x.length;
+		double k0 = 0.0, k1 = 0.0, k2 = 0.0, k3 = 0.0, r0 = 0.0, r1 = 0.0;
+		for (int i = 0; i < n; i++) {
+			k0 += y[i];
+			k3 = x[i] * y[i];
+			k1 += k3;
+			k2 += k3 * x[i];
+			k3 = y[i] * Math.log(y[i]);
+			r0 += k3;
+			r1 += x[i] * k3;
+		}
+		double det = 1 / (k0 * k2 - k1 * k1);
+		double a = Math.exp((k2 * r0 - k1 * r1) * det);
+		double b = (k0 * r1 - k1 * r0) * det;
+		return new double[] { a, b };
 	}
 
+	/***
+	 * Logarithmic least squares fit
+	 * Fits x and y to a function a + b * ln(x) in a least square sense
+	 * @param x
+	 * @param y
+	 * @return [a, b]
+	 */
+	public double[] logarithmic(double[] x, double[] y)  {
+		if(x.length != y.length) {
+			throw new IllegalArgumentException("x and y dimensions must match");
+		}
+		final int n = x.length;
+		double k0 = 0.0, k1 = 0.0, k2 = 0.0, k3 = 0.0, k4 = 0.0;
+		for (int i = 0; i < n; i++) {
+			k0 += y[i];
+			k3 = Math.log(x[i]);
+			k1 += k3;
+			k2 += k3 * k3;
+			k4 += y[i] * k3;
+		}
+		double b = (n * k4 - k0 * k1) / (n * k2 - k1 * k1);
+		double a = (k0 - b * k1) / n;
+		return new double[] { a, b };
+	}
 }

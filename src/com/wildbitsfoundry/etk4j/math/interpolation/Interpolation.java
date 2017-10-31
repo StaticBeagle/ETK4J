@@ -20,7 +20,7 @@ public final class Interpolation {
 
 	public static double neville(double[] x, double[] y, double xi) {
 		if (x.length != y.length) {
-			Splines.checkXYDimensions(x, y);
+			Spline.checkXYDimensions(x, y);
 		}
 		int length = x.length;
 		double[][] N = new double[length][length];

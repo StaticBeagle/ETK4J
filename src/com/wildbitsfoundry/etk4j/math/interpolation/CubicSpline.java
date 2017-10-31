@@ -79,22 +79,10 @@ public class CubicSpline extends Spline {
 	public void setExtrapolationMethod(ExtrapolationMethod method) {
 		super.setExtrapolationMethod(method);
 	}
-
-	public static CubicSpline newCubicSpline(double[] x, double[] y) {
-		return newNotAKnotSpline(x, y);
-	}
-
-	public static CubicSpline newCubicSplineInPlace(double[] x, double[] y) {
-		return newNotAKnotSplineInPlace(x, y);
-	}
-
-	public static CubicSpline newNaturalSpline(double[] x, double[] y) {
-		return newNaturalSplineInPlace(Arrays.copyOf(x, x.length), y);
-	}
-
+	
 	private static CubicSpline buildSpline(double[] x, double[] y, CubicSplineBuilder builder) {
-		Splines.checkXYDimensions(x, y);
-		Splines.checkMinkXLength(x, 2);
+		checkXYDimensions(x, y);
+		checkMinkXLength(x, 2);
 		final int n = x.length;
 		// need to double check these equations
 		if (n == 2) {
@@ -114,6 +102,18 @@ public class CubicSpline extends Spline {
 		}
 		TridiagonalLDLTSystem T = setupSpline(x, y);
 		return new CubicSpline(x, y, builder.build(T, x, y, n));
+	}
+
+	public static CubicSpline newCubicSpline(double[] x, double[] y) {
+		return newNotAKnotSpline(x, y);
+	}
+
+	public static CubicSpline newCubicSplineInPlace(double[] x, double[] y) {
+		return newNotAKnotSplineInPlace(x, y);
+	}
+
+	public static CubicSpline newNaturalSpline(double[] x, double[] y) {
+		return newNaturalSplineInPlace(Arrays.copyOf(x, x.length), y);
 	}
 
 	public static CubicSpline newNaturalSplineInPlace(double[] x, double[] y) {
@@ -212,8 +212,8 @@ public class CubicSpline extends Spline {
 	}
 
 	public static CubicSpline newAkimaSplineInPlace(double[] x, double[] y, double ep) {
-		Splines.checkXYDimensions(x, y);
-		Splines.checkMinkXLength(x, 5);
+		checkXYDimensions(x, y);
+		checkMinkXLength(x, 5);
 		final int n = x.length;
 		double[] d = new double[n];
 		double[] t = new double[n + 3];

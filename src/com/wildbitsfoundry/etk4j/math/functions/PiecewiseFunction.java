@@ -78,7 +78,7 @@ public abstract class PiecewiseFunction implements UnivariateFunction {
 			double range = _x[n - 1] - _x[0];
 			double xp = _x[0] + delta - range * Math.floor(delta / range);
 			return this.evaluateAt(xp);
-		default:
+		case Throw:
 			// x is smaller than the smaller value in the sequence
 			if (i == 0) {
 				throw new ArrayIndexOutOfBoundsException(
@@ -86,6 +86,8 @@ public abstract class PiecewiseFunction implements UnivariateFunction {
 			}
 			throw new ArrayIndexOutOfBoundsException(
 					String.format("x = %.4f is bigger than every number in x[]", x));
+		default:
+			throw new IllegalArgumentException("invalid extrapolation option");
 		}
 	}
 }
