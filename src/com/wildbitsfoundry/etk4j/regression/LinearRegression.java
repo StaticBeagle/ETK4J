@@ -1,9 +1,22 @@
 package com.wildbitsfoundry.etk4j.regression;
 
+import java.util.Arrays;
+
 import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrices;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
+import com.wildbitsfoundry.etk4j.util.ArrayUtils;
 
 public class LinearRegression implements RegressionModel {
+
+	private double[] _beta;
+	private double[] _residuals;
+	private double _sst;
+	private double _r2;
+	private double _sse;
+	
+	// SSE sum of squared errors
+	// SSR sum of squared regression
+	// SST total sum of squares = SSE + SSR
 
 	public LinearRegression(double[] x, double[] y) {
 		// we need over-determined so more than two points
@@ -16,6 +29,19 @@ public class LinearRegression implements RegressionModel {
 		Matrix Y = new Matrix(y, n);
 
 		Matrix B = X.solve(Y);
+		
+		_beta = B.getArray();
+		
+		_residuals = B.subtract(X.multiply(B)).getArray();
+		_sse = Math.pow(ArrayUtils.norm(_residuals), 2);
+		
+		double ymean = ArrayUtils.mean(y);
+		
+		// SST
+		for(int i = 0; i < n; ++i) {
+			double dev = y[i] - ymean;
+			_sst += dev * dev;
+		}
 
 	}
 
@@ -39,8 +65,7 @@ public class LinearRegression implements RegressionModel {
 
 	@Override
 	public double[] beta() {
-		// TODO Auto-generated method stub
-		return null;
+		return Arrays.copyOf(_beta, _beta.length);
 	}
 
 	@Override

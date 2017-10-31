@@ -262,4 +262,13 @@ public final class ArrayUtils {
 		}
 		return result;
 	}
+
+	public static double mean(double[] y) {
+		final int n = y.length;
+        double sum = 0.0;
+        for (int i = 0; i < n; ++i) {
+            sum += y[i];
+        }
+        return sum / n;
+	}
 }
