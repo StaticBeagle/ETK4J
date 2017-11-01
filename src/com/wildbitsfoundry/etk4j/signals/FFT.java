@@ -2,7 +2,7 @@ package com.wildbitsfoundry.etk4j.signals;
 
 import java.util.Random;
 
-import com.wildbitsfoundry.etk4j.util.ArrayUtils;
+import com.wildbitsfoundry.etk4j.util.NumArrays;
 
 public class FFT {
 	
@@ -114,13 +114,13 @@ public class FFT {
 		switch(scaling) {
 		case STANDARD:
 			double factor = 1.0 / _n;
-			ArrayUtils.multiplyInPlace(real, factor);
-			ArrayUtils.multiplyInPlace(imag, factor);
+			NumArrays.multiplyInPlace(real, factor);
+			NumArrays.multiplyInPlace(imag, factor);
 			break;
 		case UNITARY:
 			factor = 1.0 / Math.sqrt(_n);
-			ArrayUtils.multiplyInPlace(real, factor);
-			ArrayUtils.multiplyInPlace(imag, factor);
+			NumArrays.multiplyInPlace(real, factor);
+			NumArrays.multiplyInPlace(imag, factor);
 		case NONE:
 			break;
 		default:

@@ -5,7 +5,7 @@ import java.util.Arrays;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
 import com.wildbitsfoundry.etk4j.math.polynomials.RationalFunction;
-import com.wildbitsfoundry.etk4j.util.ArrayUtils;
+import com.wildbitsfoundry.etk4j.util.NumArrays;
 
 public class TransferFunction {
 	private RationalFunction _rf;
@@ -352,7 +352,7 @@ public class TransferFunction {
 	}
 
 	public static void main(String[] args) {
-		double[] logspace = ArrayUtils.logspace(-1, 1, 100);
+		double[] logspace = NumArrays.logspace(-1, 1, 100);
 
 		TransferFunction tf1 = new TransferFunction(new double[] { 1, 10, 1000 }, new double[] { 1, 25, 100, 9, 4 });
 		System.out.println(tf1);

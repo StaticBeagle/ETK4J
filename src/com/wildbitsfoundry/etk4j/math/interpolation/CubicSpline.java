@@ -3,7 +3,7 @@ package com.wildbitsfoundry.etk4j.math.interpolation;
 import java.util.Arrays;
 
 import com.wildbitsfoundry.etk4j.curvefitting.CurveFitting;
-import com.wildbitsfoundry.etk4j.util.ArrayUtils;
+import com.wildbitsfoundry.etk4j.util.NumArrays;
 
 public class CubicSpline extends Spline {
 
@@ -266,7 +266,7 @@ public class CubicSpline extends Spline {
 		double[] y = new double[] { 5, 6, 7, 8 };
 		CubicSpline cs = newNotAKnotSpline(x, y);
 
-		double[] xi = ArrayUtils.linsteps(1.0, 4.0, 0.1);
+		double[] xi = NumArrays.linsteps(1.0, 4.0, 0.1);
 		for (double xii : xi) {
 			System.out.printf("y(%.4f) = %.4f%n", xii, cs.evaluateAt(xii));
 		}

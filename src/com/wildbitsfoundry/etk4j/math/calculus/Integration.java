@@ -2,10 +2,10 @@ package com.wildbitsfoundry.etk4j.math.calculus;
 
 import java.util.Arrays;
 
-import com.wildbitsfoundry.etk4j.util.ArrayUtils;
+import com.wildbitsfoundry.etk4j.util.NumArrays;
 
-public final class Integrals {
-	private Integrals() {}
+public final class Integration {
+	private Integration() {}
 	
 	public static double[] cummulativeTrapz(double[] a) {
 		final int length = a.length;
@@ -30,9 +30,9 @@ public final class Integrals {
 		
 		System.out.println(Arrays.toString(cummulativeTrapz(a)));
 		System.out.println((trapz(a)));
-		System.out.println(Arrays.toString(ArrayUtils.cummulativeSum(a)));
-		System.out.println(ArrayUtils.sum(a));
-		System.out.println(ArrayUtils.rms(a));
+		System.out.println(Arrays.toString(NumArrays.cummulativeSum(a)));
+		System.out.println(NumArrays.sum(a));
+		System.out.println(NumArrays.rms(a));
 		
 	}
 }

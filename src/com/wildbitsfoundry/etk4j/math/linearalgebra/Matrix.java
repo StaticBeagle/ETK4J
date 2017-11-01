@@ -3,7 +3,7 @@ package com.wildbitsfoundry.etk4j.math.linearalgebra;
 import java.util.Arrays;
 
 import com.wildbitsfoundry.etk4j.math.MathETK;
-import com.wildbitsfoundry.etk4j.util.ArrayUtils;
+import com.wildbitsfoundry.etk4j.util.NumArrays;
 
 public class Matrix {
 	private double[] _data;
@@ -29,13 +29,13 @@ public class Matrix {
 	public Matrix(double[][] data) {
 		_rows = data.length;
 		_cols = data[0].length;
-		_data = ArrayUtils.flatten(data);
+		_data = NumArrays.flatten(data);
 	}
 
 	public Matrix(double[][] data, int rows, int cols) {
 		_rows = rows;
 		_cols = cols;
-		_data = ArrayUtils.flatten(data);
+		_data = NumArrays.flatten(data);
 	}
 
 	public Matrix(double[] data, int rows, int cols) {
@@ -56,23 +56,6 @@ public class Matrix {
 		_cols = cols;
 		_data = new double[_rows * _cols];
 		Arrays.fill(_data, val);
-	}
-
-	/**
-	 * Helper method to copy a 2 dimensional array
-	 * 
-	 * @param array
-	 *            to copy
-	 * @return a newly created array containing the copy of array
-	 */
-	protected static double[][] arraycopy(final double[][] array) {
-		int rows = array.length;
-		int cols = array[0].length;
-		double[][] copy = new double[rows][cols];
-		for (int i = 0; i < rows; i++) {
-			System.arraycopy(array[i], 0, copy[i], 0, cols);
-		}
-		return copy;
 	}
 
 	/***
@@ -181,6 +164,114 @@ public class Matrix {
 	}
 
 	/**
+	 * Set a submatrix.
+	 * 
+	 * @param i0
+	 *            Initial row index
+	 * @param i1
+	 *            Final row index
+	 * @param j0
+	 *            Initial column index
+	 * @param j1
+	 *            Final column index
+	 * @param X
+	 *            A(i0:i1,j0:j1)
+	 * @exception ArrayIndexOutOfBoundsException
+	 *                Submatrix indices
+	 */
+
+	public void setMatrix(int i0, int i1, int j0, int j1, Matrix X) {
+		try {
+			for (int i = i0; i <= i1; i++) {
+				for (int j = j0; j <= j1; j++) {
+					_data[i * _cols + j] = X.get(i - i0, j - j0);
+				}
+			}
+		} catch (ArrayIndexOutOfBoundsException e) {
+			throw new ArrayIndexOutOfBoundsException("Submatrix indices");
+		}
+	}
+
+	/**
+	 * Set a submatrix.
+	 * 
+	 * @param r
+	 *            Array of row indices.
+	 * @param c
+	 *            Array of column indices.
+	 * @param X
+	 *            A(r(:),c(:))
+	 * @exception ArrayIndexOutOfBoundsException
+	 *                Submatrix indices
+	 */
+
+	public void setMatrix(int[] r, int[] c, Matrix X) {
+		try {
+			for (int i = 0; i < r.length; i++) {
+				for (int j = 0; j < c.length; j++) {
+					_data[r[i] * _cols + c[j]] = X.get(i, j);
+				}
+			}
+		} catch (ArrayIndexOutOfBoundsException e) {
+			throw new ArrayIndexOutOfBoundsException("Submatrix indices");
+		}
+	}
+
+	/**
+	 * Set a submatrix.
+	 * 
+	 * @param r
+	 *            Array of row indices.
+	 * @param j0
+	 *            Initial column index
+	 * @param j1
+	 *            Final column index
+	 * @param X
+	 *            A(r(:),j0:j1)
+	 * @exception ArrayIndexOutOfBoundsException
+	 *                Submatrix indices
+	 */
+
+	public void setMatrix(int[] r, int j0, int j1, Matrix X) {
+		try {
+			for (int i = 0; i < r.length; i++) {
+				for (int j = j0; j <= j1; j++) {
+					_data[r[i] * _cols + j] = X.get(i, j - j0);
+				}
+			}
+		} catch (ArrayIndexOutOfBoundsException e) {
+			throw new ArrayIndexOutOfBoundsException("Submatrix indices");
+		}
+	}
+
+	/**
+	 * Set a submatrix.
+	 * 
+	 * @param i0
+	 *            Initial row index
+	 * @param i1
+	 *            Final row index
+	 * @param c
+	 *            Array of column indices.
+	 * @param X
+	 *            A(i0:i1,c(:))
+	 * @exception ArrayIndexOutOfBoundsException
+	 *                Submatrix indices
+	 */
+
+	public void setMatrix(int i0, int i1, int[] c, Matrix X) {
+		try {
+			for (int i = i0; i <= i1; i++) {
+				for (int j = 0; j < c.length; j++) {
+					_data[i * _cols + c[j]] = X.get(i - i0, j);
+				}
+			}
+		} catch (ArrayIndexOutOfBoundsException e) {
+			throw new ArrayIndexOutOfBoundsException("Submatrix indices");
+		}
+	}
+
+	/**
 	 * Matrix rank
 	 * 
 	 * @return effective numerical rank, obtained from SVD.
@@ -198,6 +289,20 @@ public class Matrix {
 
 	public double cond() {
 		return new SingularValueDecomposition(this).cond();
+	}
+
+	/**
+	 * Matrix trace.
+	 * 
+	 * @return sum of the diagonal elements.
+	 */
+
+	public double trace() {
+		double t = 0;
+		for (int i = 0; i < Math.min(_rows, _cols); ++i) {
+			t += _data[i * _cols + i];
+		}
+		return t;
 	}
 
 	public Matrix cofactor() {
@@ -247,7 +352,7 @@ public class Matrix {
 	public QRDecomposition QR() {
 		return new QRDecomposition(this);
 	}
-	
+
 	public CholeskyDecomposition Chol() {
 		return new CholeskyDecomposition(this);
 	}
@@ -349,20 +454,156 @@ public class Matrix {
 		return norm;
 	}
 
-	public Matrix add(Matrix mat) {
+	/**
+	 * Unary minus
+	 * 
+	 * @return -A
+	 */
+	public Matrix uminus() {
+		final int m = _rows;
+		final int n = _cols;
+		final int length = m * n;
+		double[] x = new double[length];
+		for (int i = 0; i < length; ++i) {
+			x[i] = -_data[i];
+		}
+		return new Matrix(x, m, n);
+	}
+
+	public Matrix add(Matrix m) {
+		checkMatrixDimensions(m);
 		double[] result = new double[this._rows * this._cols];
 		for (int i = 0; i < this._rows * this._cols; ++i) {
-			result[i] = this._data[i] + mat._data[i];
+			result[i] = this._data[i] + m._data[i];
 		}
 		return new Matrix(result, _rows, _cols);
 	}
 
-	public Matrix subtract(Matrix mat) {
+	public void addEquals(Matrix m) {
+		checkMatrixDimensions(m);
+		final int length = _rows * _cols;
+		for (int i = 0; i < length; ++i) {
+			_data[i] += m._data[i];
+		}
+	}
+
+	public Matrix subtract(Matrix m) {
+		checkMatrixDimensions(m);
 		double[] result = new double[this._rows * this._cols];
 		for (int i = 0; i < this._rows * this._cols; ++i) {
-			result[i] = this._data[i] - mat._data[i];
+			result[i] = this._data[i] - m._data[i];
 		}
 		return new Matrix(result, _rows, _cols);
+	}
+
+	public void subtractEquals(Matrix m) {
+		checkMatrixDimensions(m);
+		final int length = _rows * _cols;
+		for (int i = 0; i < length; ++i) {
+			_data[i] -= m._data[i];
+		}
+	}
+
+	/**
+	 * Element-by-element multiplication, C = A.*B
+	 * 
+	 * @param B
+	 *            another matrix
+	 * @return A.*B
+	 */
+
+	public Matrix arrayMultiply(Matrix m) {
+		checkMatrixDimensions(m);
+		return new Matrix(NumArrays.multiplyElementWise(_data, m._data), _rows, _cols);
+	}
+
+	/**
+	 * Element-by-element multiplication in place, A = A.*B
+	 * 
+	 * @param B
+	 *            another matrix
+	 * @return A.*B
+	 */
+
+	public void arrayMultiplyEquals(Matrix m) {
+		checkMatrixDimensions(m);
+		NumArrays.multiplyElementWiseInPlace(_data, m._data);
+	}
+
+	/**
+	 * Element-by-element right division, C = A./B
+	 * 
+	 * @param B
+	 *            another matrix
+	 * @return A./B
+	 */
+
+	public Matrix arrayRightDivide(Matrix m) {
+		checkMatrixDimensions(m);
+		return new Matrix(NumArrays.divideElementWise(_data, m._data), _rows, _cols);
+	}
+
+	/**
+	 * Element-by-element right division in place, A = A./B
+	 * 
+	 * @param B
+	 *            another matrix
+	 * @return A./B
+	 */
+
+	public void arrayRightDivideEquals(Matrix m) {
+		checkMatrixDimensions(m);
+		NumArrays.divideElementWiseInPlace(_data, m._data);
+	}
+
+	/**
+	 * Element-by-element left division, C = A.\B
+	 * 
+	 * @param B
+	 *            another matrix
+	 * @return A.\B
+	 */
+
+	public Matrix arrayLeftDivide(Matrix m) {
+		checkMatrixDimensions(m);
+		return new Matrix(NumArrays.divideElementWise(m._data, _data), _rows, _cols);
+	}
+
+	/**
+	 * Element-by-element left division in place, A = A.\B
+	 * 
+	 * @param B
+	 *            another matrix
+	 * @return A.\B
+	 */
+
+	public void arrayLeftDivideEquals(Matrix m) {
+		checkMatrixDimensions(m);
+		NumArrays.divideElementWiseInPlace(m._data, _data);
+	}
+
+	/**
+	 * Multiply a matrix by a scalar, C = s*A
+	 * 
+	 * @param s
+	 *            scalar
+	 * @return s*A
+	 */
+
+	public Matrix multiply(double s) {
+		return new Matrix(NumArrays.multiply(_data, s), _rows, _cols);
+	}
+
+	/**
+	 * Multiply a matrix by a scalar in place, A = s*A
+	 * 
+	 * @param s
+	 *            scalar
+	 * @return replace A by s*A
+	 */
+
+	public void multiplyEquals(double s) {
+		NumArrays.multiplyInPlace(_data, s);
 	}
 
 	public Matrix multiply(Matrix mat) {
@@ -393,11 +634,23 @@ public class Matrix {
 		}
 	}
 
+	/**
+	 * Solve X*A = B, which is also A'*X' = B'
+	 * 
+	 * @param B
+	 *            right hand side
+	 * @return solution if A is square, least squares solution otherwise.
+	 */
+
+	public Matrix solveTranspose(Matrix B) {
+		return transpose().solve(B.transpose());
+	}
+
 	public void appendRows(int count) {
 		_rows += count;
 		final int newSize = _rows * _cols;
 		_data = Arrays.copyOf(_data, newSize);
-		
+
 	}
 
 	public Matrix pinv() {
@@ -452,49 +705,6 @@ public class Matrix {
 		return sb.toString();
 	}
 
-	public static void main(String[] args) {
-		double[][] aa = new double[][] { { 1, -1, 4 }, { 1, 4, -2 }, { 1, 4, 2 }, { 1, -1, 0 } };
-		QRDecomposition qr = new Matrix(aa).QR();
-		System.out.printf("H : %n%s%n%n", qr.getH());
-		System.out.printf("R : %n%s%n%n", qr.getR());
-		// System.out.printf("Q : %n%s%n%n", qr.getQ());
-		System.out.printf("Q : %n%s%n%n", qr.getQ());
-		System.out.printf("transpose(Q) : %n%s%n%n", qr.getQT());
-		
-		System.out.printf("A.inv() : %n%s%n%n", new Matrix(aa).transpose().inv());
-		System.out.printf("A.pinv() : %n%s%n%n", new Matrix(aa).transpose().pinv());
-
-		double[][] original = new double[][] { { 1, 2, 3 }, { 0, 4, 5 }, { 1, 0, 6 } };
-		Matrix sol = new Matrix(new double[] { 6, 4, 2 }, 3);
-
-		Matrix A = new Matrix(original);
-		System.out.printf("A : %n%s%n%n", A);
-		System.out.printf("A.transpose() : %n%s%n%n", A.transpose());
-		System.out.printf("A.subMatrix(0, 2, 1, 2).transpose() : %n%s%n%n", A.subMatrix(0, 2, 1, 2).transpose());
-		System.out.printf("A.subMatrix(1, 2, 0, 2).transpose() : %n%s%n%n", A.subMatrix(1, 2, 0, 2).transpose());
-		System.out.printf("A.cofactor() : %n%s%n%n", A.cofactor());
-		System.out.printf("A.adjoint() : %n%s%n%n", A.adjoint());
-		System.out.printf("A.inv() : %n%s%n%n", A.inv());
-		System.out.printf("A.pinv() : %n%s%n%n", A.pinv());
-		System.out.printf("A.det() : %n%,4f%n%n", A.det());
-		System.out.printf("A.multiply(A) : %n%s%n%n", A.multiply(A));
-		System.out.printf("A.add(A) : %n%s%n%n", A.add(A));
-		System.out.printf("A.norm1() : %n%.4f%n%n", A.norm1());
-		System.out.printf("A.normInf() : %n%.4f%n%n", A.normInf());
-		System.out.printf("A.normFrob() : %n%.4f%n%n", A.normFrob());
-		System.out.printf("A.subMatrix(1, 2, 1, 2) : %n%s%n%n", A.subMatrix(1, 2, 1, 2));
-		System.out.printf("A.subMatrix([1, 2], 1, 2) : %n%s%n%n", A.subMatrix(new int[] { 1, 2 }, 1, 2));
-		System.out.printf("A.subMatrix(1, 2, [1, 2]) : %n%s%n%n", A.subMatrix(1, 2, new int[] { 1, 2 }));
-		System.out.printf("A.subMatrix([1, 2], [1, 2]) : %n%s%n%n",
-				A.subMatrix(new int[] { 1, 2 }, new int[] { 1, 2 }));
-		System.out.printf("A.subMatrix([0, 2], [1, 2]) : %n%s%n%n",
-				A.subMatrix(new int[] { 0, 2 }, new int[] { 1, 2 }));
-		System.out.printf("A.solve([6, 4, 2]) : %n%s%n%n", A.solve(sol));
-		System.out.printf("A(:, 1:2).solve([6, 4, 2]) : %n%s%n%n", A.subMatrix(0, 2, 1, 2).solve(sol));
-		System.out.printf("A.eig().getD().diag() : %n%s%n%n", Arrays.toString(A.eig().getD().diag()));
-
-	}
-
 	public EigenvalueDecomposition eig() {
 		return this.eig(true);
 	}
@@ -529,4 +739,94 @@ public class Matrix {
 		return _data;
 	}
 
+	public double[][] getAs2DArray() {
+		double[][] data = new double[_rows][_cols];
+		for (int i = 0; i < _rows; ++i) {
+			data[i] = Arrays.copyOfRange(_data, i * _cols, i * _cols + _cols);
+		}
+		return data;
+	}
+
+	/**
+	 * Make a one-dimensional column packed copy of the internal array.
+	 * 
+	 * @return Matrix elements packed in a one-dimensional array by columns.
+	 */
+
+	public double[] getColumnPackedCopy() {
+		final int m = _rows;
+		final int n = _cols;
+		double[] vals = new double[m * n];
+		for (int i = 0; i < m; i++) {
+			for (int j = 0; j < n; j++) {
+				vals[i + j * m] = _data[i * n + j];
+			}
+		}
+		return vals;
+	}
+
+	/**
+	 * Make a one-dimensional row packed copy of the internal array.
+	 * 
+	 * @return Matrix elements packed in a one-dimensional array by rows.
+	 */
+
+	public double[] getRowPackedCopy() {
+		return this.getArrayCopy();
+	}
+
+	/*
+	 * ------------------------ Private Methods ------------------------
+	 */
+
+	/** Check if size(A) == size(B) **/
+
+	private void checkMatrixDimensions(Matrix B) {
+		if (B._rows != _rows || B._cols != _cols) {
+			throw new IllegalArgumentException("Matrix dimensions must agree.");
+		}
+	}
+
+	public static void main(String[] args) {
+		double[][] aa = new double[][] { { 1, -1, 4 }, { 1, 4, -2 }, { 1, 4, 2 }, { 1, -1, 0 } };
+		QRDecomposition qr = new Matrix(aa).QR();
+		System.out.printf("H : %n%s%n%n", qr.getH());
+		System.out.printf("R : %n%s%n%n", qr.getR());
+		// System.out.printf("Q : %n%s%n%n", qr.getQ());
+		System.out.printf("Q : %n%s%n%n", qr.getQ());
+		System.out.printf("transpose(Q) : %n%s%n%n", qr.getQT());
+
+		System.out.printf("A.inv() : %n%s%n%n", new Matrix(aa).transpose().inv());
+		System.out.printf("A.pinv() : %n%s%n%n", new Matrix(aa).transpose().pinv());
+
+		double[][] original = new double[][] { { 1, 2, 3 }, { 0, 4, 5 }, { 1, 0, 6 } };
+		Matrix sol = new Matrix(new double[] { 6, 4, 2 }, 3);
+
+		Matrix A = new Matrix(original);
+		System.out.printf("A : %n%s%n%n", A);
+		System.out.printf("A.transpose() : %n%s%n%n", A.transpose());
+		System.out.printf("A.subMatrix(0, 2, 1, 2).transpose() : %n%s%n%n", A.subMatrix(0, 2, 1, 2).transpose());
+		System.out.printf("A.subMatrix(1, 2, 0, 2).transpose() : %n%s%n%n", A.subMatrix(1, 2, 0, 2).transpose());
+		System.out.printf("A.cofactor() : %n%s%n%n", A.cofactor());
+		System.out.printf("A.adjoint() : %n%s%n%n", A.adjoint());
+		System.out.printf("A.inv() : %n%s%n%n", A.inv());
+		System.out.printf("A.pinv() : %n%s%n%n", A.pinv());
+		System.out.printf("A.det() : %n%,4f%n%n", A.det());
+		System.out.printf("A.multiply(A) : %n%s%n%n", A.multiply(A));
+		System.out.printf("A.add(A) : %n%s%n%n", A.add(A));
+		System.out.printf("A.norm1() : %n%.4f%n%n", A.norm1());
+		System.out.printf("A.normInf() : %n%.4f%n%n", A.normInf());
+		System.out.printf("A.normFrob() : %n%.4f%n%n", A.normFrob());
+		System.out.printf("A.subMatrix(1, 2, 1, 2) : %n%s%n%n", A.subMatrix(1, 2, 1, 2));
+		System.out.printf("A.subMatrix([1, 2], 1, 2) : %n%s%n%n", A.subMatrix(new int[] { 1, 2 }, 1, 2));
+		System.out.printf("A.subMatrix(1, 2, [1, 2]) : %n%s%n%n", A.subMatrix(1, 2, new int[] { 1, 2 }));
+		System.out.printf("A.subMatrix([1, 2], [1, 2]) : %n%s%n%n",
+				A.subMatrix(new int[] { 1, 2 }, new int[] { 1, 2 }));
+		System.out.printf("A.subMatrix([0, 2], [1, 2]) : %n%s%n%n",
+				A.subMatrix(new int[] { 0, 2 }, new int[] { 1, 2 }));
+		System.out.printf("A.solve([6, 4, 2]) : %n%s%n%n", A.solve(sol));
+		System.out.printf("A(:, 1:2).solve([6, 4, 2]) : %n%s%n%n", A.subMatrix(0, 2, 1, 2).solve(sol));
+		System.out.printf("A.eig().getD().diag() : %n%s%n%n", Arrays.toString(A.eig().getD().diag()));
+
+	}
 }

@@ -10,7 +10,7 @@ import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.EigenvalueDecomposition;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrices;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
-import com.wildbitsfoundry.etk4j.util.ArrayUtils;
+import com.wildbitsfoundry.etk4j.util.NumArrays;
 
 /**
  * 
@@ -139,7 +139,7 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 	 * @return Pnew(x) = P(x) * poly
 	 */
 	public Polynomial multiply(final Polynomial p) {
-		return new Polynomial(ArrayUtils.conv(_coefs, p._coefs));
+		return new Polynomial(NumArrays.conv(_coefs, p._coefs));
 	}
 
 	/***
@@ -149,12 +149,12 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 	 *            Another polynomial
 	 */
 	public void multiplyEquals(final Polynomial p) {
-		_coefs = ArrayUtils.conv(_coefs, p._coefs);
+		_coefs = NumArrays.conv(_coefs, p._coefs);
 		_roots = null;
 	}
 
 	public Polynomial multiply(double d) {
-		return new Polynomial(ArrayUtils.multiply(_coefs, d));
+		return new Polynomial(NumArrays.multiply(_coefs, d));
 	}
 
 	public void multiplyEquals(double d) {
@@ -276,7 +276,7 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 	}
 
 	public void reverseInPlace() {
-		_coefs = ArrayUtils.reverse(_coefs);
+		_coefs = NumArrays.reverse(_coefs);
 	}
 
 	/***
@@ -396,7 +396,7 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 		}
 		double[] tmp = Arrays.copyOf(_coefs, _coefs.length);
 		while (--n > 0) {
-			tmp = ArrayUtils.conv(tmp, _coefs);
+			tmp = NumArrays.conv(tmp, _coefs);
 		}
 		return new Polynomial(tmp);
 	}

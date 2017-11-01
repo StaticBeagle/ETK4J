@@ -126,7 +126,7 @@ public class RationalFunction implements UnivariateFunction {
 
 		num.multiplyEquals(rf._denominator.pow(_denominator.degree()));
 		den.multiplyEquals(rf._denominator.pow(_numerator.degree()));
-
+		
 		_numerator = num;
 		_denominator = den;
 	}

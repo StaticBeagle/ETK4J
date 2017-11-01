@@ -2,9 +2,8 @@ package com.wildbitsfoundry.etk4j.math.polynomials;
 
 import java.util.Arrays;
 
-import com.wildbitsfoundry.etk4j.math.interpolation2d.Spline2d;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
-import com.wildbitsfoundry.etk4j.util.ArrayUtils;
+import com.wildbitsfoundry.etk4j.util.NumArrays;
 
 public class Polynomial2d {
 	private double[] _coefs;
@@ -68,15 +67,15 @@ public class Polynomial2d {
 	public static Polynomial2d polyFit2D(double[] x, double[] y, double[][] z, int n, int m) {
 		double[][] vars = new double[2][];
 		// Build grid
-		x = ArrayUtils.repeat(x, z[0].length);
+		x = NumArrays.repeat(x, z[0].length);
 
-		y = ArrayUtils.repeat(y, z.length);
+		y = NumArrays.repeat(y, z.length);
 		Arrays.sort(y);
 		vars[0] = x;
 		vars[1] = y;
 
 		int[] nm = new int[] { n, m };
-		double[] coefs = polyfitN(vars, ArrayUtils.flatten(z), nm);
+		double[] coefs = polyfitN(vars, NumArrays.flatten(z), nm);
 		return new Polynomial2d(coefs, n, m);
 	}
 
@@ -96,7 +95,7 @@ public class Polynomial2d {
 			vandermonde[i] = buildPowerSeriesDescending(vars[k][i], degrees[k]);
 			for (int j = k - 1; j >= 0; --j) {
 				double[] tmp = buildPowerSeriesDescending(vars[j][i], degrees[j]);
-				vandermonde[i] = ArrayUtils.kron(vandermonde[i], tmp);
+				vandermonde[i] = NumArrays.kron(vandermonde[i], tmp);
 			}
 		}
 
@@ -203,28 +202,28 @@ public class Polynomial2d {
 		for (int i = this._m, k = 0; i >= 0; i--) {
 			for (int j = this._n; j >= 0; j--) {
 				if (j == 0 && i == 0) {
-					sb.append(String.format("%.4e", _coefs[k]));
+					sb.append(String.format("%.4g", _coefs[k]));
 				} else if (j == 0) {
 					if (i == 1) {
-						sb.append(String.format("%.4e*Y + ", _coefs[k], i));
+						sb.append(String.format("%.4g * y + ", _coefs[k], i));
 					} else {
-						sb.append(String.format("%.4e*Y^%d + ", _coefs[k], i));
+						sb.append(String.format("%.4g * y^%d + ", _coefs[k], i));
 					}
 				} else if (i == 0) {
 					if (j == 1) {
-						sb.append(String.format("%.4e*X + ", _coefs[k]));
+						sb.append(String.format("%.4g * x + ", _coefs[k]));
 					} else {
-						sb.append(String.format("%.4e*X^%d + ", _coefs[k], j));
+						sb.append(String.format("%.4g * x^%d + ", _coefs[k], j));
 					}
 				} else {
 					if (i == 1 && j == 1) {
-						sb.append(String.format("%.4e*X*Y + ", _coefs[k]));
+						sb.append(String.format("%.4g * x * y + ", _coefs[k]));
 					} else if (j == 1) {
-						sb.append(String.format("%.4e*X*Y^%d + ", _coefs[k], i));
+						sb.append(String.format("%.4g * x * y^%d + ", _coefs[k], i));
 					} else if (i == 1) {
-						sb.append(String.format("%.4e*X^%d*Y + ", _coefs[k], j));
+						sb.append(String.format("%.4g * x^%d * y + ", _coefs[k], j));
 					} else {
-						sb.append(String.format("%.4e*X^%d*Y^%d + ", _coefs[k], j, i));
+						sb.append(String.format("%.4g * x^%d * y^%d + ", _coefs[k], j, i));
 					}
 
 				}
@@ -254,6 +253,7 @@ public class Polynomial2d {
 		
 		Polynomial2d poly = polyFit2D(xp, yp, zp, 2, 2);
 		System.out.println(Arrays.toString(poly._coefs));
+		System.out.println(poly);
 		
 		System.out.println(poly.evaluateAt(1, 1));
 		System.out.println(poly.evaluateAt(2, 1));

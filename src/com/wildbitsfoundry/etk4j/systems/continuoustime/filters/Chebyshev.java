@@ -4,7 +4,7 @@ import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
 import com.wildbitsfoundry.etk4j.systems.continuoustime.TransferFunction;
-import com.wildbitsfoundry.etk4j.util.ArrayUtils;
+import com.wildbitsfoundry.etk4j.util.NumArrays;
 
 public class Chebyshev extends AnalogFilter {
 
@@ -46,13 +46,13 @@ public class Chebyshev extends AnalogFilter {
 		Complex[] poles = new Complex[n];
 		if (n % 2 == 0) {
 			int i = 0;
-			for (double k : ArrayUtils.linsteps(-n * 0.5 + 1.0, n * 0.5, 1)) {
+			for (double k : NumArrays.linsteps(-n * 0.5 + 1.0, n * 0.5, 1)) {
 				double phik = 180.0 * (k / n) - 90.0 / n;
 				poles[i++] = new Complex(-sinha * Math.cos(phik * pid), cosha * Math.sin(phik * pid));
 			}
 		} else {
 			int i = 0;
-			for (double k : ArrayUtils.linsteps(-(n - 1) * 0.5, (n - 1) * 0.5, 1)) {
+			for (double k : NumArrays.linsteps(-(n - 1) * 0.5, (n - 1) * 0.5, 1)) {
 				double phik = 180.0 * (k / n);
 				poles[i++] = new Complex(-sinha * Math.cos(phik * pid), cosha * Math.sin(phik * pid));
 			}

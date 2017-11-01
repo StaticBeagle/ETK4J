@@ -2,9 +2,9 @@ package com.wildbitsfoundry.etk4j.util;
 
 import java.util.Arrays;
 
-public final class ArrayUtils {
+public final class NumArrays {
 	
-	private ArrayUtils() {}
+	private NumArrays() {}
 	
 	/***
 	 * Creates n linearly spaced samples between x0 and x1
@@ -88,11 +88,8 @@ public final class ArrayUtils {
 	}
 	
 	public static double[] multiply(double[] a, double d) {
-		double[] result = new double[a.length];
-
-		for (int i = 0; i < result.length; ++i) {
-			result[i] = a[i] * d;
-		}
+		double[] result = Arrays.copyOf(a, a.length);
+		multiplyInPlace(result, d);
 		return result;
 	}
 	
@@ -100,6 +97,48 @@ public final class ArrayUtils {
 		final int length = a.length;
 		for (int i = 0; i < length; ++i) {
 			a[i] *= d;
+		}
+	}
+	
+	public static double[] multiplyElementWise(double[] a, double[] b) {
+		if(a.length != b.length) {
+			throw new IllegalArgumentException("a and b dimensions must match");
+		}
+		
+		double[] result = Arrays.copyOf(a, a.length);
+		multiplyElementWiseInPlace(result, b);
+		return result;
+	}
+	
+	public static void multiplyElementWiseInPlace(double[] a, double[] b) {
+		if(a.length != b.length) {
+			throw new IllegalArgumentException("a and b dimensions must match");
+		}
+		
+		final int length = a.length;
+		for (int i = 0; i < length; ++i) {
+			a[i] *= b[i];
+		}
+	}
+	
+	public static double[] divideElementWise(double[] a, double[] b) {
+		if(a.length != b.length) {
+			throw new IllegalArgumentException("a and b dimensions must match");
+		}
+		
+		double[] result = Arrays.copyOf(a, a.length);
+		divideElementWiseInPlace(result, b);
+		return result;
+	}
+	
+	public static void divideElementWiseInPlace(double[] a, double[] b) {
+		if(a.length != b.length) {
+			throw new IllegalArgumentException("a and b dimensions must match");
+		}
+		
+		final int length = a.length;
+		for (int i = 0; i < length; ++i) {
+			a[i] /= b[i];
 		}
 	}
 	
@@ -158,10 +197,10 @@ public final class ArrayUtils {
 		int bLength = b.length;
 		double[] c = new double[aLength * bLength];
 		if (a.length == 1) {
-			return ArrayUtils.multiply(b, a[0]);
+			return NumArrays.multiply(b, a[0]);
 		}
 		if (b.length == 1) {
-			return ArrayUtils.multiply(a, b[0]);
+			return NumArrays.multiply(a, b[0]);
 		}
 		for (int i = 0; i < aLength; i++) {
 			for (int j = 0; j < bLength; j++) {

@@ -3,7 +3,7 @@ package com.wildbitsfoundry.etk4j.math.interpolation;
 import java.util.Arrays;
 
 import com.wildbitsfoundry.etk4j.math.functions.PiecewiseFunction;
-import com.wildbitsfoundry.etk4j.util.ArrayUtils;
+import com.wildbitsfoundry.etk4j.util.NumArrays;
 
 public class NearestNeighbor extends PiecewiseFunction {
 	
@@ -16,7 +16,7 @@ public class NearestNeighbor extends PiecewiseFunction {
 	protected NearestNeighbor(double[] x, double[] y) {
 		super(x, y[0], y[y.length - 1]);
 		_y = Arrays.copyOf(y, y.length);
-		if(!ArrayUtils.isAscending(x)) {
+		if(!NumArrays.isAscending(x)) {
 			throw new IllegalArgumentException("x must be monotonically increasing");
 		}
 		this.setExtrapolationMethod(ExtrapolationMethod.ClampToEndPoint);
