@@ -69,7 +69,7 @@ public class QuadraticSpline extends Spline {
 
 		return new QuadraticSpline(x, y, T.solve());
 	}
-	
+
 	public static QuadraticSpline newClampedSpline(double[] x, double[] y, double d0) {
 		return newClampedSplineInPlace(Arrays.copyOf(x, x.length), y, d0);
 	}
@@ -101,8 +101,8 @@ public class QuadraticSpline extends Spline {
 	}
 
 	public static void main(String[] args) {
-		double[] x = new double[] { -1, 0, 1 };
-		double[] y = new double[] { 0, 1, 3 };
+		double[] x = { -1, 0, 1 };
+		double[] y = { 0, 1, 3 };
 		QuadraticSpline qs = newNaturalSpline(x, y);
 
 		System.out.println(qs.evaluateAt(-0.5));

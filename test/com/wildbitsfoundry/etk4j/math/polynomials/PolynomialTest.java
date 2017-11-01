@@ -19,8 +19,8 @@ public class PolynomialTest {
 	
 	@Test
 	public void testPolyfit() {
-		double[] x = new double[] { 1, 2, 3, 4 };
-		double[] y = new double[] { 1, 10, 12, 15 };
+		double[] x = { 1, 2, 3, 4 };
+		double[] y = { 1, 10, 12, 15 };
 
 		// Over determined
 		Polynomial poly = Polynomial.polyFit(x, y, 2);

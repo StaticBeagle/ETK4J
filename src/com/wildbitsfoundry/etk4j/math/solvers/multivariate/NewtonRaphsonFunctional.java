@@ -1,74 +1,72 @@
 package com.wildbitsfoundry.etk4j.math.solvers.multivariate;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.function.Function;
 
-import com.wildbitsfoundry.etk4j.math.functions.MultivariateFunction;
-
-public class NewtonRaphson {
+public class NewtonRaphsonFunctional {
 
 	private int _maxIter = 100;
 	private double _absTol = 1e-9;
 	private double _maxVal = Double.POSITIVE_INFINITY;
 	private boolean _autoJacobian = true;
 	private double _step = 0.001;
-	private double[] _x0;
+	private Double[] _x0;
 
-	private MultivariateFunction[] _functions;
-	private MultivariateFunction[][] _jacobian;
+	private List<Function<Double[], Double>> _functions;
+	private List<Function<Double[], Double[]>> _jacobian;
 
-	public NewtonRaphson(MultivariateFunction[] functions) {
+	public NewtonRaphsonFunctional(List<Function<Double[], Double>> functions) {
 		_functions = functions;
 	}
 
-	public NewtonRaphson iterationLimit(int limit) {
+	public NewtonRaphsonFunctional(List<Function<Double[], Double>> functions,
+			List<Function<Double[], Double[]>> jacobian) {
+		_functions = functions;
+		_jacobian = jacobian;
+		_autoJacobian = false;
+	}
+
+	public NewtonRaphsonFunctional iterationLimit(int limit) {
 		_maxIter = limit;
 		return this;
 	}
 
-	public NewtonRaphson absTolerance(double tol) {
+	public NewtonRaphsonFunctional absTolerance(double tol) {
 		_absTol = tol;
 		return this;
 	}
 
-	public NewtonRaphson maxAllowedValue(double val) {
+	public NewtonRaphsonFunctional maxAllowedValue(double val) {
 		_maxVal = val;
 		return this;
 	}
 
-	public NewtonRaphson autoComputeJacobian(boolean compute) {
-		_autoJacobian = compute;
-		return this;
-	}
-
-	public NewtonRaphson setDifferentiationStepSize(double step) {
+	public NewtonRaphsonFunctional differentiationStepSize(double step) {
 		_step = step;
 		return this;
 	}
 
-	public NewtonRaphson initialGuess(double[] x0) {
+	public NewtonRaphsonFunctional initialGuess(Double[] x0) {
 		_x0 = Arrays.copyOf(x0, x0.length);
 		return this;
 	}
 
-	public NewtonRaphson setJacobian(MultivariateFunction[][] jacobian) {
-		_jacobian = jacobian;
-		return this;
-	}
-
-	private double[] solvePreComputedJacobian() {
+	private Double[] solvePreComputedJacobian() {
 		int maxiter = _maxIter;
 		double tol = _absTol;
 		double maxval = _maxVal;
-		double[] x0 = _x0;
-		MultivariateFunction[] functions = _functions;
-		MultivariateFunction[][] jacobian = _jacobian;
+		Double[] x0 = _x0;
+		List<Function<Double[], Double>> functions = _functions;
+		List<Function<Double[], Double[]>> jacobian = _jacobian;
 
-		int rows = jacobian.length;
-		int cols = jacobian[0].length;
-		double[] xcurrent = x0;
-		double[] xfinal = new double[cols];
+		int rows = jacobian.size();
+		int cols = jacobian.size();
+		Double[] xcurrent = x0;
+		Double[] xfinal = new Double[cols];
 		double[] functionValues = new double[cols];
-		double[][] jacobianMatrixValues = new double[rows][cols];
+		Double[][] jacobianMatrixValues = new Double[rows][cols];
 		while (maxiter > 0) {
 			evaluateJacobian(xcurrent, jacobianMatrixValues, jacobian);
 			LU matrix = new LU(jacobianMatrixValues);
@@ -110,27 +108,27 @@ public class NewtonRaphson {
 		return null;
 	}
 
-	public double[] solve() {
+	public Double[] solve() {
 		return _autoJacobian ? this.solveAutoComputeJacobian() : this.solvePreComputedJacobian();
 	}
 
-	private double[] solveAutoComputeJacobian() {
+	private Double[] solveAutoComputeJacobian() {
 		int maxiter = _maxIter;
 		double tol = _absTol;
 		double maxval = _maxVal;
 		double step = _step;
 		double h = 1.0 / step;
-		double[] x0 = _x0;
-		MultivariateFunction[] functions = _functions;
+		Double[] x0 = _x0;
+		List<Function<Double[], Double>> functions = _functions;
 
-		int rows = functions.length;
+		int rows = functions.size();
 		int cols = x0.length;
-		double[] xcurrent = new double[cols];
-		double[] xfinal = new double[cols];
+		Double[] xcurrent = new Double[cols];
+		Double[] xfinal = new Double[cols];
 		double[] residuals = new double[cols];
 		double[] functionValues = new double[cols];
 		double[] functionPrimeValues = new double[cols];
-		double[][] jacobianMatrixValues = new double[rows][cols];
+		Double[][] jacobianMatrixValues = new Double[rows][cols];
 
 		System.arraycopy(x0, 0, xcurrent, 0, rows);
 		while (maxiter > 0) {
@@ -183,151 +181,60 @@ public class NewtonRaphson {
 		return null;
 	}
 
-	private static void evaluateJacobian(double[] x, double[][] out, MultivariateFunction[][] jacobian) {
-		int rows = out.length;
-		int cols = out[0].length;
+	private static void evaluateJacobian(Double[] xcurrent, Double[][] jacobianMatrixValues,
+			List<Function<Double[], Double[]>> jacobian) {
+		int rows = jacobianMatrixValues.length;
 
 		for (int i = 0; i < rows; i++) {
-			for (int j = 0; j < cols; j++) {
-				out[i][j] = jacobian[i][j].evaluateAt(x);
-			}
+			jacobianMatrixValues[i] = jacobian.get(i).apply(xcurrent);
+
 		}
 	}
 
-	private static void eval(double[] x, double[] out, MultivariateFunction[] functions) {
+	private static void eval(Double[] x, double[] out, List<Function<Double[], Double>> functions) {
 		int length = x.length;
 		for (int i = 0; i < length; i++) {
-			out[i] = functions[i].evaluateAt(x);
+			out[i] = functions.get(i).apply(x);
 		}
 	}
 
 	public static void main(String[] args) {
-		MultivariateFunction f1 = new MultivariateFunction() {
 
-			@Override
-			public double evaluateAt(double... x) {
-				return 3 * x[0] - Math.cos(x[1] * x[2]) - 1.5;
-			}
-		};
+		Double[] initialguess = { 1d, 2d, 3d };
 
-		MultivariateFunction f2 = new MultivariateFunction() {
+		List<Function<Double[], Double>> functions = new ArrayList<>();
+		functions.add(x -> 3 * x[0] - Math.cos(x[1] * x[2]) - 1.5);
+		functions.add(x -> 4 * x[0] * x[0] - 625.0 * x[1] * x[1] + 2.0 * x[2] - 1.0);
+		functions.add(x -> 20 * x[2] + Math.exp(-x[0] * x[1]) + 9.0);
 
-			@Override
-			public double evaluateAt(double... x) {
-				return 4 * x[0] * x[0] - 625.0 * x[1] * x[1] + 2.0 * x[2] - 1.0;
-			}
-		};
-
-		MultivariateFunction f3 = new MultivariateFunction() {
-
-			@Override
-			public double evaluateAt(double... x) {
-				return 20 * x[2] + Math.exp(-x[0] * x[1]) + 9.0;
-			}
-		};
-
-		// Jacobian
-		MultivariateFunction df1x1 = new MultivariateFunction() {
-
-			@Override
-			public double evaluateAt(double... x) {
-				return 3;
-			}
-		};
-
-		MultivariateFunction df1x2 = new MultivariateFunction() {
-
-			@Override
-			public double evaluateAt(double... x) {
-				return x[2] * Math.sin(x[1] * x[2]);
-			}
-		};
-
-		MultivariateFunction df1x3 = new MultivariateFunction() {
-
-			@Override
-			public double evaluateAt(double... x) {
-				return x[1] * Math.sin(x[1] * x[2]);
-			}
-		};
-
-		MultivariateFunction df2x1 = new MultivariateFunction() {
-
-			@Override
-			public double evaluateAt(double... x) {
-				return 8 * x[0];
-			}
-		};
-
-		MultivariateFunction df2x2 = new MultivariateFunction() {
-
-			@Override
-			public double evaluateAt(double... x) {
-				return -1250.0 * x[1];
-			}
-		};
-
-		MultivariateFunction df2x3 = new MultivariateFunction() {
-
-			@Override
-			public double evaluateAt(double... x) {
-				return 2.0;
-			}
-		};
-
-		MultivariateFunction df3x1 = new MultivariateFunction() {
-
-			@Override
-			public double evaluateAt(double... x) {
-				return -x[1] * Math.exp(x[0] * x[1]);
-			}
-		};
-
-		MultivariateFunction df3x2 = new MultivariateFunction() {
-
-			@Override
-			public double evaluateAt(double... x) {
-				return -x[0] * Math.exp(x[0] * x[1]);
-			}
-		};
-
-		MultivariateFunction df3x3 = new MultivariateFunction() {
-
-			@Override
-			public double evaluateAt(double... x) {
-				return 20.0;
-			}
-		};
-
-		MultivariateFunction[][] Jacobian = new MultivariateFunction[][] { { df1x1, df1x2, df1x3 },
-				{ df2x1, df2x2, df2x3 }, { df3x1, df3x2, df3x3 } };
-
-		MultivariateFunction[] functions = new MultivariateFunction[] { f1, f2, f3 };
-		double[] initialguess = new double[] { 1d, 2d, 3d };
+		List<Function<Double[], Double[]>> jacobian = new ArrayList<>();
+		jacobian.add(x -> new Double[] { 3.0, x[2] * Math.sin(x[1] * x[2]), x[1] * Math.sin(x[1] * x[2]) });
+		jacobian.add(x -> new Double[] { 8 * x[0], -1250.0 * x[1], 2.0 });
+		jacobian.add(x -> new Double[] { -x[1] * Math.exp(x[0] * x[1]), -x[0] * Math.exp(x[0] * x[1]), 20.0 });
 
 		System.out.printf("Solution with pre-computed Jacobian%n------------------------------------%n");
-		double[] sol1 = new NewtonRaphson(functions).absTolerance(1e-9).iterationLimit(100).initialGuess(initialguess)
-				.autoComputeJacobian(false).setJacobian(Jacobian).solve();
+		Double[] sol1 = new NewtonRaphsonFunctional(functions, jacobian).absTolerance(1e-9).iterationLimit(100)
+				.initialGuess(initialguess).solve();
 		for (double val : sol1) {
 			System.out.printf("%.6g%n", val);
 		}
 
 		System.out.printf("%nSolution with auto-computed Jacobian%n------------------------------------%n");
-		double[] sol2 = new NewtonRaphson(functions).absTolerance(1e-9).iterationLimit(100).autoComputeJacobian(true)
-				.initialGuess(initialguess).setDifferentiationStepSize(0.001).solve();
+		Double[] sol2 = new NewtonRaphsonFunctional(functions).absTolerance(1e-9).iterationLimit(100)
+				.initialGuess(initialguess).differentiationStepSize(0.001).solve();
 		for (double val : sol2) {
 			System.out.printf("%.6g%n", val);
 		}
 	}
 
 	private static class LU {
-		protected double[][] _data;
+		protected Double[][] _data;
 		protected int _cols;
 
 		protected int _pivotsign;
 		protected int[] _pivot;
 
-		public LU(double[][] matrix) {
+		public LU(Double[][] matrix) {
 			int rows = matrix.length;
 			int cols = _cols = matrix[0].length;
 			_data = matrix;
@@ -338,8 +245,8 @@ public class NewtonRaphson {
 			}
 			_pivotsign = 1;
 
-			double[] LUrow;
-			double[] LUcol = new double[rows];
+			Double[] LUrow;
+			Double[] LUcol = new Double[rows];
 
 			// Begin the outer loop
 			for (int j = 0; j < cols; j++) {
@@ -421,4 +328,5 @@ public class NewtonRaphson {
 			return x;
 		}
 	}
+
 }

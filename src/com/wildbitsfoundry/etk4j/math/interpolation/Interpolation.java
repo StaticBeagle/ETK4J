@@ -3,14 +3,15 @@ package com.wildbitsfoundry.etk4j.math.interpolation;
 import com.wildbitsfoundry.etk4j.curvefitting.CurveFitting;
 
 public final class Interpolation {
-	private Interpolation() {}
-	
+	private Interpolation() {
+	}
+
 	public static double linear(double x0, double x1, double y0, double y1, double x) {
 		double hx = x1 - x0;
 		double t = (x - x0) / hx;
 		return (y1 - y0) * t + y0;
 	}
-	
+
 	public static double cosine(double x0, double x1, double y0, double y1, double x) {
 		double hx = x1 - x0;
 		double t = (x - x0) / hx;
@@ -37,28 +38,28 @@ public final class Interpolation {
 		}
 		return N[length - 1][length - 1];
 	}
-	
+
 	public static double quadratic(double x0, double x1, double x2, double y0, double y1, double y2, double xi) {
 		double[] parabola = CurveFitting.parabola(x0, x1, x2, y0, y1, y2);
 		return parabola[2] + xi * (parabola[1] + xi * parabola[0]);
 	}
-	
+
 	public static double spline(double[] x, double[] y, double xi) {
 		final int length = x.length;
-		if(length < 2) {
+		if (length < 2) {
 			throw new IllegalArgumentException("x must have 2 or more elements");
 		}
-		if(length == 2) {
+		if (length == 2) {
 			return linear(x[0], x[1], y[0], y[1], xi);
 		}
 		Spline sp = CubicSpline.newCubicSpline(x, y);
 		return sp.evaluateAt(xi);
 	}
-	
+
 	public static void main(String[] args) {
-		double[] x = new double[] {1,2, 3};
-		double[] y = new double[] {1,3, 10};
-		
+		double[] x = { 1, 2, 3 };
+		double[] y = { 1, 3, 10 };
+
 		System.out.println(neville(x, y, 2.5));
 	}
 }

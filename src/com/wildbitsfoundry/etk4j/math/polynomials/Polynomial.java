@@ -442,8 +442,8 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 	public static void main(String[] args) {
 		// everything here is correct. It just needs to
 		// be moved to an unit test
-		double[] x = new double[] { 1, 2, 3, 4 };
-		double[] y = new double[] { 1, 10, 12, 15 };
+		double[] x = { 1, 2, 3, 4 };
+		double[] y = { 1, 10, 12, 15 };
 		Polynomial poly = Polynomial.polyFit(x, y, 2);
 		Polynomial poly2 = Polynomial.polyFit(x, y, 3);
 		Polynomial poly3 = Polynomial.polyFit(x, y, 4);

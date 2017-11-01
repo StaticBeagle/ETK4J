@@ -10,20 +10,20 @@ public class LinearRegressionTest {
 
 	@Before
 	public void before() {
-		double[] x = new double[] { 1, 2, 3, 4, 5.06, 6 };
-		double[] y = new double[] { 1, 3, 2, 6, 7.23, 7 };
+		double[] x = { 1, 2, 3, 4, 5.06, 6 };
+		double[] y = { 1, 3, 2, 6, 7.23, 7 };
 		lr = new LinearRegression(x, y);
 	}
 
 	@Test
 	public void testBeta() {
-		double[] beta = new double[] { 1.329893117683651, -0.2962581764029481 };
+		double[] beta = { 1.329893117683651, -0.2962581764029481 };
 		assertArrayEquals(beta, lr.beta(), 1e-12);
 	}
 
 	@Test
 	public void testResiduals() {
-		double[] residuals = new double[] { -0.03363494128070288, 0.6364719410356461, -1.693421176648005,
+		double[] residuals = { -0.03363494128070288, 0.6364719410356461, -1.693421176648005,
 				0.976685705668344, 0.7969990009236749, -0.6831005296989581 };
 		assertArrayEquals(residuals, lr.residuals(), 1e-12);
 	}

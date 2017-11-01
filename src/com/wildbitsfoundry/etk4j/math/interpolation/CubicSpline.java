@@ -262,8 +262,8 @@ public class CubicSpline extends Spline {
 
 	// move to examples
 	public static void main(String[] args) {
-		double[] x = new double[] { 1, 2, 3, 4 };
-		double[] y = new double[] { 5, 6, 7, 8 };
+		double[] x = { 1, 2, 3, 4 };
+		double[] y = { 5, 6, 7, 8 };
 		CubicSpline cs = newNotAKnotSpline(x, y);
 
 		double[] xi = NumArrays.linsteps(1.0, 4.0, 0.1);

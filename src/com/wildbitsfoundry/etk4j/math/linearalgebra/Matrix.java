@@ -788,7 +788,7 @@ public class Matrix {
 	}
 
 	public static void main(String[] args) {
-		double[][] aa = new double[][] { { 1, -1, 4 }, { 1, 4, -2 }, { 1, 4, 2 }, { 1, -1, 0 } };
+		double[][] aa = { { 1, -1, 4 }, { 1, 4, -2 }, { 1, 4, 2 }, { 1, -1, 0 } };
 		QRDecomposition qr = new Matrix(aa).QR();
 		System.out.printf("H : %n%s%n%n", qr.getH());
 		System.out.printf("R : %n%s%n%n", qr.getR());
@@ -799,7 +799,7 @@ public class Matrix {
 		System.out.printf("A.inv() : %n%s%n%n", new Matrix(aa).transpose().inv());
 		System.out.printf("A.pinv() : %n%s%n%n", new Matrix(aa).transpose().pinv());
 
-		double[][] original = new double[][] { { 1, 2, 3 }, { 0, 4, 5 }, { 1, 0, 6 } };
+		double[][] original = { { 1, 2, 3 }, { 0, 4, 5 }, { 1, 0, 6 } };
 		Matrix sol = new Matrix(new double[] { 6, 4, 2 }, 3);
 
 		Matrix A = new Matrix(original);

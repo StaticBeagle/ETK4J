@@ -11,20 +11,20 @@ public class LogarithmicRegressionTest {
 
 	@Before
 	public void before() {
-		double[] x = new double[] { 0.510999, 105.7, 1.78e3 };
-		double[] y = new double[] { 0, 0.69, 1.06 };
+		double[] x = { 0.510999, 105.7, 1.78e3 };
+		double[] y = { 0, 0.69, 1.06 };
 		lr = new LogarithmicRegression(x, y);
 	}
 
 	@Test
 	public void testBeta() {
-		double[] beta = new double[] { 0.1298965219335365, 0.08654036624227313 };
+		double[] beta = { 0.1298965219335365, 0.08654036624227313 };
 		assertArrayEquals(beta, lr.beta(), 1e-12);
 	}
 
 	@Test
 	public void testResiduals() {
-		double[] residuals = new double[] { 6.705538069E-4, -1.9367319333130073E-3,  1.266178126E-3 };
+		double[] residuals = { 6.705538069E-4, -1.9367319333130073E-3,  1.266178126E-3 };
 		assertArrayEquals(residuals, lr.residuals(), 1e-12);
 	}
 

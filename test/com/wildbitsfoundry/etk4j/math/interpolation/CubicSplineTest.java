@@ -87,8 +87,8 @@ public class CubicSplineTest {
 	
 	@Test
 	public void testAkimaSplineInterpolation() {
-		double[] x = new double[] { 0.5, 0.9, 1.3, 1.9, 2.1, 2.2 };
-		double[] y = new double[] { 1.0, 1.3, 1.5, 1.85, 2.1, 2.4 };
+		double[] x = { 0.5, 0.9, 1.3, 1.9, 2.1, 2.2 };
+		double[] y = { 1.0, 1.3, 1.5, 1.85, 2.1, 2.4 };
 		CubicSpline cspline = CubicSpline.newAkimaSpline(x, y);
 		
 		double yi = cspline.evaluateAt(xi[0]);
