@@ -1,207 +1,59 @@
 package com.wildbitsfoundry.etk4j.math.solvers.multivariate;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 
 import com.wildbitsfoundry.etk4j.math.functions.MultivariateFunction;
+import com.wildbitsfoundry.etk4j.util.NumArrays;
 
 public class NewtonRaphson {
+	
+	private Solver _solver = null;
 
-	private int _maxIter = 100;
-	private double _absTol = 1e-9;
-	private double _maxVal = Double.POSITIVE_INFINITY;
-	private boolean _autoJacobian = true;
-	private double _step = 0.001;
-	private double[] _x0;
-
-	private MultivariateFunction[] _functions;
-	private MultivariateFunction[][] _jacobian;
-
-	public NewtonRaphson(MultivariateFunction[] functions) {
-		_functions = functions;
+	public NewtonRaphson(MultivariateFunction[] functions, double[] initialGuess) {
+		_solver = new RegularSolver(functions, initialGuess);
+	}
+	
+	public NewtonRaphson(MultivariateFunction[] functions, MultivariateFunction[][] jacobian, double[] intialGuess) {
+		_solver = new RegularSolver(functions, jacobian, intialGuess);
+	}
+	
+	public NewtonRaphson(List<Function<Double[], Double>> functions, double[] initialGuess) {
+		_solver = new FunctionalSolver(functions, initialGuess);
+	}
+	
+	public NewtonRaphson(List<Function<Double[], Double>> functions, List<Function<Double[], Double[]>> jacobian, double[] intialGuess) {
+		_solver = new FunctionalSolver(functions, jacobian, intialGuess);
 	}
 
 	public NewtonRaphson iterationLimit(int limit) {
-		_maxIter = limit;
+		_solver.setMaxIter(limit);
 		return this;
 	}
 
 	public NewtonRaphson absTolerance(double tol) {
-		_absTol = tol;
+		_solver.setAbsTol(tol);
 		return this;
 	}
 
-	public NewtonRaphson maxAllowedValue(double val) {
-		_maxVal = val;
+//	public NewtonRaphson maxAllowedValue(double val) {
+//		_maxVal = val;
+//		return this;
+//	}
+
+	public NewtonRaphson differentiationStepSize(double step) {
+		_solver.setDiffStep(step);
 		return this;
-	}
-
-	public NewtonRaphson autoComputeJacobian(boolean compute) {
-		_autoJacobian = compute;
-		return this;
-	}
-
-	public NewtonRaphson setDifferentiationStepSize(double step) {
-		_step = step;
-		return this;
-	}
-
-	public NewtonRaphson initialGuess(double[] x0) {
-		_x0 = Arrays.copyOf(x0, x0.length);
-		return this;
-	}
-
-	public NewtonRaphson setJacobian(MultivariateFunction[][] jacobian) {
-		_jacobian = jacobian;
-		return this;
-	}
-
-	private double[] solvePreComputedJacobian() {
-		int maxiter = _maxIter;
-		double tol = _absTol;
-		double maxval = _maxVal;
-		double[] x0 = _x0;
-		MultivariateFunction[] functions = _functions;
-		MultivariateFunction[][] jacobian = _jacobian;
-
-		int rows = jacobian.length;
-		int cols = jacobian[0].length;
-		double[] xcurrent = x0;
-		double[] xfinal = new double[cols];
-		double[] functionValues = new double[cols];
-		double[][] jacobianMatrixValues = new double[rows][cols];
-		while (maxiter > 0) {
-			evaluateJacobian(xcurrent, jacobianMatrixValues, jacobian);
-			LU matrix = new LU(jacobianMatrixValues);
-			if (Double.compare(Math.abs(matrix.det()), tol) < 0) {
-				// bail out the matrix is singular
-				return null; // <-- we'll think about this later
-			}
-
-			// evaluate functions at current x
-			eval(xcurrent, functionValues, functions);
-			double[] residuals = matrix.solve(functionValues);
-
-			for (int i = 0; i < cols; i++) {
-				xfinal[i] = xcurrent[i] - residuals[i];
-			}
-			eval(xfinal, functionValues, functions);
-
-			boolean done = true;
-			for (int i = 0; i < cols; i++) {
-				done &= Double.compare(Math.abs(residuals[i]), tol) < 0;
-			}
-			if (done) {
-
-				return xfinal;
-			}
-
-			boolean diverged = false;
-			for (int i = 0; i < cols; i++) {
-				diverged |= Double.compare(Math.abs(xcurrent[i]), maxval) > 0;
-			}
-			if (diverged) {
-				return null;
-			}
-
-			maxiter--;
-			xcurrent = xfinal;
-
-		}
-		return null;
 	}
 
 	public double[] solve() {
-		return _autoJacobian ? this.solveAutoComputeJacobian() : this.solvePreComputedJacobian();
+		return _solver.solve();
 	}
-
-	private double[] solveAutoComputeJacobian() {
-		int maxiter = _maxIter;
-		double tol = _absTol;
-		double maxval = _maxVal;
-		double step = _step;
-		double h = 1.0 / step;
-		double[] x0 = _x0;
-		MultivariateFunction[] functions = _functions;
-
-		int rows = functions.length;
-		int cols = x0.length;
-		double[] xcurrent = new double[cols];
-		double[] xfinal = new double[cols];
-		double[] residuals = new double[cols];
-		double[] functionValues = new double[cols];
-		double[] functionPrimeValues = new double[cols];
-		double[][] jacobianMatrixValues = new double[rows][cols];
-
-		System.arraycopy(x0, 0, xcurrent, 0, rows);
-		while (maxiter > 0) {
-			// Compute Jacobian
-			for (int i = 0; i < cols; i++) {
-				xcurrent[i] = xcurrent[i] + step;
-				eval(xcurrent, functionPrimeValues, functions);
-				xcurrent[i] = xcurrent[i] - step;
-				eval(xcurrent, functionValues, functions);
-				for (int j = 0; j < rows; j++) {
-					jacobianMatrixValues[j][i] = (functionPrimeValues[j] - functionValues[j]) * h;
-				}
-			}
-
-			LU matrix = new LU(jacobianMatrixValues);
-			if (Double.compare(Math.abs(matrix.det()), tol) < 0) {
-				// bail out the matrix is singular
-				return null; // <-- we'll think about this later
-			}
-
-			residuals = matrix.solve(functionValues);
-			for (int i = 0; i < cols; i++) {
-				xfinal[i] = xcurrent[i] - residuals[i];
-			}
-			eval(xfinal, functionValues, functions);
-
-			double relErrorNorm = 0.0;
-			double errorNorm = 0.0;
-			for (int i = 0; i < cols; i++) {
-				// calculate the norm2 of the relative error
-				relErrorNorm += (xfinal[i] - xcurrent[i]) * (xfinal[i] - xcurrent[i]);
-				errorNorm += xfinal[i] * xfinal[i];
-			}
-			double error = Math.sqrt(relErrorNorm) / Math.sqrt(errorNorm);
-			if (Double.compare(error, tol) <= 0) {
-				return xfinal;
-			}
-
-			boolean diverged = false;
-			for (int i = 0; i < cols; i++) {
-				diverged |= Double.compare(Math.abs(xcurrent[i]), maxval) > 0;
-			}
-			if (diverged) {
-				return null;
-			}
-
-			maxiter--;
-			System.arraycopy(xfinal, 0, xcurrent, 0, rows);
-		}
-		return null;
-	}
-
-	private static void evaluateJacobian(double[] x, double[][] out, MultivariateFunction[][] jacobian) {
-		int rows = out.length;
-		int cols = out[0].length;
-
-		for (int i = 0; i < rows; i++) {
-			for (int j = 0; j < cols; j++) {
-				out[i][j] = jacobian[i][j].evaluateAt(x);
-			}
-		}
-	}
-
-	private static void eval(double[] x, double[] out, MultivariateFunction[] functions) {
-		int length = x.length;
-		for (int i = 0; i < length; i++) {
-			out[i] = functions[i].evaluateAt(x);
-		}
-	}
-
-	public static void main(String[] args) {
+	
+	private static void testRegular() {
 		MultivariateFunction f1 = new MultivariateFunction() {
 
 			@Override
@@ -299,25 +151,68 @@ public class NewtonRaphson {
 			}
 		};
 
-		MultivariateFunction[][] Jacobian = new MultivariateFunction[][] { { df1x1, df1x2, df1x3 },
+		MultivariateFunction[][] jacobian = new MultivariateFunction[][] { { df1x1, df1x2, df1x3 },
 				{ df2x1, df2x2, df2x3 }, { df3x1, df3x2, df3x3 } };
 
 		MultivariateFunction[] functions = new MultivariateFunction[] { f1, f2, f3 };
 		double[] initialguess = new double[] { 1d, 2d, 3d };
 
 		System.out.printf("Solution with pre-computed Jacobian%n------------------------------------%n");
-		double[] sol1 = new NewtonRaphson(functions).absTolerance(1e-9).iterationLimit(100).initialGuess(initialguess)
-				.autoComputeJacobian(false).setJacobian(Jacobian).solve();
+		double[] sol1 = new NewtonRaphson(functions, jacobian, initialguess)
+				.absTolerance(1e-9)
+				.iterationLimit(100)
+				.solve();
 		for (double val : sol1) {
 			System.out.printf("%.6g%n", val);
 		}
 
 		System.out.printf("%nSolution with auto-computed Jacobian%n------------------------------------%n");
-		double[] sol2 = new NewtonRaphson(functions).absTolerance(1e-9).iterationLimit(100).autoComputeJacobian(true)
-				.initialGuess(initialguess).setDifferentiationStepSize(0.001).solve();
+		double[] sol2 = new NewtonRaphson(functions, initialguess)
+				.absTolerance(1e-9)
+				.iterationLimit(100)
+				.differentiationStepSize(0.001)
+				.solve();
 		for (double val : sol2) {
 			System.out.printf("%.6g%n", val);
 		}
+	}
+	
+	public static void testFunctional() {
+		double[] initialguess = { 1d, 2d, 3d };
+
+		List<Function<Double[], Double>> functions = new ArrayList<>();
+		functions.add(x -> 3 * x[0] - Math.cos(x[1] * x[2]) - 1.5);
+		functions.add(x -> 4 * x[0] * x[0] - 625.0 * x[1] * x[1] + 2.0 * x[2] - 1.0);
+		functions.add(x -> 20 * x[2] + Math.exp(-x[0] * x[1]) + 9.0);
+
+		List<Function<Double[], Double[]>> jacobian = new ArrayList<>();
+		jacobian.add(x -> new Double[] { 3.0, x[2] * Math.sin(x[1] * x[2]), x[1] * Math.sin(x[1] * x[2]) });
+		jacobian.add(x -> new Double[] { 8 * x[0], -1250.0 * x[1], 2.0 });
+		jacobian.add(x -> new Double[] { -x[1] * Math.exp(x[0] * x[1]), -x[0] * Math.exp(x[0] * x[1]), 20.0 });
+
+		System.out.printf("Solution with pre-computed Jacobian%n------------------------------------%n");
+		double[] sol1 = new NewtonRaphson(functions, jacobian, initialguess)
+				.absTolerance(1e-9)
+				.iterationLimit(100)
+				.solve();
+		for (double val : sol1) {
+			System.out.printf("%.6g%n", val);
+		}
+
+		System.out.printf("%nSolution with auto-computed Jacobian%n------------------------------------%n");
+		double[] sol2 = new NewtonRaphson(functions, initialguess)
+				.absTolerance(1e-9)
+				.iterationLimit(100)
+				.differentiationStepSize(0.001)
+				.solve();
+		for (double val : sol2) {
+			System.out.printf("%.6g%n", val);
+		}
+	}
+	
+	public static void main(String[] args) {
+		testRegular();
+		testFunctional();
 	}
 
 	private static class LU {
@@ -393,6 +288,32 @@ public class NewtonRaphson {
 			}
 			return det;
 		}
+		
+		public void solve(final double[] vector, double[] solution) {
+			int rows = vector.length;
+			// Shuffle rows to match pivot vector
+			for (int i = 0; i < rows; i++) {
+				solution[i] = vector[_pivot[i]];
+			}
+
+			// Solve Ly = b
+			// Forward substitution
+			for (int k = 0; k < rows; k++) {
+				for (int i = k + 1; i < rows; i++) {
+					solution[i] -= solution[k] * _data[i][k];
+				}
+			}
+
+			// Solve Ux = y
+			// Back substitution
+			for (int k = rows - 1; k >= 0; k--) {
+				solution[k] /= _data[k][k];
+				for (int i = 0; i < k; i++) {
+					solution[i] -= solution[k] * _data[i][k];
+				}
+			}
+		}
+	
 
 		public double[] solve(final double[] vector) {
 			int rows = vector.length;
@@ -419,6 +340,266 @@ public class NewtonRaphson {
 				}
 			}
 			return x;
+		}
+	}
+	
+	private interface Solver {
+		public double[] solve();
+		public void setMaxIter(int max);
+		public void setAbsTol(double tol);
+		public void setDiffStep(double step);
+	}
+	
+	private static abstract class NewtonRaphsonSolver <T, U> implements Solver {
+		protected int _maxIter = 100;
+		protected double _absTol = 1e-9;
+		protected double _maxVal = Double.POSITIVE_INFINITY;
+		protected double _step = 0.001;
+		protected double[] _x0;
+		
+		protected T _functions;
+		protected U _jacobian;
+		
+		protected NewtonRaphsonSolver(T functions, double[] x0) {
+			this(functions, null, x0);
+		}
+		
+		protected NewtonRaphsonSolver(T functions, U jacobian, double[] x0) {
+			_functions = functions;
+			_jacobian = jacobian;
+			_x0 = x0;
+		}
+		
+		public abstract double[] solve(Optional<U> jacobian);
+		
+		@Override
+		public void setMaxIter(int max) {
+			_maxIter = max;
+		}
+		
+		@Override
+		public void setAbsTol(double tol) {
+			_absTol = tol;
+		}
+		
+		@Override
+		public void setDiffStep(double step) {
+			_step = step;
+		}
+		
+		@Override
+		public final double[] solve() {
+			return this.solve(Optional.ofNullable(_jacobian));
+		}
+	}
+	
+	private static class RegularSolver extends NewtonRaphsonSolver<MultivariateFunction[], MultivariateFunction[][]> {
+
+		public RegularSolver(MultivariateFunction[] functions, double[] x0) {
+			super(functions, x0);
+		}
+		
+		protected RegularSolver(MultivariateFunction[] functions, MultivariateFunction[][] jacobian, double[] x0) {
+			super(functions, jacobian, x0);
+		}
+		
+		private static void evaluateJacobian(double[] x, MultivariateFunction[][] jacobian, double[][] out) {
+			int rows = out.length;
+			int cols = out[0].length;
+			for (int i = 0; i < rows; i++) {
+				for (int j = 0; j < cols; j++) {
+					out[i][j] = jacobian[i][j].evaluateAt(x);
+				}
+			}
+		}
+
+		private static void evaluateFunctionsAt(double[] x, MultivariateFunction[] functions, double[] out) {
+			int length = x.length;
+			for (int i = 0; i < length; i++) {
+				out[i] = functions[i].evaluateAt(x);
+			}
+		}
+		
+		private static void computeJacobian(double[] x, MultivariateFunction[] f, double[] dfx, double[] fx, double step, double[][] out) {
+			double h = 1.0 / step;
+			int rows = f.length;
+			int cols = x.length;
+			for (int i = 0; i < cols; i++) {
+				x[i] = x[i] + step;
+				evaluateFunctionsAt(x, f, dfx);
+				x[i] = x[i] - step;
+				evaluateFunctionsAt(x, f, fx);
+				for (int j = 0; j < rows; j++) {
+					out[j][i] = (dfx[j] - fx[j]) * h;
+				}
+			}
+		}
+
+		@Override
+		public double[] solve(Optional<MultivariateFunction[][]> jacobian) {
+			int maxiter = _maxIter;
+			double tol = _absTol;
+			double maxval = _maxVal;
+			double step = _step;
+			double[] x0 = _x0;
+			MultivariateFunction[] functions = _functions;
+
+			int rows = functions.length;
+			int cols = x0.length;
+			double[] xcurrent = new double[cols];
+			double[] xfinal = new double[cols];
+			double[] residuals = new double[cols];
+			double[] functionValues = new double[cols];
+			double[][] jacobianMatrixValues = new double[rows][cols];
+
+			System.arraycopy(x0, 0, xcurrent, 0, rows);
+			while (maxiter-- > 0) {
+				if(jacobian.isPresent()) {
+					evaluateJacobian(xcurrent, jacobian.get(), jacobianMatrixValues);
+					evaluateFunctionsAt(xcurrent, functions, functionValues);
+				} else {
+					computeJacobian(xcurrent, functions, residuals, functionValues, step, jacobianMatrixValues);				
+				}
+
+				LU matrix = new LU(jacobianMatrixValues);
+				if (Double.compare(Math.abs(matrix.det()), tol) < 0) {
+					// bail out the matrix is singular
+					return null; // <-- we'll think about this later
+				}
+
+				matrix.solve(functionValues, residuals);
+				for (int i = 0; i < cols; i++) {
+					xfinal[i] = xcurrent[i] - residuals[i];
+				}
+				evaluateFunctionsAt(xfinal, functions, functionValues);
+
+				// relative tol
+				double error = NumArrays.euclidean(xfinal, xcurrent) / NumArrays.norm(xfinal);
+				// absolute NumArrays.euclidean(xfinal, xcurrent)
+				if (Double.compare(error, tol) <= 0) {
+					return xfinal;
+				}
+
+				boolean diverged = false;
+				for (int i = 0; i < cols; i++) {
+					diverged |= Double.compare(Math.abs(xcurrent[i]), maxval) > 0;
+				}
+				if (diverged) {
+					return null;
+				}
+				System.arraycopy(xfinal, 0, xcurrent, 0, rows);
+			}
+			return null;
+		}
+		
+		
+	}
+
+	private static class FunctionalSolver extends NewtonRaphsonSolver<List<Function<Double[], Double>>, List<Function<Double[], Double[]>>> {
+
+		protected FunctionalSolver(List<Function<Double[], Double>> functions, double[] x0) {
+			super(functions, x0);
+		}
+		
+		protected FunctionalSolver(List<Function<Double[], Double>> functions, List<Function<Double[], Double[]>> jacobian, double[] x0) {
+			super(functions, jacobian, x0);
+		}
+		
+		private static void computeJacobian(Double[] x, List<Function<Double[], Double>> f, double[] dfx, double[] fx, double step, double[][] out) {
+			double h = 1.0 / step;
+			int rows = f.size();
+			int cols = x.length;
+			for (int i = 0; i < cols; i++) {
+				x[i] = x[i] + step;
+				evaluateFunctionsAt(x, f, dfx);
+				x[i] = x[i] - step;
+				evaluateFunctionsAt(x, f, fx);
+				for (int j = 0; j < rows; j++) {
+					out[j][i] = (dfx[j] - fx[j]) * h;
+				}
+			}
+		}
+		
+		private static void evaluateJacobian(Double[] xcurrent, List<Function<Double[], Double[]>> jacobian, double[][] out) {
+			int rows = out.length;
+
+			for (int i = 0; i < rows; ++i) {
+				Double[] tmp = jacobian.get(i).apply(xcurrent);
+				for(int j = 0; j < tmp.length; ++j){
+					out[i][j] = tmp[j].doubleValue();
+				}
+			}
+		}
+
+		private static void evaluateFunctionsAt(Double[] x, List<Function<Double[], Double>> functions, double[] out) {
+			int length = x.length;
+			for (int i = 0; i < length; i++) {
+				out[i] = functions.get(i).apply(x).doubleValue();
+			}
+		}
+
+		@Override
+		public double[] solve(Optional<List<Function<Double[], Double[]>>> jacobian) {
+			int maxiter = _maxIter;
+			double tol = _absTol;
+			double maxval = _maxVal;
+			double step = _step;
+			Double[] x0 = Arrays.stream(_x0).boxed().toArray(size -> new Double[size]);
+			List<Function<Double[], Double>> functions = _functions;
+
+			int rows = functions.size();
+			int cols = x0.length;
+			Double[] xcurrent = new Double[cols];
+			Double[] xfinal = new Double[cols];
+			double[] residuals = new double[cols];
+			double[] functionValues = new double[cols];
+			double[][] jacobianMatrixValues = new double[rows][cols];
+
+			System.arraycopy(x0, 0, xcurrent, 0, rows);
+			while (maxiter-- > 0) {
+
+				if (jacobian.isPresent()) {
+					evaluateJacobian(xcurrent, jacobian.get(), jacobianMatrixValues);
+					evaluateFunctionsAt(xcurrent, functions, functionValues);
+				} else {
+					 computeJacobian(xcurrent, functions, residuals, functionValues, step, jacobianMatrixValues);
+				}
+
+				LU matrix = new LU(jacobianMatrixValues);
+				if (Double.compare(Math.abs(matrix.det()), tol) < 0) {
+					// bail out the matrix is singular
+					return null; // <-- we'll think about this later
+				}
+
+				residuals = matrix.solve(functionValues);
+				for (int i = 0; i < cols; i++) {
+					xfinal[i] = xcurrent[i] - residuals[i];
+				}
+				evaluateFunctionsAt(xfinal, functions ,functionValues);
+
+				double relErrorNorm = 0.0;
+				double errorNorm = 0.0;
+				for (int i = 0; i < cols; i++) {
+					// calculate the norm2 of the relative error
+					relErrorNorm += Math.pow(xfinal[i].doubleValue() - xcurrent[i].doubleValue(), 2);
+					errorNorm += Math.pow(xfinal[i].doubleValue(), 2);
+				}
+				double error = Math.sqrt(relErrorNorm) / Math.sqrt(errorNorm);
+				if (Double.compare(error, tol) <= 0) {
+					return Arrays.stream(xfinal).mapToDouble(Double::doubleValue).toArray();
+				}
+
+				boolean diverged = false;
+				for (int i = 0; i < cols; i++) {
+					diverged |= Double.compare(Math.abs(xcurrent[i]), maxval) > 0;
+				}
+				if (diverged) {
+					return null;
+				}
+
+				System.arraycopy(xfinal, 0, xcurrent, 0, rows);
+			}
+			return null;
 		}
 	}
 }

@@ -2,6 +2,8 @@ package com.wildbitsfoundry.etk4j.util;
 
 import java.util.Arrays;
 
+import com.wildbitsfoundry.etk4j.math.MathETK;
+
 public final class NumArrays {
 	
 	private NumArrays() {}
@@ -71,6 +73,18 @@ public final class NumArrays {
 		double[] result = new double[length];
 		for(int i = 0; i < length; ++i) {
 			result[i] = a[i] + b[i];
+		}
+		return result;
+	}
+	
+	public static double[] subtract(double[] a, double[] b) {
+		if(a.length != b.length) {
+			throw new IllegalArgumentException("a and b dimensions must match");
+		}
+		final int length = a.length;
+		double[] result = new double[length];
+		for(int i = 0; i < length; ++i) {
+			result[i] = a[i] - b[i];
 		}
 		return result;
 	}
@@ -190,6 +204,14 @@ public final class NumArrays {
 			}
 		}
 		return max;
+	}
+	
+	public static double euclidean(double[] a, double[] b) {
+		double norm = 0.0;
+		for(int i = 0; i < a.length; ++i) {
+			norm = MathETK.hypot(norm, a[i] - b[i]);
+		}
+		return norm;
 	}
 	
 	public static double[] kron(final double[] a, final double[] b) {
