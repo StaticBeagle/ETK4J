@@ -206,7 +206,25 @@ public final class NumArrays {
 		return max;
 	}
 	
-	public static double euclidean(double[] a, double[] b) {
+	public static double normNegInf(double[] a) {
+		double min = Math.abs(a[0]);
+		for(int i = 1; i < a.length; ++i) {
+			double abs = Math.abs(a[i]);
+			if(abs < min) {
+				min = abs;
+			}
+		}
+		return min;
+	}
+	
+	/***
+	 * Euclidean distance between two arrays
+	 * @param a - first array
+	 * @param b - second array
+	 * @return
+	 * 	<pre> sqrt((a[i] - b[i])<sup>2</sup>)
+	 */
+	public static double distance(double[] a, double[] b) {
 		double norm = 0.0;
 		for(int i = 0; i < a.length; ++i) {
 			norm = MathETK.hypot(norm, a[i] - b[i]);
@@ -331,5 +349,13 @@ public final class NumArrays {
             sum += y[i];
         }
         return sum / n;
+	}
+	
+	public static Double[] box(double[] a) {
+		return Arrays.stream(a).boxed().toArray(size -> new Double[size]);
+	}
+	
+	public static double[] unbox(Double[] a) {
+		return Arrays.stream(a).mapToDouble(Double::doubleValue).toArray();
 	}
 }

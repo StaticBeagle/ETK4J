@@ -1,15 +1,40 @@
 package com.wildbitsfoundry.etk4j.math.solvers.multivariate;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
+import com.wildbitsfoundry.etk4j.constants.ETKConstants;
 import com.wildbitsfoundry.etk4j.math.functions.MultivariateFunction;
 import com.wildbitsfoundry.etk4j.util.NumArrays;
 
 public class NewtonRaphson {
+	
+	public class SolverResults {
+		double[] Solution;
+		SolverStatus Status;
+		int Iterations;
+	}
+	
+	public enum SolverStatus {
+		SUCCESS,
+		DIVERGED,
+		NOT_STARTED,
+		MAX_VALUE_EXCEEDED,
+		MIN_VALUE_EXCEEDED,
+		ITERATION_LIMIT_EXCEEDED,
+		
+	}
+	
+	public enum ConvergeCriterion {
+		AVG_ABS_ERROR,
+		AVG_REL_ERROR,
+		MAX_ABS_ERROR,
+		MAX_REL_ERROR,
+		SQRT_SUM_ABS_ERROR_SQUARED,
+		SQRT_SUM_REL_ERROR_SQUARED
+	}
 	
 	private Solver _solver = null;
 
@@ -34,8 +59,8 @@ public class NewtonRaphson {
 		return this;
 	}
 
-	public NewtonRaphson absTolerance(double tol) {
-		_solver.setAbsTol(tol);
+	public NewtonRaphson tolerance(double tol) {
+		_solver.setTol(tol);
 		return this;
 	}
 
@@ -159,7 +184,7 @@ public class NewtonRaphson {
 
 		System.out.printf("Solution with pre-computed Jacobian%n------------------------------------%n");
 		double[] sol1 = new NewtonRaphson(functions, jacobian, initialguess)
-				.absTolerance(1e-9)
+				.tolerance(1e-9)
 				.iterationLimit(100)
 				.solve();
 		for (double val : sol1) {
@@ -168,7 +193,7 @@ public class NewtonRaphson {
 
 		System.out.printf("%nSolution with auto-computed Jacobian%n------------------------------------%n");
 		double[] sol2 = new NewtonRaphson(functions, initialguess)
-				.absTolerance(1e-9)
+				.tolerance(1e-9)
 				.iterationLimit(100)
 				.differentiationStepSize(0.001)
 				.solve();
@@ -192,7 +217,7 @@ public class NewtonRaphson {
 
 		System.out.printf("Solution with pre-computed Jacobian%n------------------------------------%n");
 		double[] sol1 = new NewtonRaphson(functions, jacobian, initialguess)
-				.absTolerance(1e-9)
+				.tolerance(1e-9)
 				.iterationLimit(100)
 				.solve();
 		for (double val : sol1) {
@@ -201,7 +226,7 @@ public class NewtonRaphson {
 
 		System.out.printf("%nSolution with auto-computed Jacobian%n------------------------------------%n");
 		double[] sol2 = new NewtonRaphson(functions, initialguess)
-				.absTolerance(1e-9)
+				.tolerance(1e-9)
 				.iterationLimit(100)
 				.differentiationStepSize(0.001)
 				.solve();
@@ -346,8 +371,13 @@ public class NewtonRaphson {
 	private interface Solver {
 		public double[] solve();
 		public void setMaxIter(int max);
-		public void setAbsTol(double tol);
+		public void setTol(double tol);
 		public void setDiffStep(double step);
+		public void setConvergenceCriterion(ConvergeCriterion criterion);
+	}
+	
+	private interface ErrorCalculator {
+		public double calculateError(double[] x, double[] y);
 	}
 	
 	private static abstract class NewtonRaphsonSolver <T, U> implements Solver {
@@ -359,6 +389,8 @@ public class NewtonRaphson {
 		
 		protected T _functions;
 		protected U _jacobian;
+		private ConvergeCriterion _convCrit;
+		private ErrorCalculator _errCalc;
 		
 		protected NewtonRaphsonSolver(T functions, double[] x0) {
 			this(functions, null, x0);
@@ -368,6 +400,7 @@ public class NewtonRaphson {
 			_functions = functions;
 			_jacobian = jacobian;
 			_x0 = x0;
+			this.setConvergenceCriterion(ConvergeCriterion.SQRT_SUM_REL_ERROR_SQUARED);
 		}
 		
 		public abstract double[] solve(Optional<U> jacobian);
@@ -378,7 +411,7 @@ public class NewtonRaphson {
 		}
 		
 		@Override
-		public void setAbsTol(double tol) {
+		public void setTol(double tol) {
 			_absTol = tol;
 		}
 		
@@ -390,6 +423,102 @@ public class NewtonRaphson {
 		@Override
 		public final double[] solve() {
 			return this.solve(Optional.ofNullable(_jacobian));
+		}
+		
+		@Override
+		public void setConvergenceCriterion(ConvergeCriterion criterion) {
+			_convCrit = criterion;
+			switch(_convCrit) {
+			case AVG_ABS_ERROR:
+				_errCalc = new ErrorCalculator() {
+
+					@Override
+					public double calculateError(double[] x, double[] y) {
+						final int n = x.length;
+						double error = 0.0;
+						for(int i = 0; i < n; ++i) {
+							error += Math.abs(x[i] - y[i]);
+						}
+						return error / n;
+					}
+				};
+				break;
+			case AVG_REL_ERROR:
+				_errCalc = new ErrorCalculator() {
+
+					@Override
+					public double calculateError(double[] x, double[] y) {
+						final int n = x.length;
+						double error = 0.0;
+						for(int i = 0; i < n; ++i) {
+							error += Math.abs((x[i] - y[i]) / x[i]);
+						}
+						return error / n;
+					}
+				};
+				break;
+			case MAX_ABS_ERROR:
+				_errCalc = new ErrorCalculator() {
+
+					@Override
+					public double calculateError(double[] x, double[] y) {
+						final int n = x.length;
+						double max = Math.abs(x[0] - y[0]);
+						for(int i = 1; i < n; ++i) {
+							double tmp = Math.abs(x[i] - y[i]);
+							if(tmp > max) {
+								max = tmp;
+							}
+						}
+						return max;
+					}
+				};
+				break;
+			case MAX_REL_ERROR:
+				_errCalc = new ErrorCalculator() {
+
+					@Override
+					public double calculateError(double[] x, double[] y) {
+						final int n = x.length;
+						double max = Math.abs((x[0] - y[0]) / x[0]);
+						for(int i = 1; i < n; ++i) {
+							double tmp = Math.abs((x[i] - y[i]) / x[i]);
+							if(tmp > max) {
+								max = tmp;
+							}
+						}
+						return max;
+					}
+				};
+				break;
+			case SQRT_SUM_ABS_ERROR_SQUARED:
+				_errCalc = new ErrorCalculator() {
+
+					@Override
+					public double calculateError(double[] x, double[] y) {
+						return NumArrays.distance(x, y);
+					}
+					
+				};
+				break;
+			case SQRT_SUM_REL_ERROR_SQUARED:
+				_errCalc = new ErrorCalculator() {
+
+					@Override
+					public double calculateError(double[] x, double[] y) {
+						return NumArrays.distance(x, y)  / NumArrays.norm(x);
+					}
+					
+				};
+				break;
+			default:
+				break;
+			}
+		}
+		
+		protected boolean checkForConvergence(double[] xfinal, double[] xcurrent) {
+			double error = _errCalc.calculateError(xfinal, xcurrent);
+			return Double.compare(error, _absTol) <= 0;
 		}
 	}
 	
@@ -438,7 +567,6 @@ public class NewtonRaphson {
 		@Override
 		public double[] solve(Optional<MultivariateFunction[][]> jacobian) {
 			int maxiter = _maxIter;
-			double tol = _absTol;
 			double maxval = _maxVal;
 			double step = _step;
 			double[] x0 = _x0;
@@ -460,9 +588,9 @@ public class NewtonRaphson {
 				} else {
 					computeJacobian(xcurrent, functions, residuals, functionValues, step, jacobianMatrixValues);				
 				}
-
+				
 				LU matrix = new LU(jacobianMatrixValues);
-				if (Double.compare(Math.abs(matrix.det()), tol) < 0) {
+				if (Double.compare(Math.abs(matrix.det()), ETKConstants.DOUBLE_EPS) < 0) {
 					// bail out the matrix is singular
 					return null; // <-- we'll think about this later
 				}
@@ -473,10 +601,7 @@ public class NewtonRaphson {
 				}
 				evaluateFunctionsAt(xfinal, functions, functionValues);
 
-				// relative tol
-				double error = NumArrays.euclidean(xfinal, xcurrent) / NumArrays.norm(xfinal);
-				// absolute NumArrays.euclidean(xfinal, xcurrent)
-				if (Double.compare(error, tol) <= 0) {
+				if(this.checkForConvergence(xfinal, xcurrent)) {
 					return xfinal;
 				}
 
@@ -490,9 +615,7 @@ public class NewtonRaphson {
 				System.arraycopy(xfinal, 0, xcurrent, 0, rows);
 			}
 			return null;
-		}
-		
-		
+		}		
 	}
 
 	private static class FunctionalSolver extends NewtonRaphsonSolver<List<Function<Double[], Double>>, List<Function<Double[], Double[]>>> {
@@ -544,7 +667,7 @@ public class NewtonRaphson {
 			double tol = _absTol;
 			double maxval = _maxVal;
 			double step = _step;
-			Double[] x0 = Arrays.stream(_x0).boxed().toArray(size -> new Double[size]);
+			Double[] x0 = NumArrays.box(_x0);
 			List<Function<Double[], Double>> functions = _functions;
 
 			int rows = functions.size();
@@ -577,16 +700,8 @@ public class NewtonRaphson {
 				}
 				evaluateFunctionsAt(xfinal, functions ,functionValues);
 
-				double relErrorNorm = 0.0;
-				double errorNorm = 0.0;
-				for (int i = 0; i < cols; i++) {
-					// calculate the norm2 of the relative error
-					relErrorNorm += Math.pow(xfinal[i].doubleValue() - xcurrent[i].doubleValue(), 2);
-					errorNorm += Math.pow(xfinal[i].doubleValue(), 2);
-				}
-				double error = Math.sqrt(relErrorNorm) / Math.sqrt(errorNorm);
-				if (Double.compare(error, tol) <= 0) {
-					return Arrays.stream(xfinal).mapToDouble(Double::doubleValue).toArray();
+				if (this.checkForConvergence(NumArrays.unbox(xfinal), NumArrays.unbox(xcurrent))) {
+					return NumArrays.unbox(xfinal);
 				}
 
 				boolean diverged = false;

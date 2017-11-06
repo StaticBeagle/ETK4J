@@ -1,4 +1,4 @@
-package com.wildbitsfoundry.etk4j.regression;
+package com.wildbitsfoundry.etk4j.statistics.regression;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;

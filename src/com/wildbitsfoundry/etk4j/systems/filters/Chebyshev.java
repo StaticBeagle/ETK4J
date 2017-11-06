@@ -1,9 +1,9 @@
-package com.wildbitsfoundry.etk4j.systems.continuoustime.filters;
+package com.wildbitsfoundry.etk4j.systems.filters;
 
 import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
-import com.wildbitsfoundry.etk4j.systems.continuoustime.TransferFunction;
+import com.wildbitsfoundry.etk4j.systems.TransferFunction;
 import com.wildbitsfoundry.etk4j.util.NumArrays;
 
 public class Chebyshev extends AnalogFilter {

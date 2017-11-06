@@ -1,4 +1,4 @@
-package com.wildbitsfoundry.etk4j.regression;
+package com.wildbitsfoundry.etk4j.statistics.regression;
 
 interface RegressionModel {
 	public double R2();

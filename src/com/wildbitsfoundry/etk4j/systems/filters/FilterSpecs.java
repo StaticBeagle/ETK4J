@@ -1,4 +1,4 @@
-package com.wildbitsfoundry.etk4j.systems.continuoustime.filters;
+package com.wildbitsfoundry.etk4j.systems.filters;
 
 public abstract class FilterSpecs {
 	public static enum FilterApproximation {

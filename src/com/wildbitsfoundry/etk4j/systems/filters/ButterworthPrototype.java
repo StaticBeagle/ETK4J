@@ -1,9 +1,9 @@
-package com.wildbitsfoundry.etk4j.systems.continuoustime.filters;
+package com.wildbitsfoundry.etk4j.systems.filters;
 
-import com.wildbitsfoundry.etk4j.systems.continuoustime.filters.FilterSpecs.BandPassSpecs;
-import com.wildbitsfoundry.etk4j.systems.continuoustime.filters.FilterSpecs.BandStopSpecs;
-import com.wildbitsfoundry.etk4j.systems.continuoustime.filters.FilterSpecs.HighPassSpecs;
-import com.wildbitsfoundry.etk4j.systems.continuoustime.filters.FilterSpecs.LowPassSpecs;
+import com.wildbitsfoundry.etk4j.systems.filters.FilterSpecs.BandPassSpecs;
+import com.wildbitsfoundry.etk4j.systems.filters.FilterSpecs.BandStopSpecs;
+import com.wildbitsfoundry.etk4j.systems.filters.FilterSpecs.HighPassSpecs;
+import com.wildbitsfoundry.etk4j.systems.filters.FilterSpecs.LowPassSpecs;
 
 class ButterworthPrototype implements LowPassPrototype {
 

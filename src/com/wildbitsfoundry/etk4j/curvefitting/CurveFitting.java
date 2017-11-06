@@ -1,6 +1,7 @@
 package com.wildbitsfoundry.etk4j.curvefitting;
 
 import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
+import com.wildbitsfoundry.etk4j.util.NumArrays;
 
 public final class CurveFitting {
 	private CurveFitting() {
@@ -9,6 +10,31 @@ public final class CurveFitting {
 	public static double[] line(double x0, double x1, double y0, double y1) {
 		double m = (y1 - y0) / (x1 - x0);
 		return new double[] { m, y0 - m * x0 };
+	}
+
+	public static double[] linear(double[] x, double[] y) {
+		if (x.length != y.length) {
+			throw new IllegalArgumentException("x and y dimensions must match");
+		}
+
+		final int n = x.length;
+		double xbar = NumArrays.mean(x);
+		double ybar = NumArrays.mean(y);
+
+		double sumx2 = NumArrays.norm(x);
+		sumx2 *= sumx2;
+
+		double ssxx = sumx2 - n * xbar * xbar;
+
+		double xdoty = 0.0;
+		for (int i = 0; i < n; ++i) {
+			xdoty += x[i] * y[i];
+		}
+		double ssxy = xdoty - n * xbar * ybar;
+
+		double b = ssxy / ssxx;
+		double a = ybar - b * xbar;
+		return new double[] { b, a };
 	}
 
 	public static double[] parabola(double x0, double x1, double x2, double y0, double y1, double y2) {
@@ -27,12 +53,13 @@ public final class CurveFitting {
 	/***
 	 * Exponential least squares fit <br />
 	 * Fits x and y to a function a * e^(b * x) in a least square sense
+	 * 
 	 * @param x
 	 * @param y
 	 * @return [a, b]
 	 */
 	public double[] exponential(double[] x, double[] y) {
-		if(x.length != y.length) {
+		if (x.length != y.length) {
 			throw new IllegalArgumentException("x and y dimensions must match");
 		}
 		final int n = x.length;
@@ -53,14 +80,15 @@ public final class CurveFitting {
 	}
 
 	/***
-	 * Logarithmic least squares fit
-	 * Fits x and y to a function a + b * ln(x) in a least square sense
+	 * Logarithmic least squares fit Fits x and y to a function a + b * ln(x) in
+	 * a least square sense
+	 * 
 	 * @param x
 	 * @param y
 	 * @return [a, b]
 	 */
-	public double[] logarithmic(double[] x, double[] y)  {
-		if(x.length != y.length) {
+	public double[] logarithmic(double[] x, double[] y) {
+		if (x.length != y.length) {
 			throw new IllegalArgumentException("x and y dimensions must match");
 		}
 		final int n = x.length;

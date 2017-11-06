@@ -2,6 +2,7 @@ package com.wildbitsfoundry.etk4j.math.linearalgebra;
 
 import java.util.Arrays;
 
+import com.wildbitsfoundry.etk4j.constants.ETKConstants;
 import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.util.NumArrays;
 
@@ -654,7 +655,6 @@ public class Matrix {
 	}
 
 	public Matrix pinv() {
-		double eps = 2e-16;
 		int rows = _rows;
 		int cols = _cols;
 
@@ -672,7 +672,7 @@ public class Matrix {
 		}
 
 		double[] singularValues = svdX.getSingularValues();
-		double tol = Math.max(rows, cols) * singularValues[0] * eps;
+		double tol = Math.max(rows, cols) * singularValues[0] * ETKConstants.DOUBLE_EPS;
 		double[] singularValueReciprocals = new double[singularValues.length];
 		for (int i = 0; i < singularValues.length; i++) {
 			if (Math.abs(singularValues[i]) >= tol) {

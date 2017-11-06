@@ -1,4 +1,4 @@
-package com.wildbitsfoundry.etk4j.regression;
+package com.wildbitsfoundry.etk4j.statistics.regression;
 
 import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
 

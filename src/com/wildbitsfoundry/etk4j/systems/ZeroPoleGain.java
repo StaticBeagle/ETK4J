@@ -1,4 +1,4 @@
-package com.wildbitsfoundry.etk4j.systems.continuoustime;
+package com.wildbitsfoundry.etk4j.systems;
 
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 

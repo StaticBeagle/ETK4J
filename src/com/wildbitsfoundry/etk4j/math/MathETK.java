@@ -19,7 +19,7 @@ public final class MathETK {
 	}
 
 	public static double asinh(double x) {
-		return Math.log(x + Math.sqrt(x * x + 1.0));
+		return x >= 0 ? Math.log(x + Math.sqrt(x * x + 1.0)) : -Math.log(x + Math.sqrt(x * x + 1.0));
 	}
 
 	public static double acosh(double x) {
