@@ -2,6 +2,7 @@ package com.wildbitsfoundry.etk4j.math.interpolation;
 
 import java.util.Arrays;
 
+import com.wildbitsfoundry.etk4j.constants.ETKConstants;
 import com.wildbitsfoundry.etk4j.curvefitting.CurveFitting;
 import com.wildbitsfoundry.etk4j.util.NumArrays;
 
@@ -82,24 +83,7 @@ public class CubicSpline extends Spline {
 	
 	private static CubicSpline buildSpline(double[] x, double[] y, CubicSplineBuilder builder) {
 		checkXYDimensions(x, y);
-		checkMinkXLength(x, 2);
 		final int n = x.length;
-		// need to double check these equations
-		if (n == 2) {
-			double[] line = CurveFitting.line(x[0], x[1], y[0], y[1]);
-			double hx = x[1] - x[0];
-			line[0] /= hx;
-			line[1] = line[1] - line[0] * x[0];
-			return new CubicSpline(x, y, line, line[0], line[0]);
-		}
-		if (n == 3) {
-			double[] parabola = CurveFitting.parabola(x[0], x[1], x[2], y[0], y[1], y[2]);
-			double hx = x[2] - x[0];
-			parabola[0] /= (hx * hx);
-			parabola[1] = parabola[1] / hx - 2 * parabola[0] * x[0];
-			parabola[2] = parabola[2] - parabola[1] * x[0] + parabola[0] * x[0] * x[0];
-			return new CubicSpline(x, y, parabola, parabola[1], 2 * parabola[0] * hx + parabola[1]);
-		}
 		TridiagonalLDLTSystem T = setupSpline(x, y);
 		return new CubicSpline(x, y, builder.build(T, x, y, n));
 	}
@@ -117,6 +101,7 @@ public class CubicSpline extends Spline {
 	}
 
 	public static CubicSpline newNaturalSplineInPlace(double[] x, double[] y) {
+		checkMinkXLength(x, 2);
 		CubicSplineBuilder builder = new CubicSplineBuilder() {
 			@Override
 			public double[] build(TridiagonalLDLTSystem T, double[] x, double[] y, int n) {
@@ -138,6 +123,7 @@ public class CubicSpline extends Spline {
 	}
 
 	public static CubicSpline newParabolicallyTerminatedSplineInPlace(double[] x, double[] y) {
+		checkMinkXLength(x, 2);
 		CubicSplineBuilder builder = new CubicSplineBuilder() {
 			@Override
 			public double[] build(TridiagonalLDLTSystem T, double[] x, double[] y, int n) {
@@ -158,6 +144,7 @@ public class CubicSpline extends Spline {
 	}
 
 	public static CubicSpline newClampedSplineInPlace(double[] x, double[] y, double d0, double dn) {
+		checkMinkXLength(x, 2);
 		CubicSplineBuilder builder = new CubicSplineBuilder() {
 			@Override
 			public double[] build(TridiagonalLDLTSystem T, double[] x, double[] y, int n) {
@@ -176,6 +163,7 @@ public class CubicSpline extends Spline {
 	}
 
 	public static CubicSpline newNotAKnotSplineInPlace(double[] x, double[] y) {
+		checkMinkXLength(x, 4);
 		CubicSplineBuilder builder = new CubicSplineBuilder() {
 			@Override
 			public double[] build(TridiagonalLDLTSystem T, double[] x, double[] y, int n) {
@@ -200,11 +188,11 @@ public class CubicSpline extends Spline {
 	}
 
 	public static CubicSpline newAkimaSpline(double[] x, double[] y) {
-		return newAkimaSpline(x, y, 1e-12);
+		return newAkimaSpline(x, y, ETKConstants.DOUBLE_EPS);
 	}
 
 	public static CubicSpline newAkimaSplineInPlace(double[] x, double[] y) {
-		return newAkimaSplineInPlace(x, y, 1e-12);
+		return newAkimaSplineInPlace(x, y, ETKConstants.DOUBLE_EPS);
 	}
 
 	public static CubicSpline newAkimaSpline(double[] x, double[] y, double ep) {

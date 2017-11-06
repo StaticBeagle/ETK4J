@@ -52,6 +52,9 @@ public final class Interpolation {
 		if (length == 2) {
 			return linear(x[0], x[1], y[0], y[1], xi);
 		}
+		if(length == 3) {
+			return quadratic(x[0], x[1], x[2], y[0], y[1], y[2], xi);
+		}
 		Spline sp = CubicSpline.newCubicSpline(x, y);
 		return sp.evaluateAt(xi);
 	}

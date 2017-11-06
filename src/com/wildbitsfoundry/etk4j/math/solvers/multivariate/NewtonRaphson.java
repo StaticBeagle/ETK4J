@@ -27,13 +27,10 @@ public class NewtonRaphson {
 		
 	}
 	
-	public enum ConvergeCriterion {
-		AVG_ABS_ERROR,
-		AVG_REL_ERROR,
-		MAX_ABS_ERROR,
-		MAX_REL_ERROR,
-		SQRT_SUM_ABS_ERROR_SQUARED,
-		SQRT_SUM_REL_ERROR_SQUARED
+	public enum ConvergenceCheckerType {
+		SUM_ABS_ERROR,				// Norm 1
+		MAX_ABS_ERROR,				// Infinite Norm
+		SQRT_SUM_ABS_ERROR_SQUARED,	// Norm 2
 	}
 	
 	private Solver _solver = null;
@@ -59,8 +56,13 @@ public class NewtonRaphson {
 		return this;
 	}
 
-	public NewtonRaphson tolerance(double tol) {
-		_solver.setTol(tol);
+	public NewtonRaphson absTolerance(double tol) {
+		_solver.setAbsTol(tol);
+		return this;
+	}
+	
+	public NewtonRaphson relTolerance(double tol) {
+		_solver.setRelTol(tol);
 		return this;
 	}
 
@@ -71,6 +73,11 @@ public class NewtonRaphson {
 
 	public NewtonRaphson differentiationStepSize(double step) {
 		_solver.setDiffStep(step);
+		return this;
+	}
+	
+	public NewtonRaphson setConvergenceChecker(ConvergenceChecker checker) {
+		_solver.setConvergenceChecker(checker);
 		return this;
 	}
 
@@ -184,7 +191,8 @@ public class NewtonRaphson {
 
 		System.out.printf("Solution with pre-computed Jacobian%n------------------------------------%n");
 		double[] sol1 = new NewtonRaphson(functions, jacobian, initialguess)
-				.tolerance(1e-9)
+				.absTolerance(1e-9)
+				.relTolerance(1e-8)
 				.iterationLimit(100)
 				.solve();
 		for (double val : sol1) {
@@ -193,7 +201,8 @@ public class NewtonRaphson {
 
 		System.out.printf("%nSolution with auto-computed Jacobian%n------------------------------------%n");
 		double[] sol2 = new NewtonRaphson(functions, initialguess)
-				.tolerance(1e-9)
+				.absTolerance(1e-9)
+				.relTolerance(1e-8)
 				.iterationLimit(100)
 				.differentiationStepSize(0.001)
 				.solve();
@@ -217,7 +226,8 @@ public class NewtonRaphson {
 
 		System.out.printf("Solution with pre-computed Jacobian%n------------------------------------%n");
 		double[] sol1 = new NewtonRaphson(functions, jacobian, initialguess)
-				.tolerance(1e-9)
+				.absTolerance(1e-9)
+				.relTolerance(1e-6)
 				.iterationLimit(100)
 				.solve();
 		for (double val : sol1) {
@@ -226,7 +236,8 @@ public class NewtonRaphson {
 
 		System.out.printf("%nSolution with auto-computed Jacobian%n------------------------------------%n");
 		double[] sol2 = new NewtonRaphson(functions, initialguess)
-				.tolerance(1e-9)
+				.absTolerance(1e-9)
+				.relTolerance(1e-6)
 				.iterationLimit(100)
 				.differentiationStepSize(0.001)
 				.solve();
@@ -371,26 +382,33 @@ public class NewtonRaphson {
 	private interface Solver {
 		public double[] solve();
 		public void setMaxIter(int max);
-		public void setTol(double tol);
+		public void setAbsTol(double tol);
+		public void setRelTol(double tol);
 		public void setDiffStep(double step);
-		public void setConvergenceCriterion(ConvergeCriterion criterion);
+		public void setConvergenceChecker(ConvergenceChecker checker);
+		public void setConvergenceCheckerType(ConvergenceCheckerType type);
 	}
 	
-	private interface ErrorCalculator {
-		public double calculateError(double[] x, double[] y);
+	private interface ConvergenceChecker {
+		public boolean checkForConvergence(double[] x, double[] y, double absTol, double relTol);
+		
+		default public boolean checkForConvergence(Double[] x, Double[] y, double absTol, double relTol) {
+			return checkForConvergence(NumArrays.unbox(x), NumArrays.unbox(y), absTol, relTol);
+		}
 	}
 	
 	private static abstract class NewtonRaphsonSolver <T, U> implements Solver {
 		protected int _maxIter = 100;
 		protected double _absTol = 1e-9;
+		protected double _relTol = 1e-6;
 		protected double _maxVal = Double.POSITIVE_INFINITY;
 		protected double _step = 0.001;
 		protected double[] _x0;
 		
 		protected T _functions;
 		protected U _jacobian;
-		private ConvergeCriterion _convCrit;
-		private ErrorCalculator _errCalc;
+		private ConvergenceChecker _convChecker;
+		private ConvergenceCheckerType _convCheckerType;
 		
 		protected NewtonRaphsonSolver(T functions, double[] x0) {
 			this(functions, null, x0);
@@ -400,7 +418,7 @@ public class NewtonRaphson {
 			_functions = functions;
 			_jacobian = jacobian;
 			_x0 = x0;
-			this.setConvergenceCriterion(ConvergeCriterion.SQRT_SUM_REL_ERROR_SQUARED);
+			this.setConvergenceCheckerType(ConvergenceCheckerType.SQRT_SUM_ABS_ERROR_SQUARED);
 		}
 		
 		public abstract double[] solve(Optional<U> jacobian);
@@ -411,8 +429,13 @@ public class NewtonRaphson {
 		}
 		
 		@Override
-		public void setTol(double tol) {
+		public void setAbsTol(double tol) {
 			_absTol = tol;
+		}
+		
+		@Override
+		public void setRelTol(double tol) {
+			_relTol = tol;
 		}
 		
 		@Override
@@ -426,89 +449,40 @@ public class NewtonRaphson {
 		}
 		
 		@Override
-		public void setConvergenceCriterion(ConvergeCriterion criterion) {
-			_convCrit = criterion;
-			switch(_convCrit) {
-			case AVG_ABS_ERROR:
-				_errCalc = new ErrorCalculator() {
-
-					@Override
-					public double calculateError(double[] x, double[] y) {
-						final int n = x.length;
-						double error = 0.0;
-						for(int i = 0; i < n; ++i) {
-							error += Math.abs(x[i] - y[i]);
-						}
-						return error / n;
-					}
-				};
-				break;
-			case AVG_REL_ERROR:
-				_errCalc = new ErrorCalculator() {
-
-					@Override
-					public double calculateError(double[] x, double[] y) {
-						final int n = x.length;
-						double error = 0.0;
-						for(int i = 0; i < n; ++i) {
-							error += Math.abs((x[i] - y[i]) / x[i]);
-						}
-						return error / n;
-					}
-				};
-				break;
+		public void setConvergenceCheckerType(ConvergenceCheckerType type) {
+			_convCheckerType = type;
+			switch(_convCheckerType) {
 			case MAX_ABS_ERROR:
-				_errCalc = new ErrorCalculator() {
-
+				_convChecker = new ConvergenceChecker() {
+					
 					@Override
-					public double calculateError(double[] x, double[] y) {
-						final int n = x.length;
-						double max = Math.abs(x[0] - y[0]);
-						for(int i = 1; i < n; ++i) {
-							double tmp = Math.abs(x[i] - y[i]);
-							if(tmp > max) {
-								max = tmp;
-							}
-						}
-						return max;
-					}
-				};
-				break;
-			case MAX_REL_ERROR:
-				_errCalc = new ErrorCalculator() {
-
-					@Override
-					public double calculateError(double[] x, double[] y) {
-						final int n = x.length;
-						double max = Math.abs((x[0] - y[0]) / x[0]);
-						for(int i = 1; i < n; ++i) {
-							double tmp = Math.abs((x[i] - y[i]) / x[i]);
-							if(tmp > max) {
-								max = tmp;
-							}
-						}
-						return max;
+					public boolean checkForConvergence(double[] x, double[] y, double absTol, double relTol) {
+						double delta = NumArrays.normInf(NumArrays.subtract(x, y));
+						double tmp = Math.min(NumArrays.normInf(x), NumArrays.normInf(y));
+						return delta < absTol + relTol * tmp;
 					}
 				};
 				break;
 			case SQRT_SUM_ABS_ERROR_SQUARED:
-				_errCalc = new ErrorCalculator() {
-
-					@Override
-					public double calculateError(double[] x, double[] y) {
-						return NumArrays.distance(x, y);
-					}
+				_convChecker = new ConvergenceChecker() {
 					
+					@Override
+					public boolean checkForConvergence(double[] x, double[] y, double absTol, double relTol) {
+						double delta = NumArrays.distance(x, y);
+						double tmp = Math.min(NumArrays.norm(x), NumArrays.norm(y));
+						return delta < absTol + relTol * tmp;
+					}
 				};
 				break;
-			case SQRT_SUM_REL_ERROR_SQUARED:
-				_errCalc = new ErrorCalculator() {
-
-					@Override
-					public double calculateError(double[] x, double[] y) {
-						return NumArrays.distance(x, y)  / NumArrays.norm(x);
-					}
+			case SUM_ABS_ERROR:
+				_convChecker = new ConvergenceChecker() {
 					
+					@Override
+					public boolean checkForConvergence(double[] x, double[] y, double absTol, double relTol) {
+						double delta = NumArrays.norm1(NumArrays.subtract(x, y));
+						double tmp = Math.min(NumArrays.norm1(x), NumArrays.norm1(y));
+						return delta < absTol + relTol * tmp;
+					}
 				};
 				break;
 			default:
@@ -516,9 +490,17 @@ public class NewtonRaphson {
 			}
 		}
 		
+		@Override
+		public void setConvergenceChecker(ConvergenceChecker checker) {
+			_convChecker = checker;
+		}
+		
 		protected boolean checkForConvergence(double[] xfinal, double[] xcurrent) {
-			double error = _errCalc.calculateError(xfinal, xcurrent);
-			return Double.compare(error, _absTol) <= 0;
+			return _convChecker.checkForConvergence(xfinal, xcurrent, _absTol, _relTol);
+		}
+		
+		protected boolean checkForConvergence(Double[] xfinal, Double[] xcurrent) {
+			return _convChecker.checkForConvergence(xfinal, xcurrent, _absTol, _relTol);
 		}
 	}
 	
@@ -700,7 +682,7 @@ public class NewtonRaphson {
 				}
 				evaluateFunctionsAt(xfinal, functions ,functionValues);
 
-				if (this.checkForConvergence(NumArrays.unbox(xfinal), NumArrays.unbox(xcurrent))) {
+				if (this.checkForConvergence(xfinal, xcurrent)) {
 					return NumArrays.unbox(xfinal);
 				}
 
