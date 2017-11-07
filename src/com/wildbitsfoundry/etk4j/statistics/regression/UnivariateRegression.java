@@ -25,7 +25,7 @@ abstract class UnivariateRegression implements RegressionModel {
 		_beta = NumArrays.reverse(B.getArray());
 
 		_residuals = Y.subtract(X.multiply(B)).getArray();
-		_rnorm = NumArrays.norm(_residuals);
+		_rnorm = NumArrays.norm2(_residuals);
 		_sse = Math.pow(_rnorm, 2);
 
 		double ybar = NumArrays.mean(y);

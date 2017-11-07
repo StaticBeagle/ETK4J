@@ -60,7 +60,7 @@ public class NumArraysTest {
 
 	@Test
 	public void testNorm() {
-		assertEquals(Math.sqrt(7.5), NumArrays.norm(c), 1e-12);
+		assertEquals(Math.sqrt(7.5), NumArrays.norm2(c), 1e-12);
 	}
 
 	@Test

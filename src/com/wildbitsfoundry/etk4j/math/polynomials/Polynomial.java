@@ -312,9 +312,6 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 			case 2:
 				_roots = Formulas.quadraticFormula(_coefs[0], _coefs[1], _coefs[2]);
 				break;
-			case 3:
-				_roots = Formulas.cubicFormula(_coefs[0], _coefs[1], _coefs[2], _coefs[3]);
-				break;
 			default:
 				// Use generalized eigenvalue decomposition to find the roots
 				Matrix c = Matrices.Companion(_coefs, N);

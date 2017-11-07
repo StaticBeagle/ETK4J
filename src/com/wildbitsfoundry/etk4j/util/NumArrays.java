@@ -47,6 +47,16 @@ public final class NumArrays {
 	}
 	
 	/***
+	 * Creates n linearly spaced samples between x0 and x1
+	 * @param x0 starting point
+	 * @param x1 end point
+	 * @return Array of n equally spaced samples between [x0, x1]. Step size is assumed to be 1
+	 */
+	public static double[] linsteps(double x0, double x1) {
+		return linsteps(x0, x1, 1.0);
+	}
+	
+	/***
 	 * Creates n logarithmically spaced samples between decades x0 and x1
 	 * @param x0 starting decade
 	 * @param x1 end decade
@@ -182,7 +192,7 @@ public final class NumArrays {
 		return norm;
 	}
 	
-	public static double norm(double[] a) {
+	public static double norm2(double[] a) {
 		double max = normInf(a);
 		if(max == 0.0) {
 			return 0.0;
@@ -312,7 +322,7 @@ public final class NumArrays {
 	
 	public static double rms(double[] a) {
 		final int N = a.length;
-		return norm(a) / Math.sqrt(N);
+		return norm2(a) / Math.sqrt(N);
 	}
 	
 	public static boolean isAscending(double[] a) {

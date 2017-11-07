@@ -3,8 +3,6 @@ package com.wildbitsfoundry.etk4j.math.interpolation;
 import java.util.Arrays;
 
 import com.wildbitsfoundry.etk4j.constants.ETKConstants;
-import com.wildbitsfoundry.etk4j.curvefitting.CurveFitting;
-import com.wildbitsfoundry.etk4j.util.NumArrays;
 
 public class CubicSpline extends Spline {
 
@@ -246,19 +244,6 @@ public class CubicSpline extends Spline {
 		}
 		sb.setLength(Math.max(sb.length() - System.lineSeparator().length(), 0));
 		return sb.toString().replace("+ -", "- ").replace("- -", "+ ");
-	}
-
-	// move to examples
-	public static void main(String[] args) {
-		double[] x = { 1, 2, 3, 4 };
-		double[] y = { 5, 6, 7, 8 };
-		CubicSpline cs = newNotAKnotSpline(x, y);
-
-		double[] xi = NumArrays.linsteps(1.0, 4.0, 0.1);
-		for (double xii : xi) {
-			System.out.printf("y(%.4f) = %.4f%n", xii, cs.evaluateAt(xii));
-		}
-
 	}
 
 	private static TridiagonalLDLTSystem setupSpline(double[] x, double[] y) {
