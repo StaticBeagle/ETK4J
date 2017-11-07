@@ -27,7 +27,7 @@ public class NewtonRaphson {
 		
 	}
 	
-	public enum ConvergenceCheckerType {
+	public enum ErrorEstimationScheme {
 		SUM_ABS_ERROR,				// Norm 1
 		MAX_ABS_ERROR,				// Infinite Norm
 		SQRT_SUM_ABS_ERROR_SQUARED,	// Norm 2
@@ -73,6 +73,11 @@ public class NewtonRaphson {
 
 	public NewtonRaphson differentiationStepSize(double step) {
 		_solver.setDiffStep(step);
+		return this;
+	}
+	
+	public NewtonRaphson setErrorEstimationScheme(ErrorEstimationScheme scheme) {
+		_solver.setErrorEstimationScheme(scheme);
 		return this;
 	}
 	
@@ -386,7 +391,7 @@ public class NewtonRaphson {
 		public void setRelTol(double tol);
 		public void setDiffStep(double step);
 		public void setConvergenceChecker(ConvergenceChecker checker);
-		public void setConvergenceCheckerType(ConvergenceCheckerType type);
+		public void setErrorEstimationScheme(ErrorEstimationScheme scheme);
 	}
 	
 	private interface ConvergenceChecker {
@@ -408,7 +413,6 @@ public class NewtonRaphson {
 		protected T _functions;
 		protected U _jacobian;
 		private ConvergenceChecker _convChecker;
-		private ConvergenceCheckerType _convCheckerType;
 		
 		protected NewtonRaphsonSolver(T functions, double[] x0) {
 			this(functions, null, x0);
@@ -418,7 +422,7 @@ public class NewtonRaphson {
 			_functions = functions;
 			_jacobian = jacobian;
 			_x0 = x0;
-			this.setConvergenceCheckerType(ConvergenceCheckerType.SQRT_SUM_ABS_ERROR_SQUARED);
+			this.setErrorEstimationScheme(ErrorEstimationScheme.SQRT_SUM_ABS_ERROR_SQUARED);
 		}
 		
 		public abstract double[] solve(Optional<U> jacobian);
@@ -449,9 +453,8 @@ public class NewtonRaphson {
 		}
 		
 		@Override
-		public void setConvergenceCheckerType(ConvergenceCheckerType type) {
-			_convCheckerType = type;
-			switch(_convCheckerType) {
+		public void setErrorEstimationScheme(ErrorEstimationScheme scheme) {
+			switch(scheme) {
 			case MAX_ABS_ERROR:
 				_convChecker = new ConvergenceChecker() {
 					
