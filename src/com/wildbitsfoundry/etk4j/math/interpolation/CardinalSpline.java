@@ -1,20 +1,20 @@
 package com.wildbitsfoundry.etk4j.math.interpolation;
 
+import java.util.Arrays;
+
 public class CardinalSpline extends Spline {
 
-	private double[] _coefs = null;
-
 	private CardinalSpline(double[] x, double[] y, double[] dydx) {
-		super(x, y[0], y[y.length - 1]);
+		super(x, 4);
 		final int n = _x.length;
 		_coefs = new double[(n - 1) * 4]; // 4 coefficients and n - 1 segments
 		for (int i = 0, j = 0, k = 0; i < n - 1; ++i, ++j, ++k) {
-//			double hx = x[i + 1] - x[i];
+			double hx = _x[i + 1] - _x[i];
 			double m0 = dydx[k];
 			double m1 = dydx[++k];
-			double a = (2 * y[i] + m0 - 2 * y[i + 1] + m1);
-			double b = (-3 * y[i] - 2 * m0 + 3 * y[i + 1] - m1);
-			double c = m0;
+			double a = (2 * y[i] + m0 - 2 * y[i + 1] + m1) / (hx * hx * hx);
+			double b = (-3 * y[i] - 2 * m0 + 3 * y[i + 1] - m1) / (hx * hx);
+			double c = m0 / hx;
 			double d = y[i];
 			_coefs[j] = a;
 			_coefs[++j] = b;
@@ -24,7 +24,12 @@ public class CardinalSpline extends Spline {
 	}
 
 	public static CardinalSpline newCardinalSpline(double[] x, double[] y, double tau, double alpha) {
+		return newCardinalSplineInPlace(Arrays.copyOf(x, x.length), y, tau, alpha);
+	}
+	
+	public static CardinalSpline newCardinalSplineInPlace(double[] x, double[] y, double tau, double alpha) {
 		checkXYDimensions(x, y);
+		checkMinkXLength(x, 4);
 		final int n = x.length;
 		double[] d = new double[n + 2];
 		double cp = 1 - tau;
@@ -94,8 +99,9 @@ public class CardinalSpline extends Spline {
 		return new CardinalSpline(x, y, d);
 	}
 	
+
 	public static CardinalSpline newCatmullRomSpline(double[] x, double[] y) {
-		return newCentripetalCatmullRomSpline(x, y);
+		return newUniformCatmullRomSpline(x, y);
 	}
 
 	public static CardinalSpline newCentripetalCatmullRomSpline(double[] x, double[] y) {
@@ -131,21 +137,24 @@ public class CardinalSpline extends Spline {
 	// sb.setLength(Math.max(sb.length() - System.lineSeparator().length(), 0));
 	// return sb.toString().replace("+ -", "- ");
 	// }
-
+	
+	protected double getValueAt(int i, double x) {
+		double t = x - _x[i];
+		i <<= 2;
+		return _coefs[i + 3] + t * (_coefs[i + 2] + t * (_coefs[i + 1] + t * _coefs[i]));
+	}
+	
 	@Override
-	protected double getValueAt(int index, double x) {
-		double t = (x - _x[index]) / (_x[index + 1] - _x[index]);
-		index = index << 2;
-		return _coefs[index + 3] + t * (_coefs[index + 2] + t * (_coefs[index + 1] + t * _coefs[index]));
+	public double evaluateDerivativeAt(int i, double t) {
+		i <<= 2;
+		return _coefs[i + 2] + t * (_coefs[i + 1] + t * _coefs[i]);
 	}
 
-	@Override
-	public double differentiate(double x) {
-		throw new RuntimeException("Method not implemented yet");
-	}
+	private final double a = 1.0 / 2.0, b = 1.0 / 3.0, c = 1.0 / 4.0;
 
 	@Override
-	public double integrate(double x0, double x1) {
-		throw new RuntimeException("Method not implemented yet");
+	protected double evaluateAntiDerivativeAt(int i, double t) {
+		i <<= 2;
+		return t * (_coefs[i + 3] + t * (_coefs[i + 2] * a + t * (_coefs[i + 1] * b + t * _coefs[i] * c)));
 	}
 }

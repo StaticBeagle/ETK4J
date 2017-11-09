@@ -2,12 +2,15 @@ package com.wildbitsfoundry.etk4j.math.polynomials;
 
 import java.util.Arrays;
 
+import com.wildbitsfoundry.etk4j.math.Formulas;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
+import com.wildbitsfoundry.etk4j.math.functions.DifferentiableFunction;
+import com.wildbitsfoundry.etk4j.math.functions.IntegrableFunction;
 import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.EigenvalueDecomposition;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrices;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
-import com.wildbitsfoundry.etk4j.util.ArrayUtils;
+import com.wildbitsfoundry.etk4j.util.NumArrays;
 
 /**
  * 
@@ -15,7 +18,7 @@ import com.wildbitsfoundry.etk4j.util.ArrayUtils;
  * @version
  *
  */
-public class Polynomial implements UnivariateFunction {
+public class Polynomial implements UnivariateFunction, DifferentiableFunction, IntegrableFunction {
 
 	protected double[] _coefs = null;
 	protected Complex[] _roots = null;
@@ -74,7 +77,7 @@ public class Polynomial implements UnivariateFunction {
 		Complex[] tmp = new Complex[size];
 		Complex[] result = new Complex[size + 1];
 
-		for(int i = 1; i <= size; ++i) {
+		for (int i = 1; i <= size; ++i) {
 			result[i] = new Complex();
 		}
 		result[0] = new Complex(1.0, 0.0);
@@ -113,9 +116,11 @@ public class Polynomial implements UnivariateFunction {
 	}
 
 	/***
-	 * Forces the highest order coefficient of the polynomial to be unity by
-	 * dividing all the other coefficients by the highest order coefficient.
+	 * Convert to monic Polynomial. Forces the highest order coefficient of 
+	 * the polynomial to be unity by dividing all the other coefficients by 
+	 * the highest order coefficient.
 	 * 
+	 * @return normalizing factor
 	 */
 	public double normalize() {
 		double cn = this._coefs[0];
@@ -134,7 +139,7 @@ public class Polynomial implements UnivariateFunction {
 	 * @return Pnew(x) = P(x) * poly
 	 */
 	public Polynomial multiply(final Polynomial p) {
-		return new Polynomial(ArrayUtils.conv(_coefs, p._coefs));
+		return new Polynomial(NumArrays.conv(_coefs, p._coefs));
 	}
 
 	/***
@@ -144,12 +149,12 @@ public class Polynomial implements UnivariateFunction {
 	 *            Another polynomial
 	 */
 	public void multiplyEquals(final Polynomial p) {
-		_coefs = ArrayUtils.conv(_coefs, p._coefs);
+		_coefs = NumArrays.conv(_coefs, p._coefs);
 		_roots = null;
 	}
 
 	public Polynomial multiply(double d) {
-		return new Polynomial(ArrayUtils.conv(_coefs, d));
+		return new Polynomial(NumArrays.multiply(_coefs, d));
 	}
 
 	public void multiplyEquals(double d) {
@@ -159,46 +164,44 @@ public class Polynomial implements UnivariateFunction {
 	}
 
 	public Polynomial add(final Polynomial p) {
-		double[] result = new double[Math.max(_coefs.length, p._coefs.length)];
-		addOp(this, p, result);
+		double[] result = addOp(this, p);
 		return new Polynomial(result);
 	}
 
 	public void addEquals(final Polynomial p) {
-		addOp(this, p, _coefs);
+		_coefs = addOp(this, p);
 		_roots = null;
 	}
 
-	private static final void addOp(Polynomial p1, Polynomial p2, double[] result) {
-		final int p1Length = p1._coefs.length - 1;
-		final int p2Length = p2._coefs.length - 1;
-		final int rLength = result.length - 1;
-		for(int i = p1Length, j = p2Length, k = rLength; i >= 0 && j >= 0; --i, --j, --k) {
+	private static final double[] addOp(Polynomial p1, Polynomial p2) {
+		final int p1Length = p1._coefs.length;
+		final int p2Length = p2._coefs.length;
+		double[] result = p1Length > p2Length ? Arrays.copyOf(p1._coefs, p1Length) : Arrays.copyOf(p2._coefs, p2Length);
+		for (int i = p1Length - 1, j = p2Length - 1, k = result.length - 1; i >= 0 && j >= 0; --i, --j, --k) {
 			result[k] = p1._coefs[i] + p2._coefs[j];
 		}
+		return result;
 	}
-
 
 	public Polynomial subtract(final Polynomial p) {
-		double[] result = new double[Math.max(_coefs.length, p._coefs.length)];
-		subtractOp(this, p, result);
+		double[] result = subtractOp(this, p);
 		return new Polynomial(result);
 	}
-	
+
 	public void subtractEquals(final Polynomial p) {
-		subtractOp(this, p, _coefs);
+		_coefs = subtractOp(this, p);
 		_roots = null;
 	}
-	
-	private static final void subtractOp(Polynomial p1, Polynomial p2, double[] result) {
-		final int p1Length = p1._coefs.length - 1;
-		final int p2Length = p2._coefs.length - 1;
-		final int rLength = result.length - 1;
-		for(int i = p1Length, j = p2Length, k = rLength; i >= 0 && j >= 0; --i, --j, --k) {
+
+	private static final double[] subtractOp(Polynomial p1, Polynomial p2) {
+		final int p1Length = p1._coefs.length;
+		final int p2Length = p2._coefs.length;
+		double[] result = p1Length > p2Length ? Arrays.copyOf(p1._coefs, p1Length) : Arrays.copyOf(p2._coefs, p2Length);
+		for (int i = p1Length - 1, j = p2Length - 1, k = result.length - 1; i >= 0 && j >= 0; --i, --j, --k) {
 			result[k] = p1._coefs[i] - p2._coefs[j];
 		}
+		return result;
 	}
-
 
 	/***
 	 * 
@@ -212,12 +215,12 @@ public class Polynomial implements UnivariateFunction {
 	public String toString() {
 		java.lang.StringBuilder sb = new java.lang.StringBuilder();
 		int order = this.degree();
-		sb.append(String.format("%.4f", this._coefs[0]));
+		sb.append(String.format("%.4g", this._coefs[0]));
 		sb.append(" * x^").append(order);
 		for (int i = order - 1; i >= 0; i--) {
 			if (this._coefs[order - i] != 0.0) {
 				sb.append(i < order ? Math.signum(this._coefs[order - i]) < 0 ? " - " : " + " : "")
-						.append(String.format("%.4f", Math.abs(this._coefs[order - i]))).append(" * x")
+						.append(String.format("%.4g", Math.abs(this._coefs[order - i]))).append(" * x")
 						.append(i == 1 ? "" : "^" + i);
 			}
 
@@ -226,7 +229,7 @@ public class Polynomial implements UnivariateFunction {
 		if (sb.lastIndexOf("^0") > 0) {
 			sb.setLength(sb.length() - 6);
 		}
-		return sb.toString();
+		return sb.toString().replace("1.000 * ", "");
 	}
 
 	public Polynomial derivative() {
@@ -240,6 +243,7 @@ public class Polynomial implements UnivariateFunction {
 
 	/***
 	 * Get polynomial coefficients
+	 * 
 	 * @return Array containing the coefficients in descending order
 	 */
 	public double[] getCoefficients() {
@@ -266,18 +270,22 @@ public class Polynomial implements UnivariateFunction {
 		// Horner's method
 		double[] result = new double[x.length];
 		for (int i = 0; i < x.length; i++) {
-			for (double coefficient : this._coefs) {
-				result[i] = result[i] * x[i] + coefficient;
-			}
+			result[i] = this.evaluateAt(x[i]);
 		}
 		return result;
 	}
-	
-	/***		
+
+	public void reverseInPlace() {
+		_coefs = NumArrays.reverse(_coefs);
+	}
+
+	/***
 	 * Evaluates the polynomial at real + j * imag using Horner's method
 	 * 
-	 * @param real part of the complex number
-	 * @param imaginary part of the complex number
+	 * @param real
+	 *            part of the complex number
+	 * @param imaginary
+	 *            part of the complex number
 	 * @return The value of the polynomial at real + j * imag
 	 */
 	public Complex evaluateAt(double real, double imag) {
@@ -302,10 +310,7 @@ public class Polynomial implements UnivariateFunction {
 				_roots = new Complex[] { new Complex(-_coefs[1] / _coefs[0], 0) };
 				break;
 			case 2:
-				_roots = Polynomials.quadraticFormula(_coefs[0], _coefs[1], _coefs[2]);
-				break;
-			case 3:
-				_roots = Polynomials.cubicFormula(_coefs[0], _coefs[1], _coefs[2], _coefs[3]);
+				_roots = Formulas.quadraticFormula(_coefs[0], _coefs[1], _coefs[2]);
 				break;
 			default:
 				// Use generalized eigenvalue decomposition to find the roots
@@ -319,76 +324,76 @@ public class Polynomial implements UnivariateFunction {
 			}
 		}
 		Complex[] result = new Complex[_roots.length];
-		for(int i = 0; i < _roots.length; ++i) {
+		for (int i = 0; i < _roots.length; ++i) {
 			result[i] = new Complex(_roots[i]);
 		}
 		return result;
 	}
-	
+
 	/***
 	 * Scales polynomial coefficients
+	 * 
 	 * @param d
 	 */
-	public void substituteEquals(double d) {
+	public void substituteInPlace(double d) {
 		final int deg = this.degree();
-		for(int i = 0; i < deg; ++i) {
-			for(int j = i; j < deg; ++j) {
+		for (int i = 0; i < deg; ++i) {
+			for (int j = i; j < deg; ++j) {
 				_coefs[i] *= d;
 			}
 		}
 		_roots = null;
 	}
-	
+
 	/***
 	 * Scales polynomial coefficients
+	 * 
 	 * @param d
 	 */
 	public Polynomial substitute(double d) {
 		final int deg = this.degree();
 		double[] result = Arrays.copyOf(_coefs, _coefs.length);
-		for(int i = 0; i < deg; ++i) {
-			for(int j = i; j < deg; ++j) {
+		for (int i = 0; i < deg; ++i) {
+			for (int j = i; j < deg; ++j) {
 				result[i] *= d;
 			}
 		}
 		return new Polynomial(result);
 	}
-	
-	public void substituteEquals(Polynomial p) {
+
+	public void substituteInPlace(Polynomial p) {
 		Polynomial result = substituteOp(this, p);
 		_coefs = result._coefs;
 		_roots = null;
 	}
 
-	
 	public Polynomial substitute(Polynomial p) {
 		return substituteOp(this, p);
 	}
-	
+
 	private static Polynomial substituteOp(Polynomial src, Polynomial sub) {
 		final int deg = src.degree();
 		Polynomial result = sub.pow(deg);
 		result.multiplyEquals(src._coefs[0]);
 		Polynomial tmp = null;
-		for(int i = deg - 1, j = 1; i >= 0; --i, ++j) {
+		for (int i = deg - 1, j = 1; i >= 0; --i, ++j) {
 			tmp = sub.pow(i);
 			tmp.multiplyEquals(src._coefs[j]);
 			result.addEquals(tmp);
 		}
 		return result;
 	}
-	
-	
+
 	public Polynomial pow(int n) {
-		if(n < 0) {
+		if (n < 0) {
 			throw new IllegalArgumentException("Power must be >= 0");
 		}
-		if(n == 0) {
+		if (n == 0) {
 			return new Polynomial(new double[] { 1.0 });
 		}
 		double[] tmp = Arrays.copyOf(_coefs, _coefs.length);
-		while(--n > 0) {
-			tmp = ArrayUtils.conv(tmp, _coefs);
+		while (--n > 0) {
+			tmp = NumArrays.conv(tmp, _coefs);
 		}
 		return new Polynomial(tmp);
 	}
@@ -396,15 +401,49 @@ public class Polynomial implements UnivariateFunction {
 	public double getCoefficientAt(int index) {
 		return _coefs[index];
 	}
+	
+	/***
+	 * Polynomial fit
+	 * <pre>
+	 * Finds a polynomial P(x) = c0 + c1*x + * c2*x^2 + ... + cn*x^n 
+	 * of degree n that fits the data in y best in a least-square sense.
+	 * </pre>
+	 * @param x
+	 *            Array of points for the independent variable x
+	 * @param y
+	 *            Array of solutions to y(x)
+	 * @param n
+	 *            Order of the polynomial
+	 * @return Returns a polynomial of degree n fits the data y best in a
+	 *         least-square sense
+	 */
+	public static Polynomial polyFit(double[] x, double[] y, int n) {
+		int dim = x.length;
+		if (dim != y.length) {
+			throw new IllegalArgumentException("x and y dimensions must match!");
+		}
+		// Building the coefficient matrix
+		Matrix A = Matrices.Vandermonde(x, dim, n);
+		// Building the solution vector
+		Matrix b = new Matrix(y, dim);
+		Matrix c = A.solve(b);
+
+		double[] coeffs = new double[n + 1];
+		for (int i = 0; i <= n; i++) {
+			coeffs[i] = c.get(n - i, 0);
+		}
+		Polynomial result = new Polynomial(coeffs);
+		return result;
+	}
 
 	public static void main(String[] args) {
 		// everything here is correct. It just needs to
 		// be moved to an unit test
-		double[] x = new double[] { 1, 2, 3, 4 };
-		double[] y = new double[] { 1, 10, 12, 15 };
-		Polynomial poly = Polynomials.polyfit(x, y, 2);
-		Polynomial poly2 = Polynomials.polyfit(x, y, 3);
-		Polynomial poly3 = Polynomials.polyfit(x, y, 4);
+		double[] x = { 1, 2, 3, 4 };
+		double[] y = { 1, 10, 12, 15 };
+		Polynomial poly = Polynomial.polyFit(x, y, 2);
+		Polynomial poly2 = Polynomial.polyFit(x, y, 3);
+		Polynomial poly3 = Polynomial.polyFit(x, y, 4);
 
 		System.out.println(poly.evaluateAt(2.5));
 		System.out.println(poly2.evaluateAt(2.5));
@@ -413,14 +452,43 @@ public class Polynomial implements UnivariateFunction {
 		System.out.println(poly);
 		System.out.println(poly2);
 		System.out.println(poly3);
-		
+
+		Polynomial integral = poly.integral();
+		System.out.println(integral.toString());
+		System.out.println(poly.integrate(1, 4));
+
 		System.out.println(Arrays.toString(poly.roots()));
 		System.out.println(Arrays.toString(poly2.roots()));
 		System.out.println(Arrays.toString(poly3.roots()));
-		
-		System.out.println(Arrays.toString(new Polynomial(new double[] {1, 1, 1}).roots()));
-		System.out.println(Arrays.toString(new Polynomial(new double[] {1, 2, 1}).roots()));
-		
-		System.out.println(Arrays.toString(new Polynomial(new double[] {8, 6, 7, 5, 3, 0, 9}).roots()));
+
+		System.out.println(Arrays.toString(new Polynomial(new double[] { 1, 1, 1 }).roots()));
+		System.out.println(Arrays.toString(new Polynomial(new double[] { 1, 2, 1 }).roots()));
+
+		System.out.println(Arrays.toString(new Polynomial(new double[] { 8, 6, 7, 5, 3, 0, 9 }).roots()));
+	}
+
+	public Polynomial integral() {
+		return this.integral(0.0);
+	}
+
+	public Polynomial integral(double constant) {
+		final int length = _coefs.length;
+		double[] integral = new double[length + 1];
+		for (int i = 0, j = length; i < length; ++i, --j) {
+			integral[i] = (_coefs[i] / j);
+		}
+		integral[length] = constant;
+		return new Polynomial(integral);
+	}
+
+	@Override
+	public double integrate(double a, double b) {
+		Polynomial integral = this.integral();
+		return integral.evaluateAt(b) - integral.evaluateAt(a);
+	}
+
+	@Override
+	public double differentiate(double x) {
+		return this.derivative().evaluateAt(x);
 	}
 }

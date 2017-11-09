@@ -5,8 +5,6 @@ import static org.junit.Assert.assertArrayEquals;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.wildbitsfoundry.etk4j.util.ArrayUtils;
-
 public class PolynomialTest {
 	double[] a;
 	double[] b;
@@ -21,6 +19,21 @@ public class PolynomialTest {
 	
 	@Test
 	public void testPolyfit() {
-		assertArrayEquals(a, ArrayUtils.linspace(-1.0, 1.0, 5), 1e-12);
+		double[] x = { 1, 2, 3, 4 };
+		double[] y = { 1, 10, 12, 15 };
+
+		// Over determined
+		Polynomial poly = Polynomial.polyFit(x, y, 2);
+		assertArrayEquals(new double[] { -1.5, 11.9, -9.0 }, poly.getCoefficients(), 1e-12);
+
+		// Unique solution
+		Polynomial poly2 = Polynomial.polyFit(x, y, 3);
+		assertArrayEquals(new double[] { 1.333333333333, -11.5, 34.1666666666664, -23.0 }, poly2.getCoefficients(),
+				1e-12);
+
+		// Under determined
+		Polynomial poly3 = Polynomial.polyFit(x, y, 4);
+		assertArrayEquals(new double[] { 0.6079433590792012, -4.746100257458709, 9.778017567772217, 3.769498712706295,
+				-8.40935938209905 }, poly3.getCoefficients(), 1e-12);
 	}
 }
