@@ -216,6 +216,17 @@ public final class NumArrays {
 		return max;
 	}
 	
+	public static double normInf(Double[] a) {
+		double max = Math.abs(a[0].doubleValue());
+		for(int i = 1; i < a.length; ++i) {
+			double abs = Math.abs(a[i].doubleValue());
+			if(abs > max) {
+				max = abs;
+			}
+		}
+		return max;
+	}
+	
 	public static double normNegInf(double[] a) {
 		double min = Math.abs(a[0]);
 		for(int i = 1; i < a.length; ++i) {

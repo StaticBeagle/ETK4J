@@ -2,6 +2,8 @@ package com.wildbitsfoundry.etk4j.math.interpolation;
 
 import java.util.Arrays;
 
+import com.wildbitsfoundry.etk4j.math.functions.common.ExtrapolationMethod;
+
 public class QuadraticSpline extends Spline {
 
 	private static class TridiagonalSystem {
@@ -32,9 +34,9 @@ public class QuadraticSpline extends Spline {
 			return b;
 		}
 	}
-
+	
 	protected QuadraticSpline(double[] x, double[] y, double[] dydx) {
-		super(x, 3, y[0], y[y.length - 1]);
+		super(x, 3);
 
 		final int n = _x.length;
 		// compute coefficients
@@ -51,9 +53,7 @@ public class QuadraticSpline extends Spline {
 			_coefs[++j] = b;
 			_coefs[++j] = c;
 		}
-		double d0 = dydx[0];
-		double dn = dydx[dydx.length - 1];
-		super.setEndSlopes(d0, dn);
+		this.setEndPointsAndEndSlopes(y[0], y[n - 1], dydx[0], dydx[n - 1]);
 	}
 
 	public static QuadraticSpline newNaturalSpline(double[] x, double[] y) {
@@ -98,6 +98,11 @@ public class QuadraticSpline extends Spline {
 			T.b[i] = 2 * (y[i] - y[i - 1]) / hx;
 		}
 		return T;
+	}
+	
+	@Override
+	public void setExtrapolationMethod(ExtrapolationMethod method) {
+		super.setExtrapolationMethod(method);
 	}
 
 	public static void main(String[] args) {

@@ -5,7 +5,7 @@ import java.util.Arrays;
 public class CardinalSpline extends Spline {
 
 	private CardinalSpline(double[] x, double[] y, double[] dydx) {
-		super(x, 4, y[0], y[y.length - 1]);
+		super(x, 4);
 		final int n = _x.length;
 		_coefs = new double[(n - 1) * 4]; // 4 coefficients and n - 1 segments
 		for (int i = 0, j = 0, k = 0; i < n - 1; ++i, ++j, ++k) {

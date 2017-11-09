@@ -6,8 +6,9 @@ import java.util.function.Function;
 
 import com.wildbitsfoundry.etk4j.math.functions.MultivariateFunction;
 import com.wildbitsfoundry.etk4j.math.solvers.multivariate.NewtonRaphson;
+import com.wildbitsfoundry.etk4j.math.solvers.multivariate.SolverResults;
 
-public class NewtonRaphsonMultivariateExample {
+public class MultivariateNewtonRaphsonExample {
 	
 	public static void main(String[] args) {
 		/*
@@ -41,25 +42,21 @@ public class NewtonRaphsonMultivariateExample {
 		jacobian.add(x -> new Double[] { -x[1] * Math.exp(x[0] * x[1]), -x[0] * Math.exp(x[0] * x[1]), 20.0 });
 
 		System.out.printf("Solution with pre-computed Jacobian%n------------------------------------%n");
-		double[] sol1 = new NewtonRaphson(functions, jacobian, initialguess)
+		SolverResults sol1 = new NewtonRaphson(functions, jacobian, initialguess)
 				.absTolerance(1e-9)
 				.relTolerance(1e-6)
 				.iterationLimit(100)
 				.solve();
-		for (double val : sol1) {
-			System.out.printf("%.6g%n", val);
-		}
+		System.out.println(sol1);
 
 		System.out.printf("%nSolution with auto-computed Jacobian%n------------------------------------%n");
-		double[] sol2 = new NewtonRaphson(functions, initialguess)
+		SolverResults sol2 = new NewtonRaphson(functions, initialguess)
 				.absTolerance(1e-9)
 				.relTolerance(1e-6)
 				.iterationLimit(100)
-				.differentiationStepSize(0.001)
+				.differentiationStepSize(1e-7)
 				.solve();
-		for (double val : sol2) {
-			System.out.printf("%.6g%n", val);
-		}
+		System.out.println(sol2);
 	}
 
 	public static void usingMultivariateInterface() {
@@ -167,24 +164,20 @@ public class NewtonRaphsonMultivariateExample {
 		double[] initialguess = new double[] { 1d, 2d, 3d };
 
 		System.out.printf("Solution with pre-computed Jacobian%n------------------------------------%n");
-		double[] sol1 = new NewtonRaphson(functions, jacobian, initialguess)
+		SolverResults sol1 = new NewtonRaphson(functions, jacobian, initialguess)
 				.absTolerance(1e-9)
-				.relTolerance(1e-8)
+				.relTolerance(1e-6)
 				.iterationLimit(100)
 				.solve();
-		for (double val : sol1) {
-			System.out.printf("%.6g%n", val);
-		}
+		System.out.println(sol1);
 
 		System.out.printf("%nSolution with auto-computed Jacobian%n------------------------------------%n");
-		double[] sol2 = new NewtonRaphson(functions, initialguess)
+		SolverResults sol2 = new NewtonRaphson(functions, initialguess)
 				.absTolerance(1e-9)
-				.relTolerance(1e-8)
+				.relTolerance(1e-6)
 				.iterationLimit(100)
-				.differentiationStepSize(0.001)
+				.differentiationStepSize(1e-7)
 				.solve();
-		for (double val : sol2) {
-			System.out.printf("%.6g%n", val);
-		}
+		System.out.println(sol2);
 	}
 }

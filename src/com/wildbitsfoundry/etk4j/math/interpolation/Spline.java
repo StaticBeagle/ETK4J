@@ -6,26 +6,20 @@ import com.wildbitsfoundry.etk4j.math.functions.PiecewiseFunction;
 
 public abstract class Spline extends PiecewiseFunction implements DifferentiableFunction, IntegrableFunction {
 	
+	private int _order;
 	private double[] _indefiniteIntegral = null;
-	protected double[] _coefs = null;
-	private final int _order;
 
-	protected Spline(double[] x, int order, double y0, double yn) {
-		super(x, y0, yn);
+	protected Spline(double[] x, int order) {
+		super(x);
 		_order = order;
 	}
 	
 	protected abstract double evaluateDerivativeAt(int i, double t);
-
 	protected abstract double evaluateAntiDerivativeAt(int i, double t);
-
-	public int getOrder() {
-		return _order;
-	}
 	
 	@Override
 	protected double getValueAt(int i, double x) {
-		
+
 		double t = x - _x[i];
 		i *= _order;
 		double result = 0;
@@ -34,7 +28,8 @@ public abstract class Spline extends PiecewiseFunction implements Differentiable
 		}
 		return result;
 	}
-	
+
+
 	@Override
 	public double differentiate(double x) {
 		int i = this.findLeftIndex(x);
@@ -73,18 +68,6 @@ public abstract class Spline extends PiecewiseFunction implements Differentiable
 		for (int i = 0; i < size - 1; ++i) {
 			double t = _x[i + 1] - _x[i];
 			_indefiniteIntegral[i + 1] = _indefiniteIntegral[i] + this.evaluateAntiDerivativeAt(i, t);
-		}
-	}
-		
-	protected static void checkXYDimensions(double[] x, double[] y) {
-		if (x.length != y.length) {
-			throw new IllegalArgumentException("x and y dimensions must be the same");
-		}
-	}
-
-	protected static void checkMinkXLength(double[] x, int size) {
-		if (x.length < size) {
-			throw new IllegalArgumentException(String.format("x length must be >= %d", size));
 		}
 	}
 }

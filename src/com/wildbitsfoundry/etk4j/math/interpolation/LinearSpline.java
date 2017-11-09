@@ -2,10 +2,12 @@ package com.wildbitsfoundry.etk4j.math.interpolation;
 
 import java.util.Arrays;
 
+import com.wildbitsfoundry.etk4j.math.functions.common.ExtrapolationMethod;
+
 public class LinearSpline extends Spline {
 
 	protected LinearSpline(double[] x, double[] y) {
-		super(x, 2, y[0], y[y.length - 1]);
+		super(x, 2);
 
 		final int n = _x.length;
 		// compute coefficients
@@ -20,9 +22,7 @@ public class LinearSpline extends Spline {
 			_coefs[j] = a;
 			_coefs[++j] = b;
 		}
-		double d0 = _coefs[0];
-		double dn = _coefs[_coefs.length - 2];
-		super.setEndSlopes(d0, dn);
+		this.setEndPointsAndEndSlopes(y[0], y[n - 1], _coefs[0], _coefs[_coefs.length - 2]);
 	}
 
 	public static LinearSpline newLinearSpline(double[] x, double[] y) {
@@ -34,7 +34,7 @@ public class LinearSpline extends Spline {
 		checkMinkXLength(x, 2);
 		return new LinearSpline(x, y);
 	}
-
+	
 	@Override
 	public void setExtrapolationMethod(ExtrapolationMethod method) {
 		super.setExtrapolationMethod(method);

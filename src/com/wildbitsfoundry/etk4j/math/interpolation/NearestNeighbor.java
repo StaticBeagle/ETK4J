@@ -3,6 +3,7 @@ package com.wildbitsfoundry.etk4j.math.interpolation;
 import java.util.Arrays;
 
 import com.wildbitsfoundry.etk4j.math.functions.PiecewiseFunction;
+import com.wildbitsfoundry.etk4j.math.functions.common.ExtrapolationMethod;
 import com.wildbitsfoundry.etk4j.util.NumArrays;
 
 public class NearestNeighbor extends PiecewiseFunction {
@@ -14,7 +15,7 @@ public class NearestNeighbor extends PiecewiseFunction {
 	private double[] _y = null;
 	private NeighborCalculator _calculator = null;
 	protected NearestNeighbor(double[] x, double[] y) {
-		super(x, y[0], y[y.length - 1]);
+		super(x);
 		_y = Arrays.copyOf(y, y.length);
 		if(!NumArrays.isAscending(x)) {
 			throw new IllegalArgumentException("x must be monotonically increasing");
@@ -27,8 +28,8 @@ public class NearestNeighbor extends PiecewiseFunction {
 	}
 	
 	public static NearestNeighbor newNearestNeighborInPlace(double[] x, double[] y) {
-		Spline.checkXYDimensions(x, y);
-		Spline.checkMinkXLength(x, 2);
+		checkXYDimensions(x, y);
+		checkMinkXLength(x, 2);
 		
 		NearestNeighbor nh = new NearestNeighbor(x, y);
 		nh._calculator = new NeighborCalculator() {
@@ -42,8 +43,8 @@ public class NearestNeighbor extends PiecewiseFunction {
 	}
 	
 	public static NearestNeighbor newNextNeighbor(double[] x, double[] y) {
-		Spline.checkXYDimensions(x, y);
-		Spline.checkMinkXLength(x, 2);
+		checkXYDimensions(x, y);
+		checkMinkXLength(x, 2);
 		
 		NearestNeighbor nh = new NearestNeighbor(Arrays.copyOf(x, x.length), y);
 		nh._calculator = new NeighborCalculator() {
@@ -57,8 +58,8 @@ public class NearestNeighbor extends PiecewiseFunction {
 	}
 	
 	public static NearestNeighbor newPreviousNeighbor(double[] x, double[] y) {
-		Spline.checkXYDimensions(x, y);
-		Spline.checkMinkXLength(x, 2);
+		checkXYDimensions(x, y);
+		checkMinkXLength(x, 2);
 		
 		NearestNeighbor nh = new NearestNeighbor(Arrays.copyOf(x, x.length), y);
 		nh._calculator = new NeighborCalculator() {

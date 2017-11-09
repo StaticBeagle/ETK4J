@@ -2,12 +2,13 @@ package com.wildbitsfoundry.etk4j.math.interpolation2d;
 
 import java.util.Arrays;
 
+import com.wildbitsfoundry.etk4j.math.functions.BivariateFunction;
 import com.wildbitsfoundry.etk4j.math.interpolation.CubicSpline;
 import com.wildbitsfoundry.etk4j.math.interpolation.Interpolation;
 import com.wildbitsfoundry.etk4j.math.interpolation.LinearSpline;
 import com.wildbitsfoundry.etk4j.math.interpolation.Spline;
 
-public class Spline2d {
+public class Spline2d implements BivariateFunction{
 
 	private double[] _y;
 	private Spline[] _splines;
@@ -70,6 +71,7 @@ public class Spline2d {
 		return new Spline2d(yt, splines, order);
 	}
 
+	@Override
 	public double evaluateAt(double x, double y) {
 		int index = this.findLeftIndex(y);
 

@@ -3,6 +3,7 @@ package com.wildbitsfoundry.etk4j.math.interpolation;
 import java.util.Arrays;
 
 import com.wildbitsfoundry.etk4j.constants.ETKConstants;
+import com.wildbitsfoundry.etk4j.math.functions.common.ExtrapolationMethod;
 
 public class CubicSpline extends Spline {
 
@@ -42,8 +43,7 @@ public class CubicSpline extends Spline {
 	}
 
 	private CubicSpline(double[] x, double[] y, double[] dydx) {
-		super(x, 4, y[0], y[y.length - 1]);
-
+		super(x, 4);
 		final int n = _x.length;
 		// compute coefficients
 		_coefs = new double[(n - 1) * 4]; // 4 coefficients and n - 1 segments
@@ -63,22 +63,19 @@ public class CubicSpline extends Spline {
 			_coefs[++j] = c;
 			_coefs[++j] = d;
 		}
-		double d0 = dydx[0];
-		double dn = dydx[dydx.length - 1];
-		super.setEndSlopes(d0, dn);
+		this.setEndPointsAndEndSlopes(y[0], y[n - 1], dydx[0], dydx[n - 1]);
 	}
 
 	private CubicSpline(double[] x, double[] y, double[] coefs, double d0, double dn) {
-		super(x, 4, y[0], y[y.length - 1]);
+		super(x, 4);
 		_coefs = coefs;
-		super.setEndSlopes(d0, dn);
 	}
-
+	
 	@Override
 	public void setExtrapolationMethod(ExtrapolationMethod method) {
 		super.setExtrapolationMethod(method);
 	}
-	
+
 	private static CubicSpline buildSpline(double[] x, double[] y, CubicSplineBuilder builder) {
 		checkXYDimensions(x, y);
 		final int n = x.length;

@@ -8,7 +8,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import com.wildbitsfoundry.etk4j.math.functions.PiecewiseFunction.ExtrapolationMethod;
+import com.wildbitsfoundry.etk4j.math.functions.common.ExtrapolationMethod;
 
 public class LinearSplineTest {
 	double[] x;
