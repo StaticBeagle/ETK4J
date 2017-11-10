@@ -321,6 +321,15 @@ public final class NumArrays {
 		return result;
 	}
 	
+	public static double sumSquare(double[] a) {
+		final int length = a.length;
+		double result = 0;
+		for(int i = 0; i < length; ++i) {
+			result += a[i] * a[i];
+		}
+		return result;
+	}
+	
 	public static double[] cummulativeSum(double[] a) {
 		final int length = a.length;
 		double[] result = new double[length];
