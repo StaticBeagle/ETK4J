@@ -2,10 +2,11 @@ package com.wildbitsfoundry.etk4j.math.polynomials;
 
 import java.util.Arrays;
 
+import com.wildbitsfoundry.etk4j.math.functions.BivariateFunction;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
 import com.wildbitsfoundry.etk4j.util.NumArrays;
 
-public class Polynomial2d {
+public class Polynomial2d implements BivariateFunction {
 	private double[] _coefs;
 	private int _n;
 	private int _m;
@@ -104,7 +105,7 @@ public class Polynomial2d {
 
 		Matrix c = A.solve(b);
 
-		return c.getArrayCopy();
+		return c.getArray();
 	}
 
 	private static double[] buildPowerSeriesDescending(double x, int power) {
@@ -157,7 +158,7 @@ public class Polynomial2d {
 	}
 
 	/***
-	 * Evaluate a 3-D polynomial using Horner's method.
+	 * Evaluate a 2D polynomial using Horner's method.
 	 * 
 	 * @param poly
 	 *            Polynomial to be evaluated at the points polyecified by x and y,

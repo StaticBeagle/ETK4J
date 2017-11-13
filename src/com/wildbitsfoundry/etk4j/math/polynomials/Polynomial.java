@@ -423,7 +423,7 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 			throw new IllegalArgumentException("x and y dimensions must match!");
 		}
 		// Building the coefficient matrix
-		Matrix A = Matrices.Vandermonde(x, dim, n);
+		Matrix A = Matrices.Vandermonde(x, dim, n + 1);
 		// Building the solution vector
 		Matrix b = new Matrix(y, dim);
 		Matrix c = A.solve(b);

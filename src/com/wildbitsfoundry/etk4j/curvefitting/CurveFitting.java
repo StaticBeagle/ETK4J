@@ -1,9 +1,6 @@
 package com.wildbitsfoundry.etk4j.curvefitting;
 
 import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
-import com.wildbitsfoundry.etk4j.util.NumArrays;
-
-import static com.wildbitsfoundry.etk4j.util.NumArrays.mean;
 
 public final class CurveFitting {
 	private CurveFitting() {

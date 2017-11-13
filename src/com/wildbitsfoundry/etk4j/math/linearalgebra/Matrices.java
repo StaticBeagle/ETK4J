@@ -56,9 +56,9 @@ public final class Matrices {
 	}
 
 	public static Matrix Vandermonde(double[] x, int rows, int cols) {
-		double[][] V = new double[rows][cols + 1];
+		double[][] V = new double[rows][cols];
 		for (int i = 0; i < rows; i++) {
-			for (int j = 0; j <= cols; j++) {
+			for (int j = 0; j < cols; j++) {
 				V[i][j] = Math.pow(x[i], j);
 			}
 		}
