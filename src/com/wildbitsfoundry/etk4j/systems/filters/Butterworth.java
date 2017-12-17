@@ -3,13 +3,16 @@ package com.wildbitsfoundry.etk4j.systems.filters;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
 import com.wildbitsfoundry.etk4j.systems.TransferFunction;
+import com.wildbitsfoundry.etk4j.systems.filters.FilterSpecs.LowPassSpecs;
 import com.wildbitsfoundry.etk4j.util.NumArrays;
+import static com.wildbitsfoundry.etk4j.systems.filters.AnalogFilter.lpTohp;
+import static com.wildbitsfoundry.etk4j.systems.filters.AnalogFilter.lpTobp;
+import static com.wildbitsfoundry.etk4j.systems.filters.AnalogFilter.lpTobs;
 
-public class Butterworth extends AnalogFilter {
+public class Butterworth {
 
 	private TransferFunction _tf = null;
 	private double _eps;
-
 	/***
 	 * Calculate the minimum order required for Low-Pass Butterworth filter
 	 * 
@@ -54,7 +57,6 @@ public class Butterworth extends AnalogFilter {
 			}
 		}
 		_tf = new TransferFunction(new Complex[0], poles);
-		_order = n;
 	}
 	
 	public static Butterworth newLowPass(int n, double ap) {
@@ -111,7 +113,6 @@ public class Butterworth extends AnalogFilter {
 		Butterworth bp = new Butterworth(n, ap);
 		double bw = Q / Math.pow(bp._eps, -1.0 / n) / w0;
 		bp._tf = lpTobp(bp._tf.getNumerator(), bp._tf.getDenominator(), w0, bw);
-		bp._order <<= 1;
 		return bp;
 	}
 
@@ -136,12 +137,18 @@ public class Butterworth extends AnalogFilter {
 		Butterworth bp = new Butterworth(n, amax);
 		double bw = Q * Math.pow(bp._eps, -1.0 / n) / w0;
 		bp._tf = lpTobs(bp._tf.getNumerator(), bp._tf.getDenominator(), w0, bw);
-		bp._order <<= 1;
 		return bp;
 	}
 
 	public static void main(String[] args) {
 		Butterworth lowpass = newLowPass(1, 10, 0.2, 60);
+		LowPassSpecs specs = new LowPassSpecs();
+		specs.PassBandAttenuation = 0.2;
+		specs.StopBandAttenuation = 60;
+		specs.PassBandFrequency = 1;
+		specs.StopBandFrequency = 10;
+		specs.ApproximationType = ApproximationType.BUTTERWORTH;
+		AnalogFilter lp = AnalogFilter.newLowPassFilter(specs);
 
 		Butterworth highpass = newHighPass(10, 1, 0.2, 60);
 
@@ -156,6 +163,7 @@ public class Butterworth extends AnalogFilter {
 		System.out.println();
 
 		System.out.printf("Low pass: %n%s%n%n", lowpass._tf.toString());
+		System.out.printf("Low pass: %n%s%n%n", lp._tf.toString());
 		System.out.printf("High pass: %n%s%n%n", highpass._tf.toString());
 		System.out.printf("Band pass: %n%s%n%n", bandpass._tf.toString());
 		System.out.printf("Band stop: %n%s%n", bandstop._tf.toString());

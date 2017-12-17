@@ -5,12 +5,14 @@ import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
 import com.wildbitsfoundry.etk4j.systems.TransferFunction;
 import com.wildbitsfoundry.etk4j.util.NumArrays;
+import static com.wildbitsfoundry.etk4j.systems.filters.AnalogFilter.lpTohp;
+import static com.wildbitsfoundry.etk4j.systems.filters.AnalogFilter.lpTobp;
+import static com.wildbitsfoundry.etk4j.systems.filters.AnalogFilter.lpTobs;
 
-public class Chebyshev extends AnalogFilter {
+public class Chebyshev {
 
 	private TransferFunction _tf = null;
 	private double _eps;
-
 	/***
 	 * Calculate the minimum order required for Low-Pass Chebyshev filter
 	 * 
@@ -67,7 +69,6 @@ public class Chebyshev extends AnalogFilter {
 			}
 		}
 		_tf = new TransferFunction(N, poles);
-		_order = n;
 	}
 
 	public static Chebyshev newLowPass(int n, double ap) {
@@ -124,7 +125,6 @@ public class Chebyshev extends AnalogFilter {
 		Chebyshev bp = new Chebyshev(n, ap);
 		double bw = Q / Math.pow(bp._eps, -1.0 / n) / w0;
 		bp._tf = lpTobp(bp._tf.getNumerator(), bp._tf.getDenominator(), w0, bw);
-		bp._order <<= 1;
 		return bp;
 	}
 
@@ -149,7 +149,6 @@ public class Chebyshev extends AnalogFilter {
 		Chebyshev bp = new Chebyshev(n, amax);
 		double bw = Q * Math.pow(bp._eps, -1.0 / n) / w0;
 		bp._tf = lpTobs(bp._tf.getNumerator(), bp._tf.getDenominator(), w0, bw);
-		bp._order <<= 1;
 		return bp;
 	}
 

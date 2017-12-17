@@ -1,36 +1,6 @@
 package com.wildbitsfoundry.etk4j.systems.filters;
 
 public abstract class FilterSpecs {
-	public static enum FilterApproximation {
-		Chebyshev {
-
-			@Override
-			LowPassPrototype getLowPassPrototype() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			
-		},
-		Butterworth {
-			
-			@Override
-			LowPassPrototype getLowPassPrototype() {
-				return new ButterworthPrototype();
-			}
-		},
-		InverseChebyshev{
-
-			@Override
-			LowPassPrototype getLowPassPrototype() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-		};
-
-		abstract LowPassPrototype getLowPassPrototype();
-	}
-	
 	private static enum FilterType {
 		LOWPASS,
 		HIGHPASS,
@@ -38,7 +8,7 @@ public abstract class FilterSpecs {
 		BANDSTOP
 	}
 
-	protected FilterApproximation _approxType;
+	public ApproximationType ApproximationType;
 	protected FilterType _type;
 	
 	public static class LowPassSpecs extends FilterSpecs {
