@@ -29,7 +29,7 @@ public class NumArraysTest {
 
 	@Test
 	public void testLinspaceStep() {
-		assertArrayEquals(a, NumArrays.linsteps(-1.0, 1.0, 0.5), 1e-12);
+		assertArrayEquals(a, NumArrays.linsteps(-1.0, 0.5, 1.0), 1e-12);
 	}
 
 	@Test

@@ -30,11 +30,11 @@ public final class NumArrays {
 	/***
 	 * Creates n linearly spaced samples between x0 and x1
 	 * @param x0 starting point
-	 * @param x1 end point
 	 * @param step step size
+	 * @param x1 end point
 	 * @return Array of n equally spaced samples between [x0, x1]
 	 */
-	public static double[] linsteps(double x0, double x1, double step) {
+	public static double[] linsteps(double x0, double step, double x1) {
 		final int n = (int) Math.ceil((x1 - x0) / step);
 		double[] result = new double[n + 1];
 		int i = 0;
@@ -53,7 +53,7 @@ public final class NumArrays {
 	 * @return Array of n equally spaced samples between [x0, x1]. Step size is assumed to be 1
 	 */
 	public static double[] linsteps(double x0, double x1) {
-		return linsteps(x0, x1, 1.0);
+		return linsteps(x0, 1.0, x1);
 	}
 	
 	/***

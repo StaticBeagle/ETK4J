@@ -45,12 +45,12 @@ public class AnalogFilter {
 		return type.getMinOrderNeeded(fp, fs, ap, as);
 	}
 	
-	public static AnalogFilter newLowPassFilter(int n, double ap, ApproximationType type) {
+	public static AnalogFilter newLowPass(int n, double ap, ApproximationType type) {
 		LowPassPrototype lp = type.buildLowPassPrototype(n, ap);
 		return new AnalogFilter(n, lp._tf);
 	}
 	
-	public static AnalogFilter newLowPassFilter(LowPassSpecs specs) {
+	public static AnalogFilter newLowPass(LowPassSpecs specs, ApproximationType type) {
 		double fp = specs.PassBandFrequency;
 		double fs = specs.StopBandFrequency;
 		double ap = specs.PassBandAttenuation;
@@ -58,9 +58,10 @@ public class AnalogFilter {
 		
 		double wp = 2 * Math.PI * fp;
 		double ws = 2 * Math.PI * fs;
-		final int n = specs.ApproximationType.getMinOrderNeeded(wp, ws, ap, as);
-		LowPassPrototype lp = specs.ApproximationType.buildLowPassPrototype(n, ap);
-		double factor = Math.pow(lp._eps, -1.0 / n) * wp;
+		final int n = type.getMinOrderNeeded(wp, ws, ap, as);
+		double lpa = type.getLowPassAttenuation(ap, as);
+		LowPassPrototype lp = type.buildLowPassPrototype(n, lpa);
+		double factor = type.getLowPassGainFactor(n, lp._eps, wp);
 		lp._tf.substituteInPlace(1.0 / factor);
 		return new AnalogFilter(n, lp._tf);
 	}
@@ -71,7 +72,7 @@ public class AnalogFilter {
 		return new AnalogFilter(n, lp._tf);
 	}
 	
-	public static AnalogFilter newHighPassFilter(HighPassSpecs specs) {
+	public static AnalogFilter newHighPass(HighPassSpecs specs, ApproximationType type) {
 		double fp = specs.PassBandFrequency;
 		double fs = specs.StopBandFrequency;
 		double ap = specs.PassBandAttenuation;
@@ -79,15 +80,16 @@ public class AnalogFilter {
 		
 		double wp = 2 * Math.PI * fp;
 		double ws = 2 * Math.PI * fs;
-		final int n = specs.ApproximationType.getMinOrderNeeded(wp, ws, ap, as);
-		LowPassPrototype lp = specs.ApproximationType.buildLowPassPrototype(n, ap);
-		double factor = wp / Math.pow(lp._eps, -1.0 / n);
+		final int n = type.getMinOrderNeeded(ws, wp, ap, as);
+		double hpa = type.getHighPassAttenuation(ap, as);
+		LowPassPrototype lp = type.buildLowPassPrototype(n, hpa);
+		double factor = type.getHighPassGainFactor(n, lp._eps, wp, ws);
 		lp._tf.substituteInPlace(factor);
 		lp._tf = lpTohp(lp._tf.getNumerator(), lp._tf.getDenominator());
 		return new AnalogFilter(n, lp._tf);
 	}
 	
-	public static AnalogFilter newBandPassFilter(BandPassSpecs specs) {
+	public static AnalogFilter newBandPass(BandPassSpecs specs, ApproximationType type) {
 		double fp1 = specs.LowerPassBandFrequency;
 		double fp2 = specs.UpperPassBandFrequency;
 		double fs1 = specs.LowerStopBandFrequency;
@@ -111,8 +113,8 @@ public class AnalogFilter {
 		double omega2 = Q * Math.abs((whs2 * whs2 - 1) / whs2);
 		
 
-		final int n1 = specs.ApproximationType.getMinOrderNeeded(1, omega1, ap, as1);
-		final int n2 = specs.ApproximationType.getMinOrderNeeded(1, omega2, ap, as2);
+		final int n1 = type.getMinOrderNeeded(1, omega1, ap, as1);
+		final int n2 = type.getMinOrderNeeded(1, omega2, ap, as2);
 		
 		int n = n1;
 		double omega = omega1;
@@ -120,16 +122,16 @@ public class AnalogFilter {
 			n = n2;
 			omega = omega2;
 		}
-		double bpa = specs.ApproximationType.getBandPassAp(ap, as1, as2);
-		LowPassPrototype lp = specs.ApproximationType.buildLowPassPrototype(n, bpa);
+		double bpa = type.getBandPassAp(ap, as1, as2);
+		LowPassPrototype lp = type.buildLowPassPrototype(n, bpa);
 
-		double bw = specs.ApproximationType.getBandPassBW(n, lp._eps, Q, w0, omega);
+		double bw = type.getBandPassBW(n, lp._eps, Q, w0, omega);
 		lp._tf = lpTobp(lp._tf.getNumerator(), lp._tf.getDenominator(), w0, bw);
 		n <<= 1;
 		return new AnalogFilter(n, lp._tf);
 	}
 	
-	public static AnalogFilter newBandStopFilter(BandStopSpecs specs) {
+	public static AnalogFilter newBandStop(BandStopSpecs specs, ApproximationType type) {
 		double fp1 = specs.LowerPassBandFrequency;
 		double fp2 = specs.UpperPassBandFrequency;
 		double fs1 = specs.LowerStopBandFrequency;
@@ -150,8 +152,8 @@ public class AnalogFilter {
 		double omegas1 = 1 / (Q * Math.abs((whs1 * whs1 - 1) / whs1));
 		double omegas2 = 1 / (Q * Math.abs((whs2 * whs2 - 1) / whs2));
 		
-		final int n1 = specs.ApproximationType.getMinOrderNeeded(1, omegas1, amax, amin);
-		final int n2 = specs.ApproximationType.getMinOrderNeeded(1, omegas2, amax, amin);
+		final int n1 = type.getMinOrderNeeded(1, omegas1, amax, amin);
+		final int n2 = type.getMinOrderNeeded(1, omegas2, amax, amin);
 		
 		int n = n1;
 		double omegas = omegas1;
@@ -160,11 +162,11 @@ public class AnalogFilter {
 			omegas = omegas2;
 		}
 		
-		double bsa = specs.ApproximationType.getBandStopAp(amax, amin);
-		LowPassPrototype lp = specs.ApproximationType.buildLowPassPrototype(n, bsa);
+		double bsa = type.getBandStopAp(amax, amin);
+		LowPassPrototype lp = type.buildLowPassPrototype(n, bsa);
 
-		double bw = specs.ApproximationType.getBandStopBW(n, lp._eps, Q, w0, omegas);
-		lp._tf = lpTobp(lp._tf.getNumerator(), lp._tf.getDenominator(), w0, bw);
+		double bw = type.getBandStopBW(n, lp._eps, Q, w0, omegas);
+		lp._tf = lpTobs(lp._tf.getNumerator(), lp._tf.getDenominator(), w0, bw);
 		n <<= 1;
 		return new AnalogFilter(n, lp._tf);
 	}
@@ -180,7 +182,7 @@ public class AnalogFilter {
 		RationalFunction bp = new RationalFunction(num, den);
 		bp.substituteInPlace(new RationalFunction(s2w02, s));
 
-		bp.normalize();
+		//bp.normalize();
 
 		return new TransferFunction(bp);
 	}
@@ -204,7 +206,7 @@ public class AnalogFilter {
 	public static TransferFunction lpTohp(double[] numerator, double[] denominator) {
 		final int numDegree = numerator.length - 1;
 		final int denDegree = denominator.length - 1;
-		final int filterOrder = numDegree + denDegree + 1;
+		final int filterOrder = Math.max(numDegree, denDegree) + 1;
 
 		// Reverse coefficients then scale them by the
 		// order of the denominator i.e. pad with zeros

@@ -3,6 +3,9 @@ package com.wildbitsfoundry.etk4j.systems.filters;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
 import com.wildbitsfoundry.etk4j.systems.TransferFunction;
+import com.wildbitsfoundry.etk4j.systems.filters.FilterSpecs.BandPassSpecs;
+import com.wildbitsfoundry.etk4j.systems.filters.FilterSpecs.BandStopSpecs;
+import com.wildbitsfoundry.etk4j.systems.filters.FilterSpecs.HighPassSpecs;
 import com.wildbitsfoundry.etk4j.systems.filters.FilterSpecs.LowPassSpecs;
 import com.wildbitsfoundry.etk4j.util.NumArrays;
 import static com.wildbitsfoundry.etk4j.systems.filters.AnalogFilter.lpTohp;
@@ -45,13 +48,13 @@ public class Butterworth {
 		Complex[] poles = new Complex[n];
 		if (n % 2 == 0) {
 			int i = 0;
-			for (double k : NumArrays.linsteps(-n * 0.5 + 1.0, n * 0.5, 1)) {
+			for (double k : NumArrays.linsteps(-n * 0.5 + 1.0, 1, n * 0.5)) {
 				double phik = 180.0 * (k / n) - 90.0 / n;
 				poles[i++] = new Complex(-Math.cos(phik * pid), Math.sin(phik * pid));
 			}
 		} else {
 			int i = 0;
-			for (double k : NumArrays.linsteps(-(n - 1) * 0.5, (n - 1) * 0.5, 1)) {
+			for (double k : NumArrays.linsteps(-(n - 1) * 0.5, 1, (n - 1) * 0.5)) {
 				double phik = 180.0 * (k / n);
 				poles[i++] = new Complex(-Math.cos(phik * pid), Math.sin(phik * pid));
 			}
@@ -141,20 +144,38 @@ public class Butterworth {
 	}
 
 	public static void main(String[] args) {
-		Butterworth lowpass = newLowPass(1, 10, 0.2, 60);
-		LowPassSpecs specs = new LowPassSpecs();
-		specs.PassBandAttenuation = 0.2;
-		specs.StopBandAttenuation = 60;
-		specs.PassBandFrequency = 1;
-		specs.StopBandFrequency = 10;
-		specs.ApproximationType = ApproximationType.BUTTERWORTH;
-		AnalogFilter lp = AnalogFilter.newLowPassFilter(specs);
+		LowPassSpecs lpSpecs = new LowPassSpecs();
+		lpSpecs.PassBandAttenuation = 0.2;
+		lpSpecs.StopBandAttenuation = 60;
+		lpSpecs.PassBandFrequency = 1;
+		lpSpecs.StopBandFrequency = 10;
+		AnalogFilter lp = AnalogFilter.newLowPass(lpSpecs, ApproximationType.CHEBYSHEV);
 
-		Butterworth highpass = newHighPass(10, 1, 0.2, 60);
+		HighPassSpecs hpSpecs = new HighPassSpecs();
+		hpSpecs.PassBandAttenuation = 0.2;
+		hpSpecs.StopBandAttenuation = 60;
+		hpSpecs.PassBandFrequency = 10;
+		hpSpecs.StopBandFrequency = 1;
+		AnalogFilter hp = AnalogFilter.newHighPass(hpSpecs, ApproximationType.INVERSE_CHEBYSHEV);
 
-		Butterworth bandpass = newBandPass(190, 210, 180, 220, 0.2, 20, 20);
+		BandPassSpecs bpSpecs = new BandPassSpecs();
+		bpSpecs.LowerPassBandFrequency = 190;
+		bpSpecs.UpperPassBandFrequency = 210;
+		bpSpecs.LowerStopBandFrequency = 180;
+		bpSpecs.UpperStopBandFrequency = 220;
+		bpSpecs.PassBandAttenuation = 0.2;
+		bpSpecs.LowerStopBandAttenuation = 20;
+		bpSpecs.UpperStopBandAttenuation = 20;
+		AnalogFilter bp = AnalogFilter.newBandPass(bpSpecs, ApproximationType.CHEBYSHEV);
 
-		Butterworth bandstop = newBandStop(3.6e3, 9.1e3, 5.45e3, 5.90e3, 1.5, 38);
+		BandStopSpecs bsSpecs = new BandStopSpecs();
+		bsSpecs.LowerPassBandFrequency = 3.6e3;
+		bsSpecs.UpperPassBandFrequency = 9.1e3;
+		bsSpecs.LowerStopBandFrequency = 5.45e3;
+		bsSpecs.UpperStopBandFrequency = 5.90e3;
+		bsSpecs.PassBandAttenuation = 1.5;
+		bsSpecs.StopBandAttenuation = 38;
+		AnalogFilter bs = AnalogFilter.newBandStop(bsSpecs, ApproximationType.BUTTERWORTH);
 
 		Polynomial f = new Polynomial(new double[] { 1, 1 });
 		System.out.println(f.pow(2));
@@ -162,10 +183,9 @@ public class Butterworth {
 		System.out.println(f.substitute(new Polynomial(new double[] { 1, 1 })));
 		System.out.println();
 
-		System.out.printf("Low pass: %n%s%n%n", lowpass._tf.toString());
 		System.out.printf("Low pass: %n%s%n%n", lp._tf.toString());
-		System.out.printf("High pass: %n%s%n%n", highpass._tf.toString());
-		System.out.printf("Band pass: %n%s%n%n", bandpass._tf.toString());
-		System.out.printf("Band stop: %n%s%n", bandstop._tf.toString());
+		System.out.printf("High pass: %n%s%n%n", hp._tf.toString());
+		System.out.printf("Band pass: %n%s%n%n", bp._tf.toString());
+		System.out.printf("Band stop: %n%s%n", bs._tf.toString());
 	}
 }

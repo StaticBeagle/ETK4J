@@ -8,7 +8,6 @@ public abstract class FilterSpecs {
 		BANDSTOP
 	}
 
-	public ApproximationType ApproximationType;
 	protected FilterType _type;
 	
 	public static class LowPassSpecs extends FilterSpecs {

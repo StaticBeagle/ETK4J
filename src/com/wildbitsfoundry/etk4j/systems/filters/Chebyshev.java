@@ -48,13 +48,13 @@ public class Chebyshev {
 		Complex[] poles = new Complex[n];
 		if (n % 2 == 0) {
 			int i = 0;
-			for (double k : NumArrays.linsteps(-n * 0.5 + 1.0, n * 0.5, 1)) {
+			for (double k : NumArrays.linsteps(-n * 0.5 + 1.0, 1, n * 0.5)) {
 				double phik = 180.0 * (k / n) - 90.0 / n;
 				poles[i++] = new Complex(-sinha * Math.cos(phik * pid), cosha * Math.sin(phik * pid));
 			}
 		} else {
 			int i = 0;
-			for (double k : NumArrays.linsteps(-(n - 1) * 0.5, (n - 1) * 0.5, 1)) {
+			for (double k : NumArrays.linsteps(-(n - 1) * 0.5, 1, (n - 1) * 0.5)) {
 				double phik = 180.0 * (k / n);
 				poles[i++] = new Complex(-sinha * Math.cos(phik * pid), cosha * Math.sin(phik * pid));
 			}
