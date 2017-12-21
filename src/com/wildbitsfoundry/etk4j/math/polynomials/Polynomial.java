@@ -370,6 +370,22 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 	public Polynomial substitute(Polynomial p) {
 		return substituteOp(this, p);
 	}
+	
+	public RationalFunction substitute(final Polynomial num, final Polynomial den) {
+		final int deg = this.degree();
+		Polynomial result = num.pow(deg);
+		result.multiplyEquals(_coefs[0]);
+		Polynomial nump = null;
+		Polynomial denp = null;
+		for (int i = deg - 1, j = 1; i >= 0; --i, ++j) {
+			nump = num.pow(i);
+			denp = den.pow(j);
+			nump.multiplyEquals(den);
+			nump.multiplyEquals(_coefs[j]);
+			result.addEquals(nump);
+		}
+		return new RationalFunction(nump, denp);
+	}
 
 	private static Polynomial substituteOp(Polynomial src, Polynomial sub) {
 		final int deg = src.degree();

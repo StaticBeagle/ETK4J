@@ -6,6 +6,8 @@ import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
 public class RationalFunction implements UnivariateFunction {
 	private Polynomial _numerator;
 	private Polynomial _denominator;
+	
+	private RationalFunction() { }
 
 	public RationalFunction(Complex[] zeros, Complex[] poles) {
 		_numerator = new Polynomial(zeros);
@@ -74,6 +76,16 @@ public class RationalFunction implements UnivariateFunction {
 		return new RationalFunction(numeratorLeftSide.subtract(numeratorRightSide), denominator);
 	}
 
+	public RationalFunction multiply(final Polynomial p) {
+		Polynomial numerator = _numerator.multiply(p);
+		Polynomial denominator = new Polynomial(_denominator);
+		return new RationalFunction(numerator, denominator);
+	}
+	
+	private void multiplyEquals(Polynomial p) {
+		_numerator.multiplyEquals(p);		
+	}
+	
 	public RationalFunction multiply(RationalFunction rf) {
 		Polynomial numerator = _numerator.multiply(rf._numerator);
 		Polynomial denominator = _denominator.multiply(rf._denominator);
@@ -82,7 +94,7 @@ public class RationalFunction implements UnivariateFunction {
 
 	public RationalFunction multiply(double scalar) {
 		Polynomial numerator = _numerator.multiply(scalar);
-		Polynomial denominator = _denominator.multiply(1.0);
+		Polynomial denominator = new Polynomial(_denominator);
 		return new RationalFunction(numerator, denominator);
 	}
 
@@ -111,44 +123,35 @@ public class RationalFunction implements UnivariateFunction {
 	}
 
 	public RationalFunction substitute(RationalFunction rf) {
-		Polynomial num = subPolyOp(_numerator, rf);
-		Polynomial den = subPolyOp(_denominator, rf);
-
-		num.multiplyEquals(rf._denominator.pow(_numerator.degree()));
-		den.multiplyEquals(rf._denominator.pow(_denominator.degree()));
-
-		return new RationalFunction(num, den);
+		RationalFunction result = new RationalFunction();
+		subsOp(result, rf._numerator, rf._denominator);
+		return result;
 	}
 
 	public void substituteInPlace(RationalFunction rf) {
-		Polynomial num = subPolyOp(_numerator, rf);
-		Polynomial den = subPolyOp(_denominator, rf);
-
-		num.multiplyEquals(rf._denominator.pow(_denominator.degree()));
-		den.multiplyEquals(rf._denominator.pow(_numerator.degree()));
+		subsOp(this, rf._numerator, rf._denominator);
+	}
+	
+	private static void subsOp(RationalFunction rf, Polynomial num, Polynomial den) {
+		RationalFunction nump = rf._numerator.substitute(num, den);
+		RationalFunction denp = rf._denominator.substitute(num, den);
 		
-		_numerator = num;
-		_denominator = den;
+		int numDegree = rf._numerator.degree();
+		int denDegree = rf._denominator.degree();
+		int diff = Math.abs(numDegree - denDegree);
+		if(denDegree > numDegree) {
+			nump.multiplyEquals(den.pow(diff));
+		} else if(numDegree > denDegree) {
+			denp.multiplyEquals(den.pow(diff));
+		}
+		rf._numerator = nump._numerator;
+		rf._denominator = denp._numerator;
 	}
 	
 	public double normalize() {
 		double norm = _denominator.normalize();
 		_numerator.multiplyEquals(1 / norm);
 		return norm;
-	}
-
-	private static Polynomial subPolyOp(Polynomial src, RationalFunction sub) {
-		final int deg = src.degree();
-		Polynomial result = sub._numerator.pow(deg);
-		result.multiplyEquals(src._coefs[0]);
-		Polynomial tmp = null;
-		for (int i = deg - 1, j = 1; i >= 0; --i, ++j) {
-			tmp = sub._numerator.pow(i);
-			tmp.multiplyEquals(sub._denominator.pow(j));
-			tmp.multiplyEquals(src._coefs[j]);
-			result.addEquals(tmp);
-		}
-		return result;
 	}
 
 	@Override
