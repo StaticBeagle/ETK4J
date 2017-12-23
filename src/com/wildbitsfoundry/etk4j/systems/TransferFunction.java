@@ -394,4 +394,8 @@ public class TransferFunction {
 //		freq = ArrayUtils.logspace(-3, 3, 10000000);
 
 	}
+	
+	public void normalize() {
+		this._rf.normalize();
+	}
 }

@@ -14,16 +14,15 @@ import com.wildbitsfoundry.etk4j.util.Tuples.Tuple2;
 
 public enum ApproximationType {
 	CHEBYSHEV {
+		
 		@Override
-		int getMinOrderNeeded(double fp, double fs, double ap, double as) {
+		double getExactOrderNeeded(double fp, double fs, double ap, double as) {
 			double wp = 2 * Math.PI * fp;
 			double ws = 2 * Math.PI * fs;
 			double amax = Math.pow(10, ap * 0.1) - 1;
 			double amin = Math.pow(10, as * 0.1) - 1;
-
-			double L = MathETK.acosh(Math.sqrt(amin / amax)) / MathETK.acosh(ws / wp);
-
-			return (int) Math.ceil(L);
+			
+			return MathETK.acosh(Math.sqrt(amin / amax)) / MathETK.acosh(ws / wp);
 		}
 
 		@Override
@@ -69,7 +68,7 @@ public enum ApproximationType {
 
 		@Override
 		double getBandPassBW(int n, double eps, double Q, double w0, double omega) {
-			return Q;
+			return Q / w0;
 		}
 
 		@Override
@@ -79,7 +78,7 @@ public enum ApproximationType {
 
 		@Override
 		double getBandStopBW(int n, double eps, double Q, double w0, double omegas) {
-			return Q;
+			return w0 / Q;
 		}
 
 		@Override
@@ -105,15 +104,13 @@ public enum ApproximationType {
 	
 	BUTTERWORTH {
 		@Override
-		int getMinOrderNeeded(double fp, double fs, double ap, double as) {
+		double getExactOrderNeeded(double fp, double fs, double ap, double as) {
 			double wp = 2 * Math.PI * fp;
 			double ws = 2 * Math.PI * fs;
 			double amax = Math.pow(10, ap * 0.1) - 1;
 			double amin = Math.pow(10, as * 0.1) - 1;
-
-			double L = Math.log10(amin / amax) / (2 * Math.log10(ws / wp));
-
-			return (int) Math.ceil(L);
+			
+			return Math.log10(amin / amax) / (2 * Math.log10(ws / wp));
 		}
 
 		@Override
@@ -146,7 +143,7 @@ public enum ApproximationType {
 
 		@Override
 		double getBandPassBW(int n, double eps, double Q, double w0, double omega) {
-			return Q / Math.pow(eps, -1.0 / n) / w0;
+			return Q / (Math.pow(eps, -1.0 / n) * w0);
 		}
 
 		@Override
@@ -156,7 +153,7 @@ public enum ApproximationType {
 
 		@Override
 		double getBandStopBW(int n, double eps, double Q, double w0, double omegas) {
-			return Q * Math.pow(eps, -1.0 / n) / w0;
+			return w0 / (Math.pow(eps, -1.0 / n) * Q);
 		}
 
 		@Override
@@ -183,15 +180,13 @@ public enum ApproximationType {
 	INVERSE_CHEBYSHEV
 	{
 		@Override
-		int getMinOrderNeeded(double fp, double fs, double ap, double as) {
+		double getExactOrderNeeded(double fp, double fs, double ap, double as) {
 			double wp = 2 * Math.PI * fp;
 			double ws = 2 * Math.PI * fs;
 			double amax = Math.pow(10, ap * 0.1) - 1;
 			double amin = Math.pow(10, as * 0.1) - 1;
-
-			double L = MathETK.acosh(Math.sqrt(amin / amax)) / MathETK.acosh(ws / wp);
-
-			return (int) Math.ceil(L);
+			
+			return MathETK.acosh(Math.sqrt(amin / amax)) / MathETK.acosh(ws / wp);
 		}
 
 		@Override
@@ -205,7 +200,7 @@ public enum ApproximationType {
 			Complex[] poles = new Complex[n];
 			List<Complex> zeros = new ArrayList<>(n);
 			if (n % 2 == 0) {
-				for (int k = -n >> 1 + 1, i = 0; k <= n >> 1; ++k, ++i) {
+				for (int k = (-n >> 1) + 1, i = 0; k <= n >> 1; ++k, ++i) {
 					double phik = 180.0 * (1.0 * k / n) - 90.0 / n;
 					Tuple2<Complex, Optional<Complex>> pz = this.calcPZ(phik, cosha, sinha, k, n);
 					poles[i] = pz.Item1;
@@ -267,7 +262,7 @@ public enum ApproximationType {
 
 		@Override
 		double getBandPassBW(int n, double eps, double Q, double w0, double omega) {
-			return Q / omega;
+			return Q / (omega * w0);
 		}
 
 		@Override
@@ -277,7 +272,7 @@ public enum ApproximationType {
 
 		@Override
 		double getBandStopBW(int n, double eps, double Q, double w0, double omegas) {
-			return Q * omegas;
+			return w0 / (Q * omegas);
 		}
 
 		@Override
@@ -300,7 +295,10 @@ public enum ApproximationType {
 			return ws;
 		}
 	};
-	abstract int getMinOrderNeeded(double fp, double fs, double ap, double as);
+	int getMinOrderNeeded(double fp, double fs, double ap, double as) {
+		return (int) Math.ceil(this.getExactOrderNeeded(fp, fs, ap, as));
+	}
+	abstract double getExactOrderNeeded(double fp, double fs, double ap, double as);
 	abstract LowPassPrototype buildLowPassPrototype(int n, double ap);
 	abstract double getBandPassAp(double ap, double as1, double as2);
 	abstract double getBandPassBW(int n, double eps, double Q, double w0, double omega);

@@ -1,6 +1,8 @@
 package com.wildbitsfoundry.etk4j.math.polynomials;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import com.wildbitsfoundry.etk4j.math.Formulas;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
@@ -373,16 +375,25 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 	
 	public RationalFunction substitute(final Polynomial num, final Polynomial den) {
 		final int deg = this.degree();
-		Polynomial result = num.pow(deg);
-		result.multiplyEquals(_coefs[0]);
-		Polynomial nump = null;
-		Polynomial denp = null;
+		Polynomial nump = num.pow(deg);
+		nump.multiplyEquals(_coefs[0]);
+		
+		// Pre-calculate powers 
+		List<Polynomial> pows = new ArrayList<>(deg);
+		pows.add(new Polynomial(1.0));
+		pows.add(new Polynomial(num));
+		for(int i = 2; i < deg; ++i) {
+			pows.add(pows.get(i - 1).multiply(num));
+		}
+		
+		Polynomial tmp = null;
+		Polynomial denp = new Polynomial(1.0);
 		for (int i = deg - 1, j = 1; i >= 0; --i, ++j) {
-			nump = num.pow(i);
-			denp = den.pow(j);
-			nump.multiplyEquals(den);
-			nump.multiplyEquals(_coefs[j]);
-			result.addEquals(nump);
+			tmp = pows.get(i);
+			denp.multiplyEquals(den);
+			tmp.multiplyEquals(denp);
+			tmp.multiplyEquals(_coefs[j]);
+			nump.addEquals(tmp);
 		}
 		return new RationalFunction(nump, denp);
 	}

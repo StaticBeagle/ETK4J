@@ -6,8 +6,6 @@ import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
 public class RationalFunction implements UnivariateFunction {
 	private Polynomial _numerator;
 	private Polynomial _denominator;
-	
-	private RationalFunction() { }
 
 	public RationalFunction(Complex[] zeros, Complex[] poles) {
 		_numerator = new Polynomial(zeros);
@@ -123,7 +121,7 @@ public class RationalFunction implements UnivariateFunction {
 	}
 
 	public RationalFunction substitute(RationalFunction rf) {
-		RationalFunction result = new RationalFunction();
+		RationalFunction result = new RationalFunction(this);
 		subsOp(result, rf._numerator, rf._denominator);
 		return result;
 	}
@@ -166,4 +164,18 @@ public class RationalFunction implements UnivariateFunction {
 		return resultNum;
 
 	}
+
+
+	
+//	public static void main(String[] args) {
+//		Polynomial num = new Polynomial(1, 0);
+//		Polynomial den = new Polynomial(1, 0, 1);
+//		
+//		RationalFunction rf = new RationalFunction(den, num);
+//		RationalFunction rfs = new RationalFunction(1.0, new Polynomial(1.0, 0));
+//		
+//		RationalFunction res = rf.substitute(rfs);
+//		System.out.println(res._numerator);
+//		System.out.println(res._denominator);
+//	}
 }

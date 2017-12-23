@@ -1,16 +1,16 @@
 package com.wildbitsfoundry.etk4j.systems.filters;
 
+import static com.wildbitsfoundry.etk4j.systems.filters.AnalogFilter.lpTobp;
+import static com.wildbitsfoundry.etk4j.systems.filters.AnalogFilter.lpTobs;
+import static com.wildbitsfoundry.etk4j.systems.filters.AnalogFilter.lpTohp;
+
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
-import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
 import com.wildbitsfoundry.etk4j.systems.TransferFunction;
 import com.wildbitsfoundry.etk4j.systems.filters.FilterSpecs.BandPassSpecs;
 import com.wildbitsfoundry.etk4j.systems.filters.FilterSpecs.BandStopSpecs;
 import com.wildbitsfoundry.etk4j.systems.filters.FilterSpecs.HighPassSpecs;
 import com.wildbitsfoundry.etk4j.systems.filters.FilterSpecs.LowPassSpecs;
 import com.wildbitsfoundry.etk4j.util.NumArrays;
-import static com.wildbitsfoundry.etk4j.systems.filters.AnalogFilter.lpTohp;
-import static com.wildbitsfoundry.etk4j.systems.filters.AnalogFilter.lpTobp;
-import static com.wildbitsfoundry.etk4j.systems.filters.AnalogFilter.lpTobs;
 
 public class Butterworth {
 
@@ -149,14 +149,14 @@ public class Butterworth {
 		lpSpecs.StopBandAttenuation = 60;
 		lpSpecs.PassBandFrequency = 1;
 		lpSpecs.StopBandFrequency = 10;
-		AnalogFilter lp = AnalogFilter.newLowPass(lpSpecs, ApproximationType.CHEBYSHEV);
+		AnalogFilter lp = AnalogFilter.newLowPass(lpSpecs, ApproximationType.BUTTERWORTH);
 
 		HighPassSpecs hpSpecs = new HighPassSpecs();
 		hpSpecs.PassBandAttenuation = 0.2;
 		hpSpecs.StopBandAttenuation = 60;
 		hpSpecs.PassBandFrequency = 10;
 		hpSpecs.StopBandFrequency = 1;
-		AnalogFilter hp = AnalogFilter.newHighPass(hpSpecs, ApproximationType.INVERSE_CHEBYSHEV);
+		AnalogFilter hp = AnalogFilter.newHighPass(hpSpecs, ApproximationType.BUTTERWORTH);
 
 		BandPassSpecs bpSpecs = new BandPassSpecs();
 		bpSpecs.LowerPassBandFrequency = 190;
@@ -166,7 +166,7 @@ public class Butterworth {
 		bpSpecs.PassBandAttenuation = 0.2;
 		bpSpecs.LowerStopBandAttenuation = 20;
 		bpSpecs.UpperStopBandAttenuation = 20;
-		AnalogFilter bp = AnalogFilter.newBandPass(bpSpecs, ApproximationType.CHEBYSHEV);
+		AnalogFilter bp = AnalogFilter.newBandPass(bpSpecs, ApproximationType.BUTTERWORTH);
 
 		BandStopSpecs bsSpecs = new BandStopSpecs();
 		bsSpecs.LowerPassBandFrequency = 3.6e3;
@@ -176,12 +176,6 @@ public class Butterworth {
 		bsSpecs.PassBandAttenuation = 1.5;
 		bsSpecs.StopBandAttenuation = 38;
 		AnalogFilter bs = AnalogFilter.newBandStop(bsSpecs, ApproximationType.BUTTERWORTH);
-
-		Polynomial f = new Polynomial(new double[] { 1, 1 });
-		System.out.println(f.pow(2));
-		System.out.println(f.pow(3));
-		System.out.println(f.substitute(new Polynomial(new double[] { 1, 1 })));
-		System.out.println();
 
 		System.out.printf("Low pass: %n%s%n%n", lp._tf.toString());
 		System.out.printf("High pass: %n%s%n%n", hp._tf.toString());
