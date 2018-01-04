@@ -82,7 +82,7 @@ public enum ApproximationType {
 		}
 
 		@Override
-		double getLowPassGainFactor(int n, double eps, double wp) {
+		double getLowPassScalingFrequency(int n, double eps, double wp, double ws) {
 			return wp;
 		}
 
@@ -118,18 +118,17 @@ public enum ApproximationType {
 			double eps = Math.sqrt(Math.pow(10, ap * 0.1) - 1);
 
 			final double pid = Math.PI / 180.0;
+			final double nInv = 1.0 / n;
 			Complex[] poles = new Complex[n];
 			if (n % 2 == 0) {
-				int i = 0;
-				for (double k : NumArrays.linsteps(-n * 0.5 + 1.0, 1, n * 0.5)) {
-					double phik = 180.0 * (k / n) - 90.0 / n;
-					poles[i++] = new Complex(-Math.cos(phik * pid), Math.sin(phik * pid));
+				for(int k = (-n >> 1) + 1, i = 0; k <= n >> 1; ++k, ++i) {
+					double phik = nInv * (180.0 * k - 90.0);
+					poles[i] = new Complex(-Math.cos(phik * pid), Math.sin(phik * pid));					
 				}
 			} else {
-				int i = 0;
-				for (double k : NumArrays.linsteps(-(n - 1) * 0.5, 1, (n - 1) * 0.5)) {
-					double phik = 180.0 * (k / n);
-					poles[i++] = new Complex(-Math.cos(phik * pid), Math.sin(phik * pid));
+				for(int k = -(n - 1) >> 1, i = 0; k <= (n - 1) >> 1; ++k, ++i) {
+					double phik = nInv * 180.0 * k;
+					poles[i] = new Complex(-Math.cos(phik * pid), Math.sin(phik * pid));				
 				}
 			}
 			TransferFunction tf = new TransferFunction(new Complex[0], poles);
@@ -157,7 +156,7 @@ public enum ApproximationType {
 		}
 
 		@Override
-		double getLowPassGainFactor(int n, double eps, double wp) {
+		double getLowPassScalingFrequency(int n, double eps, double wp, double ws) {
 			return Math.pow(eps, -1.0 / n) * wp;
 		}
 
@@ -276,8 +275,8 @@ public enum ApproximationType {
 		}
 
 		@Override
-		double getLowPassGainFactor(int n, double eps, double wp) {
-			return wp;
+		double getLowPassScalingFrequency(int n, double eps, double wp, double ws) {
+			return ws;
 		}
 
 		@Override
@@ -304,7 +303,7 @@ public enum ApproximationType {
 	abstract double getBandPassBW(int n, double eps, double Q, double w0, double omega);
 	abstract double getBandStopAp(double amax, double amin);
 	abstract double getBandStopBW(int n, double eps, double Q, double w0, double omegas);
-	abstract double getLowPassGainFactor(int n, double eps, double wp);
+	abstract double getLowPassScalingFrequency(int n, double eps, double wp, double ws);
 	abstract double getLowPassAttenuation(double ap, double as);
 	abstract double getHighPassAttenuation(double ap, double as);
 	abstract double getHighPassGainFactor(int n, double eps, double wp, double ws);

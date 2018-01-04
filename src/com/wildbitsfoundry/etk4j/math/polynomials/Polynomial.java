@@ -154,6 +154,17 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 		_coefs = NumArrays.conv(_coefs, p._coefs);
 		_roots = null;
 	}
+	
+	/***
+	 * Multiply two polynomials and stores the result
+	 * 
+	 * @param p
+	 *            Another polynomial
+	 */
+	public void multiplyEquals(double... coefs) {
+		_coefs = NumArrays.conv(_coefs,coefs);
+		_roots = null;
+	}
 
 	public Polynomial multiply(double d) {
 		return new Polynomial(NumArrays.multiply(_coefs, d));

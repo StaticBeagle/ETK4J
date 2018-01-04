@@ -61,8 +61,8 @@ public class AnalogFilter {
 		final int n = type.getMinOrderNeeded(wp, ws, ap, as);
 		double lpa = type.getLowPassAttenuation(ap, as);
 		LowPassPrototype lp = type.buildLowPassPrototype(n, lpa);
-		double factor = type.getLowPassGainFactor(n, lp._eps, wp);
-		lp._tf.substituteInPlace(1.0 / factor);
+		double w0 = type.getLowPassScalingFrequency(n, lp._eps, wp,ws);
+		lp._tf = lpTolp(lp._tf.getNumerator(), lp._tf.getDenominator(), w0);
 		return new AnalogFilter(n, lp._tf);
 	}
 	
@@ -201,29 +201,31 @@ public class AnalogFilter {
 		return new TransferFunction(bp);
 	}
 
-	public static TransferFunction lpTohp(Polynomial numerator, Polynomial denominator) {
-		return lpTohp(numerator.getCoefficients(), denominator.getCoefficients());
-	}
-
-	public static TransferFunction lpTohp(double[] numerator, double[] denominator) {
-		final int numDegree = numerator.length - 1;
-		final int denDegree = denominator.length - 1;
+	public static TransferFunction lpTohp(Polynomial num, Polynomial den) {
+		final int numDegree = num.degree();
+		final int denDegree = den.degree();
 		final int filterOrder = Math.max(numDegree, denDegree) + 1;
 
 		// Reverse coefficients then scale them by the
 		// order of the denominator i.e. pad with zeros
 		double[] hpNumerator = new double[filterOrder];
 		for (int i = numDegree, j = 0; i >= 0; --i, ++j) {
-			hpNumerator[j] = numerator[i];
+			hpNumerator[j] = num.getCoefficientAt(i);
 		}
 
 		// Reverse coefficients then scale them by the
 		// order of the numerator i.e. pad with zeros
 		double[] hpDenominator = new double[filterOrder];
 		for (int i = denDegree, j = 0; i >= 0; --i, ++j) {
-			hpDenominator[j] = denominator[i];
+			hpDenominator[j] = den.getCoefficientAt(i);
 		}
 
 		return new TransferFunction(hpNumerator, hpDenominator);
+	}
+	
+	public static TransferFunction lpTolp(Polynomial num, Polynomial den, double wo) {
+		TransferFunction tf = new TransferFunction(num, den);
+		tf.substituteInPlace(1.0 / wo);
+		return tf;
 	}
 }
