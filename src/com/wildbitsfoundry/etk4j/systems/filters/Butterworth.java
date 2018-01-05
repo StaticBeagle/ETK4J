@@ -148,10 +148,12 @@ public class Butterworth {
 		return bp;
 	}
 	
+	// K(k) = RF(0, 1 - k^2), 1);
 	public static double CompleteEllipticalIntegral(double k, double tol) {
 		return RF(0.0, 1 - k * k, 1.0, tol);
 	}
 		
+	// Carlson's elliptical integral of the first kind
 	public static double RF(double x, double y, double z, double tol) {
 		// check bounds
 		
@@ -235,7 +237,7 @@ public class Butterworth {
 		System.out.println("elapsed time = " + elapsed + "ms");
 		System.out.println();
 		
-		// K(k) = RF(0, 1 - k^2), 1);
+		
 		double CEI = CompleteEllipticalIntegral(0.5, 0.08);
 		System.out.println(CEI);
 		
@@ -247,12 +249,13 @@ public class Butterworth {
 		
 		double k = wp / ws;
 		double kp = Math.pow(1 - k * k, 0.25);
-		double kn = Math.sqrt((Math.pow(10.0, 0.1 * ap) - 1) / (Math.pow(10.0, 0.1 * as) - 1));
+		double eps = Math.sqrt(Math.pow(10.0, 0.1 * ap) - 1);
+		double kn =  eps / Math.sqrt(Math.pow(10.0, 0.1 * as) - 1);
 		
 		double ne = CompleteEllipticalIntegral(k, 0.08) * CompleteEllipticalIntegral(Math.sqrt(1 - kn * kn), 0.08);
 		ne /= CompleteEllipticalIntegral(Math.sqrt(1 - k * k), 0.08) * CompleteEllipticalIntegral(kn, 0.08);
 		
-		// Carlson's elliptical integral of the first kind
+
 
 		double u = 0.5 * (1 - kp) / (1 + kp);
 		double q = u + 2 * Math.pow(u, 5) + 15 * Math.pow(u, 9) + 150 * Math.pow(u, 13);
