@@ -142,7 +142,7 @@ public enum ApproximationType {
 
 		@Override
 		double getBandPassBW(int n, double eps, double Q, double w0, double omega) {
-			return Q / (Math.pow(eps, -1.0 / n) * w0);
+			return Q / w0;
 		}
 
 		@Override
@@ -152,7 +152,7 @@ public enum ApproximationType {
 
 		@Override
 		double getBandStopBW(int n, double eps, double Q, double w0, double omegas) {
-			return w0 / (Math.pow(eps, -1.0 / n) * Q);
+			return w0 / Q;
 		}
 
 		@Override
@@ -261,7 +261,7 @@ public enum ApproximationType {
 
 		@Override
 		double getBandPassBW(int n, double eps, double Q, double w0, double omega) {
-			return Q / (omega * w0);
+			return Q / w0;
 		}
 
 		@Override
@@ -271,7 +271,7 @@ public enum ApproximationType {
 
 		@Override
 		double getBandStopBW(int n, double eps, double Q, double w0, double omegas) {
-			return w0 / (Q * omegas);
+			return w0 / Q;
 		}
 
 		@Override

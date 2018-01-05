@@ -4,6 +4,8 @@ import static com.wildbitsfoundry.etk4j.systems.filters.AnalogFilter.lpTobp;
 import static com.wildbitsfoundry.etk4j.systems.filters.AnalogFilter.lpTobs;
 import static com.wildbitsfoundry.etk4j.systems.filters.AnalogFilter.lpTohp;
 
+import java.util.Arrays;
+
 import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
@@ -145,6 +147,40 @@ public class Butterworth {
 		bp._tf = lpTobs(bp._tf.getNumerator(), bp._tf.getDenominator(), w0, bw);
 		return bp;
 	}
+	
+	public static double CompleteEllipticalIntegral(double k, double tol) {
+		return RF(0.0, 1 - k * k, 1.0, tol);
+	}
+		
+	public static double RF(double x, double y, double z, double tol) {
+		// check bounds
+		
+		double dx, dy, dz;
+		double lambda;
+		double n = 1.0 / 3.0;
+		double mean;
+		double tmp;
+		do {
+			lambda = Math.sqrt(x * y) + Math.sqrt(y * z) + Math.sqrt(z * x);
+			x = 0.25 * (x + lambda);
+			y = 0.25 * (y + lambda);
+			z = 0.25 * (z + lambda);
+			mean = (x + y + z) * n;
+			tmp = 1 / mean;
+			dx = (mean - x) * tmp;
+			dy = (mean - y) * tmp;
+			dz = (mean - z) * tmp;
+		}while(Math.max(Math.max(Math.abs(dx), Math.abs(dy)), Math.abs(dz)) > tol);
+		double e2 = dx * dy - dz * dz;
+		double e3 = dx * dy * dz;
+		double c1 = 1.0 / 24.0;
+		double c2 = 0.1;
+		double c3 = 3.0 / 44.0;
+		double c4 = 1.0 / 14.0;
+		
+		double result = 1.0 + (c1 * e2 - c2 - c3 * e3) * e2 + c4 * e3;
+		return result / Math.sqrt(mean);
+	}
 
 	public static void main(String[] args) {
 		LowPassSpecs lpSpecs = new LowPassSpecs();
@@ -178,7 +214,7 @@ public class Butterworth {
 		bsSpecs.UpperStopBandFrequency = 5.90e3;
 		bsSpecs.PassBandAttenuation = 1.5;
 		bsSpecs.StopBandAttenuation = 38;
-		AnalogFilter bs = AnalogFilter.newBandStop(bsSpecs, ApproximationType.BUTTERWORTH);
+		AnalogFilter bs = AnalogFilter.newBandStop(bsSpecs, ApproximationType.INVERSE_CHEBYSHEV);
 
 		System.out.printf("Low pass: %n%s%n%n", lp._tf.toString());
 		System.out.printf("High pass: %n%s%n%n", hp._tf.toString());
@@ -197,15 +233,27 @@ public class Butterworth {
 		}
 		long elapsed = System.currentTimeMillis() - start;
 		System.out.println("elapsed time = " + elapsed + "ms");
+		System.out.println();
 		
-		double ap = 0.1;
-		double as = 50;
-		double wp = Math.sqrt(0.9);
-		double ws = 1.0 / wp;
+		// K(k) = RF(0, 1 - k^2), 1);
+		double CEI = CompleteEllipticalIntegral(0.5, 0.08);
+		System.out.println(CEI);
+		
+		
+		double ap = 1;
+		double as = 34;
+		double wp = 1;
+		double ws = 2;
 		
 		double k = wp / ws;
 		double kp = Math.pow(1 - k * k, 0.25);
+		double kn = Math.sqrt((Math.pow(10.0, 0.1 * ap) - 1) / (Math.pow(10.0, 0.1 * as) - 1));
 		
+		double ne = CompleteEllipticalIntegral(k, 0.08) * CompleteEllipticalIntegral(Math.sqrt(1 - kn * kn), 0.08);
+		ne /= CompleteEllipticalIntegral(Math.sqrt(1 - k * k), 0.08) * CompleteEllipticalIntegral(kn, 0.08);
+		
+		// Carlson's elliptical integral of the first kind
+
 		double u = 0.5 * (1 - kp) / (1 + kp);
 		double q = u + 2 * Math.pow(u, 5) + 15 * Math.pow(u, 9) + 150 * Math.pow(u, 13);
 		
@@ -213,7 +261,7 @@ public class Butterworth {
 		
 		double nexact = (Math.log10(16.0 * D) / Math.log10(1.0 / q));
 		int n = (int) Math.ceil(nexact);
-		
+		System.out.println(n);
 		double V = 0.5 / n * Math.log((Math.pow(10.0, ap * 0.05) + 1) / (Math.pow(10.0, ap * 0.05) - 1));
 		
 		double p0num = 0.0;
@@ -270,8 +318,16 @@ public class Butterworth {
 		if(n % 2 != 0) {
 			den.multiplyEquals(1, p0);
 		}
+		System.out.println(p0);
 		
 		TransferFunction tf = new TransferFunction(num, den);
 		System.out.println(tf);
+		
+		System.out.println(Arrays.toString(a));
+		System.out.println(Arrays.toString(b));
+		System.out.println(Arrays.toString(c));
+		
+		System.out.println(Arrays.toString(tf.getNumerator().getCoefficients()));
+		System.out.println(Arrays.toString(tf.getDenominator().getCoefficients()));
 	}
 }
