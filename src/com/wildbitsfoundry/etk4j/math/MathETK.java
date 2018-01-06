@@ -29,4 +29,15 @@ public final class MathETK {
 	static double atanh(double x) {
 		return 0.5 * Math.log((x + 1.0) / (x - 1.0));
 	}
+	
+	static double fix(double x) {
+		return x <= 0 ? Math.ceil(x) : Math.floor(x);
+	}
+	
+	static double rem(double a, double b) {
+		if(b == 0) {
+			return Double.NaN;
+		}
+		return a - b * fix(a / b);
+	}
 }

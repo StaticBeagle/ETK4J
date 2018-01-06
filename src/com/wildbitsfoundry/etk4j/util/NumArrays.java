@@ -388,4 +388,18 @@ public final class NumArrays {
 	public static double[] unbox(Double[] a) {
 		return Arrays.stream(a).mapToDouble(Double::doubleValue).toArray();
 	}
+
+	public static double[] scaleRange(double[] a, double curMin, double curMax, double newMin, double newMax) {
+		double[] result = new double[a.length];
+		scaleRangeInPlace(result, curMax, curMin, newMax, newMin);
+		return result;
+	}
+
+	public static void scaleRangeInPlace(double[] a, double curMin, double curMax, double newMin, double newMax) {
+		final int length = a.length;
+		double delta = (newMax - newMin) / (curMax - curMin);
+		for (int i = 0; i < length; ++i) {
+			a[i] = delta * (a[i] - curMin) + curMin;
+		}
+	}
 }
