@@ -581,7 +581,7 @@ public class Butterworth {
 		double ws = 2;
 		
 		// get order function goes here
-		int n = 3; // ellipord(...);
+		int n = 4; // ellipord(...);
 		if(n == 1) {
 			// design cheby
 			return;
@@ -630,8 +630,39 @@ public class Butterworth {
 			a = (1.0 + g.get(en)) * e.get(en - 1) * 0.5;
 			e.add(a + Math.sqrt(a * a + g.get(en)));
 		}
-		int x = 4;
-		int y = x;
+		
+		double u2 = Math.log((1 + Math.sqrt(1 + Math.pow(e.get(m2), 2))) / e.get(m2)) / n;
+		List<Complex> zeros = new ArrayList<>();
+		List<Complex> poles = new ArrayList<>();
+		Complex j = new Complex(0.0, 1.0);
+		Complex mj = j.conj();
+		for(int i = 0; i < n3; ++i) {
+			double u1 = (2.0 * i + 1.0) * Math.PI / (2.0 * n);
+			Complex c = mj.divide(new Complex(-u1, u2).cos());
+			double d = 1.0 / Math.cos(u1);
+			for(int en = m1; en >=1; --en) {
+				double k = ek.get(en);
+				c = c.subtract(c.invert().multiply(k));
+				c.divideEquals(1 + k);
+				//System.out.println(c);
+				d = (d + k / d) / (1 + k);
+				//System.out.println(d);
+			}
+			poles.add(c.invert().conj());
+			poles.add(c.invert());
+			zeros.add(new Complex(0.0, -d / ek.get(0)));
+			zeros.add(zeros.get(i).conj());
+		}
+		if(n0 == 1) {
+			a = 1.0 / Math.sinh(u2);
+			for(int en = m1; en >= 1; --en) {
+				double k = ek.get(en);
+				a = (a - k / a) / (1 + k);
+			}
+			poles.add(new Complex(-1.0 / a, 0.0));
+		}
+		System.out.println(Arrays.toString(poles.toArray(new Complex[poles.size()])));
+		System.out.println(Arrays.toString(zeros.toArray(new Complex[zeros.size()])));
 		//0.508847139909587	0.508910919163441	0.508910919574535	0.508910919574535	0.508910919574535	0.508910919574535	0.508910919574535
 	}
 
