@@ -181,6 +181,12 @@ public class Complex {
 		return this.log().multiply(d).exp();
 	}
 	
+	public Complex pow2() {
+		double real = _real * _real - _imag * _imag;
+		double imag = 2 * _real * _imag;
+		return new Complex(real, imag);
+	}
+	
 	public Complex log() {
 		return new Complex(Math.log(this.abs()), this.arg());
 	}
@@ -193,6 +199,22 @@ public class Complex {
 	public Complex sin() {
 		return new Complex(Math.sin(_real) * Math.cosh(_imag), Math.cos(_real) * Math.sinh(_imag));
 	}
+	
+	public Complex asin() {
+		return new Complex(Math.sin(_real) * Math.cosh(_imag), Math.cos(_real) * Math.sinh(_imag));
+	}
+	
+    public Complex cos() {
+        return new Complex(Math.cos(_real) * Math.cosh(_imag), -Math.sin(_real) * Math.sinh(_imag));
+    }
+    
+    public Complex acos() {
+        return this.add(new Complex(1.0, 0.0).subtract(this.pow2()).sqrt().multiply(0.0, 1.0)).log().multiply(0.0, -1.0);
+    }
+    
+    public Complex uminus() {
+    	return new Complex(-_real, -_imag);
+    }
 	
 	@Override
 	public String toString() {

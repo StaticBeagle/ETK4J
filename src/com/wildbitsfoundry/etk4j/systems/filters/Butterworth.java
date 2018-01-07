@@ -4,7 +4,9 @@ import static com.wildbitsfoundry.etk4j.systems.filters.AnalogFilter.lpTobp;
 import static com.wildbitsfoundry.etk4j.systems.filters.AnalogFilter.lpTobs;
 import static com.wildbitsfoundry.etk4j.systems.filters.AnalogFilter.lpTohp;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
@@ -149,14 +151,39 @@ public class Butterworth {
 	}
 	
 	// K(k) = RF(0, 1 - k^2), 1);
-	public static double CompleteEllipticalIntegral(double k, double tol) {
-		return RF(0.0, 1 - k * k, 1.0, tol);
+	public static double compEllipInt1(double k) {
+		return carlsonsRF(0.0, 1 - k * k, 1.0);
 	}
-		
-	// Carlson's elliptical integral of the first kind
-	public static double RF(double x, double y, double z, double tol) {
+	
+	// K(k) = RF(0, 1 - k^2), 1);
+	public static double compEllipInt1(double k, double tol) {
+		return carlsonsRF(0.0, 1 - k * k, 1.0, tol);
+	}
+	
+	public static double incompEllipInt1(double phi, double k, double tol) {
+		double sinPhi = Math.sin(phi);
+		double x = Math.pow(Math.cos(phi), 2);
+		double y = 1 - k * k * sinPhi * sinPhi;
+		return sinPhi * carlsonsRF(x, y, 1.0, tol);
+	}
+	
+	public static double carlsonsRF(double x, double y, double z) {
+		return carlsonsRF(x, y, z, 0.08);
+	}
+	
+	// Carlson's RF symmetric form of elliptic integrals
+	public static double carlsonsRF(double x, double y, double z, double tol) {
 		// check bounds
-		
+
+//% Argument limits as set by Carlson:
+//LoLim = 5.0 * realmin;
+//UpLim = 5.0 * realmax;
+//
+//% Check input arguments for acceptability:
+//mask = (min([x; y]) >= 0) & ...
+//       (min([(x + y); z]) >= LoLim) & ...
+//       (max([x; y; z]) < UpLim);
+
 		double dx, dy, dz;
 		double lambda;
 		double n = 1.0 / 3.0;
@@ -182,6 +209,225 @@ public class Butterworth {
 		
 		double result = 1.0 + (c1 * e2 - c2 - c3 * e3) * e2 + c4 * e3;
 		return result / Math.sqrt(mean);
+	}
+	
+	// Carlson's RD symmetric form of elliptic integrals
+	public static double carlsonsRD(double x, double y, double z) {
+		return carlsonsRD(x, y, z, 0.08);
+	}
+	
+	
+	// Carlson's RD symmetric form of elliptic integrals
+	public static double carlsonsRD(double x, double y, double z, double tol) {
+		// check bounds
+		
+//		% Argument limits as set by Carlson:
+//			LoLim = 5.0 * realmin;
+//			UpLim = 5.0 * realmax;
+//
+//			% Check input arguments for acceptability:
+//			mask = (min([x; y]) >= 0) & ...
+//			       (min([(x + y); z]) >= LoLim) & ...
+//			       (max([x; y; z]) < UpLim);
+
+
+		double dx, dy, dz;
+		double lambda;
+		double mu;
+		double muInv;
+		double sum = 0.0;
+		double pow4 = 1.0;;
+		do {
+			lambda = Math.sqrt(x * y) + Math.sqrt(y * z) + Math.sqrt(z * x);
+			sum += pow4 / (Math.sqrt(z) * (z + lambda));
+			
+			pow4 *= 0.25;
+			
+			x = 0.25 * (x + lambda);
+			y = 0.25 * (y + lambda);
+			z = 0.25 * (z + lambda);
+			mu = (x + y + 3.0 * z) * 0.2;
+			muInv = 1.0 / mu;
+
+			dx = 1 - x * muInv;
+			dy = 1 - y * muInv;;
+			dz = 1 - z * muInv;;
+		}while(Math.max(Math.max(Math.abs(dx), Math.abs(dy)), Math.abs(dz)) > tol);
+		double C1 = 3.0 / 14.0;
+		double C2 = 1.0 / 6.0;
+		double C3 = 9.0 / 22.0;
+		double C4 = 3.0 / 26.0;
+		double EA = dx * dy;
+		double EB = dz * dz;
+		double EC = EA - EB;
+		double ED = EA - 6.0 * EB;
+		double EF = ED + EC + EC;
+		double S1 = ED * (-C1 + 0.25 * C3 * ED - 1.50 * C4 * dz * EF);
+		double S2 = dz * (C2 * EF + dz * (-C3 * EC + dz * C4 * EA));
+
+		return 3.0 * sum + pow4 * (1.0 + S1 + S2) / (mu * Math.sqrt(mu));
+	}
+	
+	public static double[] landen(double k, double tol) {
+//		if nargin==1, tol=eps; end
+//		if tol>=1, M=tol; end 
+//
+//		if k==0 || k==1, v=k; return; end  	% returns v=k, i.e., k=0 ==> v=0,  k=1 ==> v=1
+//
+//		v = [];
+//
+//		if tol<1,
+//		   while k > tol,
+//		      k = (k/(1+sqrt(1-k^2)))^2;
+//		      v = [v; k];
+//		   end
+//		else
+//		   for n=1:M, 
+//		      k = (k/(1+sqrt(1-k^2)))^2;
+//		      v = [v; k];
+//		   end
+//		end
+		
+		List<Double> v = new ArrayList<>();
+		while(k > tol) {
+			k /= 1 + Math.sqrt(1 - k * k);
+			k *= k;
+			v.add(k);
+		}
+		return v.stream().mapToDouble(Double::doubleValue).toArray();
+	}
+	
+	public static Complex[] cd(Complex[] u, double k, double tol) {
+		double[] v = landen(k, tol);
+		
+		double piHalf = Math.PI * 0.5;
+		Complex[] w = new Complex[u.length];
+		for(int i = 0; i < w.length; ++i) {
+			w[i] = u[i].multiply(piHalf).cos();
+		}
+		
+		for(int i = v.length - 1; i >= 0; --i) {
+			for(int j = 0; j < w.length; ++j) {
+				Complex num = w[j].multiply(1 + v[i]);
+				Complex den = w[j].pow2();
+				den.multiplyEquals(v[i]);
+				den.addEquals(1.0);
+				num.divideEquals(den);
+				w[j] = num;
+			}
+		}
+		return w;
+	}
+	
+	public static Complex[] sn(Complex[] u, double k, double tol) {
+		double[] v = landen(k, tol);
+		
+		double piHalf = Math.PI * 0.5;
+		Complex[] w = new Complex[u.length];
+		for(int i = 0; i < w.length; ++i) {
+			w[i] = u[i].multiply(piHalf).sin();
+		}
+		
+		for(int i = v.length - 1; i >= 0; --i) {
+			for(int j = 0; j < w.length; ++j) {
+				Complex num = w[j].multiply(1 + v[i]);
+				Complex den = w[j].pow2();
+				den.multiplyEquals(v[i]);
+				den.addEquals(1.0);
+				num.divideEquals(den);
+				w[j] = num;
+			}
+		}
+		return w;
+	}
+	
+	public static Complex[] acd(Complex[] w, double k, double tol) {
+		double[] v = landen(k, tol);
+		
+		for(int i = 0; i < v.length; ++i) {
+			double vk = i == 0 ? k : v[i - 1];
+			for(int j = 0; j < w.length; ++j) {
+				Complex den = w[j].pow2().uminus();
+				den.multiplyEquals(vk * vk);
+				den.addEquals(1.0);
+				den = den.sqrt();
+				den.addEquals(1.0);
+
+				w[j].divideEquals(den);
+				w[j].multiplyEquals(2.0 / (1 + v[i]));
+			}
+		}
+		
+		double twoByPI = 2.0 / Math.PI;
+		Complex[] u = new Complex[w.length];
+		for(int i = 0; i < w.length; ++i) {
+			if(w[i].real() == 1.0) {
+				u[i] = new Complex();
+			} else {
+				u[i] = w[i].acos().multiply(twoByPI);
+			}
+		}
+		
+		double K = compEllipInt1(k, tol);
+		double Kp = compEllipInt1(Math.sqrt(1 - k * k), tol);
+		
+		double R = Kp / K;
+		double[] realU = Arrays.stream(u).mapToDouble(c -> c.real()).toArray();
+		double[] imagU = Arrays.stream(u).mapToDouble(c -> c.imag()).toArray();
+
+		scaledRemInPlace(realU, 4.0);
+		scaledRemInPlace(imagU, 2.0 * R);
+		
+		for(int i = 0; i < u.length; ++i) {
+			u[i] = new Complex(realU[i], imagU[i]);
+		}
+		
+		return u;
+	}
+	
+	private static void scaledRemInPlace(double[] a, double b) {
+		for(int i = 0; i < a.length; ++i) {
+			a[i] = MathETK.rem(a[i], b);
+			if(Math.abs(a[i]) > b / 2) {
+				a[i] -= b * Math.signum(a[i]);
+			}
+		}
+	}
+	
+	public static Complex[] multiply(Complex[] a, double d) {
+		Complex[] result = new Complex[a.length];
+		for(int i = 0; i < a.length; ++i) {
+			result[i] = a[i].multiply(d);
+		}
+		return result;
+	}
+	
+	public static Complex[] divide(Complex[] a, Complex[] b) {
+		Complex[] result = new Complex[a.length];
+		for(int i = 0; i < a.length; ++i) {
+			result[i] = a[i].divide(b[i]);
+		}
+		return result;
+	}
+	
+	public static Complex[] pow2(Complex[] a) {
+		Complex[] result = new Complex[a.length];
+		for(int i = 0; i < a.length; ++i) {
+			result[i] = a[i].pow2();
+		}
+		return result;
+	}
+	
+	public static Complex[] asn(Complex[] w, double k, double tol) {
+		final int length = w.length;
+		Complex[] result = new Complex[length];
+		int i = 0;
+		for(Complex c : acd(w, k, tol)) {
+			result[i] = new Complex(1.0, 0.0);
+			result[i].subtractEquals(c);
+			++i;
+		}
+		return result;
 	}
 
 	public static void main(String[] args) {
@@ -223,24 +469,21 @@ public class Butterworth {
 		System.out.printf("Band pass: %n%s%n%n", bp._tf.toString());
 		System.out.printf("Band stop: %n%s%n", bs._tf.toString());
 
-		long start = System.currentTimeMillis();
-		double total = 0.0;
-		double current = 0.0;
-		for (int i = 0; i < 10; ++i) {
-			for (int ii = 0; ii < 1000000; ii++) {
-				//current = Math.sqrt(5 * 5 + 5 * 5);
-				current = MathETK.hypot(5d, 5d);
-			}
-			total += current;
-		}
-		long elapsed = System.currentTimeMillis() - start;
-		System.out.println("elapsed time = " + elapsed + "ms");
-		System.out.println();
+//		long start = System.currentTimeMillis();
+//		double total = 0.0;
+//		double current = 0.0;
+//		for (int i = 0; i < 10; ++i) {
+//			for (int ii = 0; ii < 1000000; ii++) {
+//				//current = Math.sqrt(5 * 5 + 5 * 5);
+//				current = MathETK.hypot(5d, 5d);
+//			}
+//			total += current;
+//		}
+//		long elapsed = System.currentTimeMillis() - start;
+//		System.out.println("elapsed time = " + elapsed + "ms");
+//		System.out.println();
 		
-		
-		double CEI = CompleteEllipticalIntegral(0.5, 0.08);
-		System.out.println(CEI);
-		
+		ellip();
 		
 		double ap = 1;
 		double as = 34;
@@ -249,11 +492,7 @@ public class Butterworth {
 		
 		double k = wp / ws;
 		double kp = Math.pow(1 - k * k, 0.25);
-		double eps = Math.sqrt(Math.pow(10.0, 0.1 * ap) - 1);
-		double kn =  eps / Math.sqrt(Math.pow(10.0, 0.1 * as) - 1);
-		
-		double ne = CompleteEllipticalIntegral(k, 0.08) * CompleteEllipticalIntegral(Math.sqrt(1 - kn * kn), 0.08);
-		ne /= CompleteEllipticalIntegral(Math.sqrt(1 - k * k), 0.08) * CompleteEllipticalIntegral(kn, 0.08);
+
 		
 
 
@@ -333,4 +572,67 @@ public class Butterworth {
 		System.out.println(Arrays.toString(tf.getNumerator().getCoefficients()));
 		System.out.println(Arrays.toString(tf.getDenominator().getCoefficients()));
 	}
+
+	private static void ellip() {
+		
+		double ap = 1;
+		double as = 34;
+		double wp = 1;
+		double ws = 2;
+		
+		// get order function goes here
+		int n = 3; // ellipord(...);
+		if(n == 1) {
+			// design cheby
+			return;
+		}
+		
+		double dbn = Math.log(10.0) * 0.05;
+		int n0 = (int) MathETK.rem(n, 2);
+		int n3 = (n - n0) >> 1;
+		double apn = dbn * ap;
+		double asn = dbn * as;
+		
+		List<Double> e = new ArrayList<>();
+		e.add(Math.sqrt(2.0 * Math.exp(apn) * Math.sinh(apn)));
+		
+		List<Double> g = new ArrayList<>();
+		g.add(e.get(0) / Math.sqrt(Math.exp(2 * asn) - 1));
+		
+		double v = g.get(0);
+		int m2 = 0;
+		while(v > 1.0e-150) {
+			v = (v / (1.0 + Math.sqrt(1 - v * v)));
+			v *= v;
+			++m2;
+			g.add(v);
+		}
+		
+		int m1 = 0;
+		List<Double> ek = new ArrayList<>(m1);
+		for(int i = 0; i < 10; ++i) {
+			m1 = m2 + i;
+			while(ek.size() <= m1) {
+				ek.add(0.0);
+			}
+			ek.set(m1, 4.0 * Math.pow((g.get(m2) / 4.0), Math.pow(2.0, i) / n));
+			if(ek.get(m1) < 1.0e-14) {
+				break;
+			}
+		}
+		
+		for(int en = m1; en >= 1; --en) {
+			ek.set(en - 1, 2.0 * Math.sqrt(ek.get(en)) / (1.0 +  ek.get(en)));
+		}
+		
+		double a = 0.0;
+		for(int en = 1; en <= m2; ++en) {
+			a = (1.0 + g.get(en)) * e.get(en - 1) * 0.5;
+			e.add(a + Math.sqrt(a * a + g.get(en)));
+		}
+		int x = 4;
+		int y = x;
+		//0.508847139909587	0.508910919163441	0.508910919574535	0.508910919574535	0.508910919574535	0.508910919574535	0.508910919574535
+	}
+
 }

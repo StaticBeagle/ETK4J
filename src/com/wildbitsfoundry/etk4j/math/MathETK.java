@@ -30,14 +30,26 @@ public final class MathETK {
 		return 0.5 * Math.log((x + 1.0) / (x - 1.0));
 	}
 	
-	static double fix(double x) {
+	public static double fix(double x) {
 		return x <= 0 ? Math.ceil(x) : Math.floor(x);
 	}
 	
-	static double rem(double a, double b) {
+	public static double rem(double a, double b) {
 		if(b == 0) {
 			return Double.NaN;
 		}
 		return a - b * fix(a / b);
 	}
+	
+//	public static void main(String[] args) {
+//		System.out.println(rem(3,4));
+//		System.out.println(rem(3,-4));
+//		System.out.println(rem(-3,4));
+//		System.out.println(rem(-3,-4));
+//		System.out.println(rem(5,4));
+//		System.out.println(rem(5,-4));
+//		System.out.println(rem(-5,4));
+//		System.out.println(rem(-5,-4));
+//		
+//	}
 }
