@@ -6,6 +6,7 @@ import static com.wildbitsfoundry.etk4j.systems.filters.AnalogFilter.lpTohp;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import com.wildbitsfoundry.etk4j.math.MathETK;
@@ -581,7 +582,7 @@ public class Butterworth {
 		double ws = 2;
 		
 		// get order function goes here
-		int n = 5; // ellipord(...);
+		int n = 4; // ellipord(...);
 		if(n == 1) {
 			// filter becomes Chebyshev I
 			Complex[] z = new Complex[0];
@@ -636,11 +637,11 @@ public class Butterworth {
 		}
 		
 		double u2 = Math.log((1 + Math.sqrt(1 + Math.pow(e.get(m2), 2))) / e.get(m2)) / n;
-		List<Complex> zeros = new ArrayList<>(n % 2 != 0 ? n + 1 : n);
-		List<Complex> poles = new ArrayList<>(n);
+		Complex[] zeros = new Complex[n % 2 != 0 ? n - 1 : n];
+		Complex[] poles = new Complex[n];
 		Complex j = new Complex(0.0, 1.0);
 		Complex mj = j.conj();
-		for(int i = 0; i < n3; ++i) {
+		for(int i = 0, m = zeros.length - 1; i < n3; ++i, m = m - 2) {
 			double u1 = (2.0 * i + 1.0) * Math.PI / (2.0 * n);
 			Complex c = mj.divide(new Complex(-u1, u2).cos());
 			double d = 1.0 / Math.cos(u1);
@@ -651,11 +652,11 @@ public class Butterworth {
 				d = (d + k / d) / (1 + k);
 			}
 			Complex pole = c.invert();
-			poles.add(pole.conj());
-			poles.add(pole);
+			poles[m] = pole;
+			poles[m - 1] = pole.conj();
 			Complex zero = new Complex(0.0, d / ek.get(0));
-			zeros.add(zero.conj());
-			zeros.add(zero);
+			zeros[m] = zero;
+			zeros[m - 1] = zero.conj();
 		}
 		if(n0 == 1) {
 			a = 1.0 / Math.sinh(u2);
@@ -663,7 +664,7 @@ public class Butterworth {
 				double k = ek.get(en);
 				a = (a - k / a) / (1 + k);
 			}
-			poles.add(new Complex(-1.0 / a, 0.0));
+			poles[n - 1] = new Complex(-1.0 / a, 0.0);
 		}
 		// Compute gain k
 		Complex knum = new Complex(1.0, 0.0);
@@ -680,8 +681,8 @@ public class Butterworth {
 			double eps0 = e.get(0);
 			k /= Math.sqrt(1 + eps0 * eps0); 
 		}
-		System.out.printf("z = %s%n", Arrays.toString(zeros.toArray(new Complex[zeros.size()])));
-		System.out.printf("p = %s%n", Arrays.toString(poles.toArray(new Complex[poles.size()])));
+		System.out.printf("z = %s%n", Arrays.toString(zeros));
+		System.out.printf("p = %s%n", Arrays.toString(poles));
 		System.out.printf("k = %.4g%n", k);
 	}
 //	public Complex asin() {

@@ -201,7 +201,7 @@ public class Complex {
 	}
 	
 	public Complex asin() {
-		return new Complex(Math.sin(_real) * Math.cosh(_imag), Math.cos(_real) * Math.sinh(_imag));
+		return new Complex(1.0, 0.0).subtract(this.pow2()).sqrt().multiply(0.0, 1.0).log().multiply(0.0, -1.0);
 	}
 	
     public Complex cos() {
