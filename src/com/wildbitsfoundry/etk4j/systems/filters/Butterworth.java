@@ -576,14 +576,18 @@ public class Butterworth {
 	private static void ellip() {
 		
 		double ap = 1;
-		double as = 34;
+		double as = 64;
 		double wp = 1;
 		double ws = 2;
 		
 		// get order function goes here
-		int n = 4; // ellipord(...);
+		int n = 5; // ellipord(...);
 		if(n == 1) {
-			// design cheby
+			// filter becomes Chebyshev I
+			Complex[] z = new Complex[0];
+			Complex[] p = new Complex[1];
+			p[0] = new Complex(-Math.sqrt(1.0 / (Math.pow(10.0, ap * 0.1) - 1.0)), 0.0);
+			double k = -p[0].real();
 			return;
 		}
 		
@@ -632,8 +636,8 @@ public class Butterworth {
 		}
 		
 		double u2 = Math.log((1 + Math.sqrt(1 + Math.pow(e.get(m2), 2))) / e.get(m2)) / n;
-		List<Complex> zeros = new ArrayList<>();
-		List<Complex> poles = new ArrayList<>();
+		List<Complex> zeros = new ArrayList<>(n % 2 != 0 ? n + 1 : n);
+		List<Complex> poles = new ArrayList<>(n);
 		Complex j = new Complex(0.0, 1.0);
 		Complex mj = j.conj();
 		for(int i = 0; i < n3; ++i) {
@@ -644,14 +648,14 @@ public class Butterworth {
 				double k = ek.get(en);
 				c = c.subtract(c.invert().multiply(k));
 				c.divideEquals(1 + k);
-				//System.out.println(c);
 				d = (d + k / d) / (1 + k);
-				//System.out.println(d);
 			}
-			poles.add(c.invert().conj());
-			poles.add(c.invert());
-			zeros.add(new Complex(0.0, -d / ek.get(0)));
-			zeros.add(zeros.get(i).conj());
+			Complex pole = c.invert();
+			poles.add(pole.conj());
+			poles.add(pole);
+			Complex zero = new Complex(0.0, d / ek.get(0));
+			zeros.add(zero.conj());
+			zeros.add(zero);
 		}
 		if(n0 == 1) {
 			a = 1.0 / Math.sinh(u2);
@@ -661,9 +665,26 @@ public class Butterworth {
 			}
 			poles.add(new Complex(-1.0 / a, 0.0));
 		}
-		System.out.println(Arrays.toString(poles.toArray(new Complex[poles.size()])));
-		System.out.println(Arrays.toString(zeros.toArray(new Complex[zeros.size()])));
-		//0.508847139909587	0.508910919163441	0.508910919574535	0.508910919574535	0.508910919574535	0.508910919574535	0.508910919574535
+		// Compute gain k
+		Complex knum = new Complex(1.0, 0.0);
+		for(Complex zero : zeros) {
+			knum.multiplyEquals(zero.uminus());
+		}
+		Complex kden = new Complex(1.0, 0.0);
+		for(Complex pole : poles) {
+			kden.multiplyEquals(pole.uminus());
+		}
+		kden.divideEquals(knum);
+		double k = kden.real();
+		if(n % 2 == 0) {
+			double eps0 = e.get(0);
+			k /= Math.sqrt(1 + eps0 * eps0); 
+		}
+		System.out.printf("z = %s%n", Arrays.toString(zeros.toArray(new Complex[zeros.size()])));
+		System.out.printf("p = %s%n", Arrays.toString(poles.toArray(new Complex[poles.size()])));
+		System.out.printf("k = %.4g%n", k);
 	}
-
+//	public Complex asin() {
+//		return new Complex(1.0, 0.0).subtract(this.pow2()).sqrt().multiply(0.0, 1.0).log().multiply(0.0, -1.0);
+//	}
 }
