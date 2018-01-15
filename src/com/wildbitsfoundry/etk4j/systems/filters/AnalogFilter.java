@@ -46,7 +46,7 @@ public class AnalogFilter {
 	}
 	
 	public static AnalogFilter newLowPass(int n, double ap, ApproximationType type) {
-		LowPassPrototype lp = type.buildLowPassPrototype(n, ap);
+		LowPassPrototype lp = type.buildLowPassPrototype(n, ap, 0.0);
 		return new AnalogFilter(n, lp._tf);
 	}
 	
@@ -60,14 +60,14 @@ public class AnalogFilter {
 		double ws = 2 * Math.PI * fs;
 		final int n = type.getMinOrderNeeded(wp, ws, ap, as);
 		double lpa = type.getLowPassAttenuation(ap, as);
-		LowPassPrototype lp = type.buildLowPassPrototype(n, lpa);
+		LowPassPrototype lp = type.buildLowPassPrototype(n, lpa, as);
 		double w0 = type.getLowPassScalingFrequency(n, lp._eps, wp,ws);
 		lp._tf = lpTolp(lp._tf.getNumerator(), lp._tf.getDenominator(), w0);
 		return new AnalogFilter(n, lp._tf);
 	}
 	
 	public static AnalogFilter newHighPass(int n, double ap, ApproximationType type) {
-		LowPassPrototype lp = type.buildLowPassPrototype(n, ap);
+		LowPassPrototype lp = type.buildLowPassPrototype(n, ap, 0.0);
 		lp._tf = lpTohp(lp._tf.getNumerator(), lp._tf.getDenominator());
 		return new AnalogFilter(n, lp._tf);
 	}
@@ -82,7 +82,7 @@ public class AnalogFilter {
 		double ws = 2 * Math.PI * fs;
 		final int n = type.getMinOrderNeeded(ws, wp, ap, as);
 		double hpa = type.getHighPassAttenuation(ap, as);
-		LowPassPrototype lp = type.buildLowPassPrototype(n, hpa);
+		LowPassPrototype lp = type.buildLowPassPrototype(n, hpa, as);
 		double factor = type.getHighPassGainFactor(n, lp._eps, wp, ws);
 		lp._tf.substituteInPlace(factor);
 		lp._tf = lpTohp(lp._tf.getNumerator(), lp._tf.getDenominator());
@@ -126,7 +126,7 @@ public class AnalogFilter {
 			omega = omega2;
 		}
 		double bpa = type.getBandPassAp(ap, as1, as2);
-		LowPassPrototype lp = type.buildLowPassPrototype(n, bpa);
+		LowPassPrototype lp = type.buildLowPassPrototype(n, bpa, Math.max(as1, as2));
 
 		double bw = type.getBandPassBW(n, lp._eps, Q, w0, omega);
 		lp._tf = lpTobp(lp._tf.getNumerator(), lp._tf.getDenominator(), w0, bw);
@@ -169,7 +169,7 @@ public class AnalogFilter {
 		}
 		
 		double bsa = type.getBandStopAp(amax, amin);
-		LowPassPrototype lp = type.buildLowPassPrototype(n, bsa);
+		LowPassPrototype lp = type.buildLowPassPrototype(n, bsa, amin);
 
 		double bw = type.getBandStopBW(n, lp._eps, Q, w0, omegas);
 		lp._tf = lpTobs(lp._tf.getNumerator(), lp._tf.getDenominator(), w0, bw);
