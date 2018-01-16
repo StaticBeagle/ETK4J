@@ -88,7 +88,7 @@ public class Butterworth {
 
 	public static Butterworth newHighPass(int n, double ap) {
 		Butterworth hp = newLowPass(n, ap);
-		hp._tf = lpTohp(hp._tf.getNumerator(), hp._tf.getDenominator());
+		hp._tf = lpTohp(hp._tf.getNumerator(), hp._tf.getDenominator(), 0.0);
 		return hp;
 	}
 
@@ -99,7 +99,7 @@ public class Butterworth {
 		Butterworth hp = new Butterworth(n, ap);
 		double factor = wp / Math.pow(hp._eps, -1.0 / n);
 		hp._tf.substituteInPlace(factor);
-		hp._tf = lpTohp(hp._tf.getNumerator(), hp._tf.getDenominator());
+		hp._tf = lpTohp(hp._tf.getNumerator(), hp._tf.getDenominator(), 0.0);
 		return hp;
 	}
 
@@ -157,30 +157,44 @@ public class Butterworth {
 
 	public static void main(String[] args) {
 		LowPassSpecs lpSpecs = new LowPassSpecs();
-		lpSpecs.PassBandAttenuation = 3.0103;
-		lpSpecs.StopBandAttenuation = 30;
-		lpSpecs.PassBandFrequency = 1.0 / (2.0 * Math.PI);
-		lpSpecs.StopBandFrequency = 1.7 / (2.0 * Math.PI);
+		lpSpecs.PassBandAttenuation = -20 * Math.log10(1.0 / Math.sqrt(2.0));
+		lpSpecs.StopBandAttenuation = 70;
+		lpSpecs.PassBandFrequency = 1.0 / (2 * Math.PI);
+		lpSpecs.StopBandFrequency = 10.0 / (2 * Math.PI);
 		AnalogFilter lp = AnalogFilter.newLowPass(lpSpecs, ApproximationType.BUTTERWORTH);
+		System.out.println(Arrays.toString(lp._tf.getDenominator().getCoefficients()));
 		
 		
 
+//		HighPassSpecs hpSpecs = new HighPassSpecs();
+//		hpSpecs.PassBandAttenuation = -20 * Math.log10(1.0 / Math.sqrt(2.0));
+//		hpSpecs.StopBandAttenuation = 70;
+//		hpSpecs.PassBandFrequency = 2.0 / (2 * Math.PI);
+//		hpSpecs.StopBandFrequency = 0.1 / (2 * Math.PI);
+//		AnalogFilter hp = AnalogFilter.newHighPass(hpSpecs, ApproximationType.BUTTERWORTH);
+//		System.out.println(Arrays.toString(hp._tf.getNumerator().getCoefficients()));
+//		System.out.println(Arrays.toString(hp._tf.getDenominator().getCoefficients()));
+		
 		HighPassSpecs hpSpecs = new HighPassSpecs();
-		hpSpecs.PassBandAttenuation = 0.2;
-		hpSpecs.StopBandAttenuation = 60;
-		hpSpecs.PassBandFrequency = 10;
-		hpSpecs.StopBandFrequency = 1;
-		AnalogFilter hp = AnalogFilter.newHighPass(hpSpecs, ApproximationType.BUTTERWORTH);
+		hpSpecs.PassBandAttenuation = 0.5;
+		hpSpecs.StopBandAttenuation = 70;
+		hpSpecs.PassBandFrequency = 2.0 / (2 * Math.PI);
+		hpSpecs.StopBandFrequency = 0.1 / (2 * Math.PI);
+		AnalogFilter hp = AnalogFilter.newHighPass(hpSpecs, ApproximationType.INVERSE_CHEBYSHEV);
+		System.out.println(Arrays.toString(hp._tf.getNumerator().getCoefficients()));
+		System.out.println(Arrays.toString(hp._tf.getDenominator().getCoefficients()));
 
 		BandPassSpecs bpSpecs = new BandPassSpecs();
 		bpSpecs.LowerPassBandFrequency = 190;
 		bpSpecs.UpperPassBandFrequency = 210;
 		bpSpecs.LowerStopBandFrequency = 180;
 		bpSpecs.UpperStopBandFrequency = 220;
-		bpSpecs.PassBandAttenuation = 0.2;
+		bpSpecs.PassBandAttenuation = -20 * Math.log10(1.0 / Math.sqrt(2.0));;
 		bpSpecs.LowerStopBandAttenuation = 20;
 		bpSpecs.UpperStopBandAttenuation = 20;
 		AnalogFilter bp = AnalogFilter.newBandPass(bpSpecs, ApproximationType.BUTTERWORTH);
+		System.out.println(Arrays.toString(bp._tf.getNumerator().getCoefficients()));
+		System.out.println(Arrays.toString(bp._tf.getDenominator().getCoefficients()));
 
 		BandStopSpecs bsSpecs = new BandStopSpecs();
 		bsSpecs.LowerPassBandFrequency = 3.6e3;

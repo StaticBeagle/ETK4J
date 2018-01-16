@@ -68,7 +68,7 @@ public class AnalogFilter {
 	
 	public static AnalogFilter newHighPass(int n, double ap, ApproximationType type) {
 		LowPassPrototype lp = type.buildLowPassPrototype(n, ap, 0.0);
-		lp._tf = lpTohp(lp._tf.getNumerator(), lp._tf.getDenominator());
+		lp._tf = lpTohp(lp._tf.getNumerator(), lp._tf.getDenominator(), 0.0);
 		return new AnalogFilter(n, lp._tf);
 	}
 	
@@ -84,8 +84,7 @@ public class AnalogFilter {
 		double hpa = type.getHighPassAttenuation(ap, as);
 		LowPassPrototype lp = type.buildLowPassPrototype(n, hpa, as);
 		double factor = type.getHighPassGainFactor(n, lp._eps, wp, ws);
-		lp._tf.substituteInPlace(factor);
-		lp._tf = lpTohp(lp._tf.getNumerator(), lp._tf.getDenominator());
+		lp._tf = lpTohp(lp._tf.getNumerator(), lp._tf.getDenominator(), factor);
 		return new AnalogFilter(n, lp._tf);
 	}
 	
@@ -201,7 +200,7 @@ public class AnalogFilter {
 		return new TransferFunction(bp);
 	}
 
-	public static TransferFunction lpTohp(Polynomial num, Polynomial den) {
+	public static TransferFunction lpTohp(Polynomial num, Polynomial den, double w0) {
 		final int numDegree = num.degree();
 		final int denDegree = den.degree();
 		final int filterOrder = Math.max(numDegree, denDegree) + 1;
@@ -210,17 +209,16 @@ public class AnalogFilter {
 		// order of the denominator i.e. pad with zeros
 		double[] hpNumerator = new double[filterOrder];
 		for (int i = numDegree, j = 0; i >= 0; --i, ++j) {
-			hpNumerator[j] = num.getCoefficientAt(i);
+			hpNumerator[j] = num.getCoefficientAt(i) * Math.pow(w0, j);
 		}
 
 		// Reverse coefficients then scale them by the
 		// order of the numerator i.e. pad with zeros
 		double[] hpDenominator = new double[filterOrder];
 		for (int i = denDegree, j = 0; i >= 0; --i, ++j) {
-			hpDenominator[j] = den.getCoefficientAt(i);
+			hpDenominator[j] = den.getCoefficientAt(i) * Math.pow(w0, j);
 		}
-
-		return new TransferFunction(hpNumerator, hpDenominator);
+		return  new  TransferFunction(hpNumerator, hpDenominator);
 	}
 	
 	public static TransferFunction lpTolp(Polynomial num, Polynomial den, double wo) {

@@ -117,6 +117,7 @@ public enum ApproximationType {
 		@Override
 		LowPassPrototype buildLowPassPrototype(int n, double ap, double as) {
 			double eps = Math.sqrt(Math.pow(10, ap * 0.1) - 1);
+			double wb = Math.pow(eps, -1.0 / n);
 
 			final double pid = Math.PI / 180.0;
 			final double nInv = 1.0 / n;
@@ -124,12 +125,14 @@ public enum ApproximationType {
 			if (n % 2 == 0) {
 				for(int k = (-n >> 1) + 1, i = 0; k <= n >> 1; ++k, ++i) {
 					double phik = nInv * (180.0 * k - 90.0);
-					poles[i] = new Complex(-Math.cos(phik * pid), Math.sin(phik * pid));				
+					poles[i] = new Complex(-Math.cos(phik * pid), Math.sin(phik * pid));
+					poles[i].multiplyEquals(wb);
 				}
 			} else {
 				for(int k = -(n - 1) >> 1, i = 0; k <= (n - 1) >> 1; ++k, ++i) {
 					double phik = nInv * 180.0 * k;
 					poles[i] = new Complex(-Math.cos(phik * pid), Math.sin(phik * pid));				
+					poles[i].multiplyEquals(wb);
 				}
 			}
 			Complex kden = new Complex(1.0, 0.0);
@@ -137,7 +140,7 @@ public enum ApproximationType {
 				kden.multiplyEquals(pole.uminus());
 			}
 			double k = kden.real();
-			TransferFunction tf = new TransferFunction(new Complex[0], poles);
+			TransferFunction tf = new TransferFunction(k, poles);
 			return new LowPassPrototype(eps, tf);
 		}
 
@@ -163,7 +166,7 @@ public enum ApproximationType {
 
 		@Override
 		double getLowPassScalingFrequency(int n, double eps, double wp, double ws) {
-			return Math.pow(eps, -1.0 / n) * wp;
+			return wp;
 		}
 
 		@Override
@@ -178,7 +181,7 @@ public enum ApproximationType {
 
 		@Override
 		double getHighPassGainFactor(int n, double eps, double wp, double ws) {
-			return wp / Math.pow(eps, -1.0 / n);
+			return wp;
 		}
 	},
 	

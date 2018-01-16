@@ -87,7 +87,7 @@ public class Chebyshev {
 
 	public static Chebyshev newHighPass(int n, double ap) {
 		Chebyshev hp = newLowPass(n, ap);
-		hp._tf = lpTohp(hp._tf.getNumerator(), hp._tf.getDenominator());
+		hp._tf = lpTohp(hp._tf.getNumerator(), hp._tf.getDenominator(), 0.0);
 		return hp;
 	}
 
@@ -98,7 +98,7 @@ public class Chebyshev {
 		Chebyshev hp = new Chebyshev(n, ap);
 		double factor = wp / Math.pow(hp._eps, -1.0 / n);
 		hp._tf.substituteInPlace(factor);
-		hp._tf = lpTohp(hp._tf.getNumerator(), hp._tf.getDenominator());
+		hp._tf = lpTohp(hp._tf.getNumerator(), hp._tf.getDenominator(), 0.0);
 		return hp;
 	}
 
