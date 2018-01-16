@@ -43,7 +43,10 @@ public enum ApproximationType {
 				}
 			}
 			Complex[] zeros = new Complex[0];
-			double k = computeGain(zeros, poles) / Math.sqrt(1.0 + eps * eps);
+			double k = computeGain(zeros, poles);
+			if(n % 2 == 0) {
+				k /= Math.sqrt(1.0 + eps * eps);
+			}
 			return new ZeroPoleGain(zeros, poles, k);
 		}
 	},
