@@ -152,35 +152,30 @@ public class Butterworth {
 		bp._tf = lpTobs(bp._tf.getNumerator(), bp._tf.getDenominator(), w0, bw);
 		return bp;
 	}
-	
-	
 
 	public static void main(String[] args) {
+		testButter(); 	// working 
+		testCheby1();	// working
+	}
+
+	public static void testButter() {
 		LowPassSpecs lpSpecs = new LowPassSpecs();
 		lpSpecs.PassBandAttenuation = -20 * Math.log10(1.0 / Math.sqrt(2.0));
 		lpSpecs.StopBandAttenuation = 70;
 		lpSpecs.PassBandFrequency = 1.0 / (2 * Math.PI);
 		lpSpecs.StopBandFrequency = 10.0 / (2 * Math.PI);
 		AnalogFilter lp = AnalogFilter.newLowPass(lpSpecs, ApproximationType.BUTTERWORTH);
+		// Move these two to unit tests they are ready
+		System.out.println(Arrays.toString(lp._tf.getNumerator().getCoefficients()));
 		System.out.println(Arrays.toString(lp._tf.getDenominator().getCoefficients()));
-		
-		
 
-//		HighPassSpecs hpSpecs = new HighPassSpecs();
-//		hpSpecs.PassBandAttenuation = -20 * Math.log10(1.0 / Math.sqrt(2.0));
-//		hpSpecs.StopBandAttenuation = 70;
-//		hpSpecs.PassBandFrequency = 2.0 / (2 * Math.PI);
-//		hpSpecs.StopBandFrequency = 0.1 / (2 * Math.PI);
-//		AnalogFilter hp = AnalogFilter.newHighPass(hpSpecs, ApproximationType.BUTTERWORTH);
-//		System.out.println(Arrays.toString(hp._tf.getNumerator().getCoefficients()));
-//		System.out.println(Arrays.toString(hp._tf.getDenominator().getCoefficients()));
-		
 		HighPassSpecs hpSpecs = new HighPassSpecs();
-		hpSpecs.PassBandAttenuation = 0.5;
+		hpSpecs.PassBandAttenuation = -20 * Math.log10(1.0 / Math.sqrt(2.0));
 		hpSpecs.StopBandAttenuation = 70;
-		hpSpecs.PassBandFrequency = 2.0 / (2 * Math.PI);
+		hpSpecs.PassBandFrequency = 1.0 / (2 * Math.PI);
 		hpSpecs.StopBandFrequency = 0.1 / (2 * Math.PI);
-		AnalogFilter hp = AnalogFilter.newHighPass(hpSpecs, ApproximationType.INVERSE_CHEBYSHEV);
+		AnalogFilter hp = AnalogFilter.newHighPass(hpSpecs, ApproximationType.BUTTERWORTH);
+		// Move these two to unit tests they are ready
 		System.out.println(Arrays.toString(hp._tf.getNumerator().getCoefficients()));
 		System.out.println(Arrays.toString(hp._tf.getDenominator().getCoefficients()));
 
@@ -189,10 +184,11 @@ public class Butterworth {
 		bpSpecs.UpperPassBandFrequency = 210;
 		bpSpecs.LowerStopBandFrequency = 180;
 		bpSpecs.UpperStopBandFrequency = 220;
-		bpSpecs.PassBandAttenuation = -20 * Math.log10(1.0 / Math.sqrt(2.0));;
+		bpSpecs.PassBandAttenuation = -20 * Math.log10(1.0 / Math.sqrt(2.0));
 		bpSpecs.LowerStopBandAttenuation = 20;
 		bpSpecs.UpperStopBandAttenuation = 20;
 		AnalogFilter bp = AnalogFilter.newBandPass(bpSpecs, ApproximationType.BUTTERWORTH);
+		// Move these two to unit tests they are ready
 		System.out.println(Arrays.toString(bp._tf.getNumerator().getCoefficients()));
 		System.out.println(Arrays.toString(bp._tf.getDenominator().getCoefficients()));
 
@@ -201,9 +197,64 @@ public class Butterworth {
 		bsSpecs.UpperPassBandFrequency = 9.1e3;
 		bsSpecs.LowerStopBandFrequency = 5.45e3;
 		bsSpecs.UpperStopBandFrequency = 5.90e3;
-		bsSpecs.PassBandAttenuation = 1.5;
+		bsSpecs.PassBandAttenuation = -20 * Math.log10(1.0 / Math.sqrt(2.0));
 		bsSpecs.StopBandAttenuation = 38;
-		AnalogFilter bs = AnalogFilter.newBandStop(bsSpecs, ApproximationType.INVERSE_CHEBYSHEV);
+		AnalogFilter bs = AnalogFilter.newBandStop(bsSpecs, ApproximationType.BUTTERWORTH);
+		// Move these two to unit tests they are ready
+		System.out.println(Arrays.toString(bs._tf.getNumerator().getCoefficients()));
+		System.out.println(Arrays.toString(bs._tf.getDenominator().getCoefficients()));
+
+		System.out.printf("Low pass: %n%s%n%n", lp._tf.toString());
+		System.out.printf("High pass: %n%s%n%n", hp._tf.toString());
+		System.out.printf("Band pass: %n%s%n%n", bp._tf.toString());
+		System.out.printf("Band stop: %n%s%n", bs._tf.toString());
+	}
+	
+	public static void testCheby1() {
+		LowPassSpecs lpSpecs = new LowPassSpecs();
+		lpSpecs.PassBandAttenuation = 0.5;
+		lpSpecs.StopBandAttenuation = 70;
+		lpSpecs.PassBandFrequency = 1.0 / (2 * Math.PI);
+		lpSpecs.StopBandFrequency = 10.0 / (2 * Math.PI);
+		AnalogFilter lp = AnalogFilter.newLowPass(lpSpecs, ApproximationType.CHEBYSHEV);
+		// Move these two to unit tests they are ready
+		System.out.println(Arrays.toString(lp._tf.getNumerator().getCoefficients()));
+		System.out.println(Arrays.toString(lp._tf.getDenominator().getCoefficients()));
+
+		HighPassSpecs hpSpecs = new HighPassSpecs();
+		hpSpecs.PassBandAttenuation = 0.5;
+		hpSpecs.StopBandAttenuation = 70;
+		hpSpecs.PassBandFrequency = 1.0 / (2 * Math.PI);
+		hpSpecs.StopBandFrequency = 0.1 / (2 * Math.PI);
+		AnalogFilter hp = AnalogFilter.newHighPass(hpSpecs, ApproximationType.CHEBYSHEV);
+		// Move these two to unit tests they are ready
+		System.out.println(Arrays.toString(hp._tf.getNumerator().getCoefficients()));
+		System.out.println(Arrays.toString(hp._tf.getDenominator().getCoefficients()));
+
+		BandPassSpecs bpSpecs = new BandPassSpecs();
+		bpSpecs.LowerPassBandFrequency = 190;
+		bpSpecs.UpperPassBandFrequency = 210;
+		bpSpecs.LowerStopBandFrequency = 180;
+		bpSpecs.UpperStopBandFrequency = 220;
+		bpSpecs.PassBandAttenuation = 0.5;
+		bpSpecs.LowerStopBandAttenuation = 20;
+		bpSpecs.UpperStopBandAttenuation = 20;
+		AnalogFilter bp = AnalogFilter.newBandPass(bpSpecs, ApproximationType.CHEBYSHEV);
+		// Move these two to unit tests they are ready
+		System.out.println(Arrays.toString(bp._tf.getNumerator().getCoefficients()));
+		System.out.println(Arrays.toString(bp._tf.getDenominator().getCoefficients()));
+
+		BandStopSpecs bsSpecs = new BandStopSpecs();
+		bsSpecs.LowerPassBandFrequency = 3.6e3;
+		bsSpecs.UpperPassBandFrequency = 9.1e3;
+		bsSpecs.LowerStopBandFrequency = 5.45e3;
+		bsSpecs.UpperStopBandFrequency = 5.90e3;
+		bsSpecs.PassBandAttenuation = 0.5;
+		bsSpecs.StopBandAttenuation = 38;
+		AnalogFilter bs = AnalogFilter.newBandStop(bsSpecs, ApproximationType.CHEBYSHEV);
+		// Move these two to unit tests they are ready
+		System.out.println(Arrays.toString(bs._tf.getNumerator().getCoefficients()));
+		System.out.println(Arrays.toString(bs._tf.getDenominator().getCoefficients()));
 
 		System.out.printf("Low pass: %n%s%n%n", lp._tf.toString());
 		System.out.printf("High pass: %n%s%n%n", hp._tf.toString());
