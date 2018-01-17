@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-import com.wildbitsfoundry.etk4j.constants.ETKConstants;
+import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
 import com.wildbitsfoundry.etk4j.math.functions.MultivariateFunction;
 import com.wildbitsfoundry.etk4j.math.solvers.multivariate.SolverResults.SolverStatus;
 import com.wildbitsfoundry.etk4j.util.NumArrays;
@@ -280,7 +280,7 @@ public class NewtonRaphson {
 				}
 
 				LU matrix = new LU(jacobianMatrixValues);
-				if (Double.compare(Math.abs(matrix.det()), ETKConstants.DOUBLE_EPS) <= 0) {
+				if (Double.compare(Math.abs(matrix.det()), ConstantsETK.DOUBLE_EPS) <= 0) {
 					double error = this.estimateError(xfinal, xcurrent);
 					return buildResults(xfinal, SolverStatus.JACOBIAN_IS_SINGULAR, _maxIter - maxiter, error);
 				}
@@ -381,7 +381,7 @@ public class NewtonRaphson {
 				}
 
 				LU matrix = new LU(jacobianMatrixValues);
-				if (Double.compare(Math.abs(matrix.det()), ETKConstants.DOUBLE_EPS) <= 0) {
+				if (Double.compare(Math.abs(matrix.det()), ConstantsETK.DOUBLE_EPS) <= 0) {
 					double error = this.estimateError(NumArrays.unbox(xfinal), NumArrays.unbox(xcurrent));
 					return buildResults(xfinal, SolverStatus.JACOBIAN_IS_SINGULAR, _maxIter - maxiter, error);
 				}

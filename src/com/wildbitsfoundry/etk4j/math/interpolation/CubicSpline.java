@@ -2,7 +2,7 @@ package com.wildbitsfoundry.etk4j.math.interpolation;
 
 import java.util.Arrays;
 
-import com.wildbitsfoundry.etk4j.constants.ETKConstants;
+import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
 import com.wildbitsfoundry.etk4j.math.functions.common.ExtrapolationMethod;
 
 public class CubicSpline extends Spline {
@@ -183,11 +183,11 @@ public class CubicSpline extends Spline {
 	}
 
 	public static CubicSpline newAkimaSpline(double[] x, double[] y) {
-		return newAkimaSpline(x, y, ETKConstants.DOUBLE_EPS);
+		return newAkimaSpline(x, y, ConstantsETK.DOUBLE_EPS);
 	}
 
 	public static CubicSpline newAkimaSplineInPlace(double[] x, double[] y) {
-		return newAkimaSplineInPlace(x, y, ETKConstants.DOUBLE_EPS);
+		return newAkimaSplineInPlace(x, y, ConstantsETK.DOUBLE_EPS);
 	}
 
 	public static CubicSpline newAkimaSpline(double[] x, double[] y, double ep) {
