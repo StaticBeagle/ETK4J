@@ -149,7 +149,8 @@ public class Butterworth {
 	public static void main(String[] args) {
 //		testButter(); 	// working 
 //		testCheby1();	// working
-		testCheby2();	// working
+//		testCheby2();	// working
+		testElliptic(); // working
 	}
 
 	public static void testButter() {
