@@ -19,28 +19,29 @@ public class Spline2dExample {
 				{ 25, 100, 225, 400, 625, 900, 1225, 1600 }, { 36, 144, 324, 576, 900, 1296, 1764, 2304 },
 				{ 49, 196, 441, 784, 1225, 1764, 2401, 3136 }, { 64, 256, 576, 1024, 1600, 2304, 3136, 4096 } };
 
-		System.out.println(":: Test Bicubic spline");
+		System.out.println(":: Test Bicubic spline: z(x, y) = x^2 * y^2");
 		Spline2d sp = newBicubicSpline(x, y, z);
 		testSpline2d(sp, x, y);
 		
-		System.out.printf("%n:: Test Bilinear spline%n");
+		System.out.printf("%n:: Test Bilinear spline: z(x, y) = x^2 * y^2\"%n");
 		sp = newBilinearSpline(x, y, z);
 		testSpline2d(sp, x, y);
 
 	}
 	
 	public static void testSpline2d(BivariateFunction sp, double[] x, double[] y) {
-		GridData data = GridData.of(x, y);
-		
+
+		final int rows = x.length;
+		final int cols = y.length;
 		System.out.print("   x |");
-		for(int i = 0; i < x.length; ++i) {
+		for(int i = 0; i < rows; ++i) {
 			System.out.printf("%7.2f ", x[i]);
 		}
 		System.out.printf("%ny    |                           z(x, y)%n");
 		System.out.printf("-----|---------------------------------------------------------------%n");
-		for(int i = 0; i < data.Rows; ++i) {
+		for(int i = 0; i < rows; ++i) {
 			System.out.printf("%.2f |", y[i]);
-			for(int j = 0; j < data.Cols; ++j) {
+			for(int j = 0; j < cols; ++j) {
 				System.out.printf("%7.2f ", sp.evaluateAt(x[j], y[i]));
 			}
 			System.out.println();
