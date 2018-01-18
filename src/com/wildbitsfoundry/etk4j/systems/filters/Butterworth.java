@@ -4,23 +4,15 @@ import static com.wildbitsfoundry.etk4j.systems.filters.AnalogFilter.lpTobp;
 import static com.wildbitsfoundry.etk4j.systems.filters.AnalogFilter.lpTobs;
 import static com.wildbitsfoundry.etk4j.systems.filters.AnalogFilter.lpTohp;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
-import java.util.Collections;
-import java.util.List;
-
-import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
-import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
-import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
 import com.wildbitsfoundry.etk4j.systems.TransferFunction;
 import com.wildbitsfoundry.etk4j.systems.filters.FilterSpecs.BandPassSpecs;
 import com.wildbitsfoundry.etk4j.systems.filters.FilterSpecs.BandStopSpecs;
 import com.wildbitsfoundry.etk4j.systems.filters.FilterSpecs.HighPassSpecs;
 import com.wildbitsfoundry.etk4j.systems.filters.FilterSpecs.LowPassSpecs;
 import com.wildbitsfoundry.etk4j.util.NumArrays;
-import static com.wildbitsfoundry.etk4j.math.specialfunctions.Elliptic.compEllipInt1;
 
 public class Butterworth {
 
@@ -322,4 +314,65 @@ public class Butterworth {
 		System.out.printf("Band pass: %n%s%n%n", bp._tf.toString());
 		System.out.printf("Band stop: %n%s%n", bs._tf.toString());
 	}
+	
+	
+	public static void testElliptic() {
+		// [b,a] = ellip(3,0.5,70,1,'s');
+		LowPassSpecs lpSpecs = new LowPassSpecs();
+		lpSpecs.PassBandAttenuation = 0.5;
+		lpSpecs.StopBandAttenuation = 70;
+		lpSpecs.PassBandFrequency = 1.0 / (2 * Math.PI);
+		lpSpecs.StopBandFrequency = 10.0 / (2 * Math.PI);
+		AnalogFilter lp = AnalogFilter.newLowPass(lpSpecs, ApproximationType.ELLIPTIC);
+		// Move these two to unit tests they are ready
+		System.out.println(Arrays.toString(lp._tf.getNumerator().getCoefficients()));
+		System.out.println(Arrays.toString(lp._tf.getDenominator().getCoefficients()));
+
+		// [b,a] = ellip(3,0.5,70,1,'high','s');
+		HighPassSpecs hpSpecs = new HighPassSpecs();
+		hpSpecs.PassBandAttenuation = 0.5;
+		hpSpecs.StopBandAttenuation = 70;
+		hpSpecs.PassBandFrequency = 1.0 / (2 * Math.PI);
+		hpSpecs.StopBandFrequency = 0.1 / (2 * Math.PI);
+		AnalogFilter hp = AnalogFilter.newHighPass(hpSpecs, ApproximationType.ELLIPTIC);
+		// Move these two to unit tests they are ready
+		System.out.println(Arrays.toString(hp._tf.getNumerator().getCoefficients()));
+		System.out.println(Arrays.toString(hp._tf.getDenominator().getCoefficients()));
+
+		// [b,a] = ellip(3,0.5,20,[190, 210] * 2 * pi,'s');
+		BandPassSpecs bpSpecs = new BandPassSpecs();
+		bpSpecs.LowerPassBandFrequency = 190;
+		bpSpecs.UpperPassBandFrequency = 210;
+		bpSpecs.LowerStopBandFrequency = 180;
+		bpSpecs.UpperStopBandFrequency = 220;
+		bpSpecs.PassBandAttenuation = 0.5;
+		bpSpecs.LowerStopBandAttenuation = 20;
+		bpSpecs.UpperStopBandAttenuation = 20;
+		AnalogFilter bp = AnalogFilter.newBandPass(bpSpecs, ApproximationType.ELLIPTIC);
+		// Move these two to unit tests they are ready
+		System.out.println(Arrays.toString(bp._tf.getNumerator().getCoefficients()));
+		System.out.println(Arrays.toString(bp._tf.getDenominator().getCoefficients()));
+
+		// [b,a] = ellip(2,0.5,38,[3600, 9100] * 2 * pi,'stop','s');
+		BandStopSpecs bsSpecs = new BandStopSpecs();
+		bsSpecs.LowerPassBandFrequency = 3.6e3;
+		bsSpecs.UpperPassBandFrequency = 9.1e3;
+		bsSpecs.LowerStopBandFrequency = 5.45e3;
+		bsSpecs.UpperStopBandFrequency = 5.90e3;
+		bsSpecs.PassBandAttenuation = 0.5;
+		bsSpecs.StopBandAttenuation = 38;
+		AnalogFilter bs = AnalogFilter.newBandStop(bsSpecs, ApproximationType.ELLIPTIC);
+		// Move these two to unit tests they are ready
+		System.out.println(Arrays.toString(bs._tf.getNumerator().getCoefficients()));
+		System.out.println(Arrays.toString(bs._tf.getDenominator().getCoefficients()));
+
+		lp._tf.normalize();
+		hp._tf.normalize();
+		bs._tf.normalize();
+		System.out.printf("Low pass: %n%s%n%n", lp._tf.toString());
+		System.out.printf("High pass: %n%s%n%n", hp._tf.toString());
+		System.out.printf("Band pass: %n%s%n%n", bp._tf.toString());
+		System.out.printf("Band stop: %n%s%n", bs._tf.toString());
+	}
+
 }
