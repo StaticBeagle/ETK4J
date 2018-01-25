@@ -7,7 +7,7 @@ import com.wildbitsfoundry.etk4j.util.NumArrays;
 public final class Integration {
 	private Integration() {}
 	
-	public static double[] cummulativeTrapz(double[] a) {
+	public static double[] cummulativeTrapz(double... a) {
 		final int length = a.length;
 		double[] result = new double[length];
 		for(int i = 1; i < length; ++i) {
@@ -16,7 +16,7 @@ public final class Integration {
 		return result;
 	}
 	
-	public static double trapz(double[] a) {
+	public static double trapz(double... a) {
 		final int length = a.length;
 		double result = 0.0;
 		for(int i = 1; i < length; ++i) {

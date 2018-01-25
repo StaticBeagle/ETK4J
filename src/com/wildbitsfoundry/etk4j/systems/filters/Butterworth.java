@@ -147,15 +147,15 @@ public class Butterworth {
 	}
 
 	public static void main(String[] args) {
-//		testButter(); 	// working 
-//		testCheby1();	// working
-//		testCheby2();	// working
+		testButter(); 	// working 
+		testCheby1();	// working
+		testCheby2();	// working
 		testElliptic(); // working
 	}
 
 	public static void testButter() {
 		LowPassSpecs lpSpecs = new LowPassSpecs();
-		lpSpecs.PassBandAttenuation = -20 * Math.log10(1.0 / Math.sqrt(2.0));
+		lpSpecs.PassBandRipple = -20 * Math.log10(1.0 / Math.sqrt(2.0));
 		lpSpecs.StopBandAttenuation = 70;
 		lpSpecs.PassBandFrequency = 1.0 / (2 * Math.PI);
 		lpSpecs.StopBandFrequency = 10.0 / (2 * Math.PI);
@@ -165,7 +165,7 @@ public class Butterworth {
 		System.out.println(Arrays.toString(lp._tf.getDenominator().getCoefficients()));
 
 		HighPassSpecs hpSpecs = new HighPassSpecs();
-		hpSpecs.PassBandAttenuation = -20 * Math.log10(1.0 / Math.sqrt(2.0));
+		hpSpecs.PassBandRipple = -20 * Math.log10(1.0 / Math.sqrt(2.0));
 		hpSpecs.StopBandAttenuation = 70;
 		hpSpecs.PassBandFrequency = 1.0 / (2 * Math.PI);
 		hpSpecs.StopBandFrequency = 0.1 / (2 * Math.PI);
@@ -179,7 +179,7 @@ public class Butterworth {
 		bpSpecs.UpperPassBandFrequency = 210;
 		bpSpecs.LowerStopBandFrequency = 180;
 		bpSpecs.UpperStopBandFrequency = 220;
-		bpSpecs.PassBandAttenuation = -20 * Math.log10(1.0 / Math.sqrt(2.0));
+		bpSpecs.PassBandRipple = -20 * Math.log10(1.0 / Math.sqrt(2.0));
 		bpSpecs.LowerStopBandAttenuation = 20;
 		bpSpecs.UpperStopBandAttenuation = 20;
 		AnalogFilter bp = AnalogFilter.newBandPass(bpSpecs, ApproximationType.BUTTERWORTH);
@@ -192,7 +192,7 @@ public class Butterworth {
 		bsSpecs.UpperPassBandFrequency = 9.1e3;
 		bsSpecs.LowerStopBandFrequency = 5.45e3;
 		bsSpecs.UpperStopBandFrequency = 5.90e3;
-		bsSpecs.PassBandAttenuation = -20 * Math.log10(1.0 / Math.sqrt(2.0));
+		bsSpecs.PassBandRipple = -20 * Math.log10(1.0 / Math.sqrt(2.0));
 		bsSpecs.StopBandAttenuation = 38;
 		AnalogFilter bs = AnalogFilter.newBandStop(bsSpecs, ApproximationType.BUTTERWORTH);
 		// Move these two to unit tests they are ready
@@ -207,7 +207,7 @@ public class Butterworth {
 	
 	public static void testCheby1() {
 		LowPassSpecs lpSpecs = new LowPassSpecs();
-		lpSpecs.PassBandAttenuation = 0.5;
+		lpSpecs.PassBandRipple = 0.5;
 		lpSpecs.StopBandAttenuation = 60;
 		lpSpecs.PassBandFrequency = 1.0 / (2 * Math.PI);
 		lpSpecs.StopBandFrequency = 10.0 / (2 * Math.PI);
@@ -217,7 +217,7 @@ public class Butterworth {
 		System.out.println(Arrays.toString(lp._tf.getDenominator().getCoefficients()));
 
 		HighPassSpecs hpSpecs = new HighPassSpecs();
-		hpSpecs.PassBandAttenuation = 0.5;
+		hpSpecs.PassBandRipple = 0.5;
 		hpSpecs.StopBandAttenuation = 70;
 		hpSpecs.PassBandFrequency = 1.0 / (2 * Math.PI);
 		hpSpecs.StopBandFrequency = 0.1 / (2 * Math.PI);
@@ -231,7 +231,7 @@ public class Butterworth {
 		bpSpecs.UpperPassBandFrequency = 210;
 		bpSpecs.LowerStopBandFrequency = 180;
 		bpSpecs.UpperStopBandFrequency = 220;
-		bpSpecs.PassBandAttenuation = 0.5;
+		bpSpecs.PassBandRipple = 0.5;
 		bpSpecs.LowerStopBandAttenuation = 20;
 		bpSpecs.UpperStopBandAttenuation = 20;
 		AnalogFilter bp = AnalogFilter.newBandPass(bpSpecs, ApproximationType.CHEBYSHEV);
@@ -244,7 +244,7 @@ public class Butterworth {
 		bsSpecs.UpperPassBandFrequency = 9.1e3;
 		bsSpecs.LowerStopBandFrequency = 5.45e3;
 		bsSpecs.UpperStopBandFrequency = 5.90e3;
-		bsSpecs.PassBandAttenuation = 0.5;
+		bsSpecs.PassBandRipple = 0.5;
 		bsSpecs.StopBandAttenuation = 38;
 		AnalogFilter bs = AnalogFilter.newBandStop(bsSpecs, ApproximationType.CHEBYSHEV);
 		// Move these two to unit tests they are ready
@@ -260,7 +260,7 @@ public class Butterworth {
 	public static void testCheby2() {
 		// [b, a] = cheby2(4, 70, 10, 's');
 		LowPassSpecs lpSpecs = new LowPassSpecs();
-		lpSpecs.PassBandAttenuation = 0.5;
+		lpSpecs.PassBandRipple = 0.5;
 		lpSpecs.StopBandAttenuation = 70;
 		lpSpecs.PassBandFrequency = 1.0 / (2 * Math.PI);
 		lpSpecs.StopBandFrequency = 10.0 / (2 * Math.PI);
@@ -271,7 +271,7 @@ public class Butterworth {
 
 		// [b,a] = cheby2(4, 70, 0.1, 'high', 's');
 		HighPassSpecs hpSpecs = new HighPassSpecs();
-		hpSpecs.PassBandAttenuation = 0.5;
+		hpSpecs.PassBandRipple = 0.5;
 		hpSpecs.StopBandAttenuation = 70;
 		hpSpecs.PassBandFrequency = 1.0 / (2 * Math.PI);
 		hpSpecs.StopBandFrequency = 0.1 / (2 * Math.PI);
@@ -286,7 +286,7 @@ public class Butterworth {
 		bpSpecs.UpperPassBandFrequency = 210;
 		bpSpecs.LowerStopBandFrequency = 180;
 		bpSpecs.UpperStopBandFrequency = 220;
-		bpSpecs.PassBandAttenuation = 0.5;
+		bpSpecs.PassBandRipple = 0.5;
 		bpSpecs.LowerStopBandAttenuation = 20;
 		bpSpecs.UpperStopBandAttenuation = 20;
 		AnalogFilter bp = AnalogFilter.newBandPass(bpSpecs, ApproximationType.INVERSE_CHEBYSHEV);
@@ -300,7 +300,7 @@ public class Butterworth {
 		bsSpecs.UpperPassBandFrequency = 9.1e3;
 		bsSpecs.LowerStopBandFrequency = 5.45e3;
 		bsSpecs.UpperStopBandFrequency = 5.90e3;
-		bsSpecs.PassBandAttenuation = 0.5;
+		bsSpecs.PassBandRipple = 0.5;
 		bsSpecs.StopBandAttenuation = 38;
 		AnalogFilter bs = AnalogFilter.newBandStop(bsSpecs, ApproximationType.INVERSE_CHEBYSHEV);
 		// Move these two to unit tests they are ready
@@ -320,7 +320,7 @@ public class Butterworth {
 	public static void testElliptic() {
 		// [b,a] = ellip(3,0.5,70,1,'s');
 		LowPassSpecs lpSpecs = new LowPassSpecs();
-		lpSpecs.PassBandAttenuation = 0.5;
+		lpSpecs.PassBandRipple = 0.5;
 		lpSpecs.StopBandAttenuation = 70;
 		lpSpecs.PassBandFrequency = 1.0 / (2 * Math.PI);
 		lpSpecs.StopBandFrequency = 10.0 / (2 * Math.PI);
@@ -331,7 +331,7 @@ public class Butterworth {
 
 		// [b,a] = ellip(3,0.5,70,1,'high','s');
 		HighPassSpecs hpSpecs = new HighPassSpecs();
-		hpSpecs.PassBandAttenuation = 0.5;
+		hpSpecs.PassBandRipple = 0.5;
 		hpSpecs.StopBandAttenuation = 70;
 		hpSpecs.PassBandFrequency = 1.0 / (2 * Math.PI);
 		hpSpecs.StopBandFrequency = 0.1 / (2 * Math.PI);
@@ -346,7 +346,7 @@ public class Butterworth {
 		bpSpecs.UpperPassBandFrequency = 210;
 		bpSpecs.LowerStopBandFrequency = 180;
 		bpSpecs.UpperStopBandFrequency = 220;
-		bpSpecs.PassBandAttenuation = 0.5;
+		bpSpecs.PassBandRipple = 0.5;
 		bpSpecs.LowerStopBandAttenuation = 20;
 		bpSpecs.UpperStopBandAttenuation = 20;
 		AnalogFilter bp = AnalogFilter.newBandPass(bpSpecs, ApproximationType.ELLIPTIC);
@@ -360,7 +360,7 @@ public class Butterworth {
 		bsSpecs.UpperPassBandFrequency = 9.1e3;
 		bsSpecs.LowerStopBandFrequency = 5.45e3;
 		bsSpecs.UpperStopBandFrequency = 5.90e3;
-		bsSpecs.PassBandAttenuation = 0.5;
+		bsSpecs.PassBandRipple = 0.5;
 		bsSpecs.StopBandAttenuation = 38;
 		AnalogFilter bs = AnalogFilter.newBandStop(bsSpecs, ApproximationType.ELLIPTIC);
 		// Move these two to unit tests they are ready

@@ -16,7 +16,7 @@ public abstract class FilterSpecs {
 		}
 		public double PassBandFrequency = 1;
 		public double StopBandFrequency = 10;
-		public double PassBandAttenuation = 0.2;
+		public double PassBandRipple = 0.2;
 		public double StopBandAttenuation = 40;
 	}
 	
@@ -26,7 +26,7 @@ public abstract class FilterSpecs {
 		}
 		public double PassBandFrequency = 1;
 		public double StopBandFrequency = 10;
-		public double PassBandAttenuation = 0.2;
+		public double PassBandRipple = 0.2;
 		public double StopBandAttenuation = 40;
 	}
 	
@@ -38,7 +38,7 @@ public abstract class FilterSpecs {
 		public double UpperPassBandFrequency = 1000;
 		public double LowerStopBandFrequency = 90;
 		public double UpperStopBandFrequency = 10000;
-		public double PassBandAttenuation = 0.2;
+		public double PassBandRipple = 0.2;
 		public double LowerStopBandAttenuation = 40;
 		public double UpperStopBandAttenuation = 40;
 	}
@@ -51,7 +51,7 @@ public abstract class FilterSpecs {
 		public double UpperPassBandFrequency = 9.1e3;
 		public double LowerStopBandFrequency = 5.45e3;
 		public double UpperStopBandFrequency = 5.90e3;
-		public double PassBandAttenuation = 1.5;
+		public double PassBandRipple = 1.5;
 		public double StopBandAttenuation = 40;
 	}
 

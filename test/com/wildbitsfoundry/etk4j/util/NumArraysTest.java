@@ -86,4 +86,25 @@ public class NumArraysTest {
 		double[] xrep = new double[] { 1.0, 2.0, 3.0, 1.0, 2.0, 3.0, 1.0, 2.0, 3.0};
 		assertArrayEquals(xrep, NumArrays.repeat(x, 3), 1e-12);
 	}
+	
+	@Test
+	public void testCummulativeSum() {
+		double[] a = {1, 2, 3, 4 ,5 ,6};
+		double[] sum = NumArrays.cummulativeSum(a);
+		assertArrayEquals(new double[] {1.0, 3.0, 6.0, 10.0, 15.0, 21.0}, sum, 1e-12);
+	}
+	
+	@Test
+	public void testSum() {
+		double[] a = {1, 2, 3, 4 ,5 ,6};
+		double sum = NumArrays.sum(a);
+		assertEquals(21.0, sum, 1e-12);
+	}
+	
+	@Test
+	public void testRMS() {
+		double[] a = {1, 2, 3, 4 ,5 ,6};
+		double rms = NumArrays.rms(a);
+		assertEquals(3.894440481849308, rms, 1e-12);
+	}
 }

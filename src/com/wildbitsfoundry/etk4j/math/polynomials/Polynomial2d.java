@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import com.wildbitsfoundry.etk4j.math.functions.BivariateFunction;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
+import com.wildbitsfoundry.etk4j.util.Grids;
 import com.wildbitsfoundry.etk4j.util.NumArrays;
 
 public class Polynomial2d implements BivariateFunction {
@@ -68,12 +69,10 @@ public class Polynomial2d implements BivariateFunction {
 	public static Polynomial2d polyFit2D(double[] x, double[] y, double[][] z, int n, int m) {
 		double[][] vars = new double[2][];
 		// Build grid
-		x = NumArrays.repeat(x, z[0].length);
+		Grids.GridData gd = Grids.GridData.of(x, y);
 
-		y = NumArrays.repeat(y, z.length);
-		Arrays.sort(y);
-		vars[0] = x;
-		vars[1] = y;
+		vars[0] = gd.X;
+		vars[1] = gd.Y;
 
 		int[] nm = new int[] { n, m };
 		double[] coefs = polyfitN(vars, NumArrays.flatten(z), nm);

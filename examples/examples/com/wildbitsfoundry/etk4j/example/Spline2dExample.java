@@ -1,12 +1,10 @@
 package examples.com.wildbitsfoundry.etk4j.example;
 
-import com.wildbitsfoundry.etk4j.util.Grids.GridData;
-import com.wildbitsfoundry.etk4j.math.interpolation2d.Spline2d;
-
 import static com.wildbitsfoundry.etk4j.math.interpolation2d.Spline2d.newBicubicSpline;
 import static com.wildbitsfoundry.etk4j.math.interpolation2d.Spline2d.newBilinearSpline;
 
 import com.wildbitsfoundry.etk4j.math.functions.BivariateFunction;
+import com.wildbitsfoundry.etk4j.math.interpolation2d.Spline2d;
 
 public class Spline2dExample {
 	
@@ -19,11 +17,14 @@ public class Spline2dExample {
 				{ 25, 100, 225, 400, 625, 900, 1225, 1600 }, { 36, 144, 324, 576, 900, 1296, 1764, 2304 },
 				{ 49, 196, 441, 784, 1225, 1764, 2401, 3136 }, { 64, 256, 576, 1024, 1600, 2304, 3136, 4096 } };
 
-		System.out.println(":: Test Bicubic spline: z(x, y) = x^2 * y^2");
+		
+		System.out.printf(":: Function z(x, y) = x^2 * y^2%n%n");
+		
+		System.out.println(":: Test Bicubic spline");
 		Spline2d sp = newBicubicSpline(x, y, z);
 		testSpline2d(sp, x, y);
 		
-		System.out.printf("%n:: Test Bilinear spline: z(x, y) = x^2 * y^2\"%n");
+		System.out.printf("%n:: Test Bilinear spline%n");
 		sp = newBilinearSpline(x, y, z);
 		testSpline2d(sp, x, y);
 
@@ -47,13 +48,10 @@ public class Spline2dExample {
 			System.out.println();
 		}
 		System.out.println();
-
-		System.out.printf("z(1.5, 1.5) = %.4f%n", sp.evaluateAt(1.5, 1.5));
-		System.out.printf("z(2.5, 2.5) = %.4f%n", sp.evaluateAt(2.5, 2.5));
-		System.out.printf("z(3.5, 3.5) = %.4f%n", sp.evaluateAt(3.5, 3.5));
-		System.out.printf("z(4.5, 4.5) = %.4f%n", sp.evaluateAt(4.5, 4.5));
-		System.out.printf("z(5.5, 5.5) = %.4f%n", sp.evaluateAt(5.5, 5.5));
-		System.out.printf("z(6.5, 6.5) = %.4f%n", sp.evaluateAt(6.5, 6.5));
-		System.out.printf("z(7.5, 7.5) = %.4f%n", sp.evaluateAt(7.5, 7.5));
+		
+		for(int i = 1; i <= 7; ++i) {
+			double pi = i + 0.5;
+			System.out.printf("z(%.1f, %.1f) = %.4f%n", pi, pi, sp.evaluateAt(pi, pi));
+		}
 	}
 }

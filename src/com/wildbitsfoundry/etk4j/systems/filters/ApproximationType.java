@@ -105,8 +105,8 @@ public enum ApproximationType {
 		}
 		
 		@Override
-		ZeroPoleGain buildLowPassPrototype(int n, double ap, double as) {			
-			double eps = 1.0 / Math.sqrt(Math.pow(10, ap * 0.1) - 1);
+		ZeroPoleGain buildLowPassPrototype(int n, double ap, double as) {		
+			double eps = 1.0 / Math.sqrt(Math.pow(10, as * 0.1) - 1);
 
 			double a = 1.0 / n * MathETK.asinh(1 / eps);
 			double sinha = Math.sinh(a);
@@ -144,10 +144,6 @@ public enum ApproximationType {
 			return ws;
 		}
 
-		@Override
-		double getAttenuation(double ap, double as) {
-			return as;
-		}
 	},
 	ELLIPTIC {
 
@@ -269,10 +265,6 @@ public enum ApproximationType {
 
 	double getScalingFrequency(double wp, double ws) {
 		return wp;
-	}
-
-	double getAttenuation(double ap, double as) {
-		return ap;
 	}
 	
 	static double computeGain(Complex[] zeros, Complex[] poles) {

@@ -17,9 +17,7 @@ public class AnalogFilter {
 	static class LowPassPrototype {
 		private TransferFunction _tf;
 		
-		public LowPassPrototype(TransferFunction tf) {
-			_tf = tf;
-		}
+
 		
 		public LowPassPrototype(ZeroPoleGain zpk) {
 			_tf = zpkToTF(zpk);
@@ -49,44 +47,42 @@ public class AnalogFilter {
 		return type.getMinOrderNeeded(fp, fs, ap, as);
 	}
 	
-//	protected static AnalogFilter newLowPass(int n, double ap, ApproximationType type) {
-//		TransferFunction lp = zpkToTF(type.buildLowPassPrototype(n, ap, 0.0));
-//		return new AnalogFilter(n, lp);
-//	}
+	protected static AnalogFilter newLowPass(int n, double ap, double as, ApproximationType type) {
+		TransferFunction lp = zpkToTF(type.buildLowPassPrototype(n, ap, as));
+		return new AnalogFilter(n, lp);
+	}
 	
 	public static AnalogFilter newLowPass(LowPassSpecs specs, ApproximationType type) {
 		double fp = specs.PassBandFrequency;
 		double fs = specs.StopBandFrequency;
-		double ap = specs.PassBandAttenuation;
+		double ap = specs.PassBandRipple;
 		double as = specs.StopBandAttenuation;
 		
 		double wp = 2 * Math.PI * fp;
 		double ws = 2 * Math.PI * fs;
 		final int n = type.getMinOrderNeeded(wp, ws, ap, as);
-		double lpa = type.getAttenuation(ap, as);
-		LowPassPrototype lp = new LowPassPrototype(type.buildLowPassPrototype(n, lpa, as));
+		LowPassPrototype lp = new LowPassPrototype(type.buildLowPassPrototype(n, ap, as));
 		double w0 = type.getScalingFrequency(wp,ws);
 		lp._tf = lpTolp(lp._tf.getNumerator(), lp._tf.getDenominator(), w0);
 		return new AnalogFilter(n, lp._tf);
 	}
 	
-//	public static AnalogFilter newHighPass(int n, double ap, ApproximationType type) {
-//		LowPassPrototype lp = type.buildLowPassPrototype(n, ap, 0.0);
-//		lp._tf = lpTohp(lp._tf.getNumerator(), lp._tf.getDenominator(), 0.0);
-//		return new AnalogFilter(n, lp._tf);
-//	}
+	public static AnalogFilter newHighPass(int n, double ap, double as, ApproximationType type) {
+		TransferFunction lp = zpkToTF(type.buildLowPassPrototype(n, ap, as));
+		lp = lpTohp(lp.getNumerator(), lp.getDenominator(), 0.0);
+		return new AnalogFilter(n, lp);
+	}
 	
 	public static AnalogFilter newHighPass(HighPassSpecs specs, ApproximationType type) {
 		double fp = specs.PassBandFrequency;
 		double fs = specs.StopBandFrequency;
-		double ap = specs.PassBandAttenuation;
+		double ap = specs.PassBandRipple;
 		double as = specs.StopBandAttenuation;
 		
 		double wp = 2 * Math.PI * fp;
 		double ws = 2 * Math.PI * fs;
 		final int n = type.getMinOrderNeeded(ws, wp, ap, as);
-		double hpa = type.getAttenuation(ap, as);
-		LowPassPrototype lp = new LowPassPrototype(type.buildLowPassPrototype(n, hpa, as));
+		LowPassPrototype lp = new LowPassPrototype(type.buildLowPassPrototype(n, ap, as));
 		double factor = type.getScalingFrequency(wp, ws);
 		lp._tf = lpTohp(lp._tf.getNumerator(), lp._tf.getDenominator(), factor);
 		return new AnalogFilter(n, lp._tf);
@@ -97,7 +93,7 @@ public class AnalogFilter {
 		double fp2 = specs.UpperPassBandFrequency;
 		double fs1 = specs.LowerStopBandFrequency;
 		double fs2 = specs.UpperStopBandFrequency;
-		double ap = specs.PassBandAttenuation;
+		double ap = specs.PassBandRipple;
 		double as1 = specs.LowerStopBandAttenuation;
 		double as2 = specs.UpperStopBandAttenuation;
 		
@@ -128,8 +124,7 @@ public class AnalogFilter {
 			n = n2;
 			as = as2;
 		}
-		double bpa = type.getAttenuation(ap, as);
-		TransferFunction tf = zpkToTF(type.buildLowPassPrototype(n, bpa, as));
+		TransferFunction tf = zpkToTF(type.buildLowPassPrototype(n, ap, as));
 
 		double bw = Q / w0;
 		tf = lpTobp(tf.getNumerator(), tf.getDenominator(), w0, bw);
@@ -141,7 +136,7 @@ public class AnalogFilter {
 		double fp2 = specs.UpperPassBandFrequency;
 		double fs1 = specs.LowerStopBandFrequency;
 		double fs2 = specs.UpperStopBandFrequency;
-		double amax = specs.PassBandAttenuation;
+		double amax = specs.PassBandRipple;
 		double amin = specs.StopBandAttenuation;
 		
 		double wp1 = 2 * Math.PI * fp1;
@@ -162,8 +157,7 @@ public class AnalogFilter {
 		
 		int n = n1 > n2 ? n1 : n2;
 		
-		double bsa = type.getAttenuation(amax, amin);
-		TransferFunction tf = zpkToTF(type.buildLowPassPrototype(n, bsa, amin));
+		TransferFunction tf = zpkToTF(type.buildLowPassPrototype(n, amax, amin));
 
 		double bw = w0 / Q;
 		tf = lpTobs(tf.getNumerator(), tf.getDenominator(), w0, bw);
