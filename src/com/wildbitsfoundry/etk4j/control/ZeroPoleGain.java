@@ -1,4 +1,4 @@
-package com.wildbitsfoundry.etk4j.systems;
+package com.wildbitsfoundry.etk4j.control;
 
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 

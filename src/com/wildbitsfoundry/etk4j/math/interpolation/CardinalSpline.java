@@ -29,7 +29,7 @@ public class CardinalSpline extends Spline {
 	
 	public static CardinalSpline newCardinalSplineInPlace(double[] x, double[] y, double tau, double alpha) {
 		checkXYDimensions(x, y);
-		checkMinkXLength(x, 4);
+		checkMinXLength(x, 4);
 		final int n = x.length;
 		double[] d = new double[n + 2];
 		double cp = 1 - tau;

@@ -1,11 +1,11 @@
-package com.wildbitsfoundry.etk4j.systems.filters;
+package com.wildbitsfoundry.etk4j.signals.filters;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import com.wildbitsfoundry.etk4j.control.ZeroPoleGain;
 import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
-import com.wildbitsfoundry.etk4j.systems.ZeroPoleGain;
 
 public enum ApproximationType {
 	CHEBYSHEV {

@@ -1,4 +1,4 @@
-package com.wildbitsfoundry.etk4j.systems.filters;
+package com.wildbitsfoundry.etk4j.signals.filters;
 
 public abstract class FilterSpecs {
 	private static enum FilterType {

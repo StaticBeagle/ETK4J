@@ -93,7 +93,7 @@ public abstract class PiecewiseFunction implements UnivariateFunction {
 		}
 	}
 
-	protected static void checkMinkXLength(double[] x, int size) {
+	protected static void checkMinXLength(double[] x, int size) {
 		if (x.length < size) {
 			throw new IllegalArgumentException(String.format("x length must be >= %d", size));
 		}

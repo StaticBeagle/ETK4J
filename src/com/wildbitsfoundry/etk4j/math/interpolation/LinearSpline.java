@@ -31,7 +31,7 @@ public class LinearSpline extends Spline {
 
 	public static LinearSpline newLinearSplineInPlace(double[] x, double[] y) {
 		checkXYDimensions(x, y);
-		checkMinkXLength(x, 2);
+		checkMinXLength(x, 2);
 		return new LinearSpline(x, y);
 	}
 	

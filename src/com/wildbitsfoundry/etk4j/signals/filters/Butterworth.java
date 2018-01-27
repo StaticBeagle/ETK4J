@@ -1,17 +1,17 @@
-package com.wildbitsfoundry.etk4j.systems.filters;
+package com.wildbitsfoundry.etk4j.signals.filters;
 
-import static com.wildbitsfoundry.etk4j.systems.filters.AnalogFilter.lpTobp;
-import static com.wildbitsfoundry.etk4j.systems.filters.AnalogFilter.lpTobs;
-import static com.wildbitsfoundry.etk4j.systems.filters.AnalogFilter.lpTohp;
+import static com.wildbitsfoundry.etk4j.signals.filters.AnalogFilter.lpTobp;
+import static com.wildbitsfoundry.etk4j.signals.filters.AnalogFilter.lpTobs;
+import static com.wildbitsfoundry.etk4j.signals.filters.AnalogFilter.lpTohp;
 
 import java.util.Arrays;
 
+import com.wildbitsfoundry.etk4j.control.TransferFunction;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
-import com.wildbitsfoundry.etk4j.systems.TransferFunction;
-import com.wildbitsfoundry.etk4j.systems.filters.FilterSpecs.BandPassSpecs;
-import com.wildbitsfoundry.etk4j.systems.filters.FilterSpecs.BandStopSpecs;
-import com.wildbitsfoundry.etk4j.systems.filters.FilterSpecs.HighPassSpecs;
-import com.wildbitsfoundry.etk4j.systems.filters.FilterSpecs.LowPassSpecs;
+import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.BandPassSpecs;
+import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.BandStopSpecs;
+import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.HighPassSpecs;
+import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.LowPassSpecs;
 import com.wildbitsfoundry.etk4j.util.NumArrays;
 
 public class Butterworth {

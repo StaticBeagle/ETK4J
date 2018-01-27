@@ -1,13 +1,13 @@
-package com.wildbitsfoundry.etk4j.systems.filters;
+package com.wildbitsfoundry.etk4j.signals.filters;
 
+import com.wildbitsfoundry.etk4j.control.TransferFunction;
+import com.wildbitsfoundry.etk4j.control.ZeroPoleGain;
 import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
 import com.wildbitsfoundry.etk4j.math.polynomials.RationalFunction;
-import com.wildbitsfoundry.etk4j.systems.TransferFunction;
-import com.wildbitsfoundry.etk4j.systems.ZeroPoleGain;
-import com.wildbitsfoundry.etk4j.systems.filters.FilterSpecs.BandPassSpecs;
-import com.wildbitsfoundry.etk4j.systems.filters.FilterSpecs.BandStopSpecs;
-import com.wildbitsfoundry.etk4j.systems.filters.FilterSpecs.HighPassSpecs;
-import com.wildbitsfoundry.etk4j.systems.filters.FilterSpecs.LowPassSpecs;
+import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.BandPassSpecs;
+import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.BandStopSpecs;
+import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.HighPassSpecs;
+import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.LowPassSpecs;
 
 public class AnalogFilter {
 	

@@ -1,13 +1,15 @@
-package com.wildbitsfoundry.etk4j.systems.filters;
+package com.wildbitsfoundry.etk4j.signals.filters;
 
 import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
-import com.wildbitsfoundry.etk4j.systems.TransferFunction;
 import com.wildbitsfoundry.etk4j.util.NumArrays;
-import static com.wildbitsfoundry.etk4j.systems.filters.AnalogFilter.lpTohp;
-import static com.wildbitsfoundry.etk4j.systems.filters.AnalogFilter.lpTobp;
-import static com.wildbitsfoundry.etk4j.systems.filters.AnalogFilter.lpTobs;
+
+import static com.wildbitsfoundry.etk4j.signals.filters.AnalogFilter.lpTobp;
+import static com.wildbitsfoundry.etk4j.signals.filters.AnalogFilter.lpTobs;
+import static com.wildbitsfoundry.etk4j.signals.filters.AnalogFilter.lpTohp;
+
+import com.wildbitsfoundry.etk4j.control.TransferFunction;
 
 public class Chebyshev {
 
