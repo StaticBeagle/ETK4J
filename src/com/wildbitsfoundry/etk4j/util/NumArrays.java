@@ -382,11 +382,21 @@ public final class NumArrays {
 	}
 	
 	public static Double[] box(double[] a) {
-		return Arrays.stream(a).boxed().toArray(size -> new Double[size]);
+		final int length = a.length;
+		Double[] boxed = new Double[length];
+		for(int i = 0; i < length; ++i) {
+			boxed[i] = a[i];
+		}
+		return boxed;
 	}
 	
 	public static double[] unbox(Double[] a) {
-		return Arrays.stream(a).mapToDouble(Double::doubleValue).toArray();
+		final int length = a.length;
+		double[] unboxed = new double[length];
+		for(int i = 0; i < length; ++i) {
+			unboxed[i] = a[i].doubleValue();
+		}
+		return unboxed;
 	}
 
 	public static double[] scaleRange(double[] a, double curMin, double curMax, double newMin, double newMax) {

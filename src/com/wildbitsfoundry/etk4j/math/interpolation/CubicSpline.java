@@ -3,7 +3,8 @@ package com.wildbitsfoundry.etk4j.math.interpolation;
 import java.util.Arrays;
 
 import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
-import com.wildbitsfoundry.etk4j.math.functions.common.ExtrapolationMethod;
+import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkMinXLength;
+import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkXYDimensions;
 
 public class CubicSpline extends Spline {
 
@@ -59,17 +60,11 @@ public class CubicSpline extends Spline {
 			_coefs[++j] = c;
 			_coefs[++j] = d;
 		}
-		this.setEndPointsAndEndSlopes(y[0], y[n - 1], dydx[0], dydx[n - 1]);
 	}
 
 	private CubicSpline(double[] x, double[] y, double[] coefs, double d0, double dn) {
 		super(x, 4);
 		_coefs = coefs;
-	}
-
-	@Override
-	public void setExtrapolationMethod(ExtrapolationMethod method) {
-		super.setExtrapolationMethod(method);
 	}
 
 	private static TridiagonalLDLTSystem setupLDLT(double[] x, double[] y) {
@@ -267,7 +262,7 @@ public class CubicSpline extends Spline {
 	}
 
 	@Override
-	protected double getValueAt(int i, double x) {
+	public double evaluateSegmentAt(int i, double x) {
 		double t = x - _x[i];
 		i <<= 2;
 		return _coefs[i + 3] + t * (_coefs[i + 2] + t * (_coefs[i + 1] + t * _coefs[i]));
@@ -276,14 +271,12 @@ public class CubicSpline extends Spline {
 	@Override
 	public double evaluateDerivativeAt(int i, double t) {
 		i <<= 2;
-		return _coefs[i + 2] + t * (_coefs[i + 1] + t * _coefs[i]);
+		return _coefs[i + 2] + t * (2 * _coefs[i + 1] + t * 3 * _coefs[i]);
 	}
-
-	private final double a = 1.0 / 2.0, b = 1.0 / 3.0, c = 1.0 / 4.0;
 
 	@Override
 	protected double evaluateAntiDerivativeAt(int i, double t) {
 		i <<= 2;
-		return t * (_coefs[i + 3] + t * (_coefs[i + 2] * a + t * (_coefs[i + 1] * b + t * _coefs[i] * c)));
+		return t * (_coefs[i + 3] + t * (_coefs[i + 2] * 0.5 + t * (_coefs[i + 1] * 0.3333333333333333 + t * _coefs[i] * 0.25)));
 	}
 }

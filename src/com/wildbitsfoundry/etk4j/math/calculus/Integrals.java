@@ -4,8 +4,8 @@ import java.util.Arrays;
 
 import com.wildbitsfoundry.etk4j.util.NumArrays;
 
-public final class Integration {
-	private Integration() {}
+public final class Integrals {
+	private Integrals() {}
 	
 	public static double[] cummulativeTrapz(double... a) {
 		final int length = a.length;

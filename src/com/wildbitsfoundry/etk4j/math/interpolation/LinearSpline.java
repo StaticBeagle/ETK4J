@@ -1,8 +1,8 @@
 package com.wildbitsfoundry.etk4j.math.interpolation;
 
 import java.util.Arrays;
-
-import com.wildbitsfoundry.etk4j.math.functions.common.ExtrapolationMethod;
+import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkMinXLength;
+import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkXYDimensions;
 
 public class LinearSpline extends Spline {
 
@@ -22,7 +22,6 @@ public class LinearSpline extends Spline {
 			_coefs[j] = a;
 			_coefs[++j] = b;
 		}
-		this.setEndPointsAndEndSlopes(y[0], y[n - 1], _coefs[0], _coefs[_coefs.length - 2]);
 	}
 
 	public static LinearSpline newLinearSpline(double[] x, double[] y) {
@@ -34,14 +33,9 @@ public class LinearSpline extends Spline {
 		checkMinXLength(x, 2);
 		return new LinearSpline(x, y);
 	}
-	
-	@Override
-	public void setExtrapolationMethod(ExtrapolationMethod method) {
-		super.setExtrapolationMethod(method);
-	}
 
 	@Override
-	protected double getValueAt(int i, double x) {
+	public double evaluateSegmentAt(int i, double x) {
 		double t = x - _x[i];
 		i <<= 1;
 		return _coefs[i + 1] + t * _coefs[i];

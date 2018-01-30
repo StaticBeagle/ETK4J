@@ -2,6 +2,9 @@ package com.wildbitsfoundry.etk4j.math.interpolation;
 
 import java.util.Arrays;
 
+import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkMinXLength;
+import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkXYDimensions;
+
 public class CardinalSpline extends Spline {
 
 	private CardinalSpline(double[] x, double[] y, double[] dydx) {
@@ -138,7 +141,7 @@ public class CardinalSpline extends Spline {
 	// return sb.toString().replace("+ -", "- ");
 	// }
 	
-	protected double getValueAt(int i, double x) {
+	public double evaluateSegmentAt(int i, double x) {
 		double t = x - _x[i];
 		i <<= 2;
 		return _coefs[i + 3] + t * (_coefs[i + 2] + t * (_coefs[i + 1] + t * _coefs[i]));

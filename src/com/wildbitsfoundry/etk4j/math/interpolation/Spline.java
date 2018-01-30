@@ -1,8 +1,13 @@
 package com.wildbitsfoundry.etk4j.math.interpolation;
 
+import java.util.Arrays;
+
 import com.wildbitsfoundry.etk4j.math.functions.DifferentiableFunction;
 import com.wildbitsfoundry.etk4j.math.functions.IntegrableFunction;
 import com.wildbitsfoundry.etk4j.math.functions.PiecewiseFunction;
+import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
+import com.wildbitsfoundry.etk4j.math.interpolation.Extrapolators.*;
+
 
 public abstract class Spline extends PiecewiseFunction implements DifferentiableFunction, IntegrableFunction {
 	
@@ -14,11 +19,65 @@ public abstract class Spline extends PiecewiseFunction implements Differentiable
 		_order = order;
 	}
 	
+	@Override
+	public UnivariateFunction getSegment(int index) {
+		int offset = index * _order;
+		final double[] coefs = Arrays.copyOfRange(_coefs, offset, offset + _order);
+		final double x0 = _x[index];
+		UnivariateFunction fn = new UnivariateFunction() {
+			
+			@Override
+			public double evaluateAt(double x) {
+				double t = x - x0;
+				double result = 0.0;
+				for (int j = 0; j < _order; ++j) {
+					result = result * t + coefs[j];
+				}
+				return result;
+			}
+		};
+		return fn;
+	}
+	
+	public void setExtrapolationMethod(ExtrapolationMethod method) {
+		double x0 = _x[0];
+		double xn = _x[_x.length - 1];
+		double y0 = this.evaluateAt(x0);
+		double yn = this.evaluateAt(xn);
+		switch (method) {
+		case ClampToZero:
+			this.setExtrapolator(new ClampToZeroExtrapolator());
+			break;
+		case ClampToNaN:
+			this.setExtrapolator(new ClampToNaNExtrapolator());
+			break;
+		case ClampToEndPoint:
+			this.setExtrapolator(new ClampToEndPointExtrapolator(x0, xn, y0, yn));
+			break;
+		case Natural:
+			UnivariateFunction lfn = this.getFirstSegment();
+			UnivariateFunction rfn = this.getLastSegment();
+			this.setExtrapolator(new NaturalExtrapolator(lfn, rfn, x0, xn));
+			break;
+		case Linear:
+			this.setExtrapolator(new LinearExtrapolator(this, x0, xn, y0, yn));
+			break;
+		case Periodic:
+			this.setExtrapolator(new PeriodicExtrapolator(this, x0, xn));
+			break;
+		case Throw:
+			this.setExtrapolator(new ThrowExtrapolator(x0, xn));
+			break;
+		default:
+			throw new IllegalArgumentException("invalid extrapolation option");
+		}
+	}
+		
 	protected abstract double evaluateDerivativeAt(int i, double t);
 	protected abstract double evaluateAntiDerivativeAt(int i, double t);
 	
 	@Override
-	protected double getValueAt(int i, double x) {
+	public double evaluateSegmentAt(int i, double x) {
 
 		double t = x - _x[i];
 		i *= _order;
@@ -32,7 +91,7 @@ public abstract class Spline extends PiecewiseFunction implements Differentiable
 
 	@Override
 	public double differentiate(double x) {
-		int i = this.findLeftIndex(x);
+		int i = this.findSegmentIndex(x);
 		double t = x - _x[i];
 		return this.evaluateDerivativeAt(i, t);
 	}
@@ -52,7 +111,7 @@ public abstract class Spline extends PiecewiseFunction implements Differentiable
 			this.calcuateIntegral();
 		}
 
-		int i = this.findLeftIndex(x);
+		int i = this.findSegmentIndex(x);
 		double t = x - _x[i];
 		return _indefiniteIntegral[i] + this.evaluateAntiDerivativeAt(i, t);
 	}

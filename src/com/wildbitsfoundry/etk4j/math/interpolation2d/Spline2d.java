@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 import com.wildbitsfoundry.etk4j.math.functions.BivariateFunction;
 import com.wildbitsfoundry.etk4j.math.interpolation.CubicSpline;
-import com.wildbitsfoundry.etk4j.math.interpolation.Interpolation;
+import com.wildbitsfoundry.etk4j.math.interpolation.Interpolants;
 import com.wildbitsfoundry.etk4j.math.interpolation.LinearSpline;
 import com.wildbitsfoundry.etk4j.math.interpolation.Spline;
 
@@ -79,7 +79,7 @@ public class Spline2d implements BivariateFunction{
 		for (int i = 0; i < _order; ++i) {
 			tmp[i] = _splines[i + index].evaluateAt(x);
 		}
-		return Interpolation.spline(Arrays.copyOfRange(_y, index, index + _order), tmp, y);
+		return Interpolants.spline(Arrays.copyOfRange(_y, index, index + _order), tmp, y);
 	}
 
 	protected int findLeftIndex(double y) {

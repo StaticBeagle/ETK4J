@@ -7,7 +7,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import com.wildbitsfoundry.etk4j.math.functions.common.ExtrapolationMethod;
 import com.wildbitsfoundry.etk4j.math.interpolation.CubicSpline;
 
 public class CubicSplineTest {

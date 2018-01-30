@@ -2,8 +2,8 @@ package com.wildbitsfoundry.etk4j.math.interpolation;
 
 import com.wildbitsfoundry.etk4j.curvefitting.CurveFitting;
 
-public final class Interpolation {
-	private Interpolation() {
+public final class Interpolants {
+	private Interpolants() {
 	}
 
 	public static double linear(double x0, double x1, double y0, double y1, double x) {
