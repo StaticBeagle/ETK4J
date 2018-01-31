@@ -7,6 +7,8 @@ import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkM
 import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkXYDimensions;
 
 public class CubicSpline extends Spline {
+	
+	private static final double P5 = 0.5, P33 = 1.0 / 3.0, P25 = 0.25;
 
 	private static class TridiagonalLDLTSystem {
 		public double[] D;
@@ -243,25 +245,6 @@ public class CubicSpline extends Spline {
 	}
 
 	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		for (int i = 0, j = 0; i < _x.length - 1; ++i, ++j) {
-			double a = _coefs[j];
-			double b = _coefs[++j];
-			double c = _coefs[++j];
-			double d = _coefs[++j];
-
-			sb.append("S").append(i + 1).append("(x) = ")
-					.append(a != 0d ? String.format("%.4f * (x - %.4f)^3", a, _x[i]) : "")
-					.append(b != 0d ? String.format(" + %.4f * (x - %.4f)^2", b, _x[i]) : "")
-					.append(c != 0d ? String.format(" + %.4f * (x - %.4f)", c, _x[i]) : "")
-					.append(d != 0d ? String.format(" + %.4f", d, _x[i]) : "").append(System.lineSeparator());
-		}
-		sb.setLength(Math.max(sb.length() - System.lineSeparator().length(), 0));
-		return sb.toString().replace("+ -", "- ").replace("- -", "+ ");
-	}
-
-	@Override
 	public double evaluateSegmentAt(int i, double x) {
 		double t = x - _x[i];
 		i <<= 2;
@@ -277,6 +260,25 @@ public class CubicSpline extends Spline {
 	@Override
 	protected double evaluateAntiDerivativeAt(int i, double t) {
 		i <<= 2;
-		return t * (_coefs[i + 3] + t * (_coefs[i + 2] * 0.5 + t * (_coefs[i + 1] * 0.3333333333333333 + t * _coefs[i] * 0.25)));
+		return t * (_coefs[i + 3] + t * (_coefs[i + 2] * P5 + t * (_coefs[i + 1] * P33 + t * _coefs[i] * P25)));
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0, j = 0; i < _x.length - 1; ++i, ++j) {
+			double a = _coefs[j];
+			double b = _coefs[++j];
+			double c = _coefs[++j];
+			double d = _coefs[++j];
+			
+			sb.append("S").append(i + 1).append("(x) = ")
+			.append(a != 0d ? String.format("%.4f * (x - %.4f)^3", a, _x[i]) : "")
+			.append(b != 0d ? String.format(" + %.4f * (x - %.4f)^2", b, _x[i]) : "")
+			.append(c != 0d ? String.format(" + %.4f * (x - %.4f)", c, _x[i]) : "")
+			.append(d != 0d ? String.format(" + %.4f", d, _x[i]) : "").append(System.lineSeparator());
+		}
+		sb.setLength(Math.max(sb.length() - System.lineSeparator().length(), 0));
+		return sb.toString().replace("+ -", "- ").replace("- -", "+ ");
 	}
 }

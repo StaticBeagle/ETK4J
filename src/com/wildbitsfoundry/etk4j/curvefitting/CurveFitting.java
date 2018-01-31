@@ -1,20 +1,34 @@
 package com.wildbitsfoundry.etk4j.curvefitting;
 
 import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
+import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkXYDimensions;
 
 public final class CurveFitting {
 	private CurveFitting() {
 	}
 
+	/***
+	 * Constructs a line <code>f(x) = m * x + b</code> defined by two points (x0, y0) and (x1, y1)
+	 * @param x0 starting coordinate for x
+	 * @param x1 end coordinate for x
+	 * @param y0 starting coordinate for y
+	 * @param y1 end coordinate for y
+	 * @return [m, b];
+	 */
 	public static double[] line(double x0, double x1, double y0, double y1) {
 		double m = (y1 - y0) / (x1 - x0);
 		return new double[] { m, y0 - m * x0 };
 	}
 	
+	/***
+	 * <strong>Linear least squares fit</strong> <br />
+	 * Fits x and y to a function <code>f(x) = m * x + b</code> in a least square sense
+	 * @param x independent variable
+	 * @param y dependent variable
+	 * @return [m, b]
+	 */
 	public static double[] linear(double[] x, double[] y) {
-		if(x.length != y.length) {
-			throw new IllegalArgumentException("x and y dimensions must match");
-		}
+		checkXYDimensions(x, y);
 		
 		final int n = x.length;
 		double xbar = 0.0;
@@ -32,12 +46,23 @@ public final class CurveFitting {
 		ssxx -= n * xbar * xbar;
 		ssxy -= n * xbar * ybar;
 		
-		double b = ssxy / ssxx;
-		double a = ybar - b * xbar;
+		double m = ssxy / ssxx;
+		double b = ybar - m * xbar;
 		
-		return new double[]{b, a};
+		return new double[]{m, b};
 	}
+	
 
+	/***
+	 * Constructs a parabola <code>f(x) = a * x^2 + b * x + c</code> defined by points (x0, y0), (x1, y1), (x2, y2)
+	 * @param x0 starting coordinate for x
+	 * @param x1 middle coordinate for x
+	 * @param x2 end coordinate for x
+	 * @param y0 starting coordinate for y
+	 * @param y1 middle coordinate for y
+	 * @param y2 end coordinate for y
+	 * @return [a, b, c];
+	 */
 	public static double[] parabola(double x0, double x1, double x2, double y0, double y1, double y2) {
 		double denom = (x0 - x1) * (x0 - x2) * (x1 - x2);
 		double a = (x2 * (y1 - y0) + x1 * (y0 - y2) + x0 * (y2 - y1)) / denom;
@@ -54,14 +79,13 @@ public final class CurveFitting {
 	/***
 	 * Exponential least squares fit <br />
 	 * Fits x and y to a function a * e^(b * x) in a least square sense
-	 * @param x
-	 * @param y
+	 * @param x independent variable
+	 * @param y dependent variable
 	 * @return [a, b]
 	 */
 	public static double[] exponential(double[] x, double[] y) {
-		if(x.length != y.length) {
-			throw new IllegalArgumentException("x and y dimensions must match");
-		}
+		checkXYDimensions(x, y);
+		
 		final int n = x.length;
 		double k0 = 0.0, k1 = 0.0, k2 = 0.0, k3 = 0.0, r0 = 0.0, r1 = 0.0;
 		for (int i = 0; i < n; i++) {
@@ -82,14 +106,13 @@ public final class CurveFitting {
 	/***
 	 * Logarithmic least squares fit
 	 * Fits x and y to a function a + b * ln(x) in a least square sense
-	 * @param x
-	 * @param y
+	 * @param x independent variable
+	 * @param y dependent variable
 	 * @return [a, b]
 	 */
 	public static double[] logarithmic(double[] x, double[] y)  {
-		if(x.length != y.length) {
-			throw new IllegalArgumentException("x and y dimensions must match");
-		}
+		checkXYDimensions(x, y);
+		
 		final int n = x.length;
 		double k0 = 0.0, k1 = 0.0, k2 = 0.0, k3 = 0.0, k4 = 0.0;
 		for (int i = 0; i < n; i++) {
@@ -107,14 +130,13 @@ public final class CurveFitting {
 	/***
 	 * Power Law least squares fit
 	 * Fits x and y to a function a * x^(b) in a least square sense
-	 * @param x
-	 * @param y
+	 * @param x independent variable
+	 * @param y dependent variable
 	 * @return [a, b]
 	 */
 	public static double[] power(double[] x, double[] y)  {
-		if(x.length != y.length) {
-			throw new IllegalArgumentException("x and y dimensions must match");
-		}
+		checkXYDimensions(x, y);
+		
 		final int n = x.length;
 		double k0 = 0.0, k1 = 0.0, k2 = 0.0, k3 = 0.0, lx, ly;
 		for (int i = 0; i < n; i++) {

@@ -412,4 +412,12 @@ public final class NumArrays {
 			a[i] = delta * (a[i] - curMin) + curMin;
 		}
 	}
+	
+	public static double horner(double[] coefs, double x) {
+		double result = 0.0;
+		for (int j = 0; j < coefs.length; ++j) {
+			result = result * x + coefs[j];
+		}
+		return result;
+	}
 }

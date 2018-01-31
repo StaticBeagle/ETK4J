@@ -6,19 +6,64 @@ public class Complex {
 
 	private double _real;
 	private double _imag;	
+	private int _hash;
 
+	/***
+	 * Constructs a complex number (0.0, 0.0)
+	 */
 	public Complex() {
 		this(0d, 0d);
 	}
 	
+	public static Complex of(double real, double imag) {
+		return new Complex(real, imag);
+	}
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		return _hash;
+	}
+	
+	private void computeHash() {
+		final int prime = 31;
+		_hash = 1;
+		long temp;
+		temp = Double.doubleToLongBits(_imag);
+		_hash = prime * _hash + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(_real);
+		_hash = prime * _hash + (int) (temp ^ (temp >>> 32));
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof Complex))
+			return false;
+		Complex other = (Complex) obj;
+		if (Double.doubleToLongBits(_imag) != Double.doubleToLongBits(other._imag))
+			return false;
+		if (Double.doubleToLongBits(_real) != Double.doubleToLongBits(other._real))
+			return false;
+		return true;
+	}
+
 	public Complex(double real, double imag) {
 		_real = real;
 		_imag = imag;
+		this.computeHash();
 	}
 	
 	public Complex(Complex complex) {
-		_real = complex._real;
-		_imag = complex._imag;
+		this(complex._real, complex._imag);
 	}
 
 	/***
@@ -117,7 +162,7 @@ public class Complex {
 	
 	public Complex multiply(double real, double imag) {
 		Complex result = new Complex(_real, _imag);
-		multiplyOp(result, new Complex(real, imag));
+		multiplyOp(result, real, imag);
 		return result;
 	}
 	
@@ -196,12 +241,18 @@ public class Complex {
 		return new Complex(exp * Math.cos(_imag), exp * Math.sin(_imag));
 	}
 	
+	public Complex sqrt1z() {
+		Complex result = Complex.of(1.0, 0.0);
+		result.subtractEquals(this.pow2());
+		return result.sqrt();
+	}
+	
 	public Complex sin() {
 		return new Complex(Math.sin(_real) * Math.cosh(_imag), Math.cos(_real) * Math.sinh(_imag));
 	}
 	
 	public Complex asin() {
-		return new Complex(1.0, 0.0).subtract(this.pow2()).sqrt().multiply(0.0, 1.0).log().multiply(0.0, -1.0);
+		return sqrt1z().add(this.multiply(0.0, 1.0)).log().multiply(0.0, -1.0);
 	}
 	
     public Complex cos() {
@@ -209,7 +260,42 @@ public class Complex {
     }
     
     public Complex acos() {
-        return this.add(new Complex(1.0, 0.0).subtract(this.pow2()).sqrt().multiply(0.0, 1.0)).log().multiply(0.0, -1.0);
+        return this.add(this.sqrt1z().multiply(0.0, 1.0)).log().multiply(0.0, -1.0);
+    }
+    
+    public Complex tan() {
+    	if(_imag > 20.0) {
+    		return Complex.of(0.0, 1.0);
+    	} 
+    	if(_imag < -20) {
+    		return Complex.of(0.0, -1.0);
+    	}
+    	
+    	double dreal = 2.0 * _real;
+    	double dimag = 2.0 * _imag;
+    	
+    	double tmp = 1.0 / (Math.cos(dreal) + Math.cosh(dimag));
+    	return Complex.of(Math.sin(dreal) * tmp, Math.sinh(dimag) * tmp);
+    }
+    
+    public Complex atan() {
+    	Complex i = Complex.of(0.0, 1.0);
+    	return this.add(i).divide(i.subtract(this)).log().multiply(i.multiply(new Complex(0.5, 0.0)));
+    }
+    
+    public Complex tanh() {
+    	if(_imag > 20.0) {
+    		return Complex.of(0.0, 1.0);
+    	} 
+    	if(_imag < -20) {
+    		return Complex.of(0.0, -1.0);
+    	}
+    	
+    	double dreal = 2.0 * _real;
+    	double dimag = 2.0 * _imag;
+    	
+    	double tmp = 1.0 / (Math.cosh(dreal) + Math.cos(dimag));
+    	return Complex.of(Math.sinh(dreal) * tmp, Math.sin(dimag) * tmp);
     }
     
     public Complex uminus() {

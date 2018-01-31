@@ -19,6 +19,29 @@ public class ComplexTest {
 	}
 	
 	@Test
+	public void testEquals() {
+		Complex c = new Complex(a.real(), a.imag());
+		assertEquals(a, c);
+		
+		Complex d = new Complex(a);
+		assertEquals(a, d);
+	}
+	
+	@Test
+	public void testFromPolar() {
+		Complex c = Complex.fromPolar(0.5, 1.5);
+		assertEquals(0.035368600833851, c.real(), 1e-12);
+		assertEquals(0.498747493302027, c.imag(), 1e-12);
+	}
+	
+	@Test
+	public void testConj() {
+		Complex c = a.conj();
+		assertEquals(a.real(), c.real(), 1e-12);
+		assertEquals(-a.imag(), c.imag(), 1e-12);
+	}
+	
+	@Test
 	public void testAbs() {
 		assertEquals(3.605551275463989, a.abs(), 1e-12);
 	}
@@ -84,6 +107,10 @@ public class ComplexTest {
 		assertEquals(8.0, c.real(), 1e-12);
 		assertEquals(27.0, c.imag(), 1e-12);
 		
+		c = a.multiply(b.real(), b.imag());
+		assertEquals(8.0, c.real(), 1e-12);
+		assertEquals(27.0, c.imag(), 1e-12);
+		
 		c = a.multiply(2);
 		assertEquals(-4.0, c.real(), 1e-12);
 		assertEquals(6.0, c.imag(), 1e-12);
@@ -121,6 +148,14 @@ public class ComplexTest {
 		Complex c = a.sqrt();
 		assertEquals(0.8959774761298381, c.real(), 1e-12);
 		assertEquals(1.6741492280355401, c.imag(), 1e-12);
+		
+		c = new Complex().sqrt();
+		assertEquals(0.0, c.real(), 1e-12);
+		assertEquals(0.0, c.imag(), 1e-12);
+		
+		c = a.uminus().sqrt();
+		assertEquals(1.6741492280355401, c.real(), 1e-12);
+		assertEquals(-0.8959774761298381, c.imag(), 1e-12);
 	}
 	
 	@Test
@@ -159,6 +194,12 @@ public class ComplexTest {
 	}
 	
 	@Test
+	public void testPow2() {
+		Complex c = a.pow2();
+		assertEquals(-5.0, c.real(), 1e-12);
+		assertEquals(-12.0, c.imag(), 1e-12);
+	}
+	@Test
 	public void testLog() {
 		Complex c = a.log();
 		assertEquals(1.2824746787307684, c.real(), 1e-12);
@@ -177,5 +218,47 @@ public class ComplexTest {
 		Complex c = a.sin();
 		assertEquals(-9.15449914691143, c.real(), 1e-12);
 		assertEquals(-4.168906959966565, c.imag(), 1e-12);
+	}
+	
+	@Test
+	public void testAsin() {
+		Complex c = a.asin();
+		assertEquals(-0.570652784321099, c.real(), 1e-12);
+		assertEquals(1.983387029916536, c.imag(), 1e-12);
+	}
+
+	@Test
+	public void testCos() {
+		Complex c = a.cos();
+		assertEquals(-4.189625690968807, c.real(), 1e-12);
+		assertEquals(9.109227893755337, c.imag(), 1e-12);
+	}
+	
+	@Test
+	public void testAcos() {
+		Complex c = a.acos();
+		assertEquals(2.141449111115996, c.real(), 1e-12);
+		assertEquals(-1.983387029916536, c.imag(), 1e-12);
+	}
+
+	@Test
+	public void testTan() {
+		Complex c = a.tan();
+		assertEquals(0.003764025641504, c.real(), 1e-12);
+		assertEquals(1.003238627353610, c.imag(), 1e-12);
+	}
+	
+	@Test
+	public void testAtan() {
+		Complex c = a.atan();
+		assertEquals(-1.409921049596576, c.real(), 1e-12);
+		assertEquals(0.229072682968539, c.imag(), 1e-12);
+	}
+	
+	@Test
+	public void testTanh() {
+		Complex c = a.tanh();
+		assertEquals(-0.965385879022133, c.real(), 1e-12);
+		assertEquals(-0.009884375038323, c.imag(), 1e-12);
 	}
 }

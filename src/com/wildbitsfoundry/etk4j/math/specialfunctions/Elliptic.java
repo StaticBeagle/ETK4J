@@ -139,7 +139,11 @@ public final class Elliptic {
 			k *= k;
 			v.add(k);
 		}
-		return v.stream().mapToDouble(Double::doubleValue).toArray();
+		double[] result = new double[v.size()];
+		for(int i = 0; i < v.size(); ++i) {
+			result[i] = v.get(i).doubleValue();
+		}
+		return result;
 	}
 
 	public static double[] landen(double k, int noIter) {

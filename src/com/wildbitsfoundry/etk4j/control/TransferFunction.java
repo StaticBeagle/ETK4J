@@ -1,6 +1,7 @@
 package com.wildbitsfoundry.etk4j.control;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
@@ -10,9 +11,11 @@ import com.wildbitsfoundry.etk4j.util.NumArrays;
 public class TransferFunction {
 	private RationalFunction _rf;
 
-	private static final double radToDeg = 57.295779513082320;
-	//private static final double rad2Hz = 6.283185307179586;
-
+	/***
+	 * Constructs a transfer function from poles and zeros
+	 * @param zeros - zeros of the transfer function
+	 * @param poles - poles of the transfer function
+	 */
 	public TransferFunction(Complex[] zeros, Complex[] poles) {
 		_rf = new RationalFunction(zeros, poles);
 	}
@@ -40,7 +43,6 @@ public class TransferFunction {
 		_rf = rf;
 	}
 
-
 	public Complex[] getZeros() {
 		return _rf.getZeros();
 	}
@@ -55,6 +57,10 @@ public class TransferFunction {
 
 	public Polynomial getDenominator() {
 		return _rf.getDenominator();
+	}
+	
+	public Complex evaluateAt(double f) {
+		return _rf.evaluateAt(0.0, f);
 	}
 
 	public double getMagnitudeAt(double f) {
@@ -71,7 +77,7 @@ public class TransferFunction {
 	}
 
 	public double getPhaseAt(double f) {
-		return _rf.evaluateAt(0.0, f).arg() * radToDeg;
+		return Math.toDegrees(_rf.evaluateAt(0.0, f).arg());
 	}
 	
 	public double[] getPhaseWrappedAt(double[] f) {
@@ -157,34 +163,30 @@ public class TransferFunction {
 
 	@Override
 	public String toString() {
-		Polynomial numerator = _rf.getNumerator();
-		Polynomial denominator = _rf.getDenominator();
-		
-		int lengthNumerator = numerator.toString().length();
-		int lengthDenominator = denominator.toString().length();
-		java.lang.StringBuilder sb = new java.lang.StringBuilder();
-		char[] divider = new char[Math.max(lengthNumerator, lengthDenominator) + 2];
-		Arrays.fill(divider, '-');
+		String num = _rf.getNumerator().toString();
+		String den = _rf.getDenominator().toString();
 
-		char[] padding = new char[(int) Math
-				.floor((divider.length - Math.min(lengthNumerator, lengthDenominator)) * 0.5)];
-		Arrays.fill(padding, ' ');
-		if (lengthNumerator > lengthDenominator) {
-			sb.append(" ").append(numerator.toString()).append(System.getProperty("line.separator"))
-					.append(divider).append(System.getProperty("line.separator")).append(padding)
-					.append(denominator.toString());
-			return sb.toString().replace('x', 's');
-		} else if (lengthNumerator < lengthDenominator) {
-			sb.append(padding).append(numerator.toString()).append(System.getProperty("line.separator"))
-					.append(divider).append(System.getProperty("line.separator")).append(" ")
-					.append(denominator.toString());
-			return sb.toString().replace('x', 's');
+		int numLength = num.length();
+		int denLength = den.length();
+
+		int divLength = Math.max(numLength, denLength) + 2;
+		String divider = String.join("", Collections.nCopies(divLength, "-"));
+
+		int padLength = (int) Math.floor((divLength - Math.min(numLength, denLength)) * 0.5);
+		String padding = String.join("", Collections.nCopies(padLength, " "));
+
+		String[] format = null;
+
+		if (numLength > denLength) {
+			format = new String[] { " ", padding };
+		} else if (numLength < denLength) {
+			format = new String[] { padding, " " };
 		} else {
-			sb.append(" ").append(numerator.toString()).append(System.getProperty("line.separator"))
-					.append(divider).append(System.getProperty("line.separator")).append(" ")
-					.append(denominator.toString());
-			return sb.toString().replace('x', 's');
+			format = new String[] { " ", " " };
 		}
+		String nl = System.getProperty("line.separator");
+		String result = format[0] + num + nl + divider + nl + format[1] + den;
+		return result.replace('x', 's');
 	}
 
 	private static Polynomial getPolynomialMagnitude(Polynomial polynomial) {
@@ -268,7 +270,9 @@ public class TransferFunction {
 				j++;
 			}
 		}
-		return j > 0 ? Arrays.copyOfRange(wgc, 0, j) : new double[0];
+		wgc = Arrays.copyOfRange(wgc, 0, j);
+		Arrays.sort(wgc);
+		return wgc;
 	}
 
 	public double getGainCrossoverFrequency() {
@@ -326,7 +330,9 @@ public class TransferFunction {
 				j++;
 			}
 		}
-		return j > 0 ? Arrays.copyOfRange(wpc, 0, j) : new double[0];
+		wpc = Arrays.copyOfRange(wpc, 0, j);
+		Arrays.sort(wpc);
+		return wpc;
 	}
 
 	public double getPhaseCrossoverFrequency() {
@@ -335,16 +341,19 @@ public class TransferFunction {
 	}
 
 	public Margins getMargins() {
-		double[] wcg = this.getAllGainCrossoverFrequencies();
-		double[] wcp = this.getAllPhaseCrossoverFrequencies();
+		double wcg = this.getGainCrossoverFrequency();
+		double wcp = this.getPhaseCrossoverFrequency();
 
-		Arrays.sort(wcg);
-		Arrays.sort(wcp);
+		double pm = wcg == Double.NaN ? Double.NaN : 180 + this.getPhaseAt(wcg);
+		double gm = wcp == Double.NaN ? Double.NaN : 20 * Math.log10(1.0 / this.getMagnitudeAt(wcp));
+		
+		Margins m = new Margins();
+		m.GainCrossOverFrequency = wcg;
+		m.PhaseCrossOverFrequency = wcp;
+		m.GainMargin = gm;
+		m.PhaseMargin = pm;
 
-		double pm = wcg[0] == Double.NaN ? Double.NaN : 180 + this.getPhaseAt(wcg[0]);
-		double gm = wcp[0] == Double.NaN ? Double.NaN : 20 * Math.log10(1.0 / this.getMagnitudeAt(wcp[0]));
-
-		return new Margins(wcg, wcp, pm, gm);
+		return m;
 	}
 	
 	public void substituteInPlace(double d) {

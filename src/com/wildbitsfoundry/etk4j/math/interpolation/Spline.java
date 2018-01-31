@@ -7,6 +7,7 @@ import com.wildbitsfoundry.etk4j.math.functions.IntegrableFunction;
 import com.wildbitsfoundry.etk4j.math.functions.PiecewiseFunction;
 import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
 import com.wildbitsfoundry.etk4j.math.interpolation.Extrapolators.*;
+import com.wildbitsfoundry.etk4j.util.NumArrays;
 
 
 public abstract class Spline extends PiecewiseFunction implements DifferentiableFunction, IntegrableFunction {
@@ -28,12 +29,7 @@ public abstract class Spline extends PiecewiseFunction implements Differentiable
 			
 			@Override
 			public double evaluateAt(double x) {
-				double t = x - x0;
-				double result = 0.0;
-				for (int j = 0; j < _order; ++j) {
-					result = result * t + coefs[j];
-				}
-				return result;
+				return NumArrays.horner(coefs, x - x0);
 			}
 		};
 		return fn;
@@ -69,21 +65,40 @@ public abstract class Spline extends PiecewiseFunction implements Differentiable
 			this.setExtrapolator(new ThrowExtrapolator(x0, xn));
 			break;
 		default:
-			throw new IllegalArgumentException("invalid extrapolation option");
+			throw new IllegalArgumentException("Invalid extrapolation option");
 		}
 	}
 		
-	protected abstract double evaluateDerivativeAt(int i, double t);
-	protected abstract double evaluateAntiDerivativeAt(int i, double t);
+	protected double evaluateDerivativeAt(int index, double t) {
+		index *= _order;
+		final int length = _order - 1;
+		double result = 0.0;
+		for (int j = 0; j < length; ++j) {
+			result *= t;
+			result += _coefs[index++] * (length - j);
+		}
+		return result;
+	}
+	
+	protected double evaluateAntiDerivativeAt(int index, double t) {
+		index *= _order;
+		double result = 0.0;
+		for (int j = 0; j < _order; ++j) {
+			result *= t;
+			result += _coefs[index++] / (_order - j);
+		}
+		return result;
+	}
 	
 	@Override
-	public double evaluateSegmentAt(int i, double x) {
+	public double evaluateSegmentAt(int index, double x) {
 
-		double t = x - _x[i];
-		i *= _order;
+		double t = x - _x[index];
+		index *= _order;
 		double result = 0;
 		for (int j = 0; j < _order; ++j) {
-			result = result * t + _coefs[i++];
+			result *= t;
+			result += _coefs[index++];
 		}
 		return result;
 	}

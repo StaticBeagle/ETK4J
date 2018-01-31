@@ -1,9 +1,6 @@
 package com.wildbitsfoundry.etk4j.math.solvers.multivariate;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
-
 import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
 import com.wildbitsfoundry.etk4j.math.functions.MultivariateFunction;
 import com.wildbitsfoundry.etk4j.math.solvers.multivariate.SolverResults.SolverStatus;
@@ -21,15 +18,6 @@ public class NewtonRaphson {
 
 	public NewtonRaphson(MultivariateFunction[] functions, MultivariateFunction[][] jacobian, double[] intialGuess) {
 		_solver = new RegularSolver(functions, jacobian, intialGuess);
-	}
-
-	public NewtonRaphson(List<Function<Double[], Double>> functions, double[] initialGuess) {
-		_solver = new FunctionalSolver(functions, initialGuess);
-	}
-
-	public NewtonRaphson(List<Function<Double[], Double>> functions, List<Function<Double[], Double[]>> jacobian,
-			double[] intialGuess) {
-		_solver = new FunctionalSolver(functions, jacobian, intialGuess);
 	}
 
 	public NewtonRaphson iterationLimit(int limit) {
@@ -192,10 +180,6 @@ public class NewtonRaphson {
 			return _convChecker.checkForConvergence(xfinal, xcurrent, _absTol, _relTol);
 		}
 
-		protected boolean checkForConvergence(Double[] xfinal, Double[] xcurrent) {
-			return _convChecker.checkForConvergence(xfinal, xcurrent, _absTol, _relTol);
-		}
-
 		protected static SolverResults buildResults(double[] xfinal, SolverStatus status, int iterCount, double error) {
 			SolverResults sr = new SolverResults();
 			sr.Iterations = iterCount;
@@ -204,10 +188,6 @@ public class NewtonRaphson {
 			sr.Converged = status.equals(SolverStatus.SUCCESS) ? true : false;
 			sr.EstimatedError = error;
 			return sr;
-		}
-
-		protected static SolverResults buildResults(Double[] xfinal, SolverStatus status, int iterCount, double error) {
-			return buildResults(NumArrays.unbox(xfinal), status, iterCount, error);
 		}
 	}
 
@@ -303,108 +283,6 @@ public class NewtonRaphson {
 				System.arraycopy(xfinal, 0, xcurrent, 0, rows);
 			}
 			double error = this.estimateError(xfinal, xcurrent);
-			return buildResults(xfinal, SolverStatus.ITERATION_LIMIT_EXCEEDED, _maxIter - maxiter, error);
-		}
-	}
-
-	private static class FunctionalSolver
-			extends NewtonRaphsonSolver<List<Function<Double[], Double>>, List<Function<Double[], Double[]>>> {
-
-		protected FunctionalSolver(List<Function<Double[], Double>> functions, double[] x0) {
-			super(functions, x0);
-		}
-
-		protected FunctionalSolver(List<Function<Double[], Double>> functions,
-				List<Function<Double[], Double[]>> jacobian, double[] x0) {
-			super(functions, jacobian, x0);
-		}
-
-		private static void computeJacobian(Double[] x, List<Function<Double[], Double>> f, double[] dfx, double[] fx,
-				double step, double[][] out) {
-			double h = 0.5 / step;
-			int rows = f.size();
-			int cols = x.length;
-			for (int i = 0; i < cols; i++) {
-				x[i] = x[i] + step;
-				evaluateFunctionsAt(x, f, dfx);
-				x[i] = x[i] - 2.0 * step;
-				evaluateFunctionsAt(x, f, fx);
-				for (int j = 0; j < rows; j++) {
-					out[j][i] = (dfx[j] - fx[j]) * h;
-				}
-			}
-		}
-
-		private static void evaluateJacobian(Double[] xcurrent, List<Function<Double[], Double[]>> jacobian,
-				double[][] out) {
-			int rows = out.length;
-
-			for (int i = 0; i < rows; ++i) {
-				Double[] tmp = jacobian.get(i).apply(xcurrent);
-				for (int j = 0; j < tmp.length; ++j) {
-					out[i][j] = tmp[j].doubleValue();
-				}
-			}
-		}
-
-		private static void evaluateFunctionsAt(Double[] x, List<Function<Double[], Double>> functions, double[] out) {
-			int length = x.length;
-			for (int i = 0; i < length; i++) {
-				out[i] = functions.get(i).apply(x).doubleValue();
-			}
-		}
-
-		@Override
-		public SolverResults solve(Optional<List<Function<Double[], Double[]>>> jacobian) {
-			int maxiter = _maxIter;
-			double maxval = _maxVal;
-			double step = _step;
-			Double[] x0 = NumArrays.box(_x0);
-			List<Function<Double[], Double>> functions = _functions;
-
-			int rows = functions.size();
-			int cols = x0.length;
-			Double[] xcurrent = new Double[cols];
-			Double[] xfinal = new Double[cols];
-			double[] residuals = new double[cols];
-			double[] functionValues = new double[cols];
-			double[][] jacobianMatrixValues = new double[rows][cols];
-
-			System.arraycopy(x0, 0, xcurrent, 0, rows);
-			while (maxiter-- > 0) {
-
-				if (jacobian.isPresent()) {
-					evaluateJacobian(xcurrent, jacobian.get(), jacobianMatrixValues);
-					evaluateFunctionsAt(xcurrent, functions, functionValues);
-				} else {
-					computeJacobian(xcurrent, functions, residuals, functionValues, step, jacobianMatrixValues);
-				}
-
-				LU matrix = new LU(jacobianMatrixValues);
-				if (Double.compare(Math.abs(matrix.det()), ConstantsETK.DOUBLE_EPS) <= 0) {
-					double error = this.estimateError(NumArrays.unbox(xfinal), NumArrays.unbox(xcurrent));
-					return buildResults(xfinal, SolverStatus.JACOBIAN_IS_SINGULAR, _maxIter - maxiter, error);
-				}
-
-				residuals = matrix.solve(functionValues);
-				for (int i = 0; i < cols; i++) {
-					xfinal[i] = xcurrent[i] - residuals[i];
-				}
-				evaluateFunctionsAt(xfinal, functions, functionValues);
-
-				if (this.checkForConvergence(xfinal, xcurrent)) {
-					double error = this.estimateError(NumArrays.unbox(xfinal), NumArrays.unbox(xcurrent));
-					return buildResults(xfinal, SolverStatus.SUCCESS, _maxIter - maxiter, error);
-				}
-
-				if (!Double.isNaN(maxval) && Double.compare(NumArrays.normInf(xfinal), maxval) >= 0) {
-					double error = this.estimateError(NumArrays.unbox(xfinal), NumArrays.unbox(xcurrent));
-					return buildResults(xfinal, SolverStatus.MAX_ABS_VALUE_EXCEEDED, _maxIter - maxiter, error);
-				}
-
-				System.arraycopy(xfinal, 0, xcurrent, 0, rows);
-			}
-			double error = this.estimateError(NumArrays.unbox(xfinal), NumArrays.unbox(xcurrent));
 			return buildResults(xfinal, SolverStatus.ITERATION_LIMIT_EXCEEDED, _maxIter - maxiter, error);
 		}
 	}
