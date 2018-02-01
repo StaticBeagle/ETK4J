@@ -420,4 +420,13 @@ public final class NumArrays {
 		}
 		return result;
 	}
+
+	public static boolean equals(double[] a, double d) {
+		for(double val : a) {
+			if(d != val) {
+				return false;
+			}
+		}
+		return true;
+	}
 }

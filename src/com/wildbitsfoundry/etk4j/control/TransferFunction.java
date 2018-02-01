@@ -3,6 +3,7 @@ package com.wildbitsfoundry.etk4j.control;
 import java.util.Arrays;
 import java.util.Collections;
 
+import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
 import com.wildbitsfoundry.etk4j.math.polynomials.RationalFunction;
@@ -61,39 +62,6 @@ public class TransferFunction {
 	
 	public Complex evaluateAt(double f) {
 		return _rf.evaluateAt(0.0, f);
-	}
-
-	public double getMagnitudeAt(double f) {
-		return _rf.evaluateAt(0.0, f).abs();
-	}
-
-	public double[] getMagnitudeAt(final double[] f) {
-		int length = f.length;
-		double[] magnitude = new double[length];
-		for (int i = 0; i < length; ++i) {
-			magnitude[i] = this.getMagnitudeAt(f[i]);
-		}
-		return magnitude;
-	}
-
-	public double getPhaseAt(double f) {
-		return Math.toDegrees(_rf.evaluateAt(0.0, f).arg());
-	}
-	
-	public double[] getPhaseWrappedAt(double[] f) {
-		int length = f.length;
-		double[] phase = new double[length];
-
-		for (int i = 0; i < length; ++i) {
-			phase[i] = this.getPhaseAt(f[i]);
-		}
-		return phase;
-	}
-
-	public double[] getPhaseAt(final double[] f) {
-		double[] phase = this.getPhaseWrappedAt(f);
-		unwrapPhase(phase);
-		return phase;
 	}
 
 	public static void unwrapPhase(double[] phase) {
@@ -232,20 +200,16 @@ public class TransferFunction {
 		return result;
 	}
 	
-	private static Complex[] conv(Complex[] a, Complex[] b) 
-	{
+	private static Complex[] conv(Complex[] a, Complex[] b) {
 		Complex[] result = new Complex[a.length + b.length - 1];
-	
-	       for (int i = 0; i < result.length; ++i) 
-	       {
-	    	   result[i] = new Complex();
-	           for (int j = Math.max(0, i + 1 - b.length); j < Math.min(a.length, i + 1); ++j)
-	           {
-	        	   result[i] = result[i].add(a[j].multiply(b[i-j]));
-	           }
-	       }
-	
-	       return result;
+		for (int i = 0; i < result.length; ++i) {
+			result[i] = new Complex();
+			for (int j = Math.max(0, i + 1 - b.length); j < Math.min(a.length, i + 1); ++j) {
+				result[i] = result[i].add(a[j].multiply(b[i - j]));
+			}
+		}
+
+		return result;
 	}
 
 	// 		  |Num(s)|
@@ -265,9 +229,14 @@ public class TransferFunction {
 		double[] wgc = new double[solution.length];
 		int j = 0;
 		for (int i = 0; i < solution.length; i++) {
-			if (Double.compare(solution[i].imag(), 0.0) == 0 && solution[i].real() > 0) {
-				wgc[j] = solution[i].real();
-				j++;
+			double real = solution[i].real();
+			if (Double.compare(solution[i].imag(), 0.0) == 0 &&  real > 0) {
+				// Only include points where the magnitude was decreasing
+				double slope = this.evaluateAt(real).abs() - this.evaluateAt(real + 1e-12).abs();
+				if(slope > 0.0) {
+					wgc[j] = solution[i].real();
+					j++;					
+				}
 			}
 		}
 		wgc = Arrays.copyOfRange(wgc, 0, j);
@@ -277,7 +246,7 @@ public class TransferFunction {
 
 	public double getGainCrossoverFrequency() {
 		double[] result = this.getAllGainCrossoverFrequencies();
-		return result.length > 0 ? result[0] : Double.NaN;
+		return result.length > 0 ? result[0] : Double.POSITIVE_INFINITY;
 	}
 
 	/***
@@ -325,9 +294,15 @@ public class TransferFunction {
 		double[] wpc = new double[solution.length];
 		int j = 0;
 		for (int i = 0; i < solution.length; i++) {
-			if (solution[i].imag() == 0 && solution[i].real() > 0) {
-				wpc[j] = solution[i].real();
-				j++;
+			double real = solution[i].real();
+			if (solution[i].imag() == 0 && real > 0) {
+				// Only include points where the magnitude was decreasing
+				double slope = this.evaluateAt(real).abs() - this.evaluateAt(real + 1e-12).abs();
+				if(slope > 0.0) {
+					wpc[j] = solution[i].real();
+					j++;				
+				}
+
 			}
 		}
 		wpc = Arrays.copyOfRange(wpc, 0, j);
@@ -337,16 +312,24 @@ public class TransferFunction {
 
 	public double getPhaseCrossoverFrequency() {
 		double[] result = this.getAllPhaseCrossoverFrequencies();
-		return result.length > 0 ? result[0] : Double.NaN;
+		return result.length > 0 ? result[0] : Double.POSITIVE_INFINITY;
 	}
 
 	public Margins getMargins() {
 		double wcg = this.getGainCrossoverFrequency();
 		double wcp = this.getPhaseCrossoverFrequency();
 
-		double pm = wcg == Double.NaN ? Double.NaN : 180 + this.getPhaseAt(wcg);
-		double gm = wcp == Double.NaN ? Double.NaN : 20 * Math.log10(1.0 / this.getMagnitudeAt(wcp));
-		
+		double pm = wcg;
+		if(wcg != Double.POSITIVE_INFINITY) {
+			double phase = this.getPhaseAt(wcg);
+			pm = 180.0 + phase;
+		}
+		double gm = wcp;
+		if(wcp != Double.POSITIVE_INFINITY) {
+			double mag = this.evaluateAt(wcp).abs();
+			gm = 20 * Math.log10(1.0 / mag);
+		}
+
 		Margins m = new Margins();
 		m.GainCrossOverFrequency = wcg;
 		m.PhaseCrossOverFrequency = wcp;
@@ -359,19 +342,50 @@ public class TransferFunction {
 	public void substituteInPlace(double d) {
 		_rf.substituteInPlace(d);
 	}
+	
+	public double getPhaseAt(double f) {
+		Complex[] zeros = this.getZeros();
+		Complex[] poles = this.getPoles();
+		
+		double phase = this.calculatePhase(zeros, f);
+		phase -= this.calculatePhase(poles, f);
+		
+		return Math.toDegrees(phase);
+	}
+	
+	private double calculatePhase(Complex[] roots, double f) {
+		double phase = 0.0;
+		for(int i = 0; i < roots.length; ++i) {
+			if(roots[i].imag() == 0) {
+				double alpha = -roots[i].real();
+				phase += Math.atan2(f, alpha);
+			} else {
+				double alpha = -roots[i].real();
+				double beta = roots[i].imag();
+				double fn = MathETK.hypot(alpha, beta);
+				double zeta = alpha / fn; 
+				double ratio = f / fn;
+				phase += Math.atan2(2.0 * zeta * ratio, 1 - ratio * ratio);
+				// Skip the conjugate
+				++i;
+			}
+		}
+		return phase;
+	}
 
 	public static void main(String[] args) {
-		double[] logspace = NumArrays.logspace(-1, 1, 100);
-
-		TransferFunction tf1 = new TransferFunction(new double[] { 1, 10, 1000 }, new double[] { 1, 25, 100, 9, 4 });
+		TransferFunction tf1 = new TransferFunction(new double[] { 1000, 0 }, new double[] { 1, 25, 100, 9, 4});
 		System.out.println(tf1);
 		System.out.println(tf1.getMargins());
 		
-		double[] phase = tf1.getPhaseAt(logspace);
-		System.out.println(Arrays.toString(phase));
-		for(int i = 0; i < phase.length; ++i) {
-			System.out.printf("%.4f %.4f%n", logspace[i], phase[i]);
-		}
+		double phase = tf1.getPhaseAt(70.4);
+		System.out.println(phase);
+		
+//		double[] phase = tf1.getPhaseAt(logspace);
+//		System.out.println(Arrays.toString(phase));
+//		for(int i = 0; i < phase.length; ++i) {
+//			System.out.printf("%.4f %.4f%n", logspace[i], phase[i]);
+//		}
 //		
 //		System.out.println();
 //		for (double val : tf1.getAllPhaseCrossoverFrequencies()) {

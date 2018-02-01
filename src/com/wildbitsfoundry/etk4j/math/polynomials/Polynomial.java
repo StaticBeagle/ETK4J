@@ -312,6 +312,7 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 	}
 
 	public Complex[] roots() {
+		// lazy creation of roots
 		if (_roots == null) {
 			int N = _coefs.length - 1;
 			_roots = new Complex[N];
@@ -328,14 +329,23 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 			default:
 				// Use generalized eigenvalue decomposition to find the roots
 				Matrix c = Matrices.Companion(_coefs, N);
-				EigenvalueDecomposition evd = c.eig();
-				double[] realEig = evd.getRealEigenvalues();
-				double[] imagEig = evd.getImagEigenvalues();
-				for (int i = 0; i < N; i++) {
-					_roots[N - i - 1] = new Complex(realEig[i], imagEig[i]);
+				// check if the top row is full of zeros
+				if(NumArrays.equals(c.getRow(0), 0.0)) {
+					for (int i = 0; i < N; i++) {
+						_roots[i] = new Complex();
+					}
+				} else {
+					EigenvalueDecomposition evd = c.eig();
+					double[] realEig = evd.getRealEigenvalues();
+					double[] imagEig = evd.getImagEigenvalues();
+					for (int i = 0; i < N; i++) {
+						_roots[i] = new Complex(realEig[i], imagEig[i]);
+					}					
 				}
 			}
+			Arrays.sort(_roots);
 		}
+		// Defensive copy
 		Complex[] result = new Complex[_roots.length];
 		for (int i = 0; i < _roots.length; ++i) {
 			result[i] = new Complex(_roots[i]);

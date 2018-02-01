@@ -2,11 +2,10 @@ package com.wildbitsfoundry.etk4j.math.complex;
 
 import com.wildbitsfoundry.etk4j.math.MathETK;
 
-public class Complex {
+public class Complex implements Comparable<Complex> {
 
 	private double _real;
-	private double _imag;	
-	private int _hash;
+	private double _imag;
 
 	/***
 	 * Constructs a complex number (0.0, 0.0)
@@ -24,17 +23,14 @@ public class Complex {
 	 */
 	@Override
 	public int hashCode() {
-		return _hash;
-	}
-	
-	private void computeHash() {
 		final int prime = 31;
-		_hash = 1;
+		int hash = 1;
 		long temp;
 		temp = Double.doubleToLongBits(_imag);
-		_hash = prime * _hash + (int) (temp ^ (temp >>> 32));
+		hash = prime * hash + (int) (temp ^ (temp >>> 32));
 		temp = Double.doubleToLongBits(_real);
-		_hash = prime * _hash + (int) (temp ^ (temp >>> 32));
+		hash = prime * hash + (int) (temp ^ (temp >>> 32));
+		return hash;
 	}
 
 	/* (non-Javadoc)
@@ -55,11 +51,27 @@ public class Complex {
 			return false;
 		return true;
 	}
+	
+	@Override
+	public int compareTo(Complex obj) {
+		final int SMALLER = -1;
+		final int EQUAL = 0;
+		final int GREATER = 1;
+		if(this == obj) {
+			return EQUAL;
+		}
+		if(this._real > obj._real) {
+			return GREATER;
+		}
+		if(this._real == obj._real) {
+			return Double.compare(this._imag, obj._imag);
+		}
+		return SMALLER;
+	}
 
 	public Complex(double real, double imag) {
 		_real = real;
 		_imag = imag;
-		this.computeHash();
 	}
 	
 	public Complex(Complex complex) {
