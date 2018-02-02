@@ -66,13 +66,13 @@ public class MultivariateNewtonRaphsonExample {
 		double[] initialguess = { 1.0, 1.0, 1.0 };
 
 		System.out.printf("Solution with pre-computed Jacobian%n------------------------------------%n");
-		SolverResults sol1 = new NewtonRaphson(functions, jacobian, initialguess).absTolerance(1e-9).relTolerance(1e-6)
-				.iterationLimit(100).solve();
+		SolverResults sol1 = new NewtonRaphson(functions, jacobian, initialguess).setAbsTolerance(1e-9).setRelTolerance(1e-6)
+				.setIterationLimit(100).solve();
 		System.out.println(sol1);
 
 		System.out.printf("%nSolution with auto-computed Jacobian%n------------------------------------%n");
-		SolverResults sol2 = new NewtonRaphson(functions, initialguess).absTolerance(1e-9).relTolerance(1e-6)
-				.iterationLimit(100).differentiationStepSize(1e-7).solve();
+		SolverResults sol2 = new NewtonRaphson(functions, initialguess).setAbsTolerance(1e-9).setRelTolerance(1e-6)
+				.setIterationLimit(100).setDifferentiationStepSize(1e-7).solve();
 		System.out.println(sol2);
 	}
 }

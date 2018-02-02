@@ -1,12 +1,10 @@
 package com.wildbitsfoundry.etk4j.math.solvers.multivariate;
 
-import java.util.Optional;
 import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
 import com.wildbitsfoundry.etk4j.math.functions.MultivariateFunction;
 import com.wildbitsfoundry.etk4j.math.solvers.multivariate.SolverResults.SolverStatus;
+import com.wildbitsfoundry.etk4j.math.solvers.multivariate.SolverUtils.LU;
 import com.wildbitsfoundry.etk4j.util.NumArrays;
-
-import static com.wildbitsfoundry.etk4j.math.solvers.multivariate.SolverUtils.LU;
 
 public class NewtonRaphson implements MultivariateSolver {
 	
@@ -20,7 +18,7 @@ public class NewtonRaphson implements MultivariateSolver {
 	MultivariateFunction[] _functions;
 	MultivariateFunction[][] _jacobian;
 	
-	ConvergenceChecker _convChecker;
+	private ErrorEstimationScheme _errorScheme;
 
 
 	public NewtonRaphson(MultivariateFunction[] functions, double[] initialGuess) {
@@ -31,124 +29,47 @@ public class NewtonRaphson implements MultivariateSolver {
 		_functions = functions;
 		_jacobian = jacobian;
 		_x0 = initialGuess;
-		this.setErrorEstimationScheme(ErrorEstimationScheme.SQRT_SUM_ABS_ERROR_SQUARED);
-	}
-	
-	@Override
-	public MultivariateSolver setMaxIter(int max) {
-		_maxIter = max;
-		return this;
-	}
-
-	@Override
-	public MultivariateSolver setAbsTol(double tol) {
-		_absTol = tol;
-		return this;
-	}
-
-	@Override
-	public MultivariateSolver setRelTol(double tol) {
-		_relTol = tol;
-		return this;
-	}
-
-	@Override
-	public MultivariateSolver setMaxAbsVal(double max) {
-		_maxVal = max;
-		return this;
-	}
-
-	@Override
-	public MultivariateSolver setDiffStep(double step) {
-		_step = step;
-		return this;
+		_errorScheme = ErrorEstimationScheme.SQRT_SUM_ABS_ERROR_SQUARED;
 	}
 
 	@Override
 	public SolverResults solve() {
-		return this.solve(Optional.ofNullable(_jacobian));
+		return this.solve(_jacobian);
 	}
 
-	public NewtonRaphson iterationLimit(int limit) {
+	@Override
+	public NewtonRaphson setIterationLimit(int limit) {
 		_maxIter = limit;
 		return this;
 	}
 
-	public NewtonRaphson absTolerance(double tol) {
+	@Override
+	public NewtonRaphson setAbsTolerance(double tol) {
 		_absTol = tol;
 		return this;
 	}
 
-	public NewtonRaphson relTolerance(double tol) {
+	@Override
+	public NewtonRaphson setRelTolerance(double tol) {
 		_relTol = tol;
 		return this;
 	}
 
-	public NewtonRaphson maxAbsAllowedValue(double max) {
+	@Override
+	public NewtonRaphson setMaxAbsAllowedValue(double max) {
 		_maxVal = max;
 		return this;
 	}
 
-	public NewtonRaphson differentiationStepSize(double step) {
+	@Override
+	public NewtonRaphson setDifferentiationStepSize(double step) {
 		_step = step;
 		return this;
 	}
 
+	@Override
 	public NewtonRaphson setErrorEstimationScheme(ErrorEstimationScheme scheme) {
-		switch (scheme) {
-		case MAX_ABS_ERROR:
-			_convChecker = new ConvergenceChecker() {
-				@Override
-				public double estimateError(double[] x, double[] y) {
-					return NumArrays.normInf(NumArrays.subtract(x, y));
-				}
-
-				@Override
-				public boolean checkForConvergence(double[] x, double[] y, double absTol, double relTol) {
-					double delta = this.estimateError(x, y);
-					double tmp = Math.min(NumArrays.normInf(x), NumArrays.normInf(y));
-					return delta < absTol + relTol * tmp;
-				}
-			};
-			break;
-		case SQRT_SUM_ABS_ERROR_SQUARED:
-			_convChecker = new ConvergenceChecker() {
-				@Override
-				public double estimateError(double[] x, double[] y) {
-					return NumArrays.distance(x, y);
-				}
-
-				@Override
-				public boolean checkForConvergence(double[] x, double[] y, double absTol, double relTol) {
-					double delta = this.estimateError(x, y);
-					double tmp = Math.min(NumArrays.norm2(x), NumArrays.norm2(y));
-					return delta < absTol + relTol * tmp;
-				}
-			};
-			break;
-		case SUM_ABS_ERROR:
-			_convChecker = new ConvergenceChecker() {
-				@Override
-				public double estimateError(double[] x, double[] y) {
-					return NumArrays.norm1(NumArrays.subtract(x, y));
-				}
-
-				@Override
-				public boolean checkForConvergence(double[] x, double[] y, double absTol, double relTol) {
-					double delta = this.estimateError(x, y);
-					double tmp = Math.min(NumArrays.norm1(x), NumArrays.norm1(y));
-					return delta < absTol + relTol * tmp;
-				}
-			};
-			break;
-		default:
-			break;
-		}
-		return this;
-	}
-
-	public NewtonRaphson setConvergenceChecker(ConvergenceChecker checker) {
-		_convChecker = checker;
+		_errorScheme = scheme;
 		return this;
 	}
 	
@@ -186,7 +107,7 @@ public class NewtonRaphson implements MultivariateSolver {
 		}
 	}
 
-	protected SolverResults solve(Optional<MultivariateFunction[][]> jacobian) {
+	protected SolverResults solve(MultivariateFunction[][] jacobian) {
 		int maxiter = _maxIter;
 		double maxval = _maxVal;
 		double step = _step;
@@ -203,8 +124,8 @@ public class NewtonRaphson implements MultivariateSolver {
 
 		System.arraycopy(x0, 0, xcurrent, 0, rows);
 		while (maxiter-- > 0) {
-			if (jacobian.isPresent()) {
-				evaluateJacobian(xcurrent, jacobian.get(), jacobianMatrixValues);
+			if (jacobian != null) {
+				evaluateJacobian(xcurrent, jacobian, jacobianMatrixValues);
 				evaluateFunctionsAt(xcurrent, functions, functionValues);
 			} else {
 				computeJacobian(xcurrent, functions, residuals, functionValues, step, jacobianMatrixValues);
@@ -238,12 +159,14 @@ public class NewtonRaphson implements MultivariateSolver {
 	}
 
 	
-	protected double estimateError(double[] xfinal, double[] xcurrent) {
-		return _convChecker.estimateError(xfinal, xcurrent);
+	protected double estimateError(double[] x, double[] y) {
+		return _errorScheme.calculateRelativeError(x, y);
 	}
 
-	protected boolean checkForConvergence(double[] xfinal, double[] xcurrent) {
-		return _convChecker.checkForConvergence(xfinal, xcurrent, _absTol, _relTol);
+	protected boolean checkForConvergence(double[] x, double[] y) {
+		double delta = this.estimateError(x, y);
+		double tmp = Math.min(NumArrays.norm2(x), NumArrays.norm2(y));
+		return delta < _absTol + _relTol * tmp;
 	}
 
 	protected static SolverResults buildResults(double[] xfinal, SolverStatus status, int iterCount, double error) {

@@ -12,7 +12,9 @@ import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.EigenvalueDecomposition;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrices;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
+import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 import com.wildbitsfoundry.etk4j.util.NumArrays;
+import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkXYDimensions;
 
 /**
  * 
@@ -26,7 +28,7 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 	protected Complex[] _roots = null;
 
 	/***
-	 * Default constructor. Creates a polynomial with a constant value of 1.
+	 * Constructs a polynomial with a constant value of 1.
 	 */
 	public Polynomial() {
 		_coefs = new double[] { 1.0 };
@@ -40,14 +42,13 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 		this._coefs = new double[length];
 		System.arraycopy(polynomial._coefs, 0, this._coefs, 0, length);
 		if (polynomial._roots != null) {
-			_roots = new Complex[polynomial._roots.length];
-			System.arraycopy(polynomial._roots, 0, _roots, 0, polynomial._roots.length);
+			this._roots = ComplexArrays.deepCopy(polynomial._roots);
 		}
 
 	}
 
 	/***
-	 * Creates a polynomial P(x) and initializes its coefficients to the
+	 * Constructs a polynomial P(x) and initializes its coefficients to the
 	 * coefficients passed as parameters. The coefficients are assumed to be in
 	 * descending order i.e. [1, 3, 2] will generate P(x) = x^2 + 3x + 2
 	 * 
@@ -63,6 +64,18 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 		}
 		this._coefs = i == length ? new double[] { 1.0 } : Arrays.copyOfRange(coefficients, i, length);
 
+	}
+	
+	/***
+	 * Constructs a polynomial P(x) and initializes its coefficients to the
+	 * coefficients passed as parameters. The coefficients are assumed to be in
+	 * descending order i.e. [1, 3, 2] will generate P(x) = x^2 + 3x + 2
+	 * 
+	 * @param coefficients
+	 *            Array of coefficients in descending order
+	 */
+	public static Polynomial of(double... coefficients) {
+		return new Polynomial(coefficients);
 	}
 
 	/***
@@ -97,7 +110,7 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 		for (int i = 0; i <= size; i++) {
 			_coefs[i] = result[i].real();
 		}
-		_roots = Arrays.copyOf(roots, size);
+		_roots = ComplexArrays.deepCopy(roots);
 	}
 
 	/***
@@ -310,11 +323,21 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 		}
 		return result;
 	}
+	
+	public Complex evaluateAt(Complex c) {
+		// Horner's method
+		Complex result = new Complex();
+		for (double coef : _coefs) {
+			result.multiplyEquals(c);
+			result.addEquals(coef);
+		}
+		return result;
+	}
 
-	public Complex[] roots() {
+	public Complex[] getRoots() {
 		// lazy creation of roots
 		if (_roots == null) {
-			int N = _coefs.length - 1;
+			int N = this.degree();
 			_roots = new Complex[N];
 			switch (N) {
 			case 0:
@@ -327,30 +350,36 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 				_roots = Formulas.quadraticFormula(_coefs[0], _coefs[1], _coefs[2]);
 				break;
 			default:
-				// Use generalized eigenvalue decomposition to find the roots
-				Matrix c = Matrices.Companion(_coefs, N);
-				// check if the top row is full of zeros
-				if(NumArrays.equals(c.getRow(0), 0.0)) {
-					for (int i = 0; i < N; i++) {
-						_roots[i] = new Complex();
-					}
+				// Check if all roots are at the origin
+				if(this.allRootsAtOrigin()) {
+					Arrays.fill(_roots, new Complex());
 				} else {
+					// Use generalized eigenvalue decomposition to find the roots
+					Matrix c = Matrices.Companion(_coefs, N);
 					EigenvalueDecomposition evd = c.eig();
 					double[] realEig = evd.getRealEigenvalues();
 					double[] imagEig = evd.getImagEigenvalues();
 					for (int i = 0; i < N; i++) {
 						_roots[i] = new Complex(realEig[i], imagEig[i]);
+						
 					}					
 				}
 			}
 			Arrays.sort(_roots);
 		}
 		// Defensive copy
-		Complex[] result = new Complex[_roots.length];
-		for (int i = 0; i < _roots.length; ++i) {
-			result[i] = new Complex(_roots[i]);
+		return ComplexArrays.deepCopy(_roots);
+	}
+	
+	public boolean allRootsAtOrigin() {
+		boolean origin = true;
+		for(int i = 1; i < _coefs.length; ++i) {
+			if(_coefs[i] != 0.0) {
+				origin = false;
+				break;
+			}
 		}
-		return result;
+		return origin;
 	}
 
 	/***
@@ -466,10 +495,8 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 	 *         least-square sense
 	 */
 	public static Polynomial polyFit(double[] x, double[] y, int n) {
+		checkXYDimensions(x, y);
 		int dim = x.length;
-		if (dim != y.length) {
-			throw new IllegalArgumentException("x and y dimensions must match!");
-		}
 		// Building the coefficient matrix
 		Matrix A = Matrices.Vandermonde(x, dim, n + 1);
 		// Building the solution vector
@@ -480,8 +507,7 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 		for (int i = 0; i <= n; i++) {
 			coeffs[i] = c.get(n - i, 0);
 		}
-		Polynomial result = new Polynomial(coeffs);
-		return result;
+		return Polynomial.of(coeffs);
 	}
 
 	public static void main(String[] args) {
@@ -505,14 +531,15 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 		System.out.println(integral.toString());
 		System.out.println(poly.integrate(1, 4));
 
-		System.out.println(Arrays.toString(poly.roots()));
-		System.out.println(Arrays.toString(poly2.roots()));
-		System.out.println(Arrays.toString(poly3.roots()));
+		System.out.println(Arrays.toString(poly.getRoots()));
+		System.out.println(Arrays.toString(poly2.getRoots()));
+		System.out.println(Arrays.toString(poly3.getRoots()));
 
-		System.out.println(Arrays.toString(new Polynomial(new double[] { 1, 1, 1 }).roots()));
-		System.out.println(Arrays.toString(new Polynomial(new double[] { 1, 2, 1 }).roots()));
-
-		System.out.println(Arrays.toString(new Polynomial(new double[] { 8, 6, 7, 5, 3, 0, 9 }).roots()));
+		System.out.println(Arrays.toString(new Polynomial(new double[] { 1, 1, 1 }).getRoots()));
+		System.out.println(Arrays.toString(new Polynomial(new double[] { 1, 2, 1 }).getRoots()));
+		Polynomial polytest = new Polynomial(1,0,0,0);
+		polytest.getRoots();
+		System.out.println(Arrays.toString(new Polynomial(new double[] { 8, 6, 7, 5, 3, 0, 9 }).getRoots()));
 	}
 
 	public Polynomial integral() {
@@ -537,6 +564,12 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 
 	@Override
 	public double differentiate(double x) {
-		return this.derivative().evaluateAt(x);
+		final int length = _coefs.length;
+		double result = 0.0;
+		for (int i = 0, j = 0; j < length; ++i, ++j) {
+			result *= x;
+			result += _coefs[i] * (length - j);
+		}
+		return result;
 	}
 }

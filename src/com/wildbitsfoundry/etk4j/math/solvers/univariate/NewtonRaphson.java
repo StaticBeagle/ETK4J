@@ -1,7 +1,6 @@
 package com.wildbitsfoundry.etk4j.math.solvers.univariate;
 
-import java.util.Optional;
-
+import com.wildbitsfoundry.etk4j.math.calculus.Derivatives;
 import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
 import com.wildbitsfoundry.etk4j.math.solvers.univariate.UnivariateSolverResults.SolverStatus;
 
@@ -66,24 +65,23 @@ public class NewtonRaphson {
 	}
 	
 	public UnivariateSolverResults solve() {
-		return this.solve(Optional.ofNullable(_derivative));
+		return this.solve(_derivative);
 	}
 
-	protected UnivariateSolverResults solve(Optional<UnivariateFunction> derivative) {
+	protected UnivariateSolverResults solve(UnivariateFunction derivative) {
 		int maxiter = _maxIter;
 		double maxval = _maxVal;
 		double step = _step;
-		double den = 1.0 / (2.0 * step);
 		UnivariateFunction func = _func;
 
 		double xcurrent = _x0;
 		double xfinal = 0.0;
 		double error = 0.0;
 		while (maxiter-- > 0) {
-			if (derivative.isPresent()) {
-				xfinal = xcurrent - func.evaluateAt(xcurrent) / derivative.get().evaluateAt(xcurrent); 
+			if (derivative != null) {
+				xfinal = xcurrent - func.evaluateAt(xcurrent) / derivative.evaluateAt(xcurrent); 
 			} else {
-				double fprime = (func.evaluateAt(xcurrent + step) - func.evaluateAt(xcurrent - step)) * den;
+				double fprime = Derivatives.centeredDifference(func, xcurrent, step);
 				xfinal = xcurrent - func.evaluateAt(xcurrent) / fprime;
 			}
 
@@ -120,6 +118,4 @@ public class NewtonRaphson {
 				.solve();
 		System.out.println(sr2);
 	}
-	
-	
 }

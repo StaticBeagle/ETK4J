@@ -39,11 +39,11 @@ public class RationalFunction implements UnivariateFunction {
 	}
 
 	public Complex[] getZeros() {
-		return _numerator.roots();
+		return _numerator.getRoots();
 	}
 
 	public Complex[] getPoles() {
-		return _denominator.roots();
+		return _denominator.getRoots();
 	}
 
 	public Polynomial getNumerator() {

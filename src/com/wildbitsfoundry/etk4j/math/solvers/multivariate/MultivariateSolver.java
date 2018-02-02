@@ -4,11 +4,12 @@ import com.wildbitsfoundry.etk4j.math.solvers.multivariate.ErrorEstimationScheme
 
 public interface MultivariateSolver {
 	public SolverResults solve();
-	public MultivariateSolver setMaxIter(int max);
-	public MultivariateSolver setAbsTol(double tol);
-	public MultivariateSolver setRelTol(double tol);
-	public MultivariateSolver setMaxAbsVal(double max);
-	public MultivariateSolver setDiffStep(double step);
-	public MultivariateSolver setConvergenceChecker(ConvergenceChecker checker);
+	public MultivariateSolver setAbsTolerance(double tol);
+	public MultivariateSolver setRelTolerance(double tol);
+	public MultivariateSolver setIterationLimit(int limit);
+	public MultivariateSolver setMaxAbsAllowedValue(double max);
+	public MultivariateSolver setDifferentiationStepSize(double step);
 	public MultivariateSolver setErrorEstimationScheme(ErrorEstimationScheme scheme);
 }
+
+

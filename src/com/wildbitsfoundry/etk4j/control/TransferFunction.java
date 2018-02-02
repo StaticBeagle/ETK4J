@@ -7,7 +7,7 @@ import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
 import com.wildbitsfoundry.etk4j.math.polynomials.RationalFunction;
-import com.wildbitsfoundry.etk4j.util.NumArrays;
+import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 
 public class TransferFunction {
 	private RationalFunction _rf;
@@ -163,8 +163,13 @@ public class TransferFunction {
 		return new Polynomial(norm(numjw));
 	}
 	
-	private static double[] norm(Complex[] vector) {
-		Complex[] mag = conv(vector, conj(vector));
+	/***
+	 * Calculates the squared magnitude element wise
+	 * @param a
+	 * @return [norm0, norm1, .... normn] 
+	 */
+	private static double[] norm(Complex[] a) {
+		Complex[] mag = ComplexArrays.conv(a, ComplexArrays.conj(a));
 		double[] coefs = new double[mag.length];
 		for (int i = 0; i < mag.length; ++i) {
 			coefs[i] = mag[i].real();
@@ -192,25 +197,8 @@ public class TransferFunction {
 		return result == 2 || result == 3 ? - 1 : 1;
 	}
 	
-	private static Complex[] conj(Complex[] poly) {
-		Complex[] result = new Complex[poly.length];
-		for(int i = 0; i < poly.length; ++i) {
-			result[i] = poly[i].conj();
-		}
-		return result;
-	}
-	
-	private static Complex[] conv(Complex[] a, Complex[] b) {
-		Complex[] result = new Complex[a.length + b.length - 1];
-		for (int i = 0; i < result.length; ++i) {
-			result[i] = new Complex();
-			for (int j = Math.max(0, i + 1 - b.length); j < Math.min(a.length, i + 1); ++j) {
-				result[i] = result[i].add(a[j].multiply(b[i - j]));
-			}
-		}
 
-		return result;
-	}
+	
 
 	// 		  |Num(s)|
 	// H(s) = -------- = 1
@@ -225,18 +213,14 @@ public class TransferFunction {
 		Polynomial magPolyNum = getPolynomialMagnitude(_rf.getNumerator());
 		Polynomial magPolyDen = getPolynomialMagnitude(_rf.getDenominator());
 
-		Complex[] solution = magPolyDen.subtract(magPolyNum).roots();
+		Complex[] solution = magPolyDen.subtract(magPolyNum).getRoots();
 		double[] wgc = new double[solution.length];
 		int j = 0;
 		for (int i = 0; i < solution.length; i++) {
 			double real = solution[i].real();
-			if (Double.compare(solution[i].imag(), 0.0) == 0 &&  real > 0) {
-				// Only include points where the magnitude was decreasing
-				double slope = this.evaluateAt(real).abs() - this.evaluateAt(real + 1e-12).abs();
-				if(slope > 0.0) {
-					wgc[j] = solution[i].real();
-					j++;					
-				}
+			if (solution[i].imag() == 0 &&  real > 0) {
+				wgc[j] = real;
+				j++;					
 			}
 		}
 		wgc = Arrays.copyOfRange(wgc, 0, j);
@@ -245,9 +229,17 @@ public class TransferFunction {
 	}
 
 	public double getGainCrossoverFrequency() {
-		double[] result = this.getAllGainCrossoverFrequencies();
-		return result.length > 0 ? result[0] : Double.POSITIVE_INFINITY;
+		double[] freqs = this.getAllGainCrossoverFrequencies();
+		// Get the first one were the magnitude was decreasing
+		for(double f : freqs) {
+			double slope = this.getMagnitudeAt(f) - this.getMagnitudeAt(f + 1e-12);
+			if(slope > 0.0) {
+				return f;
+			}
+		}
+		return Double.POSITIVE_INFINITY;
 	}
+	
 
 	/***
 	 * Finds all the phase cross over frequencies by solving H(s) = H(-s)
@@ -281,38 +273,44 @@ public class TransferFunction {
 	 */
 	public double[] getAllPhaseCrossoverFrequencies() {
 		Complex[] num = evalAtjw(_rf.getNumerator().getCoefficients());
-		Complex[] conjDen = conj(evalAtjw(_rf.getDenominator().getCoefficients()));
+		Complex[] conjDen = ComplexArrays.conj(evalAtjw(_rf.getDenominator().getCoefficients()));
 		
-		Complex[] conv = conv(num, conjDen);
+		Complex[] conv = ComplexArrays.conv(num, conjDen);
 		double[] imag = new double[conv.length];
 		for(int i = 0; i < conv.length; ++i) {
 			imag[i] = conv[i].imag();
 		}
 		
-		Complex[] solution = new Polynomial(imag).roots();
+		Complex[] solution = new Polynomial(imag).getRoots();
 
 		double[] wpc = new double[solution.length];
 		int j = 0;
 		for (int i = 0; i < solution.length; i++) {
 			double real = solution[i].real();
 			if (solution[i].imag() == 0 && real > 0) {
-				// Only include points where the magnitude was decreasing
-				double slope = this.evaluateAt(real).abs() - this.evaluateAt(real + 1e-12).abs();
-				if(slope > 0.0) {
-					wpc[j] = solution[i].real();
-					j++;				
-				}
-
+				wpc[j] = real;
+				j++;				
 			}
 		}
 		wpc = Arrays.copyOfRange(wpc, 0, j);
 		Arrays.sort(wpc);
 		return wpc;
 	}
+	
+	public double getMagnitudeAt(double f) {
+		return this.evaluateAt(f).abs();
+	}
 
 	public double getPhaseCrossoverFrequency() {
-		double[] result = this.getAllPhaseCrossoverFrequencies();
-		return result.length > 0 ? result[0] : Double.POSITIVE_INFINITY;
+		double[] freqs = this.getAllPhaseCrossoverFrequencies();
+		// Get the first one were the magnitude was decreasing
+		for(double f : freqs) {
+			double slope = this.getMagnitudeAt(f) - this.getMagnitudeAt(f + 1e-12);
+			if(slope > 0.0) {
+				return f;
+			}
+		}
+		return Double.POSITIVE_INFINITY;
 	}
 
 	public Margins getMargins() {
@@ -326,7 +324,7 @@ public class TransferFunction {
 		}
 		double gm = wcp;
 		if(wcp != Double.POSITIVE_INFINITY) {
-			double mag = this.evaluateAt(wcp).abs();
+			double mag = this.getMagnitudeAt(wcp);
 			gm = 20 * Math.log10(1.0 / mag);
 		}
 
@@ -343,30 +341,52 @@ public class TransferFunction {
 		_rf.substituteInPlace(d);
 	}
 	
+	/***
+	 * Calculates the phase at of the system a given frequency. </br>
+	 * This operation uses the zeros and poles of the system to calculate the phase as: </br>
+	 * <pre>
+	 * 	&Sigma; Phase(Zeros) - &Sigma; Phase(Poles)
+	 * </pre>
+	 * If you need to calculate the magnitude and phase or just the phase for an array of frequencies,</br>
+	 * it might be more efficient to use {@link #evaluateAt(double)}, and then <strong>unwrap</strong> the 
+	 * phase information</br> using {@link #unwrapPhase(double[])}.
+	 * @param f
+	 * @return the phase of the system in degrees
+	 */
 	public double getPhaseAt(double f) {
 		Complex[] zeros = this.getZeros();
 		Complex[] poles = this.getPoles();
 		
-		double phase = this.calculatePhase(zeros, f);
-		phase -= this.calculatePhase(poles, f);
+		double phase = calculatePhase(zeros, f);
+		phase -= calculatePhase(poles, f);
 		
 		return Math.toDegrees(phase);
 	}
 	
-	private double calculatePhase(Complex[] roots, double f) {
+	
+	/***
+	 * 
+	 * @param roots
+	 * @param f
+	 * @return
+	 */
+	private static double calculatePhase(Complex[] roots, double f) {
 		double phase = 0.0;
 		for(int i = 0; i < roots.length; ++i) {
 			if(roots[i].imag() == 0) {
+				// Single real root
 				double alpha = -roots[i].real();
 				phase += Math.atan2(f, alpha);
 			} else {
+				// Complex pair roots
 				double alpha = -roots[i].real();
 				double beta = roots[i].imag();
 				double fn = MathETK.hypot(alpha, beta);
 				double zeta = alpha / fn; 
 				double ratio = f / fn;
 				phase += Math.atan2(2.0 * zeta * ratio, 1 - ratio * ratio);
-				// Skip the conjugate
+				// Roots are sorted. Skip the conjugate since it was
+				// already taken into account in the calculation above
 				++i;
 			}
 		}
