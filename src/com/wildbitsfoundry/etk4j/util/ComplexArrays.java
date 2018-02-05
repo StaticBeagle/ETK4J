@@ -1,6 +1,7 @@
 package com.wildbitsfoundry.etk4j.util;
 
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
+import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkXYDimensions;
 
 public final class ComplexArrays {
 	private ComplexArrays() {
@@ -46,6 +47,16 @@ public final class ComplexArrays {
 			result[i] = a[i].imag();
 		}
 		return result;
+	}
+	
+	public static Complex[] zip(double[] real, double[] imag) {
+		checkXYDimensions(real, imag);
+		final int length = real.length;
+		Complex[] c = new Complex[length];
+		for(int i = 0; i < length; ++i) {
+			c[i] = Complex.of(real[i], imag[i]);
+		}
+		return c;
 	}
 	
 	/***

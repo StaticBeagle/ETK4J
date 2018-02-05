@@ -64,7 +64,7 @@ public class Complex implements Comparable<Complex> {
 			return GREATER;
 		}
 		if(this._real == obj._real) {
-			return Double.compare(this._imag, obj._imag);
+			return Double.compare(obj._imag, this._imag);
 		}
 		return SMALLER;
 	}

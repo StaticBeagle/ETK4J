@@ -138,10 +138,10 @@ public class TransferFunction {
 		int denLength = den.length();
 
 		int divLength = Math.max(numLength, denLength) + 2;
-		String divider = String.join("", Collections.nCopies(divLength, "-"));
+		String divider = String.format("%0" + divLength + "d", 0).replace('0', '-');
 
 		int padLength = (int) Math.floor((divLength - Math.min(numLength, denLength)) * 0.5);
-		String padding = String.join("", Collections.nCopies(padLength, " "));
+		String padding = String.format("%0" + padLength + "d", 0).replace('0', ' ');
 
 		String[] format = null;
 
@@ -385,7 +385,7 @@ public class TransferFunction {
 				double zeta = alpha / fn; 
 				double ratio = f / fn;
 				phase += Math.atan2(2.0 * zeta * ratio, 1 - ratio * ratio);
-				// Roots are sorted. Skip the conjugate since it was
+				// Roots are in pairs. Skip the conjugate since it was
 				// already taken into account in the calculation above
 				++i;
 			}

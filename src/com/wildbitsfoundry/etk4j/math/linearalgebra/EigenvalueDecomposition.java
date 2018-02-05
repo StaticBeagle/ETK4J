@@ -858,22 +858,28 @@ public class EigenvalueDecomposition {
 		}
 	}
 
+	/***
+	 * Using norm 2
+	 * @param matrix
+	 */
 	private static void balanceMatrix(Matrix matrix) {
-		int dim = matrix.getRowCount();
+		int rows = matrix.getRowCount();
 		double[] data = matrix.getArray();
-		double radix = 2.0;
-		double radix2 = radix * radix;
+		double radix = 2.0;				// radix base
+		double radix2 = radix * radix;	// radix base squared
 		boolean done = false;
 		while (!done) {
-			for (int i = 0; i < dim; i++) {
+			done = true;
+			for (int i = 0; i < rows; i++) {
 				double r = 0.0, c = 0.0;
-				for (int j = 0; j < dim; j++) {
+				for (int j = 0; j < rows; j++) {
 					if (j != i) {
-						c += Math.abs(data[j * dim + i]);
-						r += Math.abs(data[i * dim + j]);
+						// Compute row[i] and col[i] (norm2)^2
+ 						c += Math.abs(data[j * rows + i]);
+						r += Math.abs(data[i * rows + j]);
 					}
 				}
-				if (c != 0.0 && r != 0.0) {
+				if (c != 0 && r != 0) {
 					double s = c + r;
 					double f = 1.0;
 					double g = r / radix;
@@ -887,13 +893,14 @@ public class EigenvalueDecomposition {
 						c /= radix2;
 					}
 					if ((c + r) / f < 0.95 * s) {
-						done = true;
+						done = false;
 						g = 1.0 / f;
-						for (int j = 0; j < dim; j++) {
-							data[i * dim + j] *= g;
+						//scaling[i] *= f;
+						for (int j = 0; j < rows; j++) {
+							data[i * rows + j] *= g;
 						}
-						for (int j = 0; j < dim; j++) {
-							data[j * dim + i] *= f;
+						for (int j = 0; j < rows; j++) {
+							data[j * rows + i] *= f;
 						}
 					}
 				}
@@ -918,11 +925,18 @@ public class EigenvalueDecomposition {
 	 */
 
 	public EigenvalueDecomposition(Matrix Arg, boolean balance) {
-		if(balance) {
-			EigenvalueDecomposition.balanceMatrix(Arg);
-		}
 		double[] A = Arg.getArray();
 		_dim = Arg.getColumnCount();
+		issymmetric = true;
+		for (int j = 0; (j < _dim) & issymmetric; j++) {
+			for (int i = 0; (i < _dim) & issymmetric; i++) {
+				issymmetric = (A[i * _dim + j] == A[j * _dim + i]);
+			}
+		}
+		if(balance && !issymmetric) {
+			EigenvalueDecomposition.balanceMatrix(Arg);
+		}
+
 		V = new double[_dim * _dim];
 		d = new double[_dim];
 		e = new double[_dim];
