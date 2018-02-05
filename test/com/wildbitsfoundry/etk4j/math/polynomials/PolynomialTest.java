@@ -3,7 +3,9 @@ package com.wildbitsfoundry.etk4j.math.polynomials;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.util.ComplexArrays;
@@ -21,14 +23,14 @@ public class PolynomialTest {
 	public void testNormalize() {
 		Polynomial poly = Polynomial.of(5, 25, 50);
 		poly.normalize();
-		assertArrayEquals(new double[] { 1, 5, 10 }, poly._coefs, 1e-12);
+		assertArrayEquals(new double[] { 1, 5, 10 }, poly.getCoefficients(), 1e-12);
 	}
 
 	@Test
 	public void testDenormalize() {
 		Polynomial poly = Polynomial.of(50, 25, 5);
 		poly.denormalize();
-		assertArrayEquals(new double[] { 10, 5, 1 }, poly._coefs, 1e-12);
+		assertArrayEquals(new double[] { 10, 5, 1 }, poly.getCoefficients(), 1e-12);
 	}
 
 	@Test
@@ -37,16 +39,16 @@ public class PolynomialTest {
 		Polynomial p2 = Polynomial.of(-1, 4, 5, 6);
 
 		Polynomial p3 = p1.multiply(p2);
-		assertArrayEquals(new double[] { -1, 2, 12, 20, 17, 6 }, p3._coefs, 1e-12);
+		assertArrayEquals(new double[] { -1, 2, 12, 20, 17, 6 }, p3.getCoefficients(), 1e-12);
 
 		p3 = p2.multiply(p1);
-		assertArrayEquals(new double[] { -1, 2, 12, 20, 17, 6 }, p3._coefs, 1e-12);
+		assertArrayEquals(new double[] { -1, 2, 12, 20, 17, 6 }, p3.getCoefficients(), 1e-12);
 
 		p3 = p1.multiply(-1.0, 4.0, 5.0, 6.0);
-		assertArrayEquals(new double[] { -1, 2, 12, 20, 17, 6 }, p3._coefs, 1e-12);
+		assertArrayEquals(new double[] { -1, 2, 12, 20, 17, 6 }, p3.getCoefficients(), 1e-12);
 
 		p3 = p1.multiply(5.0);
-		assertArrayEquals(new double[] { 5, 10, 5 }, p3._coefs, 1e-12);
+		assertArrayEquals(new double[] { 5, 10, 5 }, p3.getCoefficients(), 1e-12);
 	}
 
 	@Test
@@ -55,13 +57,13 @@ public class PolynomialTest {
 		Polynomial p2 = Polynomial.of(-1, 4, 5, 6);
 
 		p1.multiplyEquals(p2);
-		assertArrayEquals(new double[] { -1, 2, 12, 20, 17, 6 }, p1._coefs, 1e-12);
+		assertArrayEquals(new double[] { -1, 2, 12, 20, 17, 6 }, p1.getCoefficients(), 1e-12);
 
 		p1.multiplyEquals(-9, 0, 4);
-		assertArrayEquals(new double[] { 9, -18, -112, -172, -105, 26, 68, 24 }, p1._coefs, 1e-12);
+		assertArrayEquals(new double[] { 9, -18, -112, -172, -105, 26, 68, 24 }, p1.getCoefficients(), 1e-12);
 
 		p1.multiplyEquals(-0.5);
-		assertArrayEquals(new double[] { -4.5, 9, 56, 86, 52.5, -13, -34, -12 }, p1._coefs, 1e-12);
+		assertArrayEquals(new double[] { -4.5, 9, 56, 86, 52.5, -13, -34, -12 }, p1.getCoefficients(), 1e-12);
 	}
 
 	@Test
@@ -70,10 +72,10 @@ public class PolynomialTest {
 		Polynomial p2 = Polynomial.of(-1, 4, -5, 6);
 
 		Polynomial p3 = p1.add(p2);
-		assertArrayEquals(new double[] { -1, 5, -3, 7 }, p3._coefs, 1e-12);
+		assertArrayEquals(new double[] { -1, 5, -3, 7 }, p3.getCoefficients(), 1e-12);
 
 		p3 = p2.add(p1);
-		assertArrayEquals(new double[] { -1, 5, -3, 7 }, p3._coefs, 1e-12);
+		assertArrayEquals(new double[] { -1, 5, -3, 7 }, p3.getCoefficients(), 1e-12);
 	}
 
 	@Test
@@ -82,7 +84,7 @@ public class PolynomialTest {
 		Polynomial p2 = Polynomial.of(-1, 4, -5, 6);
 
 		p1.addEquals(p2);
-		assertArrayEquals(new double[] { -1, 5, -3, 7 }, p1._coefs, 1e-12);
+		assertArrayEquals(new double[] { -1, 5, -3, 7 }, p1.getCoefficients(), 1e-12);
 	}
 
 	@Test
@@ -91,10 +93,10 @@ public class PolynomialTest {
 		Polynomial p2 = Polynomial.of(-1, 4, -5, 6);
 
 		Polynomial p3 = p1.subtract(p2);
-		assertArrayEquals(new double[] { 1, -3, 7, -5 }, p3._coefs, 1e-12);
+		assertArrayEquals(new double[] { 1, -3, 7, -5 }, p3.getCoefficients(), 1e-12);
 
 		p3 = p2.subtract(p1);
-		assertArrayEquals(new double[] { -1, 3, -7, 5 }, p3._coefs, 1e-12);
+		assertArrayEquals(new double[] { -1, 3, -7, 5 }, p3.getCoefficients(), 1e-12);
 	}
 
 	@Test
@@ -103,7 +105,7 @@ public class PolynomialTest {
 		Polynomial p2 = Polynomial.of(-1, 4, -5, 6);
 
 		p1.subtractEquals(p2);
-		assertArrayEquals(new double[] { 1, -3, 7, -5 }, p1._coefs, 1e-12);
+		assertArrayEquals(new double[] { 1, -3, 7, -5 }, p1.getCoefficients(), 1e-12);
 	}
 
 	@Test
@@ -113,18 +115,18 @@ public class PolynomialTest {
 
 		// Over determined
 		Polynomial poly = Polynomial.polyFit(x, y, 2);
-		assertArrayEquals(new double[] { -1.5, 11.9, -9.0 }, poly._coefs, 1e-12);
+		assertArrayEquals(new double[] { -1.5, 11.9, -9.0 }, poly.getCoefficients(), 1e-12);
 
 		// Unique solution
 		Polynomial poly2 = Polynomial.polyFit(x, y, 3);
 		double[] coefsUnique = new double[] { 1.333333333333, -11.5, 34.1666666666664, -23.0 };
-		assertArrayEquals(coefsUnique, poly2._coefs, 1e-12);
+		assertArrayEquals(coefsUnique, poly2.getCoefficients(), 1e-12);
 
 		// Under determined
 		Polynomial poly3 = Polynomial.polyFit(x, y, 4);
 		double[] coefsUnder = new double[] { 0.6079433590792012, -4.746100257458709, 9.778017567772217,
 				3.769498712706295, -8.40935938209905 };
-		assertArrayEquals(coefsUnder, poly3._coefs, 1e-12);
+		assertArrayEquals(coefsUnder, poly3.getCoefficients(), 1e-12);
 	}
 
 	@Test
@@ -132,7 +134,7 @@ public class PolynomialTest {
 		Polynomial p1 = Polynomial.of(1, 2, 1);
 		Polynomial p2 = p1.derivative();
 
-		assertArrayEquals(new double[] { 2, 2 }, p2._coefs, 1e-12);
+		assertArrayEquals(new double[] { 2, 2 }, p2.getCoefficients(), 1e-12);
 	}
 
 	@Test
@@ -183,8 +185,8 @@ public class PolynomialTest {
 		roots = ComplexArrays.zip(re, im);
 		p1 = new Polynomial(roots);
 
-		real = ComplexArrays.real(p1._roots);
-		imag = ComplexArrays.imag(p1._roots);
+		real = ComplexArrays.real(p1.getRoots());
+		imag = ComplexArrays.imag(p1.getRoots());
 
 		assertArrayEquals(re, real, 1e-12);
 		assertArrayEquals(im, imag, 1e-12);
@@ -239,21 +241,56 @@ public class PolynomialTest {
 		Polynomial p1 = Polynomial.of(1, 2, 1);
 		Polynomial p2 = p1.substitute(2);
 		
-		assertArrayEquals(new double[] { 4, 4, 1 }, p2._coefs, 1e-12);
+		assertArrayEquals(new double[] { 4, 4, 1 }, p2.getCoefficients(), 1e-12);
 		
 		p1 = Polynomial.of(1, 2, 1);
 		p2 = p1.substitute(0.5);
 		
-		assertArrayEquals(new double[] { 0.25, 1, 1 }, p2._coefs, 1e-12);
+		assertArrayEquals(new double[] { 0.25, 1, 1 }, p2.getCoefficients(), 1e-12);
 		
 		p2 = p1.substitute(0);
 		
-		assertArrayEquals(new double[] { 1 }, p2._coefs, 1e-12);
+		assertArrayEquals(new double[] { 1 }, p2.getCoefficients(), 1e-12);
+		
+		p1.substituteInPlace(2);
+		
+		assertArrayEquals(new double[] { 4, 4, 1 }, p1.getCoefficients(), 1e-12);
 		
 		p1 = Polynomial.of(1, 2, 1);
-		p2 = p1.substitute(0);
+		p2 = p1.substitute(p1);
 		
-		assertArrayEquals(new double[] { 1 }, p2._coefs, 1e-12);
+		assertArrayEquals(new double[] { 1, 4, 8, 8, 4 }, p2.getCoefficients(), 1e-12);
 		
+		p1 = Polynomial.of(1, 0, -1, 2, -1);
+		p2 = p1.substitute(Polynomial.of(1, 2, 1));
+		
+		assertArrayEquals(new double[] { 1, 8, 28, 56, 69, 52, 24, 8, 1 }, p2.getCoefficients(), 1e-12);
+		
+		RationalFunction rf = Polynomial.of(1, 2, 1).substitute(Polynomial.of(1, 0), Polynomial.of(1, 1));
+		
+		p1 = rf.getNumerator();
+		p2 = rf.getDenominator();
+		
+		assertArrayEquals(new double[] { 4, 4, 1 }, p1.getCoefficients(), 1e-12);
+		assertArrayEquals(new double[] { 1, 2, 1}, p2.getCoefficients(), 1e-12);
+	}
+	
+	@Rule
+	public final ExpectedException exception = ExpectedException.none();
+	
+	
+	@Test
+	public void testPow() {
+		Polynomial p1 = Polynomial.of(1, 2, 1);
+		exception.expect(IllegalArgumentException.class);
+		p1.pow(-1);
+		
+		Polynomial p2 = p1.pow(0);
+		
+		assertArrayEquals(new double[] { 1 }, p2.getCoefficients(), 1e-12);
+		
+		p2 = p1.pow(3);
+		
+		assertArrayEquals(new double[] { 1, 6, 15, 20, 6, 1 }, p2.getCoefficients(), 1e-12);
 	}
 }

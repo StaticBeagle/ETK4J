@@ -405,9 +405,7 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 		final int deg = this.degree();
 		double[] result = Arrays.copyOf(_coefs, _coefs.length);
 		for (int i = 0; i < deg; ++i) {
-			for (int j = i; j < deg; ++j) {
-				result[i] *= d;
-			}
+			result[i] *= Math.pow(d, deg - i);
 		}
 		return new Polynomial(result);
 	}
