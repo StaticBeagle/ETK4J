@@ -1,9 +1,5 @@
 package com.wildbitsfoundry.etk4j.math.calculus;
 
-import java.util.Arrays;
-
-import com.wildbitsfoundry.etk4j.util.NumArrays;
-
 public final class Integrals {
 	private Integrals() {
 	}

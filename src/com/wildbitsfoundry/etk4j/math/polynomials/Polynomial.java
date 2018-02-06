@@ -59,10 +59,12 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 
 		int length = coefficients.length;
 		int i = 0;
-		while (i < length && coefficients[i] == 0.0) {
-			++i;
+		while (coefficients[i] == 0.0) {
+			if(++i == length) {
+				break;
+			}
 		}
-		this._coefs = i == length ? new double[] { 1.0 } : Arrays.copyOfRange(coefficients, i, length);
+		this._coefs = i == length ? new double[] { 0.0 } : Arrays.copyOfRange(coefficients, i, length);
 
 	}
 	
@@ -130,9 +132,8 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 		int i;
 		// Find the normalizing gain
 		i = _coefs.length - 1;
-		while (this._coefs[i] < Double.MIN_VALUE) {
-			--i;
-			if (i == 0)
+		while (this._coefs[i] == 0.0) {
+			if (--i == 0)
 				break;
 		}
 		for (int j = 0; j < this._coefs.length; j++) {
@@ -257,8 +258,12 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
 		final int length = this.degree();
+		if(length == 0 && _coefs[0] == 0.0) {
+			return "0.000";
+		}
+		
+		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i <= length; ++i) {
 			if (_coefs[i] == 0) {
 				continue;
@@ -277,9 +282,7 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 				sb.append(x);
 			}
 		}
-		if(sb.length() > 3) {
-			sb.replace(0, 3, _coefs[0] < 0 ? "-" : "");
-		}
+		sb.replace(0, 3, _coefs[0] < 0 ? "-" : "");
 		return sb.toString();
 	}
 
@@ -529,7 +532,7 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 
 	@Override
 	public double differentiate(double x) {
-		final int length = _coefs.length;
+		final int length = _coefs.length - 1;
 		double result = 0.0;
 		for (int i = 0, j = 0; j < length; ++i, ++j) {
 			result *= x;

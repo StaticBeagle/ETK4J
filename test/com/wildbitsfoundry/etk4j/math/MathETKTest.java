@@ -72,6 +72,7 @@ public final class MathETKTest {
 		assertEquals(1.0 , rem(5,-4), 1e-12);
 		assertEquals(-1.0 , rem(-5,4), 1e-12);
 		assertEquals(-1.0 , rem(-5,-4), 1e-12);
+		assertEquals(Double.NaN , rem(-5, 0), 1e-12);
 	}
 
 }
