@@ -1,7 +1,6 @@
 package com.wildbitsfoundry.etk4j.control;
 
 import java.util.Arrays;
-import java.util.Collections;
 
 import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
@@ -378,7 +377,7 @@ public class TransferFunction {
 				double alpha = -roots[i].real();
 				phase += Math.atan2(f, alpha);
 			} else {
-				// Complex pair roots
+				// Complex pair of roots
 				double alpha = -roots[i].real();
 				double beta = roots[i].imag();
 				double fn = MathETK.hypot(alpha, beta);
