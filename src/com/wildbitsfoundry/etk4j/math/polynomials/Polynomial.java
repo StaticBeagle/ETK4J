@@ -390,13 +390,18 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 	 * @param d
 	 */
 	public void substituteInPlace(double d) {
+		_roots = null;
+		if(d == 0) {
+			_coefs = new double[] { _coefs[this.degree()] };
+			return;
+		}
+		
 		final int deg = this.degree();
 		for (int i = 0; i < deg; ++i) {
 			for (int j = i; j < deg; ++j) {
 				_coefs[i] *= d;
 			}
-		}
-		_roots = null;
+		}	
 	}
 
 	/***

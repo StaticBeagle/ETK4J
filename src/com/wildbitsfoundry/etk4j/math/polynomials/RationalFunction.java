@@ -162,20 +162,5 @@ public class RationalFunction implements UnivariateFunction {
 		Complex resultDen = _denominator.evaluateAt(real, imag);
 		resultNum.divideEquals(resultDen);
 		return resultNum;
-
 	}
-
-
-	
-//	public static void main(String[] args) {
-//		Polynomial num = new Polynomial(1, 0);
-//		Polynomial den = new Polynomial(1, 0, 1);
-//		
-//		RationalFunction rf = new RationalFunction(den, num);
-//		RationalFunction rfs = new RationalFunction(1.0, new Polynomial(1.0, 0));
-//		
-//		RationalFunction res = rf.substitute(rfs);
-//		System.out.println(res._numerator);
-//		System.out.println(res._denominator);
-//	}
 }
