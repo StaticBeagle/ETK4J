@@ -1,6 +1,8 @@
 package com.wildbitsfoundry.etk4j.math.interpolation;
 
 import com.wildbitsfoundry.etk4j.curvefitting.CurveFitting;
+import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkXYDimensions;
+import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkMinXLength;
 
 public final class Interpolants {
 	private Interpolants() {
@@ -20,9 +22,7 @@ public final class Interpolants {
 	}
 
 	public static double neville(double[] x, double[] y, double xi) {
-		if (x.length != y.length) {
-			throw new IllegalArgumentException("x and y dimensions must be the same");
-		}
+		checkXYDimensions(x, y);
 		int length = x.length;
 		double[][] N = new double[length][length];
 
@@ -45,10 +45,10 @@ public final class Interpolants {
 	}
 
 	public static double spline(double[] x, double[] y, double xi) {
+		checkXYDimensions(x, y);
+		checkMinXLength(x, 2);
+		
 		final int length = x.length;
-		if (length < 2) {
-			throw new IllegalArgumentException("x must have 2 or more elements");
-		}
 		if (length == 2) {
 			return linear(x[0], x[1], y[0], y[1], xi);
 		}
@@ -57,12 +57,5 @@ public final class Interpolants {
 		}
 		Spline sp = CubicSpline.newCubicSpline(x, y);
 		return sp.evaluateAt(xi);
-	}
-
-	public static void main(String[] args) {
-		double[] x = { 1, 2, 3 };
-		double[] y = { 1, 3, 10 };
-
-		System.out.println(neville(x, y, 2.5));
 	}
 }

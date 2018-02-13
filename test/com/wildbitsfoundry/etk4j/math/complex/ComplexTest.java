@@ -1,6 +1,7 @@
 package com.wildbitsfoundry.etk4j.math.complex;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -19,12 +20,43 @@ public class ComplexTest {
 	}
 	
 	@Test
+	public void testHashCode() {
+		int hash = a.hashCode();
+		
+		assertEquals(-2131229759, hash);
+	}
+	
+	@Test
 	public void testEquals() {
 		Complex c = new Complex(a.real(), a.imag());
 		assertEquals(a, c);
 		
 		Complex d = new Complex(a);
 		assertEquals(a, d);
+		
+		c = a;
+		assertEquals(a, c);
+		
+		assertNotEquals(a, c.toString());
+
+		c = null;
+		assertNotEquals(a, c);
+		
+		c = a.add(1);
+		assertNotEquals(a, c);
+		
+		c = a.add(Complex.of(0, 1));
+		assertNotEquals(a, c);
+	}
+	
+	@Test
+	public void testCompareTo() {
+		Complex c = new Complex(a.real(), a.imag());
+		
+		assertEquals(0.0, a.compareTo(c), 1e-12);
+		assertEquals(0.0, a.compareTo(a), 1e-12);
+		assertEquals(1.0, a.compareTo(c.subtract(1.0)), 1e-12);
+		assertEquals(-1.0, a.compareTo(c.add(1.0)), 1e-12);
 	}
 	
 	@Test
@@ -59,6 +91,11 @@ public class ComplexTest {
 	@Test
 	public void testInvert() {
 		Complex c = a.invert();
+		assertEquals(-0.153846153846154, c.real(), 1e-12);
+		assertEquals(-0.230769230769231, c.imag(), 1e-12);
+		
+		c = a;
+		c.invertEquals();
 		assertEquals(-0.153846153846154, c.real(), 1e-12);
 		assertEquals(-0.230769230769231, c.imag(), 1e-12);
 	}
@@ -98,6 +135,10 @@ public class ComplexTest {
 		
 		c.addEquals(1);
 		assertEquals(-5.0, c.real(), 1e-12);
+		assertEquals(9.0, c.imag(), 1e-12);
+		
+		c.subtractEquals(1);
+		assertEquals(-6.0, c.real(), 1e-12);
 		assertEquals(9.0, c.imag(), 1e-12);
 	}
 	
@@ -155,7 +196,7 @@ public class ComplexTest {
 		
 		c = a.uminus().sqrt();
 		assertEquals(1.6741492280355401, c.real(), 1e-12);
-		assertEquals(-0.8959774761298381, c.imag(), 1e-12);
+		assertEquals(-0.8959774761298381, c.imag(), 1e-12);		
 	}
 	
 	@Test
@@ -246,6 +287,14 @@ public class ComplexTest {
 		Complex c = a.tan();
 		assertEquals(0.003764025641504, c.real(), 1e-12);
 		assertEquals(1.003238627353610, c.imag(), 1e-12);
+		
+		c = Complex.of(1, 20.5).tan();
+		assertEquals(0.0, c.real(), 1e-12);
+		assertEquals(1.0, c.imag(), 1e-12);
+		
+		c = Complex.of(1, -20.5).tan();
+		assertEquals(0.0, c.real(), 1e-12);
+		assertEquals(-1.00, c.imag(), 1e-12);
 	}
 	
 	@Test
@@ -260,5 +309,19 @@ public class ComplexTest {
 		Complex c = a.tanh();
 		assertEquals(-0.965385879022133, c.real(), 1e-12);
 		assertEquals(-0.009884375038323, c.imag(), 1e-12);
+		
+		c = Complex.of(1, 20.5).tanh();
+		assertEquals(0.0, c.real(), 1e-12);
+		assertEquals(1.0, c.imag(), 1e-12);
+		
+		c = Complex.of(1, -20.5).tanh();
+		assertEquals(0.0, c.real(), 1e-12);
+		assertEquals(-1.00, c.imag(), 1e-12);
+	}
+	
+	
+	@Test
+	public void testToString() {
+		assertEquals("(-2.0000, 3.0000)", a.toString());
 	}
 }
