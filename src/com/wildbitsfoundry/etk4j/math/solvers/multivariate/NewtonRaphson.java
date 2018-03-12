@@ -165,7 +165,7 @@ public class NewtonRaphson implements MultivariateSolver {
 
 	protected boolean checkForConvergence(double[] x, double[] y) {
 		double delta = this.estimateError(x, y);
-		double tmp = Math.min(NumArrays.norm2(x), NumArrays.norm2(y));
+		double tmp = _errorScheme.calculateMaxNormOfError(x, y);
 		return delta < _absTol + _relTol * tmp;
 	}
 
