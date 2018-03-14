@@ -358,7 +358,6 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 		// lazy creation of roots
 		if (_roots == null) {
 			int N = this.degree();
-			_roots = new Complex[N];
 			switch (N) {
 			case 0:
 				_roots = new Complex[0];
@@ -371,6 +370,7 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 				break;
 			default:
 				// Use generalized eigenvalue decomposition to find the roots
+				_roots = new Complex[N];
 				Matrix c = Matrices.Companion(_coefs, N);
 				EigenvalueDecomposition evd = c.eig();
 				double[] realEig = evd.getRealEigenvalues();

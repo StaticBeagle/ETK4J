@@ -941,13 +941,6 @@ public class EigenvalueDecomposition {
 		d = new double[_dim];
 		e = new double[_dim];
 
-		issymmetric = true;
-		for (int j = 0; (j < _dim) & issymmetric; j++) {
-			for (int i = 0; (i < _dim) & issymmetric; i++) {
-				issymmetric = (A[i * _dim + j] == A[j * _dim + i]);
-			}
-		}
-
 		if (issymmetric) {
 			for (int i = 0; i < _dim; i++) {
 				for (int j = 0; j < _dim; j++) {
