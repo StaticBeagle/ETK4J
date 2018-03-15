@@ -1,7 +1,7 @@
 package com.wildbitsfoundry.etk4j.math.solvers.univariate;
 
 
-public class UnivariateSolverResults {
+public class SolverResults {
 	public enum SolverStatus {
 		SUCCESS,
 		DIVERGED,

@@ -6,6 +6,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import com.wildbitsfoundry.etk4j.math.functions.MultivariateFunction;
+import com.wildbitsfoundry.etk4j.math.solvers.multivariate.SolverResults.SolverStatus;
 
 public class NewtonRaphsonTest {
 	
@@ -125,4 +126,31 @@ public class NewtonRaphsonTest {
 				.setIterationLimit(100).setDifferentiationStepSize(1e-7).solve();
 		assertArrayEquals(new double[] { 0.8332816138167558, 0.03533461613948315, -0.49854927781116914}, sol.Solution, 1e-12);
 	}
+	
+	@Test
+	public void testToString() {
+		SolverResults sol = new NewtonRaphson(functions, jacobian, initialguess).setAbsTolerance(1e-9).setRelTolerance(1e-6)
+				.setIterationLimit(100).solve();
+		assertArrayEquals(new double[] { 0.8332816138167558, 0.03533461613948315, -0.49854927781116914}, sol.Solution, 1e-12);
+		String expected = "Status: SUCCESS\r\n" + 
+				"Iterations: 9\r\n" + 
+				"Converged: true\r\n" + 
+				"Estimated Error: 2.0395127754881876E-8\r\n" + 
+				"Solution: [0.833282, 0.0353346, -0.498549]";
+		assertEquals(expected, sol.toString());
+	}
+	
+	@Test
+	public void testSolverStatusEnum() {
+		SolverStatus status = SolverStatus.valueOf("SUCCESS");
+		assertEquals(SolverStatus.SUCCESS, status);
+	}
+	
+	@Test
+	public void testErrorEstimationSchemeEnum() {
+		ErrorEstimationScheme scheme = ErrorEstimationScheme.valueOf("MAX_ABS_ERROR");
+		assertEquals(ErrorEstimationScheme.MAX_ABS_ERROR, scheme);
+	}
+	
+	
 }

@@ -101,32 +101,5 @@ final class SolverUtils {
 				}
 			}
 		}
-
-		public double[] solve(final double[] vector) {
-			int rows = vector.length;
-			double[] x = new double[rows];
-			// Shuffle rows to match pivot vector
-			for (int i = 0; i < rows; i++) {
-				x[i] = vector[_pivot[i]];
-			}
-
-			// Solve Ly = b
-			// Forward substitution
-			for (int k = 0; k < rows; k++) {
-				for (int i = k + 1; i < rows; i++) {
-					x[i] -= x[k] * _data[i][k];
-				}
-			}
-
-			// Solve Ux = y
-			// Back substitution
-			for (int k = rows - 1; k >= 0; k--) {
-				x[k] /= _data[k][k];
-				for (int i = 0; i < k; i++) {
-					x[i] -= x[k] * _data[i][k];
-				}
-			}
-			return x;
-		}
 	}
 }

@@ -2,7 +2,7 @@ package com.wildbitsfoundry.etk4j.math.solvers.univariate;
 
 import com.wildbitsfoundry.etk4j.math.calculus.Derivatives;
 import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
-import com.wildbitsfoundry.etk4j.math.solvers.univariate.UnivariateSolverResults.SolverStatus;
+import com.wildbitsfoundry.etk4j.math.solvers.univariate.SolverResults.SolverStatus;
 
 
 public class NewtonRaphson {
@@ -54,8 +54,8 @@ public class NewtonRaphson {
 		return this;
 	}
 	
-	protected static UnivariateSolverResults buildResults(double xfinal, SolverStatus status, int iterCount, double error) {
-		UnivariateSolverResults sr = new UnivariateSolverResults();
+	protected static SolverResults buildResults(double xfinal, SolverStatus status, int iterCount, double error) {
+		SolverResults sr = new SolverResults();
 		sr.Iterations = iterCount;
 		sr.Solution = xfinal;
 		sr.Status = status;
@@ -64,11 +64,11 @@ public class NewtonRaphson {
 		return sr;
 	}
 	
-	public UnivariateSolverResults solve() {
+	public SolverResults solve() {
 		return this.solve(_derivative);
 	}
 
-	protected UnivariateSolverResults solve(UnivariateFunction derivative) {
+	protected SolverResults solve(UnivariateFunction derivative) {
 		int maxiter = _maxIter;
 		double maxval = _maxVal;
 		double step = _step;
@@ -96,26 +96,5 @@ public class NewtonRaphson {
 			xcurrent = xfinal;
 		}
 		return buildResults(xfinal, SolverStatus.ITERATION_LIMIT_EXCEEDED, _maxIter - maxiter, error);
-	}
-
-	public static void main(String[] args) {
-
-		System.out.printf("Solution with pre-computed Jacobian%n------------------------------------%n");
-		UnivariateSolverResults sr1 = new NewtonRaphson(x -> 2 - x * x, x -> -2 * x, 1)
-				.absTolerance(1e-9)
-				.relTolerance(1e-6)
-				.iterationLimit(100)
-				.differentiationStepSize(1e-7)
-				.solve();
-		System.out.println(sr1);
-
-		System.out.printf("%nSolution with auto-computed Jacobian%n------------------------------------%n");
-		UnivariateSolverResults sr2 = new NewtonRaphson(x -> 2 - x * x, 1)
-				.absTolerance(1e-9)
-				.relTolerance(1e-6)
-				.iterationLimit(100)
-				.differentiationStepSize(1e-7)
-				.solve();
-		System.out.println(sr2);
 	}
 }
