@@ -11,13 +11,11 @@ import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.LowPassSpecs;
 
 public class AnalogFilter {
 	
-	int _order;
-	TransferFunction _tf;
+	private int _order;
+	private TransferFunction _tf;
 	
 	static class LowPassPrototype {
 		private TransferFunction _tf;
-		
-
 		
 		public LowPassPrototype(ZeroPoleGain zpk) {
 			_tf = zpkToTF(zpk);
@@ -27,6 +25,19 @@ public class AnalogFilter {
 	protected AnalogFilter(int order, TransferFunction tf) {
 		_order = order;
 		_tf = tf;
+	}
+	
+	public double[] getNumerator() {
+		return _tf.getNumerator().getCoefficients();
+	}
+	
+	public double[] getDenominator() {
+		return _tf.getDenominator().getCoefficients();
+	}
+	
+	@Override
+	public String toString() {
+		return _tf.toString();
 	}
 	
 	
@@ -47,7 +58,7 @@ public class AnalogFilter {
 		return type.getMinOrderNeeded(fp, fs, ap, as);
 	}
 	
-	protected static AnalogFilter newLowPass(int n, double ap, double as, ApproximationType type) {
+	public static AnalogFilter newLowPass(int n, double ap, double as, ApproximationType type) {
 		TransferFunction lp = zpkToTF(type.buildLowPassPrototype(n, ap, as));
 		return new AnalogFilter(n, lp);
 	}
@@ -67,7 +78,7 @@ public class AnalogFilter {
 		return new AnalogFilter(n, lp._tf);
 	}
 	
-	public static AnalogFilter newHighPass(int n, double ap, double as, ApproximationType type) {
+	static AnalogFilter newHighPass(int n, double ap, double as, ApproximationType type) {
 		TransferFunction lp = zpkToTF(type.buildLowPassPrototype(n, ap, as));
 		lp = lpTohp(lp.getNumerator(), lp.getDenominator(), 0.0);
 		return new AnalogFilter(n, lp);

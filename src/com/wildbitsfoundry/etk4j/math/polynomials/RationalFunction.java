@@ -10,18 +10,21 @@ public class RationalFunction implements UnivariateFunction {
 	public RationalFunction(Complex[] zeros, Complex[] poles) {
 		_numerator = new Polynomial(zeros);
 		_denominator = new Polynomial(poles);
+
+		_numerator.multiplyEquals(calculatGain(zeros, poles));
 	}
-	
+
 	public RationalFunction(double num, Complex[] poles) {
 		_numerator = new Polynomial(num);
 		_denominator = new Polynomial(poles);
+
+		_numerator.multiplyEquals(calculatGain(new Complex[] { Complex.of(-1.0, 0.0) }, poles));
 	}
 
 	public RationalFunction(RationalFunction rf) {
 		_numerator = new Polynomial(rf._numerator);
 		_denominator = new Polynomial(rf._denominator);
 	}
-	
 
 	public RationalFunction(Polynomial num, Polynomial den) {
 		_numerator = new Polynomial(num);
@@ -32,7 +35,7 @@ public class RationalFunction implements UnivariateFunction {
 		_numerator = new Polynomial(num);
 		_denominator = new Polynomial(den);
 	}
-	
+
 	public RationalFunction(double[] num, double[] den) {
 		_numerator = new Polynomial(num);
 		_denominator = new Polynomial(den);
@@ -79,11 +82,11 @@ public class RationalFunction implements UnivariateFunction {
 		Polynomial denominator = new Polynomial(_denominator);
 		return new RationalFunction(numerator, denominator);
 	}
-	
+
 	private void multiplyEquals(Polynomial p) {
-		_numerator.multiplyEquals(p);		
+		_numerator.multiplyEquals(p);
 	}
-	
+
 	public RationalFunction multiply(RationalFunction rf) {
 		Polynomial numerator = _numerator.multiply(rf._numerator);
 		Polynomial denominator = _denominator.multiply(rf._denominator);
@@ -129,23 +132,23 @@ public class RationalFunction implements UnivariateFunction {
 	public void substituteInPlace(RationalFunction rf) {
 		subsOp(this, rf._numerator, rf._denominator);
 	}
-	
+
 	private static void subsOp(RationalFunction rf, Polynomial num, Polynomial den) {
 		RationalFunction nump = rf._numerator.substitute(num, den);
 		RationalFunction denp = rf._denominator.substitute(num, den);
-		
+
 		int numDegree = rf._numerator.degree();
 		int denDegree = rf._denominator.degree();
 		int diff = Math.abs(numDegree - denDegree);
-		if(denDegree > numDegree) {
+		if (denDegree > numDegree) {
 			nump.multiplyEquals(den.pow(diff));
-		} else if(numDegree > denDegree) {
+		} else if (numDegree > denDegree) {
 			denp.multiplyEquals(den.pow(diff));
 		}
 		rf._numerator = nump._numerator;
 		rf._denominator = denp._numerator;
 	}
-	
+
 	public double normalize() {
 		double norm = _denominator.normalize();
 		_numerator.multiplyEquals(1 / norm);
@@ -162,5 +165,19 @@ public class RationalFunction implements UnivariateFunction {
 		Complex resultDen = _denominator.evaluateAt(real, imag);
 		resultNum.divideEquals(resultDen);
 		return resultNum;
+	}
+
+	private static double calculatGain(Complex[] zeros, Complex[] poles) {
+		// Compute gain k
+		Complex knum = new Complex(1.0, 0.0);
+		for (Complex zero : zeros) {
+			knum.multiplyEquals(zero.uminus());
+		}
+		Complex kden = new Complex(1.0, 0.0);
+		for (Complex pole : poles) {
+			kden.multiplyEquals(pole.uminus());
+		}
+		kden.divideEquals(knum);
+		return kden.real();
 	}
 }
