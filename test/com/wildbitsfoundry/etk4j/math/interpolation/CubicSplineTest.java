@@ -1,13 +1,12 @@
 package com.wildbitsfoundry.etk4j.math.interpolation;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
-import com.wildbitsfoundry.etk4j.math.interpolation.CubicSpline;
 
 public class CubicSplineTest {
 	double[] x;
@@ -19,7 +18,7 @@ public class CubicSplineTest {
 	@Rule
 	public final ExpectedException exception = ExpectedException.none();
 
-	@Before
+	@BeforeClass
 	public void setArrays() {
 		x = new double[] { 0.9, 1.3, 1.9, 2.1 };
 		y = new double[] { 1.3, 1.5, 1.85, 2.1 };
