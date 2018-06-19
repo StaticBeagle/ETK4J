@@ -9,17 +9,17 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 public class CubicSplineTest {
-	double[] x;
-	double[] y;
-	double[] xi;
-	double left;
-	double right;
+	static double[] x;
+	static double[] y;
+	static double[] xi;
+	static double left;
+	static double right;
 	
 	@Rule
 	public final ExpectedException exception = ExpectedException.none();
 
 	@BeforeClass
-	public void setArrays() {
+	public static void setArrays() {
 		x = new double[] { 0.9, 1.3, 1.9, 2.1 };
 		y = new double[] { 1.3, 1.5, 1.85, 2.1 };
 		xi = new double[] {1.15, 1.8, 2.0};

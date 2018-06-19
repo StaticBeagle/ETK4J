@@ -1,7 +1,6 @@
 package com.wildbitsfoundry.etk4j.math.polynomials;
 
 import java.util.Arrays;
-
 import com.wildbitsfoundry.etk4j.math.functions.BivariateFunction;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
 import com.wildbitsfoundry.etk4j.util.Grids;
@@ -13,16 +12,17 @@ public class Polynomial2d implements BivariateFunction {
 	private int _m;
 
 	public Polynomial2d(double[] coefs, int n, int m) {
+		// check that (n + 1) * (m + 1) = coefs.length
 		_coefs = Arrays.copyOf(coefs, coefs.length);
 		_n = n;
 		_m = m;
 	}
 
 	/***
-	 * Finds the coefficients of a polynomial P(x,y) of degree n + m that fits
-	 * the data z best in a least-square sense. Always make sure that the number
-	 * of points for x,y,z are the same and that the total number of points >=
-	 * (n + 1) * (m + 1)
+	 * Finds the coefficients of a polynomial P(x,y) of degree n + m that fits the
+	 * data z best in a least-square sense. Always make sure that the number of
+	 * points for x,y,z are the same and that the total number of points >= (n + 1)
+	 * * (m + 1)
 	 * 
 	 * @param x
 	 *            Array of points for the independent variable x
@@ -34,10 +34,10 @@ public class Polynomial2d implements BivariateFunction {
 	 *            Maximum order allowed for x
 	 * @param m
 	 *            Maximum order allowed for y
-	 * @return Returns a bivariate polynomial of degree n + m fits the data z
-	 *         best in a least-square sense
+	 * @return Returns a bivariate polynomial of degree n + m fits the data z best
+	 *         in a least-square sense
 	 */
-	public static Polynomial2d polyFit2D(double[] x, double[] y, double[] z, int n, int m) {
+	public static Polynomial2d polyFit2d(double[] x, double[] y, double[] z, int n, int m) {
 		double[][] vars = new double[2][];
 		vars[0] = x;
 		vars[1] = y;
@@ -48,10 +48,10 @@ public class Polynomial2d implements BivariateFunction {
 	}
 
 	/***
-	 * Finds the coefficients of a polynomial P(x,y) of degree n + m that fits
-	 * the data z best in a least-square sense. Always make sure that the number
-	 * of points for x,y,z are the same and that the total number of points >=
-	 * (n + 1) * (m + 1) in a regular grid
+	 * Finds the coefficients of a polynomial P(x,y) of degree n + m that fits the
+	 * data z best in a least-square sense. Always make sure that the number of
+	 * points for x,y,z are the same and that the total number of points >= (n + 1)
+	 * * (m + 1) in a regular grid
 	 * 
 	 * @param x
 	 *            Array of points for the independent variable x
@@ -63,10 +63,10 @@ public class Polynomial2d implements BivariateFunction {
 	 *            Maximum order allowed for x
 	 * @param m
 	 *            Maximum order allowed for y
-	 * @return Returns a bivariate polynomial of degree n + m fits the data z
-	 *         best in a least-square sense
+	 * @return Returns a bivariate polynomial of degree n + m fits the data z best
+	 *         in a least-square sense
 	 */
-	public static Polynomial2d polyFit2D(double[] x, double[] y, double[][] z, int n, int m) {
+	public static Polynomial2d polyFit2d(double[] x, double[] y, double[][] z, int n, int m) {
 		double[][] vars = new double[2][];
 		// Build grid
 		Grids.GridData gd = Grids.GridData.of(x, y);
@@ -197,146 +197,64 @@ public class Polynomial2d implements BivariateFunction {
 
 	@Override
 	public String toString() {
-		java.lang.StringBuilder sb = new java.lang.StringBuilder();
-
-		for (int i = this._m, k = 0; i >= 0; i--) {
-			for (int j = this._n; j >= 0; j--) {
-				if (j == 0 && i == 0) {
-					sb.append(String.format("%.4g", _coefs[k]));
-				} else if (j == 0) {
-					if (i == 1) {
-						sb.append(String.format("%.4g * y + ", _coefs[k], i));
-					} else {
-						sb.append(String.format("%.4g * y^%d + ", _coefs[k], i));
-					}
-				} else if (i == 0) {
-					if (j == 1) {
-						sb.append(String.format("%.4g * x + ", _coefs[k]));
-					} else {
-						sb.append(String.format("%.4g * x^%d + ", _coefs[k], j));
-					}
-				} else {
-					if (i == 1 && j == 1) {
-						sb.append(String.format("%.4g * x * y + ", _coefs[k]));
-					} else if (j == 1) {
-						sb.append(String.format("%.4g * x * y^%d + ", _coefs[k], i));
-					} else if (i == 1) {
-						sb.append(String.format("%.4g * x^%d * y + ", _coefs[k], j));
-					} else {
-						sb.append(String.format("%.4g * x^%d * y^%d + ", _coefs[k], j, i));
-					}
-
+		StringBuilder result = new StringBuilder();
+		for (int i = _m, k = 0; i >= 0; --i) {
+			for (int j = _n; j >= 0; --j) {
+				double coefAbs = Math.abs(_coefs[k]);
+				if (coefAbs == 0.0) {
+					++k;
+					continue;
 				}
-				k++;
+				// Handle beginning
+				String sign = "";
+				if(k == 0) {
+					if(_coefs[k] < 0) {
+						sign = "-";
+					} 
+				} else {
+					sign = " + ";
+					if(_coefs[k] < 0) {
+						sign = " - ";
+					} 
+				}
+				// Handle end
+				String coef = coefAbs == 1.0 ? sign : String.format("%s%.4g * ", sign, coefAbs);
+				if (k == _coefs.length - 1) {
+					coef = String.format("%s%.4g", sign, coefAbs);
+				}
+				result.append(coef);
+				result.append(getVariablesAndPowers(i, j));
+				++k;
 			}
 		}
-		return sb.toString();
+		return result.toString();
 	}
-
-	public static void main(String[] args) {
-		double[] x = { 0, 1, 1, 2, 3, 4, 5, 6, 8, 9 };
-		double[] y = { 1, 2, 7, 9, 10, 14, 15, 33, 48, 59 };
-
-		double[] z = { 1, 1, 6, 3, 4, 9, 6, 8, 9 };
-
-		System.out.println(Arrays.toString(polyFit2D(x, y, z, 2, 2)._coefs));
-
-		double[] xp = { 1, 2, 3, 4, 5, 6, 7, 8 };
-		double[] yp = { 1, 2, 3, 4, 5, 6, 7, 8 };
-
-		double[][] zp = { { 1, 4, 9, 16, 25, 36, 49, 64 }, { 4, 16, 36, 64, 100, 144, 196, 256 },
-				{ 9, 36, 81, 144, 225, 324, 441, 576 }, { 16, 64, 144, 256, 400, 576, 784, 1024 },
-				{ 25, 100, 225, 400, 625, 900, 1225, 1600 }, { 36, 144, 324, 576, 900, 1296, 1764, 2304 },
-				{ 49, 196, 441, 784, 1225, 1764, 2401, 3136 }, { 64, 256, 576, 1024, 1600, 2304, 3136, 4096 } };
-
 		
-		
-		Polynomial2d poly = polyFit2D(xp, yp, zp, 2, 2);
-		System.out.println(Arrays.toString(poly._coefs));
-		System.out.println(poly);
-		
-		System.out.println(poly.evaluateAt(1, 1));
-		System.out.println(poly.evaluateAt(2, 1));
-		System.out.println(poly.evaluateAt(3, 1));
-		System.out.println(poly.evaluateAt(4, 1));
-		System.out.println(poly.evaluateAt(5, 1));
-		System.out.println(poly.evaluateAt(6, 1));
-		System.out.println(poly.evaluateAt(7, 1));
-		System.out.println(poly.evaluateAt(8, 1));
+	private static String getVariablesAndPowers(int i, int j) {
+		String x = null;
+		String y = null;
+		if (j == 0) {
+			x = "";
+		} else if (j == 1) {
+			x = "x";
+		} else {
+			x = String.format("x^%d", j);
+		}
 
-		System.out.println(poly.evaluateAt(1, 2));
-		System.out.println(poly.evaluateAt(2, 2));
-		System.out.println(poly.evaluateAt(3, 2));
-		System.out.println(poly.evaluateAt(4, 2));
-		System.out.println(poly.evaluateAt(5, 2));
-		System.out.println(poly.evaluateAt(6, 2));
-		System.out.println(poly.evaluateAt(7, 2));
-		System.out.println(poly.evaluateAt(8, 2));
-
-		System.out.println(poly.evaluateAt(1, 3));
-		System.out.println(poly.evaluateAt(2, 3));
-		System.out.println(poly.evaluateAt(3, 3));
-		System.out.println(poly.evaluateAt(4, 3));
-		System.out.println(poly.evaluateAt(5, 3));
-		System.out.println(poly.evaluateAt(6, 3));
-		System.out.println(poly.evaluateAt(7, 3));
-		System.out.println(poly.evaluateAt(8, 3));
-
-		System.out.println(poly.evaluateAt(1, 4));
-		System.out.println(poly.evaluateAt(2, 4));
-		System.out.println(poly.evaluateAt(3, 4));
-		System.out.println(poly.evaluateAt(4, 4));
-		System.out.println(poly.evaluateAt(5, 4));
-		System.out.println(poly.evaluateAt(6, 4));
-		System.out.println(poly.evaluateAt(7, 4));
-		System.out.println(poly.evaluateAt(8, 4));
-
-		System.out.println(poly.evaluateAt(1, 5));
-		System.out.println(poly.evaluateAt(2, 5));
-		System.out.println(poly.evaluateAt(3, 5));
-		System.out.println(poly.evaluateAt(4, 5));
-		System.out.println(poly.evaluateAt(5, 5));
-		System.out.println(poly.evaluateAt(6, 5));
-		System.out.println(poly.evaluateAt(7, 5));
-		System.out.println(poly.evaluateAt(8, 5));
-
-		System.out.println(poly.evaluateAt(1, 6));
-		System.out.println(poly.evaluateAt(2, 6));
-		System.out.println(poly.evaluateAt(3, 6));
-		System.out.println(poly.evaluateAt(4, 6));
-		System.out.println(poly.evaluateAt(5, 6));
-		System.out.println(poly.evaluateAt(6, 6));
-		System.out.println(poly.evaluateAt(7, 6));
-		System.out.println(poly.evaluateAt(8, 6));
-
-		System.out.println(poly.evaluateAt(1, 7));
-		System.out.println(poly.evaluateAt(2, 7));
-		System.out.println(poly.evaluateAt(3, 7));
-		System.out.println(poly.evaluateAt(4, 7));
-		System.out.println(poly.evaluateAt(5, 7));
-		System.out.println(poly.evaluateAt(6, 7));
-		System.out.println(poly.evaluateAt(7, 7));
-		System.out.println(poly.evaluateAt(8, 7));
-
-		System.out.println(poly.evaluateAt(1, 8));
-		System.out.println(poly.evaluateAt(2, 8));
-		System.out.println(poly.evaluateAt(3, 8));
-		System.out.println(poly.evaluateAt(4, 8));
-		System.out.println(poly.evaluateAt(5, 8));
-		System.out.println(poly.evaluateAt(6, 8));
-		System.out.println(poly.evaluateAt(7, 8));
-		System.out.println(poly.evaluateAt(8, 8));
-
-		System.out.println(poly.evaluateAt(1.5, 1.5));
-
-		System.out.println(poly.evaluateAt(2.5, 2.5));
-
-		System.out.println(poly.evaluateAt(3.5, 3.5));
-		
-		System.out.println(poly.evaluateAt(4.5, 4.5));
-
-		System.out.println(poly.evaluateAt(5.5, 5.5));
-		
-		System.out.println(poly.evaluateAt(7.5, 7.5));
+		if (i == 0) {
+			y = "";
+		}
+		else if (i == 1) {
+			y = "y";
+		} else {
+			y = String.format("y^%d", i);
+		}
+		if (!x.isEmpty() && !y.isEmpty()) {
+			return x + " * " + y;
+		} else if (x.isEmpty()) {
+			return y;
+		} else {
+			return x;
+		}
 	}
 }

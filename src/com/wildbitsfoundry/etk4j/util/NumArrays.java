@@ -140,6 +140,18 @@ public final class NumArrays {
 			a[i] *= d;
 		}
 	}
+	
+	public static double[] addElementWise(double[] a, double b) {
+		double[] result = Arrays.copyOf(a, a.length);
+		addElementWiseInPlace(result, b);
+		return result;
+	}
+
+	public static void addElementWiseInPlace(double[] a, double b) {
+		for(int i = 0; i < a.length; ++i) {
+			a[i] += b;
+		}
+	}
 
 	public static double[] multiplyElementWise(double[] a, double[] b) {
 		if (a.length != b.length) {
