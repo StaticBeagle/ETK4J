@@ -59,9 +59,6 @@ public class Polynomial2dTest {
 
 		yi = poly.evaluateAt(xiyi[6][0], xiyi[6][1]);
 		assertEquals(3164.0625, yi, 1e-12);
-
-		double[] yyi = NumArrays.addElementWise(x, 0.5);
-		double[] result = poly.evaluateAt(x, y);
 	}
 
 	@Test
