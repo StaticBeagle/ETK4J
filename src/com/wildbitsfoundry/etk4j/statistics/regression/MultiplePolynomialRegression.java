@@ -5,7 +5,7 @@ import java.util.Arrays;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
 import com.wildbitsfoundry.etk4j.util.NumArrays;
 
-public class MultiplePolynomialRegression extends MultivariateRegression {
+class MultiplePolynomialRegression extends MultivariateRegression {
 	public MultiplePolynomialRegression(double[][] x, double[] y, int[] n) {
 
 		// int order = (m + 1) * (n + 1); // ... * (nx + 1)

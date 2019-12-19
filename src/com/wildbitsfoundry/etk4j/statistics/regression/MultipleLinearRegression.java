@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
 
-public class MultipleLinearRegression extends MultivariateRegression {
+class MultipleLinearRegression extends MultivariateRegression {
 
 	public MultipleLinearRegression(double[][] x, double[] y) {
 
