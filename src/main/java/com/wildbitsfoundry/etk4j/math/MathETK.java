@@ -72,4 +72,16 @@ public final class MathETK {
 		}
 		return a - b * fix(a / b);
 	}
+
+	/***
+	 * Find the number rounded down to a multiple of the threshold.
+	 * @param x
+	 * @param threshold
+	 * @return
+	 */
+	public static double floor(double x, double threshold) {
+		double result = 0d;
+		result = x / threshold;
+		return Math.floor(result) * threshold;
+	}
 }
