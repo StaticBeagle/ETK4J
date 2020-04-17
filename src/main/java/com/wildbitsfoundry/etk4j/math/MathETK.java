@@ -80,8 +80,20 @@ public final class MathETK {
 	 * @return
 	 */
 	public static double floor(double x, double threshold) {
-		double result = 0d;
+		double result = 0.0d;
 		result = x / threshold;
 		return Math.floor(result) * threshold;
+	}
+
+	/***
+	 * Find the number rounded up to a multiple of the threshold.
+	 * @param x
+	 * @param threshold
+	 * @return
+	 */
+	public static double ceil(double x, double threshold) {
+		double result = 0.0d;
+		result = x / threshold;
+		return Math.ceil(result) * threshold;
 	}
 }

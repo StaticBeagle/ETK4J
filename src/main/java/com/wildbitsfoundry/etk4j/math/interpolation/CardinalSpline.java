@@ -5,7 +5,7 @@ import java.util.Arrays;
 import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkMinXLength;
 import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkXYDimensions;
 
-public class CardinalSpline extends Spline {
+class CardinalSpline extends Spline {
 
 	private CardinalSpline(double[] x, double[] y, double[] dydx) {
 		super(x, 4);
