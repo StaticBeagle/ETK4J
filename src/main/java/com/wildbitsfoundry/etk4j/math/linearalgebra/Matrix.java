@@ -629,10 +629,28 @@ public class Matrix {
 			return new QRDecomposition(this).solve(B);
 		} else { // Matrix is fat (Underdetermined system)
 			QRDecomposition qr = this.transpose().QR();
-			Matrix R1 = Matrices.fwdSubsSolve(qr.getRT(), B);
+			Matrix R1 = fwdSubsSolve(qr.getRT(), B);
 			R1.appendRows(_cols - R1._rows);
 			return qr.QmultiplyX(R1);
 		}
+	}
+
+	private static Matrix fwdSubsSolve(Matrix L, Matrix B) {
+		final int nx = B.getColumnCount();
+		final int m = L.getRowCount();
+		final int n = L.getColumnCount();
+		double[] t = L.getArray();
+		double[] X = B.getArrayCopy();
+
+		for (int j = 0; j < nx; ++j) {
+			for (int i = 0; i < m; ++i) {
+				for (int k = 0; k < i; ++k) {
+					X[i * nx + j] -= X[k * nx + j] * t[i * n + k];
+				}
+				X[i * nx + j] /= t[i * n + i];
+			}
+		}
+		return new Matrix(X, m, nx);
 	}
 
 	/**
