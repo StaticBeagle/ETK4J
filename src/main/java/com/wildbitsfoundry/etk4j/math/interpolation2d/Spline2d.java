@@ -25,8 +25,9 @@ public class Spline2d implements BivariateFunction {
         final int rows = y.length;
         final int cols = x.length;
         final int order = 4;
-        if (rows != cols) {
-            throw new IllegalArgumentException("x and y dimensions must match");
+
+        if (cols % order != 0) {
+            throw new IllegalArgumentException(String.format("x length has to be a multiple of %d", order));
         }
         if (rows % order != 0) {
             throw new IllegalArgumentException(String.format("y length has to be a multiple of %d", order));
@@ -34,6 +35,11 @@ public class Spline2d implements BivariateFunction {
         if (z.length != y.length) {
             throw new IllegalArgumentException(
                     String.format("The number of arrays in z has to be a multiple of %d", order));
+        }
+        for(int i = 0; i < z.length; ++i) {
+            if(cols != z[i].length) {
+                throw new IllegalArgumentException("The number of values in each array in z has to be the same");
+            }
         }
         double[] yt = Arrays.copyOf(y, rows);
         Spline[] splines = new Spline[rows];
@@ -50,8 +56,9 @@ public class Spline2d implements BivariateFunction {
         final int rows = y.length;
         final int cols = x.length;
         final int order = 2;
-        if (rows != cols) {
-            throw new IllegalArgumentException("x and y dimensions must match");
+
+        if (cols % order != 0) {
+            throw new IllegalArgumentException(String.format("x length has to be a multiple of %d", order));
         }
         if (rows % order != 0) {
             throw new IllegalArgumentException(String.format("y length has to be a multiple of %d", order));
@@ -59,6 +66,11 @@ public class Spline2d implements BivariateFunction {
         if (z.length != y.length) {
             throw new IllegalArgumentException(
                     String.format("The number of arrays in z has to be a multiple of %d", order));
+        }
+        for(int i = 0; i < z.length; ++i) {
+            if(cols != z[i].length) {
+                throw new IllegalArgumentException("The number of values in each array in z has to be the same");
+            }
         }
         double[] yt = Arrays.copyOf(y, rows);
         Spline[] splines = new Spline[rows];

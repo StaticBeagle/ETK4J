@@ -28,12 +28,19 @@ public class Spline2dExample {
 		sp = newBilinearSpline(x, y, z);
 		testSpline2d(sp, x, y);
 
+		x = new double[] {0, 1, 2, 3};
+		y = new double[] {1, 2};
+		z = new double[][] {{0, 1, 2, 3}, {1, 2, 3, 4}};
+
+		System.out.printf("%n:: Test Bilinear spline%n");
+		sp = newBilinearSpline(x, y, z);
+		testSpline2d(sp, x, y);
 	}
 	
 	public static void testSpline2d(BivariateFunction sp, double[] x, double[] y) {
 
-		final int rows = x.length;
-		final int cols = y.length;
+		final int rows = y.length;
+		final int cols = x.length;
 		System.out.print("   x |");
 		for(int i = 0; i < rows; ++i) {
 			System.out.printf("%7.2f ", x[i]);
@@ -49,7 +56,7 @@ public class Spline2dExample {
 		}
 		System.out.println();
 		
-		for(int i = 1; i <= 7; ++i) {
+		for(int i = 1; i < rows; ++i) {
 			double pi = i + 0.5;
 			System.out.printf("z(%.1f, %.1f) = %.4f%n", pi, pi, sp.evaluateAt(pi, pi));
 		}
