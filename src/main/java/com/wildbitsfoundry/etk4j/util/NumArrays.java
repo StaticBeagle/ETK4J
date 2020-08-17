@@ -4,8 +4,6 @@ import java.util.Arrays;
 
 import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.interpolation.CubicSpline;
-import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrices;
-import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
 
 public final class NumArrays {
 
@@ -523,17 +521,5 @@ public final class NumArrays {
         }
         result[newSize - 1] = a[length - 1];
         return result;
-    }
-
-    public static void main(String[] args) {
-        double[] x = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-        double[] y = {2, 4, 6, 8, 10, 12, 14, 16, 18, 20};
-//		System.out.println(Arrays.toString(gradient(x, y)));
-
-        System.out.println(Arrays.toString(shrink(expand(x, 21), 10)));
-
-        Matrix matrix = Matrices.Magic(6);
-
-        System.out.println(matrix);
     }
 }

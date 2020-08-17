@@ -5,11 +5,11 @@ public final class Tuples {
 	private Tuples() {
 	}
 
-	public static <T1, T2> Tuple2 create(T1 item1, T2 item2) {
+	public static <T1, T2> Tuple2<T1, T2> create(T1 item1, T2 item2) {
 		return new Tuple2<>(item1, item2);
 	}
 
-	public static <T1, T2, T3> Tuple3 create(T1 item1, T2 item2, T3 item3) {
+	public static <T1, T2, T3> Tuple3<T1, T2, T3> create(T1 item1, T2 item2, T3 item3) {
 		return new Tuple3<>(item1, item2, item3);
 	}
 
@@ -49,7 +49,7 @@ public final class Tuples {
 		}
 	}
 
-	public static class Tuple3<T1, T2, T3> extends Tuple2 {
+	public static class Tuple3<T1, T2, T3> extends Tuple2<Object, Object> {
 		private T3 item3;
 
 		public Tuple3(T1 item1, T2 item2, T3 item3) {
