@@ -169,6 +169,10 @@ public enum ApproximationType {
 
 		@Override
 		ZeroPoleGain buildLowPassPrototype(int n, double ap, double as) {
+			// H. J. Orchard, Life Fellow, IEEE, and Alan N. Willson, Jr., Fellow, IEEE
+			// Elliptic Functions for Filter Design
+			// IEEE TRANSACTIONS ON CIRCUITS AND SYSTEMS—I: FUNDAMENTAL THEORY AND APPLICATIONS,
+			// VOL. 44, NO. 4, APRIL 1997
 			if(n == 1) {
 				// filter becomes Chebyshev I
 				Complex[] z = new Complex[0];
