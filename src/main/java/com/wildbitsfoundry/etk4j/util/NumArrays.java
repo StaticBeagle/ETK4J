@@ -402,6 +402,9 @@ public final class NumArrays {
         int cols = a[0].length;
         double[] result = new double[rows * cols];
         for (int i = 0; i < rows; i++) {
+            if(a[i].length != cols) {
+                throw new IllegalArgumentException("All rows must have the same length.");
+            }
             System.arraycopy(a[i], 0, result, i * cols, cols);
         }
         return result;

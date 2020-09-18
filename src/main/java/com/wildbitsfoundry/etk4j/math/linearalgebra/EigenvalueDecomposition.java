@@ -1,5 +1,6 @@
 package com.wildbitsfoundry.etk4j.math.linearalgebra;
 
+import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
 import com.wildbitsfoundry.etk4j.math.MathETK;
 
 /**
@@ -158,7 +159,7 @@ public class EigenvalueDecomposition {
 		// Accumulate transformations.
 
 		for (int i = 0; i < _dim - 1; i++) {
-			V[(_dim - 1) * _dim - i] = V[i * _dim + i];
+			V[(_dim - 1) * _dim + i] = V[i * _dim + i];
 			V[i * _dim + i] = 1.0;
 			double h = d[i + 1];
 			if (h != 0.0) {
@@ -203,7 +204,7 @@ public class EigenvalueDecomposition {
 
 		double f = 0.0;
 		double tst1 = 0.0;
-		double eps = Math.pow(2.0, -52.0);
+		double eps = ConstantsETK.DOUBLE_EPS;
 		for (int l = 0; l < _dim; l++) {
 
 			// Find small subdiagonal element
@@ -983,7 +984,7 @@ public class EigenvalueDecomposition {
 	 */
 
 	public Matrix getV() {
-		return new Matrix(V, _dim);
+		return new Matrix(V, _dim, _dim);
 	}
 
 	/**

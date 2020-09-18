@@ -1,5 +1,7 @@
 package com.wildbitsfoundry.etk4j.math.linearalgebra;
 
+import java.util.Random;
+
 public final class Matrices {
     private Matrices() {
     }
@@ -28,6 +30,16 @@ public final class Matrices {
 
     public static Matrix Identity(int n) {
         return Matrices.Identity(n, n);
+    }
+
+    public static Matrix Random(int rows, int cols) {
+        Random rand = new Random();
+        double[] data = new double[rows * cols];
+
+        for(int i = 0; i < data.length; ++i) {
+            data[i] = rand.nextDouble() * 100.0;
+        }
+        return new Matrix(data, rows, cols);
     }
 
     public static Matrix Companion(double[] coefs, int n) {

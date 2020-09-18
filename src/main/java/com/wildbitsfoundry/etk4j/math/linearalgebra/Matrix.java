@@ -18,12 +18,25 @@ public class Matrix {
         this._data = new double[rows * cols];
     }
 
+    /***
+     * Column packed
+     * @param data
+     * @param rows
+     */
     public Matrix(double[] data, int rows) {
         _rows = rows;
-        _cols = data.length / rows;
+        _cols = (_rows != 0 ? data.length / _rows : 0);
+        if (_rows * _cols != data.length) {
+            throw new IllegalArgumentException("Array length must be a multiple of rows");
+        }
+
         int dim = _rows * _cols;
         _data = new double[dim];
-        System.arraycopy(data, 0, _data, 0, dim);
+        for (int i = 0; i < _rows; ++i) {
+            for (int j = 0; j < _cols; ++j) {
+                _data[i * _cols + j] = data[i + j * rows];
+            }
+        }
 
     }
 
@@ -60,6 +73,15 @@ public class Matrix {
     }
 
     /***
+     * Deep copy
+     * @return
+     */
+    public Matrix copy() {
+        double[] data = Arrays.copyOf(this._data, this._data.length);
+        return new Matrix(data, this._rows, this._cols);
+    }
+
+    /***
      * Get submatrix
      *
      * @param row0
@@ -73,6 +95,7 @@ public class Matrix {
      * @return A(row0 : row1, col0 : col1)
      */
     public Matrix subMatrix(int row0, int row1, int col0, int col1) {
+        // check bounds
         int rowDim = row1 - row0 + 1;
         int colDim = col1 - col0 + 1;
         double[] data = new double[rowDim * colDim];
@@ -386,7 +409,7 @@ public class Matrix {
         for (int j = 0; j < _cols; ++j) {
             double sum = 0.0;
             for (int i = 0; i < _rows; ++i) {
-                sum += _data[i * _cols + j];
+                sum += Math.abs(_data[i * _cols + j]);
             }
             norm = Math.max(norm, sum);
         }
@@ -413,7 +436,7 @@ public class Matrix {
         for (int i = 0; i < _rows; ++i) {
             double sum = 0.0;
             for (int j = 0; j < _cols; ++j) {
-                sum += _data[i * _cols + j];
+                sum += Math.abs(_data[i * _cols + j]);
             }
             norm = Math.max(norm, sum);
         }
@@ -542,7 +565,16 @@ public class Matrix {
 
     public Matrix arrayLeftDivide(Matrix m) {
         checkMatrixDimensions(m);
-        return new Matrix(NumArrays.divideElementWise(m._data, _data), _rows, _cols);
+        if (_data.length != m._data.length) {
+            throw new IllegalArgumentException("a and b dimensions must match");
+        }
+
+        final int length = _data.length;
+        double[] data = Arrays.copyOf(_data, length);
+        for (int i = 0; i < length; ++i) {
+            data[i] = m._data[i] / data[i];
+        }
+        return new Matrix(data, _rows, _cols);
     }
 
     /**
@@ -554,7 +586,14 @@ public class Matrix {
 
     public void arrayLeftDivideEquals(Matrix m) {
         checkMatrixDimensions(m);
-        NumArrays.divideElementWiseInPlace(m._data, _data);
+        if (_data.length != m._data.length) {
+            throw new IllegalArgumentException("a and b dimensions must match");
+        }
+
+        final int length = _data.length;
+        for (int i = 0; i < length; ++i) {
+            _data[i] = m._data[i] / _data[i];
+        }
     }
 
     /**
@@ -580,17 +619,26 @@ public class Matrix {
     }
 
     public Matrix multiply(Matrix mat) {
-        double[] result = new double[this._rows * mat._cols];
-        for (int i = 0, j = 0; i < this._rows; i++) {
-            for (int k = 0; k < mat._cols; k++, j++) {
-                double value = this._data[i * this._cols] * mat._data[k];
-                for (int l = 1, m = i * this._cols + 1, n = k + mat._cols; l < this._cols; l++, m++, n += mat._cols) {
-                    value += this._data[m] * mat._data[n];
+        if (mat._rows != this._cols) {
+            throw new IllegalArgumentException("Matrix inner dimensions must agree.");
+        }
+        double[][] C = new double[this._rows][mat._cols];
+        double[] Bcolj = new double[this._cols];
+        for (int j = 0; j < mat._cols; j++) {
+            for (int k = 0; k < this._cols; k++) {
+                Bcolj[k] = mat.get(k, j);
+            }
+            for (int i = 0; i < this._rows; i++) {
+                double[] Arowi = this.subMatrix(i, i, 0, this._cols - 1)._data;
+
+                double s = 0;
+                for (int k = 0; k < this._cols; k++) {
+                    s += Arowi[k]*Bcolj[k];
                 }
-                result[j] = value;
+                C[i][j] = s;
             }
         }
-        return new Matrix(result, _rows, mat._cols);
+        return new Matrix(C);
     }
 
     public Matrix solve(Matrix B) {
