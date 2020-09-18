@@ -622,23 +622,24 @@ public class Matrix {
         if (mat._rows != this._cols) {
             throw new IllegalArgumentException("Matrix inner dimensions must agree.");
         }
-        double[][] C = new double[this._rows][mat._cols];
+        double[] result = new double[this._rows * mat._cols];
         double[] Bcolj = new double[this._cols];
         for (int j = 0; j < mat._cols; j++) {
             for (int k = 0; k < this._cols; k++) {
                 Bcolj[k] = mat.get(k, j);
             }
             for (int i = 0; i < this._rows; i++) {
-                double[] Arowi = this.subMatrix(i, i, 0, this._cols - 1)._data;
+                double[] Arowi = new double[this._cols];
+                System.arraycopy(this._data, i * this._cols, Arowi, 0, this._cols);
 
                 double s = 0;
                 for (int k = 0; k < this._cols; k++) {
                     s += Arowi[k]*Bcolj[k];
                 }
-                C[i][j] = s;
+                result[i * mat._cols + j] = s;
             }
         }
-        return new Matrix(C);
+        return new Matrix(result, this._rows, mat._cols);
     }
 
     public Matrix solve(Matrix B) {
