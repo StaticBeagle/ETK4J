@@ -55,12 +55,18 @@ public final class Matrices {
         }
         return c;
     }
+    
+    public static Matrix emtpty() {
+    	return new Matrix(0, 0);
+    }
 
     public static Matrix Magic(int n) {
         Matrix magicMatrix = null;
         if (n == 1) {
             magicMatrix = new Matrix(n, n);
             magicMatrix.set(0, 0, 1.0);
+        } else if (n == 2) {
+        	return Matrices.emtpty();
         } else if (n % 2 == 1) {    // n is odd
             magicMatrix = oddMagicMatrix(n);
         } else if (n % 4 == 0) {     // if n is even and double order

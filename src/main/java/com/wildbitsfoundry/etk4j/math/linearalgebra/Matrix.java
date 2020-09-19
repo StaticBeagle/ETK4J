@@ -37,8 +37,12 @@ public class Matrix {
                 _data[i * _cols + j] = data[i + j * rows];
             }
         }
-
     }
+    
+    // row packed
+    // _rows = rows
+    // _cols = cols
+    // _data = data;
 
     public Matrix(double[][] data) {
         _rows = data.length;
@@ -681,7 +685,7 @@ public class Matrix {
      * @return solution if A is square, least squares solution otherwise.
      */
 
-    public Matrix solveTranspose(Matrix B) {
+    public Matrix transposeSolve(Matrix B) {
         return transpose().solve(B.transpose());
     }
 
@@ -802,8 +806,44 @@ public class Matrix {
         }
         return vals;
     }
+    
+    
 
-    /**
+    @Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + _cols;
+		result = prime * result + Arrays.hashCode(_data);
+		result = prime * result + _rows;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof Matrix)) {
+			return false;
+		}
+		Matrix other = (Matrix) obj;
+		if (_cols != other._cols) {
+			return false;
+		}
+		if (!Arrays.equals(_data, other._data)) {
+			return false;
+		}
+		if (_rows != other._rows) {
+			return false;
+		}
+		return true;
+	}
+
+	/**
      * Make a one-dimensional row packed copy of the internal array.
      *
      * @return Matrix elements packed in a one-dimensional array by rows.
@@ -826,4 +866,15 @@ public class Matrix {
             throw new IllegalArgumentException("Matrix dimensions must agree.");
         }
     }
+
+	public void setRow(int i, double[] row) {
+		if(i < 0 || i >= _rows) {
+			throw new IndexOutOfBoundsException("f");
+		}
+		if(row.length != _cols) {
+			throw new IllegalArgumentException();
+		}
+		System.arraycopy(row, 0, _data, i * _cols, _cols);
+		
+	}
 }
