@@ -100,6 +100,10 @@ public class Complex implements Comparable<Complex> {
 		return MathETK.hypot(_real, _imag);
 	}
 	
+	/***
+	 * 
+	 * @return The angle in radians where the x-axis is in polar coordinates
+	 */
 	public double arg() {
 		return Math.atan2(_imag, _real);
 	}

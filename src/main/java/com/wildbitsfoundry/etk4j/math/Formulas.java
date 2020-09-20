@@ -6,10 +6,35 @@ public class Formulas {
 	private Formulas() {}
 	
 	public static Complex[] quadraticFormula(double a, double b, double c) {
-		
-		double dis = b * b - 4 * a * c;
 		Complex r1;
 		Complex r2;
+
+		if(b == 0 && c == 0) {
+			r1 = new Complex(0.0, 0.0);
+			r2 = new Complex(r1);
+			return new Complex[] { r1, r2 };
+		}
+		
+		if(b == 0 && c != 0) {
+			double dis = -c / a;
+			if(dis < 0) {
+				r1 = new Complex(0.0, Math.sqrt(-dis));
+				r2 = r1.conj();
+			} else {
+				r1 = new Complex(Math.sqrt(dis), 0.0);
+				r2 = new Complex(-Math.sqrt(dis), 0.0);
+			}
+			return new Complex[] { r1, r2 };
+		}
+		
+		if(b != 0 && c == 0) {
+			r1 = new Complex(0.0, 0.0);
+			r2 = new Complex(-b / a, 0.0);
+			return new Complex[] { r1, r2 };
+		}
+		
+		double dis = b * b - 4 * a * c;
+
 		if (dis < 0) {
 			double k = 1 / (2 * a);
 			r1 = new Complex(-b * k, Math.sqrt(-dis) * k);

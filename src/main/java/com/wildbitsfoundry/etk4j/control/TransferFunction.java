@@ -62,6 +62,23 @@ public class TransferFunction {
 	public Complex evaluateAt(double f) {
 		return _rf.evaluateAt(0.0, f);
 	}
+	
+	public double[] getMagnitudeAt(double[] frequencies) {
+		double[] magnitude = new double[frequencies.length];
+		for(int i = 0; i < frequencies.length; ++i) {
+			magnitude[i] = this.evaluateAt(frequencies[i]).abs();
+		}
+		return magnitude;
+	}
+	
+	public double[] getPhaseAt(double[] frequencies) {
+		double[] phase = new double[frequencies.length];
+		for(int i = 0; i < frequencies.length; ++i) {
+			phase[i] = this.evaluateAt(frequencies[i]).arg() * (180 / Math.PI);
+		}
+		unwrapPhase(phase);
+		return phase;
+	}
 
 	public static void unwrapPhase(double[] phase) {
 		int length = phase.length;
@@ -212,7 +229,7 @@ public class TransferFunction {
 		Polynomial magPolyNum = getPolynomialMagnitude(_rf.getNumerator());
 		Polynomial magPolyDen = getPolynomialMagnitude(_rf.getDenominator());
 
-		Complex[] solution = magPolyDen.subtract(magPolyNum).getRoots();
+		Complex[] solution = magPolyNum.subtract(magPolyDen).getRoots();
 		double[] wgc = new double[solution.length];
 		int j = 0;
 		for (int i = 0; i < solution.length; i++) {

@@ -13,6 +13,18 @@ public final class MathETKTest {
 	public void testQuadraticFormula() {
 		Complex[] q = Formulas.quadraticFormula(2.0, 2.0, 1.0);
 		assertArrayEquals(new Complex[] { new Complex(-0.5, 0.5), new Complex(-0.5, -0.5) }, q);
+		
+		q = Formulas.quadraticFormula(3.0, 12.0, 0.0);
+		assertArrayEquals(new Complex[] { new Complex(0.0, 0.0), new Complex(-4.0, 0.0) }, q);
+		
+		q = Formulas.quadraticFormula(2.0, 0.0, 8.0);
+		assertArrayEquals(new Complex[] { new Complex(0.0, 2.0), new Complex(0.0, -2.0) }, q);
+		
+		q = Formulas.quadraticFormula(2.0, 0.0, -8.0);
+		assertArrayEquals(new Complex[] { new Complex(2.0, 0.0), new Complex(-2.0, 0.0) }, q);
+		
+		q = Formulas.quadraticFormula(2.0, 0.0, 0.0);
+		assertArrayEquals(new Complex[] { new Complex(0.0, 0.0), new Complex(0.0, 0.0) }, q);
 	}
 	
 	@Test
