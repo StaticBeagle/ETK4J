@@ -1,58 +1,172 @@
 package com.wildbitsfoundry.etk4j.signals.filters;
 
 public abstract class FilterSpecs {
-	private static enum FilterType {
-		LOWPASS,
-		HIGHPASS,
-		BANDPASS,
-		BANDSTOP
-	}
 
-	protected FilterType _type;
 	
 	public static class LowPassSpecs extends FilterSpecs {
-		public LowPassSpecs() {
-			_type = FilterType.LOWPASS;
+
+		private double passBandFrequency = 1;
+		private double stopBandFrequency = 10;
+		private double passBandRipple = 0.2;
+		private double stopBandAttenuation = 40;
+		
+		public double getPassBandFrequency() {
+			return passBandFrequency;
 		}
-		public double PassBandFrequency = 1;
-		public double StopBandFrequency = 10;
-		public double PassBandRipple = 0.2;
-		public double StopBandAttenuation = 40;
+		public void setPassBandFrequency(double passBandFrequency) {
+			this.passBandFrequency = passBandFrequency;
+		}
+		public double getStopBandFrequency() {
+			return stopBandFrequency;
+		}
+		public void setStopBandFrequency(double stopBandFrequency) {
+			this.stopBandFrequency = stopBandFrequency;
+		}
+		public double getPassBandRipple() {
+			return passBandRipple;
+		}
+		public void setPassBandRipple(double passBandRipple) {
+			this.passBandRipple = passBandRipple;
+		}
+		public double getStopBandAttenuation() {
+			return stopBandAttenuation;
+		}
+		public void setStopBandAttenuation(double stopBandAttenuation) {
+			this.stopBandAttenuation = stopBandAttenuation;
+		}
 	}
 	
 	public static class HighPassSpecs extends FilterSpecs {
-		public HighPassSpecs() {
-			_type = FilterType.HIGHPASS;
+
+		private double passBandFrequency = 1;
+		private double stopBandFrequency = 10;
+		private double passBandRipple = 0.2;
+		private double stopBandAttenuation = 40;
+		
+		public double getPassBandFrequency() {
+			return passBandFrequency;
 		}
-		public double PassBandFrequency = 1;
-		public double StopBandFrequency = 10;
-		public double PassBandRipple = 0.2;
-		public double StopBandAttenuation = 40;
+		public void setPassBandFrequency(double passBandFrequency) {
+			this.passBandFrequency = passBandFrequency;
+		}
+		public double getStopBandFrequency() {
+			return stopBandFrequency;
+		}
+		public void setStopBandFrequency(double stopBandFrequency) {
+			this.stopBandFrequency = stopBandFrequency;
+		}
+		public double getPassBandRipple() {
+			return passBandRipple;
+		}
+		public void setPassBandRipple(double passBandRipple) {
+			this.passBandRipple = passBandRipple;
+		}
+		public double getStopBandAttenuation() {
+			return stopBandAttenuation;
+		}
+		public void setStopBandAttenuation(double stopBandAttenuation) {
+			this.stopBandAttenuation = stopBandAttenuation;
+		}
 	}
 	
 	public static class BandPassSpecs extends FilterSpecs {
-		public BandPassSpecs() {
-			_type = FilterType.BANDPASS;
+
+		private double lowerPassBandFrequency = 900;
+		private double upperPassBandFrequency = 1000;
+		private double lowerStopBandFrequency = 90;
+		private double upperStopBandFrequency = 10000;
+		private double passBandRipple = 0.2;
+		private double lowerStopBandAttenuation = 40;
+		private double upperStopBandAttenuation = 40;
+		
+		public double getLowerPassBandFrequency() {
+			return lowerPassBandFrequency;
 		}
-		public double LowerPassBandFrequency = 900;
-		public double UpperPassBandFrequency = 1000;
-		public double LowerStopBandFrequency = 90;
-		public double UpperStopBandFrequency = 10000;
-		public double PassBandRipple = 0.2;
-		public double LowerStopBandAttenuation = 40;
-		public double UpperStopBandAttenuation = 40;
+		public void setLowerPassBandFrequency(double lowerPassBandFrequency) {
+			this.lowerPassBandFrequency = lowerPassBandFrequency;
+		}
+		public double getUpperPassBandFrequency() {
+			return upperPassBandFrequency;
+		}
+		public void setUpperPassBandFrequency(double upperPassBandFrequency) {
+			this.upperPassBandFrequency = upperPassBandFrequency;
+		}
+		public double getLowerStopBandFrequency() {
+			return lowerStopBandFrequency;
+		}
+		public void setLowerStopBandFrequency(double lowerStopBandFrequency) {
+			this.lowerStopBandFrequency = lowerStopBandFrequency;
+		}
+		public double getUpperStopBandFrequency() {
+			return upperStopBandFrequency;
+		}
+		public void setUpperStopBandFrequency(double upperStopBandFrequency) {
+			this.upperStopBandFrequency = upperStopBandFrequency;
+		}
+		public double getPassBandRipple() {
+			return passBandRipple;
+		}
+		public void setPassBandRipple(double passBandRipple) {
+			this.passBandRipple = passBandRipple;
+		}
+		public double getLowerStopBandAttenuation() {
+			return lowerStopBandAttenuation;
+		}
+		public void setLowerStopBandAttenuation(double lowerStopBandAttenuation) {
+			this.lowerStopBandAttenuation = lowerStopBandAttenuation;
+		}
+		public double getUpperStopBandAttenuation() {
+			return upperStopBandAttenuation;
+		}
+		public void setUpperStopBandAttenuation(double upperStopBandAttenuation) {
+			this.upperStopBandAttenuation = upperStopBandAttenuation;
+		}
 	}
 	
 	public static class BandStopSpecs extends FilterSpecs {
-		public BandStopSpecs() {
-			_type = FilterType.BANDSTOP;
+		private double lowerPassBandFrequency = 3.6e3;
+		private double upperPassBandFrequency = 9.1e3;
+		private double lowerStopBandFrequency = 5.45e3;
+		private double upperStopBandFrequency = 5.90e3;
+		private double passBandRipple = 1.5;
+		private double stopBandAttenuation = 40;
+		
+		public double getLowerPassBandFrequency() {
+			return lowerPassBandFrequency;
 		}
-		public double LowerPassBandFrequency = 3.6e3;
-		public double UpperPassBandFrequency = 9.1e3;
-		public double LowerStopBandFrequency = 5.45e3;
-		public double UpperStopBandFrequency = 5.90e3;
-		public double PassBandRipple = 1.5;
-		public double StopBandAttenuation = 40;
+		public void setLowerPassBandFrequency(double lowerPassBandFrequency) {
+			this.lowerPassBandFrequency = lowerPassBandFrequency;
+		}
+		public double getUpperPassBandFrequency() {
+			return upperPassBandFrequency;
+		}
+		public void setUpperPassBandFrequency(double upperPassBandFrequency) {
+			this.upperPassBandFrequency = upperPassBandFrequency;
+		}
+		public double getLowerStopBandFrequency() {
+			return lowerStopBandFrequency;
+		}
+		public void setLowerStopBandFrequency(double lowerStopBandFrequency) {
+			this.lowerStopBandFrequency = lowerStopBandFrequency;
+		}
+		public double getUpperStopBandFrequency() {
+			return upperStopBandFrequency;
+		}
+		public void setUpperStopBandFrequency(double upperStopBandFrequency) {
+			this.upperStopBandFrequency = upperStopBandFrequency;
+		}
+		public double getPassBandRipple() {
+			return passBandRipple;
+		}
+		public void setPassBandRipple(double passBandRipple) {
+			this.passBandRipple = passBandRipple;
+		}
+		public double getStopBandAttenuation() {
+			return stopBandAttenuation;
+		}
+		public void setStopBandAttenuation(double stopBandAttenuation) {
+			this.stopBandAttenuation = stopBandAttenuation;
+		}
 	}
 
 }
