@@ -46,11 +46,11 @@ public class TestTransferFunction {
 		Complex[] poles = tf.getPoles();
 
 		assertArrayEquals(new Complex[] {}, zeros);
-		assertArrayEquals(new Complex[] { new Complex(-1.0000000209081399, 0.0), new Complex(-0.9999999790918601, 0.0),
-				new Complex(-4.1910912494273124E-17, 0.0) }, poles);
+		assertArrayEquals(new Complex[] { Complex.newComplex(-1.0000000209081399, 0.0), Complex.newComplex(-0.9999999790918601, 0.0),
+				Complex.newComplex(-4.1910912494273124E-17, 0.0) }, poles);
 
-		zeros = new Complex[] { new Complex(-1.0, 0.0) };
-		poles = new Complex[] { new Complex(-5.0, 0.0), new Complex(-1.0, 0.0), new Complex(-2.0, 0.0) };
+		zeros = new Complex[] { Complex.newComplex(-1.0, 0.0) };
+		poles = new Complex[] { Complex.newComplex(-5.0, 0.0), Complex.newComplex(-1.0, 0.0), Complex.newComplex(-2.0, 0.0) };
 
 		tf = new TransferFunction(zeros, poles);
 
@@ -63,7 +63,7 @@ public class TestTransferFunction {
 
 	@Test
 	public void testGettersAndEvaluation() {
-		Complex[] poles = new Complex[] { new Complex(-1.0, 0.0), new Complex(-1.0, 0.0), new Complex(-1.0, 0.0) };
+		Complex[] poles = new Complex[] { Complex.newComplex(-1.0, 0.0), Complex.newComplex(-1.0, 0.0), Complex.newComplex(-1.0, 0.0) };
 
 		TransferFunction tf = new TransferFunction(10.0, poles);
 

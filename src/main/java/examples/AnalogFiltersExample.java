@@ -1,14 +1,13 @@
 package examples;
 
+import java.util.Arrays;
+
 import com.wildbitsfoundry.etk4j.signals.filters.AnalogFilter;
-import com.wildbitsfoundry.etk4j.signals.filters.Butterworth;
-import com.wildbitsfoundry.etk4j.signals.filters.Chebyshev;
-import com.wildbitsfoundry.etk4j.signals.filters.Elliptic;
+import com.wildbitsfoundry.etk4j.signals.filters.ApproximationType;
 import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.BandPassSpecs;
 import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.BandStopSpecs;
 import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.HighPassSpecs;
 import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.LowPassSpecs;
-import com.wildbitsfoundry.etk4j.signals.filters.InverseChebyshev;
 
 public class AnalogFiltersExample {
 
@@ -75,8 +74,8 @@ public class AnalogFiltersExample {
 		bsSpecs.setStopBandAttenuation(38.0); // 38 db attenuation at the notch
 
 		buildBandStopFilters(bsSpecs);
-		
-		// Calculate the minimum order for a low pass Chebyshev to meet the following specs:
+
+		// Design a low pass Chebyshev to meet the following specs:
 		// 0.2 dB ripple in the pass band
 		// 60 dB attenuation in the stop band
 		// 1000 Hz cutoff frequency
@@ -84,20 +83,30 @@ public class AnalogFiltersExample {
 		
 		// Step 1. Calculate the filter order required to meet the specs
 		double ripple = 0.2;
-		double attenuation = 60.0;
-		double cutoff = 1000.0;
-		double stopBand = 10000.0;
-		int n = Chebyshev.getMinOrderNeeded(cutoff, stopBand, ripple, attenuation);
-		System.out.println("Minimum order required to meet the specs is:");
-		System.out.println(n);
+		double attenuation = 60;
+		double cutoff = 1000;
+		double stopBand = 10000;
+		ApproximationType type = ApproximationType.CHEBYSHEV;
+		int n = AnalogFilter.getMinOrderNeeded(cutoff, stopBand, ripple, attenuation, type);
+		// Step 2. Calculate the filter approximation
+		AnalogFilter filter = AnalogFilter.newLowPass(n, ripple, attenuation, type);
+		
+		// Step 3. Print the filter coefficients
+		System.out.println();
+		System.out.println("Filter numerator:");
+		System.out.println(Arrays.toString(filter.getNumerator()));
+		System.out.println("Filter denominator:");
+		System.out.println(Arrays.toString(filter.getDenominator()));
+		System.out.println("Filter transfer function:");
+		System.out.println(filter);
 	}
 
 	public static void buildLowPassFilters(LowPassSpecs lpSpecs) {
-		AnalogFilter bu = new Butterworth(lpSpecs);
-		AnalogFilter cb1 = new Chebyshev(lpSpecs);
-		AnalogFilter cb2 = new InverseChebyshev(lpSpecs);
-		AnalogFilter el = new Elliptic(lpSpecs);
-		
+		AnalogFilter bu = AnalogFilter.newLowPass(lpSpecs, ApproximationType.BUTTERWORTH);
+		AnalogFilter cb1 = AnalogFilter.newLowPass(lpSpecs, ApproximationType.CHEBYSHEV);
+		AnalogFilter cb2 = AnalogFilter.newLowPass(lpSpecs, ApproximationType.INVERSE_CHEBYSHEV);
+		AnalogFilter el = AnalogFilter.newLowPass(lpSpecs, ApproximationType.ELLIPTIC);
+
 		System.out.println();
 		System.out.println("//////////////////////////////////");
 		System.out.println("//");
@@ -109,11 +118,11 @@ public class AnalogFiltersExample {
 	}
 
 	public static void buildHighPassFilters(HighPassSpecs hpSpecs) {
-		AnalogFilter bu = new Butterworth(hpSpecs);
-		AnalogFilter cb1 = new Chebyshev(hpSpecs);
-		AnalogFilter cb2 = new InverseChebyshev(hpSpecs);
-		AnalogFilter el = new Elliptic(hpSpecs);
-		
+		AnalogFilter bu = AnalogFilter.newHighPass(hpSpecs, ApproximationType.BUTTERWORTH);
+		AnalogFilter cb1 = AnalogFilter.newHighPass(hpSpecs, ApproximationType.CHEBYSHEV);
+		AnalogFilter cb2 = AnalogFilter.newHighPass(hpSpecs, ApproximationType.INVERSE_CHEBYSHEV);
+		AnalogFilter el = AnalogFilter.newHighPass(hpSpecs, ApproximationType.ELLIPTIC);
+
 		System.out.println();
 		System.out.println("//////////////////////////////////");
 		System.out.println("//");
@@ -125,11 +134,11 @@ public class AnalogFiltersExample {
 	}
 
 	public static void buildBandPassFilters(BandPassSpecs bpSpecs) {
-		AnalogFilter bu = new Butterworth(bpSpecs);
-		AnalogFilter cb1 = new Chebyshev(bpSpecs);
-		AnalogFilter cb2 = new InverseChebyshev(bpSpecs);
-		AnalogFilter el = new Elliptic(bpSpecs);
-		
+		AnalogFilter bu = AnalogFilter.newBandPass(bpSpecs, ApproximationType.BUTTERWORTH);
+		AnalogFilter cb1 = AnalogFilter.newBandPass(bpSpecs, ApproximationType.CHEBYSHEV);
+		AnalogFilter cb2 = AnalogFilter.newBandPass(bpSpecs, ApproximationType.INVERSE_CHEBYSHEV);
+		AnalogFilter el = AnalogFilter.newBandPass(bpSpecs, ApproximationType.ELLIPTIC);
+
 		System.out.println();
 		System.out.println("//////////////////////////////////");
 		System.out.println("//");
@@ -141,11 +150,11 @@ public class AnalogFiltersExample {
 	}
 
 	public static void buildBandStopFilters(BandStopSpecs bsSpecs) {
-		AnalogFilter bu = new Butterworth(bsSpecs);
-		AnalogFilter cb1 = new Chebyshev(bsSpecs);
-		AnalogFilter cb2 = new InverseChebyshev(bsSpecs);
-		AnalogFilter el = new Elliptic(bsSpecs);
-		
+		AnalogFilter bu = AnalogFilter.newBandStop(bsSpecs, ApproximationType.BUTTERWORTH);
+		AnalogFilter cb1 = AnalogFilter.newBandStop(bsSpecs, ApproximationType.CHEBYSHEV);
+		AnalogFilter cb2 = AnalogFilter.newBandStop(bsSpecs, ApproximationType.INVERSE_CHEBYSHEV);
+		AnalogFilter el = AnalogFilter.newBandStop(bsSpecs, ApproximationType.ELLIPTIC);
+
 		System.out.println();
 		System.out.println("//////////////////////////////////");
 		System.out.println("//");

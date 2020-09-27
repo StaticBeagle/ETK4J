@@ -11,8 +11,8 @@ public class RationalFunctionTest {
 	
 	@Test
 	public void testConstructors() {
-		Complex[] zeros = { Complex.of(-1, 0) };
-		Complex[] poles = { Complex.of(-1, 0), Complex.of(-1, 0) };
+		Complex[] zeros = { Complex.newComplex(-1, 0) };
+		Complex[] poles = { Complex.newComplex(-1, 0), Complex.newComplex(-1, 0) };
 		
 		RationalFunction rf = new RationalFunction(zeros, poles);
 		

@@ -95,9 +95,9 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 		Complex[] result = new Complex[size + 1];
 
 		for (int i = 1; i <= size; ++i) {
-			result[i] = new Complex();
+			result[i] = Complex.newComplex();
 		}
-		result[0] = new Complex(1.0, 0.0);
+		result[0] = Complex.newComplex(1.0, 0.0);
 
 		for (int i = 0; i < size; ++i) {
 			// Fill up tmp
@@ -336,7 +336,7 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 	 */
 	public Complex evaluateAt(double real, double imag) {
 		// Horner's method
-		Complex result = new Complex();
+		Complex result = Complex.newComplex();
 		for (double coef : _coefs) {
 			result.multiplyEquals(real, imag);
 			result.addEquals(coef);
@@ -346,7 +346,7 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 	
 	public Complex evaluateAt(Complex c) {
 		// Horner's method
-		Complex result = new Complex();
+		Complex result = Complex.newComplex();
 		for (double coef : _coefs) {
 			result.multiplyEquals(c);
 			result.addEquals(coef);
@@ -363,7 +363,7 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 				_roots = new Complex[0];
 				break;
 			case 1:
-				_roots = new Complex[] { new Complex(-_coefs[1] / _coefs[0], 0) };
+				_roots = new Complex[] { Complex.newComplex(-_coefs[1] / _coefs[0], 0) };
 				break;
 			case 2:
 				_roots = Formulas.quadraticFormula(_coefs[0], _coefs[1], _coefs[2]);
@@ -376,7 +376,7 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 				double[] realEig = evd.getRealEigenvalues();
 				double[] imagEig = evd.getImagEigenvalues();
 				for (int i = 0; i < N; i++) {
-					_roots[i] = new Complex(realEig[i], imagEig[i]);
+					_roots[i] = Complex.newComplex(realEig[i], imagEig[i]);
 				}
 			}
 		}
