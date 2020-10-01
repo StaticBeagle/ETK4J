@@ -36,7 +36,7 @@ public final class Matrices {
         Random rand = new Random();
         double[] data = new double[rows * cols];
 
-        for(int i = 0; i < data.length; ++i) {
+        for (int i = 0; i < data.length; ++i) {
             data[i] = rand.nextDouble() * 100.0;
         }
         return new Matrix(data, rows, cols);
@@ -55,9 +55,9 @@ public final class Matrices {
         }
         return c;
     }
-    
+
     public static Matrix emtpty() {
-    	return new Matrix(0, 0);
+        return new Matrix(0, 0);
     }
 
     public static Matrix Magic(int n) {
@@ -66,99 +66,114 @@ public final class Matrices {
             magicMatrix = new Matrix(n, n);
             magicMatrix.set(0, 0, 1.0);
         } else if (n == 2) {
-        	return Matrices.emtpty();
-        } else if (n % 2 == 1) {    // n is odd
-            magicMatrix = oddMagicMatrix(n);
-        } else if (n % 4 == 0) {     // if n is even and double order
-            magicMatrix = evenDoubleOrderMagicMatrix(n);
-        } else {
-            magicMatrix = evenSigleOrderMagicMatrix(n);
-        }
-        return magicMatrix;
-    }
-
-    private static Matrix oddMagicMatrix(int n) {
-        Matrix magicMatrix = new Matrix(n, n);
-        int i = 0, j = n / 2, n2 = n * n;
-
-        for (int k = 1; k <= n2; ++k) {
-            magicMatrix.set(i, j, k);
-
-            i--;
-            j++;
-            if (k % n == 0) {
-                i += 2;
-                --j;
-            } else if (j == n) {
-                j -= n;
-            } else if (i < 0) {
-                i += n;
-            }
-        }
-        return magicMatrix;
-    }
-
-    private static Matrix evenDoubleOrderMagicMatrix(int n) {
-        Matrix magicMatrix = new Matrix(n, n);
-        int i, j;
-
-        Matrix I = new Matrix(n, n);
-        Matrix J = new Matrix(n, n);
-
-        //prepare I, J
-        int index = 1;
-        for (i = 0; i < n; i++) {
-            for (j = 0; j < n; j++) {
-                I.set(i, j, (int) ((i + 1) % 4) / 2);
-                J.set(j, i, (int) ((i + 1) % 4) / 2);
-                magicMatrix.set(i, j, index);
-                index++;
-            }
+            return Matrices.emtpty();
         }
 
-        for (i = 0; i < n; i++) {
-            for (j = 0; j < n; j++) {
-                if (I.get(i, j) == J.get(i, j))
-                    magicMatrix.set(i, j, n * n + 1 - magicMatrix.get(i, j));
-            }
-        }
-        return magicMatrix;
-    }
+        double[][] M = new double[n][n];
 
-    private static Matrix evenSigleOrderMagicMatrix(int n) {
 
-        int size = n * n;
-        int halfN = n / 2;
-        int subSquareSize = size / 4;
+        // Odd order
 
-        Matrix subSquare = Magic(halfN);
-        int[] quadrantFactors = {0, 2, 3, 1};
-        double[][] result = new double[n][n];
 
-        for (int r = 0; r < n; r++) {
-            for (int c = 0; c < n; c++) {
-                int quadrant = (r / halfN) * 2 + (c / halfN);
-                result[r][c] = subSquare.get(r % halfN, c % halfN);
-                result[r][c] += quadrantFactors[quadrant] * subSquareSize;
-            }
-        }
+        if ((n % 2) == 1) {
 
-        int nColsLeft = halfN / 2;
-        int nColsRight = nColsLeft - 1;
+            int a = (n + 1) / 2;
 
-        for (int r = 0; r < halfN; r++)
-            for (int c = 0; c < n; c++) {
-                if (c < nColsLeft || c >= n - nColsRight
-                        || (c == nColsLeft && r == nColsLeft)) {
+            int b = (n + 1);
 
-                    if (c == 0 && r == nColsLeft)
-                        continue;
+            for (int j = 0; j < n; j++) {
 
-                    double tmp = result[r][c];
-                    result[r][c] = result[r + halfN][c];
-                    result[r + halfN][c] = tmp;
+                for (int i = 0; i < n; i++) {
+
+                    M[i][j] = n * ((i + j + a) % n) + ((i + 2 * j + b) % n) + 1;
+
                 }
+
             }
-        return new Matrix(result);
+
+
+            // Doubly Even Order
+
+
+        } else if ((n % 4) == 0) {
+
+            for (int j = 0; j < n; j++) {
+
+                for (int i = 0; i < n; i++) {
+
+                    if (((i + 1) / 2) % 2 == ((j + 1) / 2) % 2) {
+
+                        M[i][j] = n * n - n * i - j;
+
+                    } else {
+
+                        M[i][j] = n * i + j + 1;
+
+                    }
+
+                }
+
+            }
+
+
+            // Singly Even Order
+
+
+        } else {
+
+            int p = n / 2;
+
+            int k = (n - 2) / 4;
+
+            Matrix A = Magic(p);
+
+            for (int j = 0; j < p; j++) {
+
+                for (int i = 0; i < p; i++) {
+
+                    double aij = A.get(i, j);
+
+                    M[i][j] = aij;
+
+                    M[i][j + p] = aij + 2 * p * p;
+
+                    M[i + p][j] = aij + 3 * p * p;
+
+                    M[i + p][j + p] = aij + p * p;
+
+                }
+
+            }
+
+            for (int i = 0; i < p; i++) {
+
+                for (int j = 0; j < k; j++) {
+
+                    double t = M[i][j];
+                    M[i][j] = M[i + p][j];
+                    M[i + p][j] = t;
+
+                }
+
+                for (int j = n - k + 1; j < n; j++) {
+
+                    double t = M[i][j];
+                    M[i][j] = M[i + p][j];
+                    M[i + p][j] = t;
+
+                }
+
+            }
+
+            double t = M[k][0];
+            M[k][0] = M[k + p][0];
+            M[k + p][0] = t;
+
+            t = M[k][k];
+            M[k][k] = M[k + p][k];
+            M[k + p][k] = t;
+
+        }
+        return new Matrix(M);
     }
 }
