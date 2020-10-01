@@ -42,6 +42,10 @@ public class TransferFunction {
 	public TransferFunction(RationalFunction rf) {
 		_rf = rf;
 	}
+	
+	public TransferFunction(ZeroPoleGain zpk) {
+		_rf = new RationalFunction(zpk.Zeros, zpk.Poles).multiply(zpk.Gain);
+	}
 
 	public Complex[] getZeros() {
 		return _rf.getZeros();
@@ -200,9 +204,9 @@ public class TransferFunction {
 		for(int i = length - 1, j = 0; i >= 0; --i, ++j) {
 			poly[i] *= getComplexSign(j);
 			if(j % 2 == 0) {
-				result[i] = new Complex(poly[i], 0.0);
+				result[i] = Complex.fromReal(poly[i]);
 			} else {
-				result[i] = new Complex(0.0,poly[i]);
+				result[i] = Complex.fromImaginary(poly[i]);
 			}
 		}
 		return result;

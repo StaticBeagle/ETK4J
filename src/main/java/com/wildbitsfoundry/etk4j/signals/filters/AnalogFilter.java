@@ -64,10 +64,10 @@ public class AnalogFilter {
 	}
 	
 	public static AnalogFilter newLowPass(LowPassSpecs specs, ApproximationType type) {
-		double fp = specs.PassBandFrequency;
-		double fs = specs.StopBandFrequency;
-		double ap = specs.PassBandRipple;
-		double as = specs.StopBandAttenuation;
+		double fp = specs.getPassBandFrequency();
+		double fs = specs.getStopBandFrequency();
+		double ap = specs.getPassBandRipple();
+		double as = specs.getStopBandAttenuation();
 		
 		double wp = 2 * Math.PI * fp;
 		double ws = 2 * Math.PI * fs;
@@ -85,10 +85,10 @@ public class AnalogFilter {
 	}
 	
 	public static AnalogFilter newHighPass(HighPassSpecs specs, ApproximationType type) {
-		double fp = specs.PassBandFrequency;
-		double fs = specs.StopBandFrequency;
-		double ap = specs.PassBandRipple;
-		double as = specs.StopBandAttenuation;
+		double fp = specs.getPassBandFrequency();
+		double fs = specs.getStopBandFrequency();
+		double ap = specs.getPassBandRipple();
+		double as = specs.getStopBandAttenuation();
 		
 		double wp = 2 * Math.PI * fp;
 		double ws = 2 * Math.PI * fs;
@@ -100,13 +100,13 @@ public class AnalogFilter {
 	}
 	
 	public static AnalogFilter newBandPass(BandPassSpecs specs, ApproximationType type) {
-		double fp1 = specs.LowerPassBandFrequency;
-		double fp2 = specs.UpperPassBandFrequency;
-		double fs1 = specs.LowerStopBandFrequency;
-		double fs2 = specs.UpperStopBandFrequency;
-		double ap = specs.PassBandRipple;
-		double as1 = specs.LowerStopBandAttenuation;
-		double as2 = specs.UpperStopBandAttenuation;
+		double fp1 = specs.getLowerPassBandFrequency();
+		double fp2 = specs.getUpperPassBandFrequency();
+		double fs1 = specs.getLowerStopBandFrequency();
+		double fs2 = specs.getUpperStopBandFrequency();
+		double ap = specs.getPassBandRipple();
+		double as1 = specs.getLowerStopBandAttenuation();
+		double as2 = specs.getUpperStopBandAttenuation();
 		
 		double wp1 = 2 * Math.PI * fp1;
 		double wp2 = 2 * Math.PI * fp2;
@@ -143,12 +143,12 @@ public class AnalogFilter {
 	}
 	
 	public static AnalogFilter newBandStop(BandStopSpecs specs, ApproximationType type) {
-		double fp1 = specs.LowerPassBandFrequency;
-		double fp2 = specs.UpperPassBandFrequency;
-		double fs1 = specs.LowerStopBandFrequency;
-		double fs2 = specs.UpperStopBandFrequency;
-		double amax = specs.PassBandRipple;
-		double amin = specs.StopBandAttenuation;
+		double fp1 = specs.getLowerPassBandFrequency();
+		double fp2 = specs.getUpperPassBandFrequency();
+		double fs1 = specs.getLowerStopBandFrequency();
+		double fs2 = specs.getUpperStopBandFrequency();
+		double amax = specs.getPassBandRipple();
+		double amin = specs.getStopBandAttenuation();
 		
 		double wp1 = 2 * Math.PI * fp1;
 		double wp2 = 2 * Math.PI * fp2;

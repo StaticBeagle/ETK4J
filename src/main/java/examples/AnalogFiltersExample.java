@@ -19,19 +19,19 @@ public class AnalogFiltersExample {
 
 		// Specs for low pass filter
 		LowPassSpecs lpSpecs = new LowPassSpecs();
-		lpSpecs.PassBandRipple = 3.01; // 3.01 dB gain/ripple refer to note
-		lpSpecs.StopBandAttenuation = 60; // 60 dB at the stop band
-		lpSpecs.PassBandFrequency = 1.0; // 1 Hz cutoff frequency
-		lpSpecs.StopBandFrequency = 10.0; // 10 Hz stop band frequency
+		lpSpecs.setPassBandRipple(3.01); // 3.01 dB gain/ripple refer to note
+		lpSpecs.setStopBandAttenuation(60.0); // 60 dB at the stop band
+		lpSpecs.setPassBandFrequency(1.0); // 1 Hz cutoff frequency
+		lpSpecs.setStopBandFrequency(10.0); // 10 Hz stop band frequency
 
 		buildLowPassFilters(lpSpecs);
 
 		// Specs for high pass filter
 		HighPassSpecs hpSpecs = new HighPassSpecs();
-		hpSpecs.PassBandRipple = 3.01; // 3.01 dB gain/ripple refer to note
-		hpSpecs.StopBandAttenuation = 60; // 60 dB at the stop band
-		hpSpecs.PassBandFrequency = 1.0; // 1 Hz cutoff frequency
-		hpSpecs.StopBandFrequency = 0.1; // 0.1 Hz stop band frequency
+		hpSpecs.setPassBandRipple(3.01); // 3.01 dB gain/ripple refer to note
+		hpSpecs.setStopBandAttenuation(60.0); // 60 dB at the stop band
+		hpSpecs.setPassBandFrequency(1.0); // 1 Hz cutoff frequency
+		hpSpecs.setStopBandFrequency(0.1); // 0.1 Hz stop band frequency
 
 		buildHighPassFilters(hpSpecs);
 
@@ -45,13 +45,13 @@ public class AnalogFiltersExample {
 		// respectively. In a frequency spectrum, the order of the frequencies will be:
 		// LowerStopBandFrequency < LowerPassBandFrequency < UpperPassBandFrequency <
 		// UpperStopBandFrequency
-		bpSpecs.LowerPassBandFrequency = 190; // 190 Hz lower pass band frequency
-		bpSpecs.UpperPassBandFrequency = 210; // 210 Hz upper pass band frequency
-		bpSpecs.LowerStopBandFrequency = 180; // 180 Hz lower stop band frequency
-		bpSpecs.UpperStopBandFrequency = 220; // 220 Hz upper stop band frequency
-		bpSpecs.PassBandRipple = 0.2; // 0.2 dB gain/ripple refer to note
-		bpSpecs.LowerStopBandAttenuation = 20; // 20 dB attenuation at the lower end of the skirt
-		bpSpecs.UpperStopBandAttenuation = 20; // 20 dB attenuation at the upper end of the skirt
+		bpSpecs.setLowerPassBandFrequency(190.0); // 190 Hz lower pass band frequency
+		bpSpecs.setUpperPassBandFrequency(210.0); // 210 Hz upper pass band frequency
+		bpSpecs.setLowerStopBandFrequency(180.0); // 180 Hz lower stop band frequency
+		bpSpecs.setUpperStopBandFrequency(220.0); // 220 Hz upper stop band frequency
+		bpSpecs.setPassBandRipple(0.2); // 0.2 dB gain/ripple refer to note
+		bpSpecs.setLowerStopBandAttenuation(20.0); // 20 dB attenuation at the lower end of the skirt
+		bpSpecs.setUpperStopBandAttenuation(20.0); // 20 dB attenuation at the upper end of the skirt
 
 		buildBandPassFilters(bpSpecs);
 
@@ -66,15 +66,15 @@ public class AnalogFiltersExample {
 		// In a frequency spectrum, the order of the frequencies will be:
 		// LowerPassBandFrequency < LowerStopBandFrequency < UpperStopBandFrequency <
 		// UpperPassBandFrequency
-		bsSpecs.LowerPassBandFrequency = 3.6e3; // 3600 Hz lower pass band frequency
-		bsSpecs.UpperPassBandFrequency = 9.1e3; // 9100 Hz lower pass band frequency
-		bsSpecs.LowerStopBandFrequency = 5.45e3; // 5450 Hz lower stop band frequency
-		bsSpecs.UpperStopBandFrequency = 5.90e3; // 5900 Hz upper stop band frequency
-		bsSpecs.PassBandRipple = 0.5; // 0.5 dB gain/ripple refer to note
-		bsSpecs.StopBandAttenuation = 38; // 38 db attenuation at the notch
+		bsSpecs.setLowerPassBandFrequency(3.6e3); // 3600 Hz lower pass band frequency
+		bsSpecs.setUpperPassBandFrequency(9.1e3); // 9100 Hz lower pass band frequency
+		bsSpecs.setLowerStopBandFrequency(5.45e3); // 5450 Hz lower stop band frequency
+		bsSpecs.setUpperStopBandFrequency(5.90e3); // 5900 Hz upper stop band frequency
+		bsSpecs.setPassBandRipple(0.5); // 0.5 dB gain/ripple refer to note
+		bsSpecs.setStopBandAttenuation(38.0); // 38 db attenuation at the notch
 
 		buildBandStopFilters(bsSpecs);
-		
+
 		// Design a low pass Chebyshev to meet the following specs:
 		// 0.2 dB ripple in the pass band
 		// 60 dB attenuation in the stop band
@@ -102,49 +102,70 @@ public class AnalogFiltersExample {
 	}
 
 	public static void buildLowPassFilters(LowPassSpecs lpSpecs) {
-		// Build Butterworth approximation
 		AnalogFilter bu = AnalogFilter.newLowPass(lpSpecs, ApproximationType.BUTTERWORTH);
 		AnalogFilter cb1 = AnalogFilter.newLowPass(lpSpecs, ApproximationType.CHEBYSHEV);
 		AnalogFilter cb2 = AnalogFilter.newLowPass(lpSpecs, ApproximationType.INVERSE_CHEBYSHEV);
 		AnalogFilter el = AnalogFilter.newLowPass(lpSpecs, ApproximationType.ELLIPTIC);
 
+		System.out.println();
+		System.out.println("//////////////////////////////////");
+		System.out.println("//");
+		System.out.println("// Low pass filter approximations");
+		System.out.println("//");
+		System.out.println("//////////////////////////////////");
+
 		printTransferFunctions(bu, cb1, cb2, el);
 	}
 
 	public static void buildHighPassFilters(HighPassSpecs hpSpecs) {
-		// Build Butterworth approximation
 		AnalogFilter bu = AnalogFilter.newHighPass(hpSpecs, ApproximationType.BUTTERWORTH);
 		AnalogFilter cb1 = AnalogFilter.newHighPass(hpSpecs, ApproximationType.CHEBYSHEV);
 		AnalogFilter cb2 = AnalogFilter.newHighPass(hpSpecs, ApproximationType.INVERSE_CHEBYSHEV);
 		AnalogFilter el = AnalogFilter.newHighPass(hpSpecs, ApproximationType.ELLIPTIC);
 
+		System.out.println();
+		System.out.println("//////////////////////////////////");
+		System.out.println("//");
+		System.out.println("// High pass filter approximations");
+		System.out.println("//");
+		System.out.println("//////////////////////////////////");
+
 		printTransferFunctions(bu, cb1, cb2, el);
 	}
 
 	public static void buildBandPassFilters(BandPassSpecs bpSpecs) {
-		// Build Butterworth approximation
 		AnalogFilter bu = AnalogFilter.newBandPass(bpSpecs, ApproximationType.BUTTERWORTH);
 		AnalogFilter cb1 = AnalogFilter.newBandPass(bpSpecs, ApproximationType.CHEBYSHEV);
 		AnalogFilter cb2 = AnalogFilter.newBandPass(bpSpecs, ApproximationType.INVERSE_CHEBYSHEV);
 		AnalogFilter el = AnalogFilter.newBandPass(bpSpecs, ApproximationType.ELLIPTIC);
 
+		System.out.println();
+		System.out.println("//////////////////////////////////");
+		System.out.println("//");
+		System.out.println("// Band pass filter approximations");
+		System.out.println("//");
+		System.out.println("//////////////////////////////////");
+
 		printTransferFunctions(bu, cb1, cb2, el);
 	}
 
 	public static void buildBandStopFilters(BandStopSpecs bsSpecs) {
-		// Build Butterworth approximation
 		AnalogFilter bu = AnalogFilter.newBandStop(bsSpecs, ApproximationType.BUTTERWORTH);
 		AnalogFilter cb1 = AnalogFilter.newBandStop(bsSpecs, ApproximationType.CHEBYSHEV);
 		AnalogFilter cb2 = AnalogFilter.newBandStop(bsSpecs, ApproximationType.INVERSE_CHEBYSHEV);
 		AnalogFilter el = AnalogFilter.newBandStop(bsSpecs, ApproximationType.ELLIPTIC);
 
+		System.out.println();
+		System.out.println("//////////////////////////////////");
+		System.out.println("//");
+		System.out.println("// Band stop filter approximations");
+		System.out.println("//");
+		System.out.println("//////////////////////////////////");
+
 		printTransferFunctions(bu, cb1, cb2, el);
 	}
 
 	static void printTransferFunctions(AnalogFilter... analogFilters) {
-		System.out.println();
-		System.out.println("Band stop filter approximations");
-		System.out.println("------------------------------");
 		System.out.printf("Butterworth: %n%s%n%n", analogFilters[0]);
 		System.out.printf("Chebyshev: %n%s%n%n", analogFilters[1]);
 		System.out.printf("Inverse Chebyshev: %n%s%n%n", analogFilters[2]);

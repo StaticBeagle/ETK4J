@@ -18,30 +18,30 @@ public class AnalogFilterTest {
 
 	@BeforeClass
 	public static void setUpClass() {
-		lpSpecs.PassBandRipple = -20 * Math.log10(1.0 / Math.sqrt(2.0));
-		lpSpecs.StopBandAttenuation = 70;
-		lpSpecs.PassBandFrequency = 1.0 / (2 * Math.PI);
-		lpSpecs.StopBandFrequency = 10.0 / (2 * Math.PI);
+		lpSpecs.setPassBandRipple(-20.0 * Math.log10(1.0 / Math.sqrt(2.0)));
+		lpSpecs.setStopBandAttenuation(70.0);
+		lpSpecs.setPassBandFrequency(1.0 / (2.0 * Math.PI));
+		lpSpecs.setStopBandFrequency(10.0 / (2.0 * Math.PI));
 
-		hpSpecs.PassBandRipple = -20 * Math.log10(1.0 / Math.sqrt(2.0));
-		hpSpecs.StopBandAttenuation = 70;
-		hpSpecs.PassBandFrequency = 1.0 / (2 * Math.PI);
-		hpSpecs.StopBandFrequency = 0.1 / (2 * Math.PI);
+		hpSpecs.setPassBandRipple(-20.0 * Math.log10(1.0 / Math.sqrt(2.0)));
+		hpSpecs.setStopBandAttenuation(70.0);
+		hpSpecs.setPassBandFrequency(1.0 / (2.0 * Math.PI));
+		hpSpecs.setStopBandFrequency(0.1 / (2.0 * Math.PI));
 
-		bpSpecs.LowerPassBandFrequency = 190;
-		bpSpecs.UpperPassBandFrequency = 210;
-		bpSpecs.LowerStopBandFrequency = 180;
-		bpSpecs.UpperStopBandFrequency = 220;
-		bpSpecs.PassBandRipple = -20 * Math.log10(1.0 / Math.sqrt(2.0));
-		bpSpecs.LowerStopBandAttenuation = 20;
-		bpSpecs.UpperStopBandAttenuation = 20;
+		bpSpecs.setLowerPassBandFrequency(190.0);
+		bpSpecs.setUpperPassBandFrequency(210.0);
+		bpSpecs.setLowerStopBandFrequency(180.0);
+		bpSpecs.setUpperStopBandFrequency(220.0);
+		bpSpecs.setPassBandRipple(-20.0 * Math.log10(1.0 / Math.sqrt(2.0)));
+		bpSpecs.setLowerStopBandAttenuation(20);
+		bpSpecs.setUpperStopBandAttenuation(20);
 
-		bsSpecs.LowerPassBandFrequency = 3.6e3;
-		bsSpecs.UpperPassBandFrequency = 9.1e3;
-		bsSpecs.LowerStopBandFrequency = 5.45e3;
-		bsSpecs.UpperStopBandFrequency = 5.90e3;
-		bsSpecs.PassBandRipple = -20 * Math.log10(1.0 / Math.sqrt(2.0));
-		bsSpecs.StopBandAttenuation = 38;
+		bsSpecs.setLowerPassBandFrequency(3.6e3);
+		bsSpecs.setUpperPassBandFrequency(9.1e3);
+		bsSpecs.setLowerStopBandFrequency(5.45e3);
+		bsSpecs.setUpperStopBandFrequency(5.90e3);
+		bsSpecs.setPassBandRipple(-20.0 * Math.log10(1.0 / Math.sqrt(2.0)));
+		bsSpecs.setStopBandAttenuation(38.0);
 	}
 
 	@Test

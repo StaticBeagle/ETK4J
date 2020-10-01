@@ -18,7 +18,7 @@ public class RationalFunction implements UnivariateFunction {
 		_numerator = new Polynomial(num);
 		_denominator = new Polynomial(poles);
 
-		_numerator.multiplyEquals(calculatGain(new Complex[] { Complex.of(-1.0, 0.0) }, poles));
+		_numerator.multiplyEquals(calculatGain(new Complex[] { Complex.newComplex(-1.0, 0.0) }, poles));
 	}
 
 	public RationalFunction(RationalFunction rf) {
@@ -169,11 +169,11 @@ public class RationalFunction implements UnivariateFunction {
 
 	private static double calculatGain(Complex[] zeros, Complex[] poles) {
 		// Compute gain k
-		Complex knum = new Complex(1.0, 0.0);
+		Complex knum = Complex.fromReal(1.0);
 		for (Complex zero : zeros) {
 			knum.multiplyEquals(zero.uminus());
 		}
-		Complex kden = new Complex(1.0, 0.0);
+		Complex kden = Complex.fromReal(1.0);
 		for (Complex pole : poles) {
 			kden.multiplyEquals(pole.uminus());
 		}

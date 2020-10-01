@@ -15,8 +15,8 @@ public class ComplexTest {
 	
 	@Before
 	public void before() {
-		a = new Complex(-2, 3);
-		b = new Complex(5, -6);
+		a = Complex.newComplex(-2, 3);
+		b = Complex.newComplex(5, -6);
 	}
 	
 	@Test
@@ -28,10 +28,10 @@ public class ComplexTest {
 	
 	@Test
 	public void testEquals() {
-		Complex c = new Complex(a.real(), a.imag());
+		Complex c = Complex.newComplex(a.real(), a.imag());
 		assertEquals(a, c);
 		
-		Complex d = new Complex(a);
+		Complex d = Complex.newComplex(a);
 		assertEquals(a, d);
 		
 		c = a;
@@ -45,13 +45,13 @@ public class ComplexTest {
 		c = a.add(1);
 		assertNotEquals(a, c);
 		
-		c = a.add(Complex.of(0, 1));
+		c = a.add(Complex.newComplex(0, 1));
 		assertNotEquals(a, c);
 	}
 	
 	@Test
 	public void testCompareTo() {
-		Complex c = new Complex(a.real(), a.imag());
+		Complex c = Complex.newComplex(a.real(), a.imag());
 		
 		assertEquals(0.0, a.compareTo(c), 1e-12);
 		assertEquals(0.0, a.compareTo(a), 1e-12);
@@ -190,7 +190,7 @@ public class ComplexTest {
 		assertEquals(0.8959774761298381, c.real(), 1e-12);
 		assertEquals(1.6741492280355401, c.imag(), 1e-12);
 		
-		c = new Complex().sqrt();
+		c = Complex.newComplex(0.0, 0.0).sqrt();
 		assertEquals(0.0, c.real(), 1e-12);
 		assertEquals(0.0, c.imag(), 1e-12);
 		
@@ -288,11 +288,11 @@ public class ComplexTest {
 		assertEquals(0.003764025641504, c.real(), 1e-12);
 		assertEquals(1.003238627353610, c.imag(), 1e-12);
 		
-		c = Complex.of(1, 20.5).tan();
+		c = Complex.newComplex(1, 20.5).tan();
 		assertEquals(0.0, c.real(), 1e-12);
 		assertEquals(1.0, c.imag(), 1e-12);
 		
-		c = Complex.of(1, -20.5).tan();
+		c = Complex.newComplex(1, -20.5).tan();
 		assertEquals(0.0, c.real(), 1e-12);
 		assertEquals(-1.00, c.imag(), 1e-12);
 	}
@@ -310,11 +310,11 @@ public class ComplexTest {
 		assertEquals(-0.965385879022133, c.real(), 1e-12);
 		assertEquals(-0.009884375038323, c.imag(), 1e-12);
 		
-		c = Complex.of(1, 20.5).tanh();
+		c = Complex.newComplex(1, 20.5).tanh();
 		assertEquals(0.0, c.real(), 1e-12);
 		assertEquals(1.0, c.imag(), 1e-12);
 		
-		c = Complex.of(1, -20.5).tanh();
+		c = Complex.newComplex(1, -20.5).tanh();
 		assertEquals(0.0, c.real(), 1e-12);
 		assertEquals(-1.00, c.imag(), 1e-12);
 	}

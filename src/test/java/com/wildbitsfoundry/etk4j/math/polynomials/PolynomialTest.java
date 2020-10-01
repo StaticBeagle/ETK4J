@@ -206,11 +206,11 @@ public class PolynomialTest {
 		Polynomial p1 = Polynomial.of(1, 2, 1);
 		assertEquals(9.0, p1.evaluateAt(2), 1e-12);
 
-		assertEquals(Complex.of(9.0, 0.0), p1.evaluateAt(2, 0));
+		assertEquals(Complex.newComplex(9.0, 0.0), p1.evaluateAt(2, 0));
 
-		assertEquals(Complex.of(5.0, 12.0), p1.evaluateAt(2, 2));
+		assertEquals(Complex.newComplex(5.0, 12.0), p1.evaluateAt(2, 2));
 
-		assertEquals(Complex.of(5.0, 12.0), p1.evaluateAt(Complex.of(2, 2)));
+		assertEquals(Complex.newComplex(5.0, 12.0), p1.evaluateAt(Complex.newComplex(2, 2)));
 	}
 	
 	@Test
