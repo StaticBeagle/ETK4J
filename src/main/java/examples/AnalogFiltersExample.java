@@ -86,10 +86,10 @@ public class AnalogFiltersExample {
 		double attenuation = 60;
 		double cutoff = 1000;
 		double stopBand = 10000;
-		ApproximationType type = ApproximationType.CHEBYSHEV;
+		ApproximationType type = ApproximationType.INVERSE_CHEBYSHEV;
 		int n = AnalogFilter.getMinOrderNeeded(cutoff, stopBand, ripple, attenuation, type);
 		// Step 2. Calculate the filter approximation
-		AnalogFilter filter = AnalogFilter.newLowPass(n, ripple, attenuation, type);
+		AnalogFilter filter = AnalogFilter.newLowPass(n, ripple, attenuation, cutoff, stopBand, type);
 		
 		// Step 3. Print the filter coefficients
 		System.out.println();

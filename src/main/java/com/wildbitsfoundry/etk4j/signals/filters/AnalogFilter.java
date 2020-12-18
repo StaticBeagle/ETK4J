@@ -58,9 +58,12 @@ public class AnalogFilter {
 		return type.getMinOrderNeeded(fp, fs, ap, as);
 	}
 	
-	public static AnalogFilter newLowPass(int n, double ap, double as, ApproximationType type) {
-		TransferFunction lp = zpkToTF(type.buildLowPassPrototype(n, ap, as));
-		return new AnalogFilter(n, lp);
+	public static AnalogFilter newLowPass(int n, double ap, double as, double wp, double ws, ApproximationType type) {
+		LowPassPrototype lp = new LowPassPrototype(type.buildLowPassPrototype(n, ap, as));
+		double w0 = type.getScalingFrequency(wp,ws);
+		lp._tf = lpTolp(lp._tf.getNumerator(), lp._tf.getDenominator(), w0);
+		lp._tf.normalize();
+		return new AnalogFilter(n, lp._tf);
 	}
 	
 	public static AnalogFilter newLowPass(LowPassSpecs specs, ApproximationType type) {
@@ -227,7 +230,6 @@ public class AnalogFilter {
 	}
 	
 	public static TransferFunction zpkToTF(ZeroPoleGain zpk) {
-		TransferFunction tf = new TransferFunction(zpk.Zeros, zpk.Poles);
-		return tf.multiply(zpk.Gain);
+		return new TransferFunction(zpk.Zeros, zpk.Poles, zpk.Gain);
 	}
 }

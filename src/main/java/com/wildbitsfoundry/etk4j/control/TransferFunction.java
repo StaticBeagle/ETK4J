@@ -44,7 +44,11 @@ public class TransferFunction {
 	}
 	
 	public TransferFunction(ZeroPoleGain zpk) {
-		_rf = new RationalFunction(zpk.Zeros, zpk.Poles).multiply(zpk.Gain);
+		this(zpk.Zeros, zpk.Poles, zpk.Gain);
+	}
+
+	public TransferFunction(Complex[] zeros, Complex[] poles, double gain) {
+		_rf = new RationalFunction(zeros, poles, gain);
 	}
 
 	public Complex[] getZeros() {

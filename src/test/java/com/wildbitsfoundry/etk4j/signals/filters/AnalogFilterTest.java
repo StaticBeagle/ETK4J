@@ -91,7 +91,7 @@ public class AnalogFilterTest {
 
 		AnalogFilter bs = AnalogFilter.newBandStop(bsSpecs, ApproximationType.CHEBYSHEV);
 		assertArrayEquals(bs.getNumerator(),
-				new double[] { 0.35355339059327345, 0.0, 9.145103647206777E8, 0.0, 5.9137405370244147E17 }, 1e-12);
+				new double[] { 0.24999999999999978, 0.0, 6.46656480359374E8, 0.0, 4.1816460359077389E17 }, 1e-12);
 		assertArrayEquals(bs.getDenominator(), new double[] { 0.7071067811865472, 22241.020745028698,
 				3.0232428619731693E9, 2.8764600389160188E13, 1.18274810740488346E18 }, 1e-12);
 	}
@@ -139,13 +139,13 @@ public class AnalogFilterTest {
 
 		AnalogFilter bp = AnalogFilter.newBandPass(bpSpecs, ApproximationType.ELLIPTIC);
 		assertArrayEquals(bp.getNumerator(),
-				new double[] { 0.014142135623730961, 0.0, 45775.752030315074, 0.0, 3.5089749077347435E10 }, 1e-12);
+				new double[] { 0.010000000000000007, 0.0, 32368.34467454966, 0.0, 2.4812199522726772E10 }, 1e-12);
 		assertArrayEquals(bp.getDenominator(), new double[] { 1.0, 74.29569429254273, 3162604.5546259275,
 				1.1702975017491841E8, 2.4812199522726753E12 }, 1e-12);
 
 		AnalogFilter bs = AnalogFilter.newBandStop(bsSpecs, ApproximationType.ELLIPTIC);
 		assertArrayEquals(bs.getNumerator(),
-				new double[] { 0.00901331036955213, 0.0, 2.3581732495384E7, 0.0, 1.5076189430897526E16 }, 1e-12);
+				new double[] { 0.006373372883249337, 0.0, 1.667480295961319E7, 0.0, 1.0660475781040596E16 }, 1e-12);
 		assertArrayEquals(bs.getDenominator(), new double[] { 0.7159526914868412, 22039.161022784196,
 				3.046123922854621E9, 2.8503532594134285E13, 1.19754429370137139E18 }, 1e-12);
 	}
