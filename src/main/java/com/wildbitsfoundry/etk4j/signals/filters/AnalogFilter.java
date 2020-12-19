@@ -68,8 +68,8 @@ public class AnalogFilter {
 		double ws = 2 * Math.PI * fs;
 		final int n = type.getMinOrderNeeded(wp, ws, ap, as);
 		LowPassPrototype lp = new LowPassPrototype(type.buildLowPassPrototype(n, ap, as));
-		double w0 = type.getScalingFrequency(wp,ws);
-		lp._tf = lpTolp(lp._tf.getNumerator(), lp._tf.getDenominator(), w0);
+		lp._tf = lpTolp(lp._tf.getNumerator(), lp._tf.getDenominator(), fp);
+		lp._tf.normalize();
 		return new AnalogFilter(n, lp._tf);
 	}
 	
@@ -83,7 +83,8 @@ public class AnalogFilter {
 		double ws = 2 * Math.PI * fs;
 		final int n = type.getMinOrderNeeded(ws, wp, ap, as);
 		LowPassPrototype lp = new LowPassPrototype(type.buildLowPassPrototype(n, ap, as));
-		lp._tf = lpTohp(lp._tf.getNumerator(), lp._tf.getDenominator());
+		lp._tf = lpTohp(lp._tf.getNumerator(), lp._tf.getDenominator(), fp);
+		lp._tf.normalize();
 		return new AnalogFilter(n, lp._tf);
 	}
 	
@@ -109,7 +110,6 @@ public class AnalogFilter {
 
 		double omega1 = Q * Math.abs((whs1 * whs1 - 1) / whs1);
 		double omega2 = Q * Math.abs((whs2 * whs2 - 1) / whs2);
-		
 
 		final int n1 = type.getMinOrderNeeded(1, omega1, ap, as1);
 		final int n2 = type.getMinOrderNeeded(1, omega2, ap, as2);
@@ -128,6 +128,7 @@ public class AnalogFilter {
 		double bw = fp2 - fp1;
 		double f0 = w0 / (2 * Math.PI);
 		tf = lpTobp(tf.getNumerator(), tf.getDenominator(), f0, bw);
+		tf.normalize();
 		return new AnalogFilter(n, tf);
 	}
 
@@ -163,8 +164,8 @@ public class AnalogFilter {
 		double whs1 = ws1 / w0;
 		double whs2 = ws2 / w0;
 
-		double omegas1 = 1 / (Q * Math.abs((whs1 * whs1 - 1) / whs1));
-		double omegas2 = 1 / (Q * Math.abs((whs2 * whs2 - 1) / whs2));
+		double omegas1 = whs1 / (Q * Math.abs(whs1 * whs1 - 1));
+		double omegas2 = whs2 / (Q * Math.abs(whs2 * whs2 - 1));
 		
 		final int n1 = type.getMinOrderNeeded(1, omegas1, amax, amin);
 		final int n2 = type.getMinOrderNeeded(1, omegas2, amax, amin);
@@ -176,6 +177,7 @@ public class AnalogFilter {
 		double bw = fp2 - fp1;
 		double f0 = w0 / (2 * Math.PI);
 		tf = lpTobs(tf.getNumerator(), tf.getDenominator(), f0, bw);
+		tf.normalize();
 		return new AnalogFilter(n, tf);
 	}
 	
@@ -199,7 +201,7 @@ public class AnalogFilter {
 		return lpTobs(new Polynomial(num), new Polynomial(den), w0, bw);
 	}
 
-	public static TransferFunction lpTohp(Polynomial num, Polynomial den) {
+	public static TransferFunction lpTohp(Polynomial num, Polynomial den, double w0) {
 		final int numDegree = num.degree();
 		final int denDegree = den.degree();
 		final int filterOrder = Math.max(numDegree, denDegree) + 1;
@@ -208,14 +210,14 @@ public class AnalogFilter {
 		// order of the denominator i.e. pad with zeros
 		double[] hpNumerator = new double[filterOrder];
 		for (int i = numDegree, j = 0; i >= 0; --i, ++j) {
-			hpNumerator[j] = num.getCoefficientAt(i);
+			hpNumerator[j] = num.getCoefficientAt(i) * Math.pow(w0, j);
 		}
 
 		// Reverse coefficients then scale them by the
 		// order of the numerator i.e. pad with zeros
 		double[] hpDenominator = new double[filterOrder];
 		for (int i = denDegree, j = 0; i >= 0; --i, ++j) {
-			hpDenominator[j] = den.getCoefficientAt(i);
+			hpDenominator[j] = den.getCoefficientAt(i) * Math.pow(w0, j);
 		}
 		return  new  TransferFunction(hpNumerator, hpDenominator);
 	}

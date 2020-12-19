@@ -145,12 +145,6 @@ public enum ApproximationType {
             double k = RationalFunction.calculateGain(zeros, poles);
             return new ZeroPoleGain(zeros, poles, k);
         }
-
-        @Override
-        double getScalingFrequency(double wp, double ws) {
-            return wp;
-        }
-
     },
     ELLIPTIC {
         @Override
@@ -270,8 +264,4 @@ public enum ApproximationType {
     abstract int getMinOrderNeeded(double fp, double fs, double ap, double as);
 
     abstract ZeroPoleGain buildLowPassPrototype(int n, double ap, double as);
-
-    double getScalingFrequency(double wp, double ws) {
-        return wp;
-    }
 }

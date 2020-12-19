@@ -20,19 +20,19 @@ public class AnalogFiltersExample {
 
         // Specs for low pass filter
         LowPassSpecs lpSpecs = new LowPassSpecs();
-        lpSpecs.setPassBandRipple(3.01); // 3.01 dB gain/ripple refer to note
+        lpSpecs.setPassBandRipple(1.5); // 1.5 dB gain/ripple refer to note
         lpSpecs.setStopBandAttenuation(60.0); // 60 dB at the stop band
-        lpSpecs.setPassBandFrequency(1.0); // 1 Hz cutoff frequency
-        lpSpecs.setStopBandFrequency(10.0); // 10 Hz stop band frequency
+        lpSpecs.setPassBandFrequency(2500); // 2500 Hz cutoff frequency
+        lpSpecs.setStopBandFrequency(10000); // 10000 Hz stop band frequency
 
         buildLowPassFilters(lpSpecs);
 
         // Specs for high pass filter
         HighPassSpecs hpSpecs = new HighPassSpecs();
-        hpSpecs.setPassBandRipple(3.01); // 3.01 dB gain/ripple refer to note
+        hpSpecs.setPassBandRipple(0.2); // 0.2 dB gain/ripple refer to note
         hpSpecs.setStopBandAttenuation(60.0); // 60 dB at the stop band
-        hpSpecs.setPassBandFrequency(1.0); // 1 Hz cutoff frequency
-        hpSpecs.setStopBandFrequency(0.1); // 0.1 Hz stop band frequency
+        hpSpecs.setPassBandFrequency(12); // 12 Hz cutoff frequency
+        hpSpecs.setStopBandFrequency(0.2); // 0.2 Hz stop band frequency
 
         buildHighPassFilters(hpSpecs);
 
@@ -75,13 +75,6 @@ public class AnalogFiltersExample {
         bsSpecs.setStopBandAttenuation(38.0); // 38 db attenuation at the notch
 
         buildBandStopFilters(bsSpecs);
-
-        System.out.println();
-        double[] b = {1.0, 2.0, 3.0, 4.0, 5.0};
-        double[] a = {5.0, 4.0, 3.0, 2.0, 1.0};
-        TransferFunction tf = AnalogFilter.lpTobs(b, a, 2, 3);
-        tf.normalize();
-        System.out.println(tf);
     }
 
     public static void buildLowPassFilters(LowPassSpecs lpSpecs) {
@@ -102,7 +95,7 @@ public class AnalogFiltersExample {
 
     public static void buildHighPassFilters(HighPassSpecs hpSpecs) {
         AnalogFilter bu = AnalogFilter.newHighPass(hpSpecs, ApproximationType.BUTTERWORTH);
-        AnalogFilter cb1 = AnalogFilter.newHighPass(hpSpecs, ApproximationType.CHEBYSHEV);
+        AnalogFilter cb1 = AnalogFilter.newHighPass(hpSpecs, ApproximationType.CHEBYSHEV);;
         AnalogFilter cb2 = AnalogFilter.newHighPass(hpSpecs, ApproximationType.INVERSE_CHEBYSHEV);
         AnalogFilter el = AnalogFilter.newHighPass(hpSpecs, ApproximationType.ELLIPTIC);
 
@@ -135,17 +128,9 @@ public class AnalogFiltersExample {
 
     public static void buildBandStopFilters(BandStopSpecs bsSpecs) {
         AnalogFilter bu = AnalogFilter.newBandStop(bsSpecs, ApproximationType.BUTTERWORTH);
-        System.out.println(Arrays.toString(bu.getNumerator()));
-        System.out.println(Arrays.toString(bu.getDenominator()));
         AnalogFilter cb1 = AnalogFilter.newBandStop(bsSpecs, ApproximationType.CHEBYSHEV);
-        System.out.println(Arrays.toString(cb1.getNumerator()));
-        System.out.println(Arrays.toString(cb1.getDenominator()));
         AnalogFilter cb2 = AnalogFilter.newBandStop(bsSpecs, ApproximationType.INVERSE_CHEBYSHEV);
-        System.out.println(Arrays.toString(cb2.getNumerator()));
-        System.out.println(Arrays.toString(cb2.getDenominator()));
         AnalogFilter el = AnalogFilter.newBandStop(bsSpecs, ApproximationType.ELLIPTIC);
-        System.out.println(Arrays.toString(el.getNumerator()));
-        System.out.println(Arrays.toString(el.getDenominator()));
 
         System.out.println();
         System.out.println("//////////////////////////////////");
