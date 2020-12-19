@@ -74,31 +74,6 @@ public class AnalogFiltersExample {
 		bsSpecs.setStopBandAttenuation(38.0); // 38 db attenuation at the notch
 
 		buildBandStopFilters(bsSpecs);
-
-		// Design a low pass Chebyshev to meet the following specs:
-		// 0.2 dB ripple in the pass band
-		// 60 dB attenuation in the stop band
-		// 1000 Hz cutoff frequency
-		// 10000 Hz stop band frequency
-		
-		// Step 1. Calculate the filter order required to meet the specs
-		double ripple = 0.2;
-		double attenuation = 60;
-		double cutoff = 1000;
-		double stopBand = 10000;
-		ApproximationType type = ApproximationType.INVERSE_CHEBYSHEV;
-		int n = AnalogFilter.getMinOrderNeeded(cutoff, stopBand, ripple, attenuation, type);
-		// Step 2. Calculate the filter approximation
-		AnalogFilter filter = AnalogFilter.newLowPass(n, ripple, attenuation, cutoff, stopBand, type);
-		
-		// Step 3. Print the filter coefficients
-		System.out.println();
-		System.out.println("Filter numerator:");
-		System.out.println(Arrays.toString(filter.getNumerator()));
-		System.out.println("Filter denominator:");
-		System.out.println(Arrays.toString(filter.getDenominator()));
-		System.out.println("Filter transfer function:");
-		System.out.println(filter);
 	}
 
 	public static void buildLowPassFilters(LowPassSpecs lpSpecs) {
