@@ -125,9 +125,24 @@ public class AnalogFilter {
 		}
 		TransferFunction tf = zpkToTF(type.buildLowPassPrototype(n, ap, as));
 
-		double bw = Q / w0;
-		tf = lpTobp(tf.getNumerator(), tf.getDenominator(), w0, bw);
+		double bw = fp2 - fp1;
+		double f0 = w0 / (2 * Math.PI);
+		tf = lpTobp(tf.getNumerator(), tf.getDenominator(), f0, bw);
 		return new AnalogFilter(n, tf);
+	}
+
+	public static TransferFunction lpTobp(Polynomial num, Polynomial den, double w0, double bw) {
+		Polynomial s = new Polynomial(bw, 0.0);
+		Polynomial s2w02 = new Polynomial(1.0, 0, w0 * w0);
+
+		RationalFunction bp = new RationalFunction(num, den);
+		bp.substituteInPlace(new RationalFunction(s2w02, s));
+
+		return new TransferFunction(bp);
+	}
+
+	public static TransferFunction lpTobp(double[] num, double[] den, double w0, double bw) {
+		return lpTobp(new Polynomial(num), new Polynomial(den), w0, bw);
 	}
 	
 	public static AnalogFilter newBandStop(BandStopSpecs specs, ApproximationType type) {
@@ -158,8 +173,9 @@ public class AnalogFilter {
 		
 		TransferFunction tf = zpkToTF(type.buildLowPassPrototype(n, amax, amin));
 
-		double bw = w0 / Q;
-		tf = lpTobs(tf.getNumerator(), tf.getDenominator(), w0, bw);
+		double bw = fp2 - fp1;
+		double f0 = w0 / (2 * Math.PI);
+		tf = lpTobs(tf.getNumerator(), tf.getDenominator(), f0, bw);
 		return new AnalogFilter(n, tf);
 	}
 	
@@ -167,15 +183,7 @@ public class AnalogFilter {
 		return _order;
 	}
 
-	public static TransferFunction lpTobp(Polynomial num, Polynomial den, double w0, double bw) {
-		Polynomial s = new Polynomial(1 / bw, 0.0);
-		Polynomial s2w02 = new Polynomial(1.0, 0, w0 * w0);
 
-		RationalFunction bp = new RationalFunction(num, den);
-		bp.substituteInPlace(new RationalFunction(s2w02, s));
-
-		return new TransferFunction(bp);
-	}
 
 	public static TransferFunction lpTobs(Polynomial num, Polynomial den, double w0, double bw) {
 		Polynomial s = new Polynomial(bw, 0.0);
@@ -185,6 +193,10 @@ public class AnalogFilter {
 		bp.substituteInPlace(new RationalFunction(s, s2w02));
 
 		return new TransferFunction(bp);
+	}
+
+	public static TransferFunction lpTobs(double[] num, double[] den, double w0, double bw) {
+		return lpTobs(new Polynomial(num), new Polynomial(den), w0, bw);
 	}
 
 	public static TransferFunction lpTohp(Polynomial num, Polynomial den) {
