@@ -1,8 +1,11 @@
 package examples;
 
 import java.util.Arrays;
+import java.util.Objects;
+import java.util.function.BiFunction;
 
 import com.wildbitsfoundry.etk4j.control.TransferFunction;
+import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
 import com.wildbitsfoundry.etk4j.signals.filters.AnalogFilter;
 import com.wildbitsfoundry.etk4j.signals.filters.ApproximationType;
 import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.BandPassSpecs;
@@ -71,7 +74,7 @@ public class AnalogFiltersExample {
         bsSpecs.setUpperPassBandFrequency(9.1e3); // 9100 Hz lower pass band frequency
         bsSpecs.setLowerStopBandFrequency(5.45e3); // 5450 Hz lower stop band frequency
         bsSpecs.setUpperStopBandFrequency(5.90e3); // 5900 Hz upper stop band frequency
-        bsSpecs.setPassBandRipple(0.5); // 0.5 dB gain/ripple refer to note
+        bsSpecs.setPassBandRipple(0.5); // 1.5 dB gain/ripple refer to note
         bsSpecs.setStopBandAttenuation(38.0); // 38 db attenuation at the notch
 
         buildBandStopFilters(bsSpecs);

@@ -11,13 +11,13 @@ import com.wildbitsfoundry.etk4j.math.polynomials.RationalFunction;
 public enum ApproximationType {
     CHEBYSHEV {
         @Override
-        int getMinOrderNeeded(double fp, double fs, double ap, double as) {
+        double getOrderNeeded(double fp, double fs, double ap, double as) {
             double wp = 2 * Math.PI * fp;
             double ws = 2 * Math.PI * fs;
             double amax = Math.pow(10, ap * 0.1) - 1;
             double amin = Math.pow(10, as * 0.1) - 1;
             double ne = MathETK.acosh(Math.sqrt(amin / amax)) / MathETK.acosh(ws / wp);
-            return (int) Math.ceil(ne);
+            return ne;
         }
 
         @Override
@@ -53,14 +53,14 @@ public enum ApproximationType {
 
     BUTTERWORTH {
         @Override
-        int getMinOrderNeeded(double fp, double fs, double ap, double as) {
+        double getOrderNeeded(double fp, double fs, double ap, double as) {
             double wp = 2 * Math.PI * fp;
             double ws = 2 * Math.PI * fs;
             double amax = Math.pow(10, ap * 0.1) - 1;
             double amin = Math.pow(10, as * 0.1) - 1;
 
             double ne = Math.log10(amin / amax) / (2 * Math.log10(ws / wp));
-            return (int) Math.ceil(ne);
+            return ne;
         }
 
         @Override
@@ -93,14 +93,14 @@ public enum ApproximationType {
 
     INVERSE_CHEBYSHEV {
         @Override
-        int getMinOrderNeeded(double fp, double fs, double ap, double as) {
+        double getOrderNeeded(double fp, double fs, double ap, double as) {
             double wp = 2 * Math.PI * fp;
             double ws = 2 * Math.PI * fs;
             double amax = Math.pow(10, ap * 0.1) - 1;
             double amin = Math.pow(10, as * 0.1) - 1;
 
             double ne = MathETK.acosh(Math.sqrt(amin / amax)) / MathETK.acosh(ws / wp);
-            return (int) Math.ceil(ne);
+            return ne;
         }
 
         @Override
@@ -148,7 +148,7 @@ public enum ApproximationType {
     },
     ELLIPTIC {
         @Override
-        int getMinOrderNeeded(double fp, double fs, double ap, double as) {
+        double getOrderNeeded(double fp, double fs, double ap, double as) {
             // 	Digital Filter Designer's Handbook: With C++ Algorithms by C. Britton Rorabaugh
             double k = fp / fs;
             double kp = Math.sqrt(Math.sqrt(1 - k * k));
@@ -164,7 +164,7 @@ public enum ApproximationType {
             //	return compEllipInt1(rt) * compEllipInt1(knp) / (compEllipInt1(rtp) * compEllipInt1(kn));
 
             double ne = (Math.log10(16.0 * D) / Math.log10(1.0 / q));
-            return (int) Math.ceil(ne);
+            return ne;
         }
 
         @Override
@@ -261,7 +261,11 @@ public enum ApproximationType {
         }
     };
 
-    abstract int getMinOrderNeeded(double fp, double fs, double ap, double as);
+    int getMinOrderNeeded(double fp, double fs, double ap, double as) {
+        return (int) Math.ceil(this.getOrderNeeded(fp, fs, ap, as));
+    }
+
+    abstract double getOrderNeeded(double fp, double fs, double ap, double as);
 
     abstract ZeroPoleGain buildLowPassPrototype(int n, double ap, double as);
 }
