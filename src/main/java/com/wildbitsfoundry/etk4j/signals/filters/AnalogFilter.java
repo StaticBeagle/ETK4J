@@ -174,8 +174,8 @@ public class AnalogFilter {
         final int n = type.getMinOrderNeeded(1, ws, ap, as);
         TransferFunction tf = zpkToTF(type.buildLowPassPrototype(n, ap, as));
 
-        double bw = fp2 - fp1;
-        double f0 = Math.sqrt(fp1 * fp2);
+        double bw = wp[1] - wp[0];
+        double f0 = Math.sqrt(wp[0] * wp[1]);
         tf = lpTobs(tf.getNumerator(), tf.getDenominator(), f0, bw);
         tf.normalize();
         return new AnalogFilter(n, tf);
