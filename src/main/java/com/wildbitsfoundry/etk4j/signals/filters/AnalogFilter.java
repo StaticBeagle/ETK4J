@@ -1,7 +1,9 @@
 package com.wildbitsfoundry.etk4j.signals.filters;
 
+import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
 import com.wildbitsfoundry.etk4j.control.TransferFunction;
 import com.wildbitsfoundry.etk4j.control.ZeroPoleGain;
+import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
 import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
 import com.wildbitsfoundry.etk4j.math.polynomials.RationalFunction;
 import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.BandPassSpecs;
@@ -42,22 +44,8 @@ public class AnalogFilter {
         return _tf.toString();
     }
 
-
-    /***
-     * Calculate the minimum order required for Low-Pass Chebyshev filter
-     *
-     * @param fp
-     *            passband frequency in Hertz
-     * @param fs
-     *            stopband frequency in Hertz
-     * @param ap
-     *            passband attenuation in dB
-     * @param as
-     *            stopband attenuation in dB
-     * @return
-     */
-    public static int getMinOrderNeeded(double fp, double fs, double ap, double as, ApproximationType type) {
-        return type.getMinOrderNeeded(fp, fs, ap, as);
+    public int getOrder() {
+        return _order;
     }
 
     public static AnalogFilter newLowPass(LowPassSpecs specs, ApproximationType type) {
@@ -131,7 +119,7 @@ public class AnalogFilter {
         double f0 = w0 / (2 * Math.PI);
         tf = lpTobp(tf.getNumerator(), tf.getDenominator(), f0, bw);
         tf.normalize();
-        return new AnalogFilter(n, tf);
+        return new AnalogFilter(2 * n, tf);
     }
 
     public static TransferFunction lpTobp(Polynomial num, Polynomial den, double w0, double bw) {
@@ -159,8 +147,8 @@ public class AnalogFilter {
         double[] wp = new double[2];
         // maximize the pass band
         // https://github.com/scipy/scipy/blob/master/scipy/signal/filter_design.py
-		wp[0] = goldenSectionMinimum(AnalogFilter::bandStopObjMinimize, fp1, fs1 - 1e-12,
-				1e-5, 500, specs, type, 0);
+        wp[0] = goldenSectionMinimum(AnalogFilter::bandStopObjMinimize, fp1, fs1 - 1e-12,
+                1e-5, 500, specs, type, 0);
 
         wp[1] = goldenSectionMinimum(AnalogFilter::bandStopObjMinimize, fs2 + 1e-12, fp2,
                 1e-5, 500, specs, type, 1);
@@ -178,65 +166,173 @@ public class AnalogFilter {
         double f0 = Math.sqrt(wp[0] * wp[1]);
         tf = lpTobs(tf.getNumerator(), tf.getDenominator(), f0, bw);
         tf.normalize();
-        return new AnalogFilter(n, tf);
+        return new AnalogFilter(2 * n, tf);
     }
 
     // TODO move this somewhere where it fits better
     // Maybe improve it and roll out our own implementation
     // https://www.mathworks.com/matlabcentral/fileexchange/25919-golden-section-method-algorithm
-	private static double goldenSectionMinimum(BiFunction<Double, Object[], Double> func,
+    private static double goldenSectionMinimum(BiFunction<Double, Object[], Double> func,
                                                double a, double b, double tol, int maxIter, Object... params) {
-		double gold = (Math.sqrt(5.0) - 1.0) / 2.0;
+        double gold = (Math.sqrt(5.0) - 1.0) / 2.0;
 
-		double x1 = a + (1 - gold) * (b - a);
-		double x2 = a + gold * (b - a);
+        double x1 = a + (1 - gold) * (b - a);
+        double x2 = a + gold * (b - a);
 
-		double fx1 = func.apply(x1, params);
-		double fx2 = func.apply(x2, params);
+        double fx1 = func.apply(x1, params);
+        double fx2 = func.apply(x2, params);
 
-		int k = 1;
-		while ((Math.abs(b - a) > tol) && (k < maxIter)) {
-			k = k + 1;
-			if (fx1 < fx2) {
-				b = x2;
-				x2 = x1;
-				x1 = a + (1 - gold) * (b - a);
-			} else {
-				a = x1;
-				x1 = x2;
-				x2 = a + gold * (b - a);
-			}
-			fx1 = func.apply(x1, params);
-			fx2 = func.apply(x2, params);
-		}
-		if (fx1 < fx2)
-			return x1;
-		return x2;
-	}
+        int k = 1;
+        while ((Math.abs(b - a) > tol) && (k < maxIter)) {
+            k = k + 1;
+            if (fx1 < fx2) {
+                b = x2;
+                x2 = x1;
+                x1 = a + (1 - gold) * (b - a);
+            } else {
+                a = x1;
+                x1 = x2;
+                x2 = a + gold * (b - a);
+            }
+            fx1 = func.apply(x1, params);
+            fx2 = func.apply(x2, params);
+        }
+        if (fx1 < fx2)
+            return x1;
+        return x2;
+    }
 
-    private static double bandStopObjMinimize(double wp, Object ... params) {
-    	BandStopSpecs specs = (BandStopSpecs) params[0];
-    	ApproximationType type = (ApproximationType) params[1];
-    	Integer index = (Integer) params[2];
+    private static double brentsMinimizer(BiFunction<Double, Object[], Double> func,
+                                          double a, double b, double tol, int maxIter, Object... params) {
 
-    	double[] passb = new double[] {specs.getLowerPassBandFrequency(), specs.getUpperPassBandFrequency()};
-    	double[] stopb = new double[] {specs.getLowerStopBandFrequency(), specs.getUpperStopBandFrequency()};
-		double amax = specs.getPassBandRipple();
-		double amin = specs.getStopBandAttenuation();
+        double sqrtEPS = Math.sqrt(ConstantsETK.DOUBLE_EPS);
+        double goldenMean = 0.5 * (3.0 - Math.sqrt(5.0));
+        double fulc = a + goldenMean * (b - a);
+        double nfc = fulc;
+        double xf = fulc;
+        double rat = 0;
+        double e = 0.0;
+        double x = xf;
+        double fx = func.apply(x, params);
+        int num = 1;
+        double fu = Double.POSITIVE_INFINITY;
 
-    	passb[index] = wp;
+        double ffulc = fx;
+        double fnfc = fx;
+        double xm = 0.5 * (a + b);
+        double tol1 = sqrtEPS * Math.abs(xf) + tol / 3.0;
+        double tol2 = 2.0 * tol1;
 
-    	double w1 = (stopb[0] * (passb[0] - passb[1]) /
-				(stopb[0] * stopb[0] - passb[0] * passb[1]));
-		double w2 = (stopb[1] * (passb[0] - passb[1]) /
-				(stopb[1] * stopb[1] - passb[0] * passb[1]));
 
-		double w0 = Math.min(Math.abs(w1), Math.abs(w2));
-    	return type.getOrderNeeded(1, w0, amax, amin);
-	}
+        while (Math.abs(xf - xm) > (tol2 - 0.5 * (b - a))) {
+            int golden = 1;
+            // Check for parabolic fit
+            if (Math.abs(e) > tol1) {
+                golden = 0;
+                double r = (xf - nfc) * (fx - ffulc);
+                double q = (xf - fulc) * (fx - fnfc);
+                double p = (xf - fulc) * q - (xf - nfc) * r;
+                q = 2.0 * (q - r);
+                if (q > 0.0) {
+                    p = -p;
+                }
+                q = Math.abs(q);
+                r = e;
+                e = rat;
 
-    public int getOrder() {
-        return _order;
+                // Check for acceptability of parabola
+                if ((Math.abs(p) < Math.abs(0.5 * q * r)) && (p > q * (a - xf)) && (p < q * (b - xf))) {
+                    rat = (p + 0.0) / q;
+                    x = xf + rat;
+
+
+                    if (x - a < tol2 || b - x < tol2) {
+                        double si = Math.signum(xm - xf) + ((xm - xf) == 0 ? 1 : 0);
+                        rat = tol1 * si;
+                    }
+                } else {      // #do a golden -section step
+                    golden = 1;
+                }
+            }
+
+            if (golden != 0) { //#do a golden -section step
+                if (xf >= xm) {
+                    e = a - xf;
+                } else {
+                    e = b - xf;
+                }
+                rat = goldenMean * e;
+            }
+
+
+            double si = Math.signum(rat) + (rat == 0 ? 1 : 0);
+            x = xf + si * Math.max(Math.abs(rat), tol1);
+            fu = func.apply(x, params);
+            num += 1;
+
+            if (fu <= fx) {
+                if (x >= xf) {
+                    a = xf;
+                } else {
+                    b = xf;
+                }
+                fulc = nfc;
+                ffulc = fnfc;
+                nfc = xf;
+                fnfc = fx;
+                xf = x;
+                fx = fu;
+            } else {
+                if (x < xf) {
+                    a = x;
+                } else {
+                    b = x;
+                }
+                if (fu <= fnfc || nfc == xf) {
+                    fulc = nfc;
+                    ffulc = fnfc;
+                    nfc = x;
+                    fnfc = fu;
+                } else if (fu <= ffulc || fulc == xf || fulc == nfc) {
+                    fulc = x;
+                    ffulc = fu;
+                }
+            }
+
+            xm = 0.5 * (a + b);
+            tol1 = sqrtEPS * Math.abs(xf) + tol / 3.0;
+            tol2 = 2.0 * tol1;
+
+            if (num >= maxIter)
+                // max number of iterations exceeded
+                break;
+        }
+
+        if(Double.isNaN(xf) || Double.isNaN(fx) || Double.isNaN(fu)) {
+            // not converged
+        }
+        return xf;
+    }
+
+    private static double bandStopObjMinimize(double wp, Object... params) {
+        BandStopSpecs specs = (BandStopSpecs) params[0];
+        ApproximationType type = (ApproximationType) params[1];
+        Integer index = (Integer) params[2];
+
+        double[] passb = new double[]{specs.getLowerPassBandFrequency(), specs.getUpperPassBandFrequency()};
+        double[] stopb = new double[]{specs.getLowerStopBandFrequency(), specs.getUpperStopBandFrequency()};
+        double amax = specs.getPassBandRipple();
+        double amin = specs.getStopBandAttenuation();
+
+        passb[index] = wp;
+
+        double w1 = (stopb[0] * (passb[0] - passb[1]) /
+                (stopb[0] * stopb[0] - passb[0] * passb[1]));
+        double w2 = (stopb[1] * (passb[0] - passb[1]) /
+                (stopb[1] * stopb[1] - passb[0] * passb[1]));
+
+        double w0 = Math.min(Math.abs(w1), Math.abs(w2));
+        return type.getOrderNeeded(1, w0, amax, amin);
     }
 
     public static TransferFunction lpTobs(Polynomial num, Polynomial den, double w0, double bw) {
@@ -281,6 +377,12 @@ public class AnalogFilter {
     }
 
     public static TransferFunction zpkToTF(ZeroPoleGain zpk) {
-        return new TransferFunction(zpk.Zeros, zpk.Poles, zpk.Gain);
+        return new TransferFunction(zpk.getZeros(), zpk.getPoles(), zpk.getGain());
+    }
+
+    public static void main(String[] args) {
+        UnivariateFunction gg = x -> x * x;
+        BiFunction<Double, Object[], Double> func = (x, params) -> gg.evaluateAt(x);
+        System.out.println(brentsMinimizer(func, 1, 2, 1e-5, 500));
     }
 }

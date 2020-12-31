@@ -1,4 +1,4 @@
-package com.wildbitsfoundry.etk4j.curvefitting;
+package com.wildbitsfoundry.etk4j.math.curvefitting;
 
 import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
 import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkXYDimensions;

@@ -1,6 +1,6 @@
 package com.wildbitsfoundry.etk4j.math.interpolation;
 
-import com.wildbitsfoundry.etk4j.curvefitting.CurveFitting;
+import com.wildbitsfoundry.etk4j.math.curvefitting.CurveFitting;
 import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkXYDimensions;
 import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkMinXLength;
 
@@ -55,7 +55,6 @@ public final class Interpolants {
 		if(length == 3) {
 			return quadratic(x[0], x[1], x[2], y[0], y[1], y[2], xi);
 		}
-		Spline sp = CubicSpline.newCubicSpline(x, y);
-		return sp.evaluateAt(xi);
+		return CubicSpline.newCubicSpline(x, y).evaluateAt(xi);
 	}
 }
