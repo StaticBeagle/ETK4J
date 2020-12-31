@@ -25,10 +25,10 @@ public class TestTransferFunction {
 		TransferFunction tf = new TransferFunction(numerator, denominator);
 		Margins margins = tf.getMargins();
 
-		assertEquals(0.6823278038280193, margins.GainCrossOverFrequency, 1e-12);
-		assertEquals(21.386389751875015, margins.PhaseMargin, 1e-12);
-		assertEquals(0.9999999999999998, margins.PhaseCrossOverFrequency, 1e-12);
-		assertEquals(6.02059991327962, margins.GainMargin, 1e-12);
+		assertEquals(0.6823278038280193, margins.getGainCrossOverFrequency(), 1e-12);
+		assertEquals(21.386389751875015, margins.getPhaseMargin(), 1e-12);
+		assertEquals(0.9999999999999998, margins.getPhaseCrossOverFrequency(), 1e-12);
+		assertEquals(6.02059991327962, margins.getGainMargin(), 1e-12);
 		assertEquals(
 				"Margins [GainMargin=6.02059991327962, PhaseMargin=21.386389751875015,"
 						+ " GainCrossOverFrequency=0.6823278038280193, PhaseCrossOverFrequency=0.9999999999999998]",

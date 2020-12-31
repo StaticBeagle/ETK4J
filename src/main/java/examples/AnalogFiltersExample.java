@@ -1,11 +1,5 @@
 package examples;
 
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.function.BiFunction;
-
-import com.wildbitsfoundry.etk4j.control.TransferFunction;
-import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
 import com.wildbitsfoundry.etk4j.signals.filters.AnalogFilter;
 import com.wildbitsfoundry.etk4j.signals.filters.ApproximationType;
 import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.BandPassSpecs;

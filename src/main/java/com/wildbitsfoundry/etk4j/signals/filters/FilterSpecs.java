@@ -2,7 +2,6 @@ package com.wildbitsfoundry.etk4j.signals.filters;
 
 public abstract class FilterSpecs {
 
-
     public static class LowPassSpecs extends FilterSpecs {
 
         private double passBandFrequency = 1;

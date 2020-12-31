@@ -1,4 +1,4 @@
-package com.wildbitsfoundry.etk4j.curvefitting;
+package com.wildbitsfoundry.etk4j.math.curvefitting;
 
 import static org.junit.Assert.assertArrayEquals;
 

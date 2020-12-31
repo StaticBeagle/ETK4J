@@ -273,12 +273,12 @@ public class CubicSpline extends Spline {
 			double d = _coefs[++j];
 			
 			sb.append("S").append(i + 1).append("(x) = ")
-			.append(a != 0d ? String.format("%.4f * (x - %.4f)^3", a, _x[i]) : "")
-			.append(b != 0d ? String.format(" + %.4f * (x - %.4f)^2", b, _x[i]) : "")
-			.append(c != 0d ? String.format(" + %.4f * (x - %.4f)", c, _x[i]) : "")
-			.append(d != 0d ? String.format(" + %.4f", d, _x[i]) : "").append(System.lineSeparator());
+			.append(a != 0d ? String.format("%.4g * (x - %.4f)^3", a, _x[i]) : "")
+			.append(b != 0d ? String.format(" + %.4g * (x - %.4f)^2", b, _x[i]) : "")
+			.append(c != 0d ? String.format(" + %.4g * (x - %.4f)", c, _x[i]) : "")
+			.append(d != 0d ? String.format(" + %.4g", d, _x[i]) : "").append(System.lineSeparator());
 		}
 		sb.setLength(Math.max(sb.length() - System.lineSeparator().length(), 0));
-		return sb.toString().replace("+ -", "- ").replace("- -", "+ ");
+		return sb.toString().replace("+ -", "- ").replace("- -", "+ ").replace("=  + ", "= ").replace("=  - ", "= -");
 	}
 }

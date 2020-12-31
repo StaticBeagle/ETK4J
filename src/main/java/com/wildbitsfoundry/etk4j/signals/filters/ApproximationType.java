@@ -167,6 +167,8 @@ public enum ApproximationType {
             return ne;
         }
 
+        // H. J. Orchard and A. N. Willson Jr., “Elliptic functions for filter design,”
+        // IEEE Trans. Circuits Syst., vol. 44, pp. 273–287, 1997
         @Override
         ZeroPoleGain buildLowPassPrototype(int n, double ap, double as) {
             if (n == 1) {
