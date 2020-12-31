@@ -3,8 +3,6 @@ package com.wildbitsfoundry.etk4j.math.calculus;
 import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
 import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
 
-import java.sql.Ref;
-
 public final class Integrals {
     private Integrals() {
     }

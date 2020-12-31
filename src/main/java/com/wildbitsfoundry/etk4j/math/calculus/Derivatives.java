@@ -1,8 +1,6 @@
 package com.wildbitsfoundry.etk4j.math.calculus;
 
 import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
-import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrices;
-import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
 
 public final class Derivatives {
 	private Derivatives() {
