@@ -1,14 +1,8 @@
 package com.wildbitsfoundry.etk4j.signals.fft;
 
-import com.wildbitsfoundry.etk4j.util.NumArrays;
+import com.wildbitsfoundry.etk4j.math.complex.Complex;
 
 public class FFT {
-
-	public enum FFTScaling {
-		STANDARD,
-		UNITARY,
-		NONE
-	}
 
 	private int _n;
 	private int _m;
@@ -50,6 +44,9 @@ public class FFT {
 	public void direct(double[] real, double[] imag) {
 		if(real.length != imag.length) {
 			throw new IllegalArgumentException("Length mismatch between real and imag");
+		}
+		if(real.length != _n) {
+			throw new IllegalArgumentException(String.format("The lengths of the arrays must be equal to n = %d.", _n));
 		}
 		
 		int i, j, k, n1, n2, a;
@@ -101,29 +98,87 @@ public class FFT {
 			}
 		}
 	}
-
+	
 	public void inverse(double[] real, double[] imag) {
 		this.direct(imag, real);
-		this.inverse(real, imag, FFTScaling.STANDARD);
+		double factor = 1.0 / _n;
+		multiplyInPlace(real, imag, factor);
 	}
+	
+    private static void multiplyInPlace(double[] a, double[] b, double d) {
+        final int length = a.length;
+        for (int i = 0; i < length; ++i) {
+            a[i] *= d;
+            b[i] *= d;
+        }
+    }
+    
+	public void direct(Complex[] data) {
+		if(data.length != _n) {
+			throw new IllegalArgumentException(String.format("The lengths of the arrays must be equal to n = %d.", _n));
+		}
+		
+		int i, j, k, n1, n2, a;
+		double c, s, t1, t2;
 
-	public void inverse(double[] real, double[] imag, FFTScaling scaling) {
+		// Bit-reverse
+		j = 0;
+		n2 = _n / 2;
+		for (i = 1; i < _n - 1; i++) {
+			n1 = n2;
+			while (j >= n1) {
+				j = j - n1;
+				n1 = n1 / 2;
+			}
+			j = j + n1;
 
+			if (i < j) {
+				// swap data[i] and data[j]
+				t1 = data[i].real();
+				t2 = data[i].imag();
+				data[i].addEquals(-t1 + data[j].real(), -t2 + data[j].imag());
+				data[j].addEquals(-data[j].real() + t1, -data[j].imag() + t2);
+			}
+		}
 
-		switch(scaling) {
-		case STANDARD:
-			double factor = 1.0 / _n;
-			NumArrays.multiplyInPlace(real, factor);
-			NumArrays.multiplyInPlace(imag, factor);
-			break;
-		case UNITARY:
-			factor = 1.0 / Math.sqrt(_n);
-			NumArrays.multiplyInPlace(real, factor);
-			NumArrays.multiplyInPlace(imag, factor);
-		case NONE:
-			break;
-		default:
-			throw new IllegalStateException("FFT inverse DFTScaling missing");
+		// FFT
+		n1 = 0;
+		n2 = 1;
+
+		for (i = 0; i < _m; i++) {
+			n1 = n2;
+			n2 = n2 + n2;
+			a = 0;
+
+			for (j = 0; j < n1; j++) {
+				c = _cos[a];
+				s = _sin[a];
+				a += 1 << (_m - i - 1);
+
+				for (k = j; k < _n; k = k + n2) {
+					t1 = c * data[k + n1].real() - s * data[k + n1].imag();
+					t2 = s * data[k + n1].real() + c * data[k + n1].imag();
+					data[k + n1].addEquals(-data[k + n1].real() + data[k].real() - t1, -data[k + n1].imag() + data[k].imag() - t2);
+					data[k].addEquals(t1, t2);
+				}
+			}
+		}
+	}
+	
+	public void inverse(Complex[] data) {
+		double t1;
+		// finding the conjugate of the complex number
+		// without calling conj() and creating a new Complex
+		for(int i = 0; i < _n; ++i) {
+			t1 = data[i].imag();
+			data[i].addEquals(0.0, -t1 - t1);
+		}
+		this.direct(data);
+		double factor = 1.0 / _n;
+		for(int i = 0; i < _n; ++i) {
+			t1 = data[i].imag();
+			data[i].addEquals(0.0, -t1 - t1);
+			data[i].multiplyEquals(factor);
 		}
 	}
 }

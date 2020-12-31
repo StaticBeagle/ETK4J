@@ -154,6 +154,13 @@ public class Complex implements Comparable<Complex> {
 		addOp(result, d);
 		return result;
 	}
+	
+	public Complex add(double real, double imag) {
+		Complex result = new Complex(_real, _imag);
+		addOp(result, real, imag);
+		return result;
+	}
+
 
 	public void addEquals(Complex c) {
 		addOp(this, c);
@@ -161,6 +168,10 @@ public class Complex implements Comparable<Complex> {
 
 	public void addEquals(double d) {
 		addOp(this, d);
+	}
+	
+	public void addEquals(double real, double imag) {
+		addOp(this, real, imag);
 	}
 
 	public Complex subtract(Complex c) {
@@ -344,6 +355,11 @@ public class Complex implements Comparable<Complex> {
 
 	private static final void addOp(Complex c, double d) {
 		c._real += d;
+	}
+	
+	private static final void addOp(Complex c, double real, double imag) {
+		c._real += real;
+		c._imag += imag;
 	}
 
 	private static final void addOp(Complex c1, Complex c2) {
