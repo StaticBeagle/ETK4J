@@ -44,7 +44,11 @@ public class TransferFunction {
 	}
 	
 	public TransferFunction(ZeroPoleGain zpk) {
-		_rf = new RationalFunction(zpk.Zeros, zpk.Poles).multiply(zpk.Gain);
+		this(zpk.getZeros(), zpk.getPoles(), zpk.getGain());
+	}
+
+	public TransferFunction(Complex[] zeros, Complex[] poles, double gain) {
+		_rf = new RationalFunction(zeros, poles, gain);
 	}
 
 	public Complex[] getZeros() {
@@ -348,12 +352,7 @@ public class TransferFunction {
 			gm = 20 * Math.log10(1.0 / mag);
 		}
 
-		Margins m = new Margins();
-		m.GainCrossOverFrequency = wcg;
-		m.PhaseCrossOverFrequency = wcp;
-		m.GainMargin = gm;
-		m.PhaseMargin = pm;
-
+		Margins m = new Margins(gm, pm, wcg, wcp);
 		return m;
 	}
 	

@@ -1,4 +1,4 @@
-package com.wildbitsfoundry.etk4j.math.rootfinding;
+package com.wildbitsfoundry.etk4j.math.solvers.univariate;
 
 import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
 
@@ -53,7 +53,7 @@ public final class RootFindingMethods {
 
 
         if (fa * fb > 0.0) {
-            return new Root(false, x, "Root is not bracketed", 0);
+            return new Root(false, Double.NaN, "Root is not bracketed", 0);
         }
         for (int i = 1; i <= maxIter; i++) {
             c = 0.5 * (a + b);
@@ -91,7 +91,7 @@ public final class RootFindingMethods {
                 fb = fx;
             }
         }
-        return new Root(false, x, "Max number of iterations exceeded", ++maxIter);
+        return new Root(false, x, "Max number of iterations exceeded", maxIter);
     }
 
     /***
@@ -111,8 +111,7 @@ public final class RootFindingMethods {
         double fs = 0;        // initialize
 
         if (!(fa * fb < 0)) {
-            //std::cout << "Signs of f(lower_bound) and f(upper_bound) must be opposites" << std::endl; // throws exception if root isn't bracketed
-            return new Root(false, Double.NaN, "Root is not bracketed. Signs of f(x0) & f(x1) must be different.", 0);
+            return new Root(false, Double.NaN, "Root is not bracketed", 0);
         }
 
         if (Math.abs(fa) < Math.abs(b))    // if magnitude of f(lower_bound) is less than magnitude of f(upper_bound)
@@ -192,7 +191,7 @@ public final class RootFindingMethods {
             }
 
         }
-        return new Root(false, Double.NaN, "Max number of iterations reached.", iter);
+        return new Root(false, Double.NaN, "Max number of iterations exceeded", maxIter);
     }
 
 

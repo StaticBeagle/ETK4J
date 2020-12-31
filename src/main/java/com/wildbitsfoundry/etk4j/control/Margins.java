@@ -1,17 +1,40 @@
 package com.wildbitsfoundry.etk4j.control;
 
 public class Margins {
-	public double GainMargin;
-	public double PhaseMargin;
-	public double GainCrossOverFrequency;
-	public double PhaseCrossOverFrequency;
-	
+	private final double gainMargin;
+	private final double phaseMargin;
+	private final double gainCrossOverFrequency;
+	private final double phaseCrossOverFrequency;
+
+	public Margins(double gainMargin, double phaseMargin, double gainCrossOverFrequency, double phaseCrossOverFrequency) {
+		this.gainMargin = gainMargin;
+		this.phaseMargin = phaseMargin;
+		this.gainCrossOverFrequency = gainCrossOverFrequency;
+		this.phaseCrossOverFrequency = phaseCrossOverFrequency;
+	}
+
+	public double getGainMargin() {
+		return gainMargin;
+	}
+
+	public double getPhaseMargin() {
+		return phaseMargin;
+	}
+
+	public double getGainCrossOverFrequency() {
+		return gainCrossOverFrequency;
+	}
+
+	public double getPhaseCrossOverFrequency() {
+		return phaseCrossOverFrequency;
+	}
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
-		return "Margins [GainMargin=" + GainMargin + ", PhaseMargin=" + PhaseMargin + ", GainCrossOverFrequency="
-				+ GainCrossOverFrequency + ", PhaseCrossOverFrequency=" + PhaseCrossOverFrequency + "]";
+		return "Margins [GainMargin=" + gainMargin + ", PhaseMargin=" + phaseMargin + ", GainCrossOverFrequency="
+				+ gainCrossOverFrequency + ", PhaseCrossOverFrequency=" + phaseCrossOverFrequency + "]";
 	}
 }

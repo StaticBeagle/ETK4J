@@ -97,7 +97,7 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 		for (int i = 1; i <= size; ++i) {
 			result[i] = Complex.newComplex();
 		}
-		result[0] = Complex.newComplex(1.0, 0.0);
+		result[0] = Complex.fromReal(1.0);
 
 		for (int i = 0; i < size; ++i) {
 			// Fill up tmp

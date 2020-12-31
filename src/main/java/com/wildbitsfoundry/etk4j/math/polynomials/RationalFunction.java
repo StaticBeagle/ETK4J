@@ -8,17 +8,21 @@ public class RationalFunction implements UnivariateFunction {
 	private Polynomial _denominator;
 
 	public RationalFunction(Complex[] zeros, Complex[] poles) {
+		this(zeros, poles, calculateGain(zeros, poles));
+	}
+
+	public RationalFunction(Complex[] zeros, Complex[] poles, double gain) {
 		_numerator = new Polynomial(zeros);
 		_denominator = new Polynomial(poles);
 
-		_numerator.multiplyEquals(calculatGain(zeros, poles));
+		_numerator.multiplyEquals(gain);
 	}
 
 	public RationalFunction(double num, Complex[] poles) {
 		_numerator = new Polynomial(num);
 		_denominator = new Polynomial(poles);
 
-		_numerator.multiplyEquals(calculatGain(new Complex[] { Complex.newComplex(-1.0, 0.0) }, poles));
+		_numerator.multiplyEquals(calculateGain(new Complex[] { Complex.newComplex(-1.0, 0.0) }, poles));
 	}
 
 	public RationalFunction(RationalFunction rf) {
@@ -167,7 +171,7 @@ public class RationalFunction implements UnivariateFunction {
 		return resultNum;
 	}
 
-	private static double calculatGain(Complex[] zeros, Complex[] poles) {
+	public static double calculateGain(Complex[] zeros, Complex[] poles) {
 		// Compute gain k
 		Complex knum = Complex.fromReal(1.0);
 		for (Complex zero : zeros) {
