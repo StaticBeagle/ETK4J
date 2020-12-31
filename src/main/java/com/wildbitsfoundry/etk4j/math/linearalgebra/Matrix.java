@@ -742,7 +742,7 @@ public class Matrix {
             if (i > 0 && i % _cols == 0) {
                 sb.append(System.lineSeparator());
             }
-            sb.append(String.format("%.4f", _data[i])).append(" ");
+            sb.append(String.format("%.4g", _data[i])).append(" ");
         }
         return sb.toString();
     }
