@@ -1,7 +1,5 @@
 package com.wildbitsfoundry.etk4j.signals.fft;
 
-import java.util.Arrays;
-
 import com.wildbitsfoundry.etk4j.util.NumArrays;
 
 public class FFT {

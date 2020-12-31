@@ -1,5 +1,7 @@
 package com.wildbitsfoundry.etk4j.math.calculus;
 
+import java.util.Arrays;
+
 import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
 import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
 
@@ -16,6 +18,11 @@ public final class Integrals {
         return result;
     }
 
+    /***
+     * Unit spaced trapezoidal integration.
+     * @param a array of values of the function.
+     * @return the approximate integral of {@code a} with unit spacing.
+     */
     public static double trapz(double... a) {
         final int length = a.length;
         double result = 0.0;
@@ -24,21 +31,38 @@ public final class Integrals {
         }
         return result;
     }
-
-    public static double simpson(double... a) {
-        final int length = a.length;
-        if (length % 2 != 0) {
-            throw new IllegalArgumentException("The number of elements must be even");
+    
+    /***
+     * Evaluates the definite integral from a to b using the trapezoidal rule.
+     * @param func the function to be integrated.
+     * @param a the starting point of the integration.
+     * @param b the end point of the integration.
+     * @param n the number of steps.
+     * @return the approximate definite integral of {@code func} from a to b. 
+     */
+    public static double trapz(UnivariateFunction func, double a, double b, int n) {
+        if(b < a) {
+        	throw new IllegalArgumentException("b must be greater than a.");
         }
-
-        double even = 0, odd = 0;
-        for (int i = 0; i < length; ) {
-            odd += a[i++];
-            even += a[i++];
+        if(n <= 0) {
+        	throw new IllegalArgumentException("n has to be greater than zero.");
         }
-        return 1.0 / 3.0 * (a[0] + 2.0 * even + 4.0 * odd + a[length - 1]);
+    	double h = (b - a) / n;
+    	double sum = func.evaluateAt(a) + func.evaluateAt(b);
+    	for(int i = 1; i < n; ++i) {
+    		sum += 2.0 * func.evaluateAt(a + i * h);
+    	}
+    	return 0.5 * h * sum;
     }
-
+    
+    /***
+     * Evaluates the definite integral from a to b using the Simpson's 1/3 rule.
+     * @param func the function to be integrated.
+     * @param a the starting point of the integration.
+     * @param b the end point of the integration.
+     * @param n the number of steps.
+     * @return the approximate definite integral of {@code func} from a to b. 
+     */
     public static double simpson(UnivariateFunction func, double a, double b, double n) {
         if (n % 2 != 0) {
             throw new IllegalArgumentException("The number of elements must be even");
@@ -165,8 +189,19 @@ public final class Integrals {
         double[] e = new double[3];
         e[0] = ConstantsETK.FLOAT_EPS; // relative tol
         e[1] = ConstantsETK.FLOAT_EPS; // absolute tol
-        double gg = qadrat(fx,1, 10,  e[1], e[0]);
+        double gg = qadrat(fx, 0, Math.PI / 2.0,  e[1], e[0]);
         System.out.println(gg);
-
+        
+        gg = trapz(fx, 0, Math.PI / 2.0, 1000);
+        System.out.println(gg);
+        
+        gg = simpson(fx, 0, Math.PI / 2.0, 1000);
+        System.out.println(gg);
+        
+        gg = trapz(new double[] {1, 4, 9, 16, 25, 36});
+        System.out.println(gg);
+        
+        double[] ggg = cummulativeTrapz(new double[] {1, 4, 9, 16, 25});
+        System.out.println(Arrays.toString(ggg));
     }
 }
