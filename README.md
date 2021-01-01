@@ -9,6 +9,9 @@ The linear algebra part of the library was taken from [Jama](https://math.nist.g
 and the internal data representation was changed from 2d array of doubles to a 1d array of doubles
 and the values are accessed via an offset.
 
+There's a set of examples that show how to use some of the classes contained in the library. The examples
+can be found <pre>src/main/java</pre>
+
 # Requirements
 ---
 JDK 1.8
