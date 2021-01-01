@@ -1,5 +1,22 @@
 package com.wildbitsfoundry.etk4j.control;
 
+/***
+ * 
+ * @author StaticBeagle
+ * 
+ * <p>
+ * The {@code Margins} class holds the calculation results 
+ * for the various performance metrics of a {@link TransferFunction} 
+ * i.e.
+ * <ol>
+ * <li>phase margin</li>
+ * <li>gain margin</li>
+ * <li>gain crossover frequency</li>
+ * <li>phase crossover frequency</li>
+ * </ol>
+ * </p>
+ *
+ */
 public class Margins {
 	private final double gainMargin;
 	private final double phaseMargin;

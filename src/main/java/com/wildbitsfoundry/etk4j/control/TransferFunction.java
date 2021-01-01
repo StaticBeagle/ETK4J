@@ -8,6 +8,11 @@ import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
 import com.wildbitsfoundry.etk4j.math.polynomials.RationalFunction;
 import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 
+/***
+ * 
+ * @author StaticBeagle
+ *
+ */
 public class TransferFunction {
 	private RationalFunction _rf;
 
