@@ -33,10 +33,10 @@ public final class Integrals {
     }
     
     /***
-     * Evaluates the definite integral from a to b using the trapezoidal rule.
+     * Computes the approximate definite integral from a to b using the trapezoidal rule.
      * @param func the function to be integrated.
-     * @param a the starting point of the integration.
-     * @param b the end point of the integration.
+     * @param a the lower limit of the integral.
+     * @param b the upper limit of the integral.
      * @param n the number of steps.
      * @return the approximate definite integral of {@code func} from a to b. 
      */
@@ -56,10 +56,10 @@ public final class Integrals {
     }
     
     /***
-     * Evaluates the definite integral from a to b using the Simpson's 1/3 rule.
+     * Computes the approximate definite integral from a to b using the Simpson's 1/3 rule.
      * @param func the function to be integrated.
-     * @param a the starting point of the integration.
-     * @param b the end point of the integration.
+     * @param a the lower limit of the integral.
+     * @param b the upper limit of the integral.
      * @param n the number of steps.
      * @return the approximate definite integral of {@code func} from a to b. 
      */
@@ -78,12 +78,29 @@ public final class Integrals {
         }
         return h / 3.0 * (func.evaluateAt(a) + 2.0 * even + 4.0 * odd + func.evaluateAt(b));
     }
-
-    public static double qadrat(UnivariateFunction func, double a, double b,
-                                 double absTol, double relTol) {
-        return qadrat(func, a, b, absTol, relTol, 50);
+    
+    /***
+     * Computes the approximate definite integral from a to b using 1d quadrature.<br/>
+     * The default tolerances are 1.1920929E-7 and the default number of evaluations is 150.
+     * @param func the function to be integrated.
+     * @param a the lower limit of the integral.
+     * @param b the upper limit of the integral.
+     * @return the approximate definite integral of {@code func} from a to b. 
+     */
+    public static double qadrat(UnivariateFunction func, double a, double b) {
+        return qadrat(func, a, b, ConstantsETK.FLOAT_EPS, ConstantsETK.FLOAT_EPS, 150);
     }
 
+    /***
+     * Computes the approximate definite integral from a to b using 1d quadrature.
+     * @param func the function to be integrated.
+     * @param a the lower limit of the integral.
+     * @param b the upper limit of the integral.
+     * @param absTol the absolute tolerance.
+     * @param relTol the relative tolerance.
+     * @param 
+     * @return the approximate definite integral of {@code func} from a to b. 
+     */
     public static double qadrat(UnivariateFunction func, double a, double b,
                                  double absTol, double relTol, int maxEval) {
         double x, f0, f2, f3, f5, f6, f7, f9, f14, hmin, hmax, re, ae, result;
@@ -124,7 +141,10 @@ public final class Integrals {
         /* this function is internally used by QADRAT */
 
         if (numEval.getValue() >= maxEval) {
-            throw new RuntimeException("Maximum number of evaluations reached in GaussLobatto");
+        	String error = String.format("Maximum number of evaluations reached in qadrat.%n"
+        			+ "If increasing the number of evaluations doesn't help, try loosening the%n"
+        			+ "relative and absolute tolerances.");
+            throw new RuntimeException(error);
         }
 
         numEval.setValue(numEval.getValue() + 1);
@@ -185,11 +205,11 @@ public final class Integrals {
     }
 
     public static void main(String[] args) {
-        UnivariateFunction fx = x -> Math.sin(x);
+        UnivariateFunction fx = x -> Math.sin(x * x);
         double[] e = new double[3];
-        e[0] = ConstantsETK.FLOAT_EPS; // relative tol
-        e[1] = ConstantsETK.FLOAT_EPS; // absolute tol
-        double gg = qadrat(fx, 0, Math.PI / 2.0,  e[1], e[0]);
+        e[0] = ConstantsETK.DOUBLE_EPS; // relative tol
+        e[1] = ConstantsETK.DOUBLE_EPS; // absolute tol
+        double gg = qadrat(fx, 0, Math.PI / 2.0);
         System.out.println(gg);
         
         gg = trapz(fx, 0, Math.PI / 2.0, 1000);
