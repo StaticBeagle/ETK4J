@@ -10,8 +10,10 @@ and the internal data representation was changed from 2d array of doubles to a 1
 and the values are accessed via an offset.
 
 There's a set of examples that show how to use some of the classes contained in the library. The examples
-can be found <pre>src/main/java</pre>
+can be found
+
+    src/main/java
 
 # Requirements
 ---
-JDK 1.8
+JDK 1.8+
