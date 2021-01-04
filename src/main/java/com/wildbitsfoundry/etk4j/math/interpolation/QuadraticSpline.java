@@ -3,6 +3,8 @@ package com.wildbitsfoundry.etk4j.math.interpolation;
 import java.util.Arrays;
 
 public class QuadraticSpline extends Spline {
+	
+	private static final double P5 = 0.5, P33 = 1.0 / 3.0;
 
 	private static class TridiagonalSystem {
 		public double[] L; // Sub-diagonal
@@ -97,25 +99,42 @@ public class QuadraticSpline extends Spline {
 		return T;
 	}
 
+	
+
+	@Override
+	public double evaluateSegmentAt(int i, double x) {
+		double t = x - _x[i];
+		i *= 3;
+		return _coefs[i + 2] + t * (_coefs[i + 1] + t * _coefs[i]);
+	}
+
+	@Override
+	public double evaluateDerivativeAt(int i, double t) {
+		i *= 3;
+		return _coefs[i + 1] + t * 2.0 * _coefs[i];
+	}
+
+	@Override
+	public double evaluateAntiDerivativeAt(int i, double t) {
+		i *= 3;
+		return t * (_coefs[i + 2] + t * (_coefs[i + 1] * P5 + t * _coefs[i] * P33));
+	}
+
 	public static void main(String[] args) {
 		double[] x = { -1, 0, 1 };
 		double[] y = { 0, 1, 3 };
 		QuadraticSpline qs = newNaturalSpline(x, y);
-
+		
 		System.out.println(qs.evaluateAt(-0.5));
 		System.out.println(qs.evaluateAt(0.5));
+		
+		x = new double[] {0, 1, 2, 3, 4, 5, 6, 7, 8 };
+		y = new double[] {0, 1, 4, 9, 16, 25, 36, 49, 64 };
+		
+		QuadraticSpline cs = QuadraticSpline.newNaturalSpline(x, y);
+		System.out.println(cs.differentiate(2.0));
+		System.out.println(cs.evaluateAntiDerivativeAt(0, 2.0));
+		System.out.println(cs.integrate(3.0));
+		System.out.println(cs.integrate(1, 3.0));
 	}
-
-	@Override
-	protected double evaluateDerivativeAt(int i, double t) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	protected double evaluateAntiDerivativeAt(int i, double t) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
 }

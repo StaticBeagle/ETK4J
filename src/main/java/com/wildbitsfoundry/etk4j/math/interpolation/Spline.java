@@ -80,12 +80,12 @@ public abstract class Spline extends PiecewiseFunction implements Differentiable
 		return result;
 	}
 	
-	protected double evaluateAntiDerivativeAt(int index, double t) {
+	public double evaluateAntiDerivativeAt(int index, double t) {
 		index *= _order;
 		double result = 0.0;
 		for (int j = 0; j < _order; ++j) {
-			result *= t;
 			result += _coefs[index++] / (_order - j);
+			result *= t;
 		}
 		return result;
 	}
@@ -120,7 +120,7 @@ public abstract class Spline extends PiecewiseFunction implements Differentiable
 		return integrate(b) - integrate(a);
 	}
 
-	private double integrate(double x) {
+	public double integrate(double x) {
 		// Lazy creating of values
 		if (_indefiniteIntegral == null) {
 			this.calcuateIntegral();

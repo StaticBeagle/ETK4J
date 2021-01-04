@@ -7,7 +7,7 @@ import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkM
 import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkXYDimensions;
 
 public class CubicSpline extends Spline {
-	
+
 	private static final double P5 = 0.5, P33 = 1.0 / 3.0, P25 = 0.25;
 
 	private static class TridiagonalLDLTSystem {
@@ -258,11 +258,11 @@ public class CubicSpline extends Spline {
 	}
 
 	@Override
-	protected double evaluateAntiDerivativeAt(int i, double t) {
+	public double evaluateAntiDerivativeAt(int i, double t) {
 		i <<= 2;
 		return t * (_coefs[i + 3] + t * (_coefs[i + 2] * P5 + t * (_coefs[i + 1] * P33 + t * _coefs[i] * P25)));
 	}
-	
+
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
@@ -271,14 +271,25 @@ public class CubicSpline extends Spline {
 			double b = _coefs[++j];
 			double c = _coefs[++j];
 			double d = _coefs[++j];
-			
+
 			sb.append("S").append(i + 1).append("(x) = ")
-			.append(a != 0d ? String.format("%.4g * (x - %.4f)^3", a, _x[i]) : "")
-			.append(b != 0d ? String.format(" + %.4g * (x - %.4f)^2", b, _x[i]) : "")
-			.append(c != 0d ? String.format(" + %.4g * (x - %.4f)", c, _x[i]) : "")
-			.append(d != 0d ? String.format(" + %.4g", d, _x[i]) : "").append(System.lineSeparator());
+					.append(a != 0d ? String.format("%.4g * (x - %.4f)^3", a, _x[i]) : "")
+					.append(b != 0d ? String.format(" + %.4g * (x - %.4f)^2", b, _x[i]) : "")
+					.append(c != 0d ? String.format(" + %.4g * (x - %.4f)", c, _x[i]) : "")
+					.append(d != 0d ? String.format(" + %.4g", d, _x[i]) : "").append(System.lineSeparator());
 		}
 		sb.setLength(Math.max(sb.length() - System.lineSeparator().length(), 0));
 		return sb.toString().replace("+ -", "- ").replace("- -", "+ ").replace("=  + ", "= ").replace("=  - ", "= -");
+	}
+
+	public static void main(String[] args) {
+		double[] x = {0, 1, 2, 3, 4, 5, 6, 7, 8 };
+		double[] y = {0, 1, 4, 9, 16, 25, 36, 49, 64 };
+		
+		CubicSpline cs = CubicSpline.newNaturalSpline(x, y);
+		System.out.println(cs.differentiate(2.0));
+		System.out.println(cs.evaluateAntiDerivativeAt(0, 3.0));
+		System.out.println(cs.integrate(3.0));
+		System.out.println(cs.integrate(1.0, 3.0));
 	}
 }
