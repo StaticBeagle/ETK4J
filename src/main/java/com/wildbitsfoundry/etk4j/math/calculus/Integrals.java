@@ -37,7 +37,7 @@ public final class Integrals {
      * @param func the function to be integrated.
      * @param a the lower limit of the integral.
      * @param b the upper limit of the integral.
-     * @param n the number of steps.
+     * @param n the number of partitions.
      * @param params optional parameters passed to {@code func}.
      * @return the approximate definite integral of {@code func} from a to b. 
      */
@@ -61,7 +61,7 @@ public final class Integrals {
      * @param func the function to be integrated.
      * @param a the lower limit of the integral.
      * @param b the upper limit of the integral.
-     * @param n the number of steps.
+     * @param n the number of partitions.
      * @return the approximate definite integral of {@code func} from a to b. 
      */
     public static double trapz(UnivariateFunction func, double a, double b, int n) {
@@ -73,7 +73,7 @@ public final class Integrals {
      * @param func the function to be integrated.
      * @param a the lower limit of the integral.
      * @param b the upper limit of the integral.
-     * @param n the number of steps. Must be even.
+     * @param n the number of partitions. Must be even.
      * @param params optional parameters passed to {@code func}.
      * @return the approximate definite integral of {@code func} from a to b. 
      */
@@ -97,8 +97,7 @@ public final class Integrals {
      * @param func the function to be integrated.
      * @param a the lower limit of the integral.
      * @param b the upper limit of the integral.
-
-     * @param n the number of steps. Must be even.
+     * @param n the number of partitions. Must be even.
      * @param params optional parameters passed to {@code func}.
      * @return the approximate definite integral of {@code func} from a to b. 
      */
