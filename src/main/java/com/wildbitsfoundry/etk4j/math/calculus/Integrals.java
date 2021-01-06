@@ -108,31 +108,6 @@ public final class Integrals {
     
     
     /***
-     * Computes the approximate definite integral from a to b using 1d quadrature.<br/>
-     * The default tolerances are 1.1920929E-7 and the default number of evaluations is 150.
-     * @param func the function to be integrated.
-     * @param a the lower limit of the integral.
-     * @param b the upper limit of the integral.
-     * @param params optional parameters passed to {@code func}.
-     * @return the approximate definite integral of {@code func} from a to b. 
-     */
-    public static double qadrat(BiFunction<Double, Object[], Double> func, double a, double b, Object ...params) {
-        return qadrat(func, a, b, ConstantsETK.FLOAT_EPS, ConstantsETK.FLOAT_EPS, 150, params);
-    }
-    
-    /***
-     * Computes the approximate definite integral from a to b using 1d quadrature.<br/>
-     * The default tolerances are 1.1920929E-7 and the default number of evaluations is 150.
-     * @param func the function to be integrated.
-     * @param a the lower limit of the integral.
-     * @param b the upper limit of the integral.
-     * @return the approximate definite integral of {@code func} from a to b. 
-     */
-    public static double qadrat(UnivariateFunction func, double a, double b) {
-        return qadrat(func, a, b, ConstantsETK.FLOAT_EPS, ConstantsETK.FLOAT_EPS, 150);
-    }
-    
-    /***
      * Computes the approximate definite integral from a to b using 1d quadrature.
      * @param func the function to be integrated.
      * @param a the lower limit of the integral.
