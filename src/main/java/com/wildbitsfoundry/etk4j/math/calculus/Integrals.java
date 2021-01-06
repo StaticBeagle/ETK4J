@@ -1,6 +1,5 @@
 package com.wildbitsfoundry.etk4j.math.calculus;
 
-import java.util.Arrays;
 import java.util.function.BiFunction;
 
 import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
@@ -74,15 +73,14 @@ public final class Integrals {
      * @param func the function to be integrated.
      * @param a the lower limit of the integral.
      * @param b the upper limit of the integral.
-     * @param n the number of steps.
+     * @param n the number of steps. Must be even.
      * @param params optional parameters passed to {@code func}.
      * @return the approximate definite integral of {@code func} from a to b. 
      */
-    public static double simpson(BiFunction<Double, Object[], Double> func, double a, double b, double n, Object ...params) {
-        if (n % 2 != 0) {
-            throw new IllegalArgumentException("The number of elements must be even");
-        }
-
+    public static double simpson(BiFunction<Double, Object[], Double> func, double a, double b, int n, Object ...params) {
+    	if(n % 2 != 0) {
+    		throw new IllegalArgumentException("The number of partitions (n) must be even");
+    	}
         double even = 0, odd = 0;
         double h = (b - a) / n;
         for (int i = 1; i < n; i = i + 2) {
@@ -99,38 +97,14 @@ public final class Integrals {
      * @param func the function to be integrated.
      * @param a the lower limit of the integral.
      * @param b the upper limit of the integral.
-     * @param n the number of steps.
+     * @param n the number of steps. Must be even.
      * @param params optional parameters passed to {@code func}.
      * @return the approximate definite integral of {@code func} from a to b. 
      */
-    public static double simpson(UnivariateFunction func, double a, double b, double n, Object ...params) {
+    public static double simpson(UnivariateFunction func, double a, double b, int n) {
         return simpson((x, o) -> func.evaluateAt(x), a, b, n);
     }
     
-    /***
-     * Computes the approximate definite integral from a to b using 1d quadrature.<br/>
-     * The default tolerances are 1.1920929E-7 and the default number of evaluations is 150.
-     * @param func the function to be integrated.
-     * @param a the lower limit of the integral.
-     * @param b the upper limit of the integral.
-     * @param params optional parameters passed to {@code func}.
-     * @return the approximate definite integral of {@code func} from a to b. 
-     */
-    public static double qadrat(BiFunction<Double, Object[], Double> func, double a, double b, Object ...params) {
-        return qadrat(func, a, b, ConstantsETK.FLOAT_EPS, ConstantsETK.FLOAT_EPS, 150, params);
-    }
-    
-    /***
-     * Computes the approximate definite integral from a to b using 1d quadrature.<br/>
-     * The default tolerances are 1.1920929E-7 and the default number of evaluations is 150.
-     * @param func the function to be integrated.
-     * @param a the lower limit of the integral.
-     * @param b the upper limit of the integral.
-     * @return the approximate definite integral of {@code func} from a to b. 
-     */
-    public static double qadrat(UnivariateFunction func, double a, double b) {
-        return qadrat(func, a, b, ConstantsETK.FLOAT_EPS, ConstantsETK.FLOAT_EPS, 150);
-    }
     
     /***
      * Computes the approximate definite integral from a to b using 1d quadrature.
@@ -186,7 +160,7 @@ public final class Integrals {
      */
     public static double qadrat(UnivariateFunction func, double a, double b,
                                  double absTol, double relTol, int maxEval) {
-        return qadrat((x, o) -> func.evaluateAt(x), a, b, absTol, relTol, maxEval, new Object[] {});
+        return qadrat((x, o) -> func.evaluateAt(x), a, b, absTol, relTol, maxEval);
     }
 
 
@@ -263,9 +237,9 @@ public final class Integrals {
     public static void main(String[] args) {
         UnivariateFunction fx = x -> Math.sin(x * x);
         double[] e = new double[3];
-        e[0] = ConstantsETK.DOUBLE_EPS; // relative tol
-        e[1] = ConstantsETK.DOUBLE_EPS; // absolute tol
-        double gg = qadrat(fx, 0, Math.PI / 2.0);
+        e[0] = ConstantsETK.FLOAT_EPS; // relative tol
+        e[1] = ConstantsETK.FLOAT_EPS; // absolute tol
+        double gg = qadrat(fx, 0, Math.PI / 2.0, e[0], e[1], 150);
         System.out.println(gg);
         
         gg = trapz(fx, 0, Math.PI / 2.0, 1000);
@@ -274,10 +248,5 @@ public final class Integrals {
         gg = simpson(fx, 0, Math.PI / 2.0, 1000);
         System.out.println(gg);
         
-        gg = trapz(new double[] {1, 4, 9, 16, 25, 36});
-        System.out.println(gg);
-        
-        double[] ggg = cummulativeTrapz(new double[] {1, 4, 9, 16, 25});
-        System.out.println(Arrays.toString(ggg));
     }
 }

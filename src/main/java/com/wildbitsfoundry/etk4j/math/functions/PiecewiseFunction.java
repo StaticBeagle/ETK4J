@@ -28,7 +28,7 @@ public abstract class PiecewiseFunction implements UnivariateFunction {
 
 	public int findSegmentIndex(double x) {
 		int index = Arrays.binarySearch(_x, x);
-		return index < 0 ? -(index + 2) : Math.min(index, _x.length - 2);
+		return index < 0.0 ? -(index + 2) : Math.min(index, _x.length - 2);
 	}
 
 	public int getNumberOfSegments() {
@@ -37,6 +37,7 @@ public abstract class PiecewiseFunction implements UnivariateFunction {
 
 	@Override
 	public final double evaluateAt(double x) {
+		x += 0.0;	// convert -0.0 to 0.0
 		if (x >= _x0 && x <= _xn) {
 			int index = this.findSegmentIndex(x);
 			return this.evaluateSegmentAt(index, x);
