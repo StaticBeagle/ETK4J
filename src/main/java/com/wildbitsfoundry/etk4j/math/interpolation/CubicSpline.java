@@ -291,5 +291,6 @@ public class CubicSpline extends Spline {
 		System.out.println(cs.evaluateAntiDerivativeAt(0, 3.0));
 		System.out.println(cs.integrate(3.0));
 		System.out.println(cs.integrate(1.0, 3.0));
+		System.out.println(cs.evaluateAt(7.5));
 	}
 }
