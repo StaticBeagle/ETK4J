@@ -67,7 +67,7 @@ public final class Integrals {
     public static double trapz(UnivariateFunction func, double a, double b, int n) {
         return trapz((x, o) -> func.evaluateAt(x), a, b, n);
     }
-    
+   
     /***
      * Computes the approximate definite integral from a to b using the Simpson's 1/3 rule.
      * @param func the function to be integrated.
@@ -97,6 +97,7 @@ public final class Integrals {
      * @param func the function to be integrated.
      * @param a the lower limit of the integral.
      * @param b the upper limit of the integral.
+
      * @param n the number of steps. Must be even.
      * @param params optional parameters passed to {@code func}.
      * @return the approximate definite integral of {@code func} from a to b. 
@@ -105,6 +106,31 @@ public final class Integrals {
         return simpson((x, o) -> func.evaluateAt(x), a, b, n);
     }
     
+    
+    /***
+     * Computes the approximate definite integral from a to b using 1d quadrature.<br/>
+     * The default tolerances are 1.1920929E-7 and the default number of evaluations is 150.
+     * @param func the function to be integrated.
+     * @param a the lower limit of the integral.
+     * @param b the upper limit of the integral.
+     * @param params optional parameters passed to {@code func}.
+     * @return the approximate definite integral of {@code func} from a to b. 
+     */
+    public static double qadrat(BiFunction<Double, Object[], Double> func, double a, double b, Object ...params) {
+        return qadrat(func, a, b, ConstantsETK.FLOAT_EPS, ConstantsETK.FLOAT_EPS, 150, params);
+    }
+    
+    /***
+     * Computes the approximate definite integral from a to b using 1d quadrature.<br/>
+     * The default tolerances are 1.1920929E-7 and the default number of evaluations is 150.
+     * @param func the function to be integrated.
+     * @param a the lower limit of the integral.
+     * @param b the upper limit of the integral.
+     * @return the approximate definite integral of {@code func} from a to b. 
+     */
+    public static double qadrat(UnivariateFunction func, double a, double b) {
+        return qadrat(func, a, b, ConstantsETK.FLOAT_EPS, ConstantsETK.FLOAT_EPS, 150);
+    }
     
     /***
      * Computes the approximate definite integral from a to b using 1d quadrature.
@@ -240,6 +266,7 @@ public final class Integrals {
         e[0] = ConstantsETK.FLOAT_EPS; // relative tol
         e[1] = ConstantsETK.FLOAT_EPS; // absolute tol
         double gg = qadrat(fx, 0, Math.PI / 2.0, e[0], e[1], 150);
+
         System.out.println(gg);
         
         gg = trapz(fx, 0, Math.PI / 2.0, 1000);
