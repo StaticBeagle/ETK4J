@@ -204,7 +204,7 @@ public final class NumArrays {
         return Math.sqrt(norm);
     }
 
-    public static double max(double[] a) {
+    public static double max(double... a) {
         double max = a[0];
         for (int i = 1; i < a.length; ++i) {
             if (a[i] > max) {
@@ -212,6 +212,16 @@ public final class NumArrays {
             }
         }
         return max;
+    }
+
+    public static double min(double... a) {
+        double min = a[0];
+        for (int i = 1; i < a.length; ++i) {
+            if (a[i] < min) {
+                min = a[i];
+            }
+        }
+        return min;
     }
 
     public static double norm1(double[] a) {
@@ -524,5 +534,9 @@ public final class NumArrays {
         }
         result[newSize - 1] = a[length - 1];
         return result;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(min(2,9,1,5));
     }
 }
