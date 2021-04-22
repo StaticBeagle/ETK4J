@@ -25,6 +25,9 @@ public final class MathETKTest {
 		
 		q = Formulas.quadraticFormula(2.0, 0.0, 0.0);
 		assertArrayEquals(new Complex[] { Complex.newComplex(0.0, 0.0), Complex.newComplex(0.0, 0.0) }, q);
+
+		q = Formulas.quadraticFormula(1.0, 5.0, 6.0);
+		assertArrayEquals(new Complex[] { Complex.newComplex(-2.0, 0.0), Complex.newComplex(-3.0, 0.0) }, q);
 	}
 	
 	@Test

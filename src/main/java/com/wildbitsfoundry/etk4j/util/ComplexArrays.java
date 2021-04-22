@@ -71,4 +71,34 @@ public final class ComplexArrays {
 		}
 		return result;
 	}
+
+	public static Complex mean(Complex[] a) {
+		double realMean = 0.0;
+		double imagMean = 0.0;
+
+		for(int i = 0; i < a.length; ++i) {
+			realMean += a[i].real();
+			imagMean += a[i].imag();
+		}
+		return Complex.newComplex(realMean / a.length, imagMean / a.length);
+	}
+
+	public static double[] abs(Complex[] a) {
+		double[] abs = new double[a.length];
+		for(int i = 0; i < a.length; ++i) {
+			abs[i] = a[i].abs();
+		}
+		return abs;
+	}
+
+	public static Complex[] zeros(int length) {
+		if(length < 0) {
+			throw new IllegalArgumentException("dim must be greater than zero.");
+		}
+		Complex[] result = new Complex[length];
+		for(int i = 0; i < length; ++i) {
+			result[i] = Complex.newComplex();
+		}
+		return result;
+	}
 }

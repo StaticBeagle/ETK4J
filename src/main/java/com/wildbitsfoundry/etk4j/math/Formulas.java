@@ -41,8 +41,8 @@ public class Formulas {
 			r2 = r1.conj();
 		} else {
 			double q = -0.5 * (b + Math.signum(b) * Math.sqrt(dis));
-			r1 = Complex.newComplex(q / a, 0.0);
-			r2 = Complex.newComplex(c / q, 0.0);
+			r1 = Complex.newComplex(c / q, 0.0);
+			r2 = Complex.newComplex(q / a, 0.0);
 		}
 		return new Complex[] { r1, r2 };
 	}

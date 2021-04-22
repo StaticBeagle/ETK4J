@@ -3,6 +3,8 @@ package com.wildbitsfoundry.etk4j.math.interpolation;
 import java.util.Arrays;
 
 import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
+import com.wildbitsfoundry.etk4j.util.NumArrays;
+
 import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkMinXLength;
 import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkXYDimensions;
 
@@ -292,5 +294,16 @@ public class CubicSpline extends Spline {
 		System.out.println(cs.integrate(3.0));
 		System.out.println(cs.integrate(1.0, 3.0));
 		System.out.println(cs.evaluateAt(7.5));
+
+		x = NumArrays.linsteps(0, 10);
+		y = new double[] {10, 10, 10, 10, 10, 10, 10.5, 15, 50, 60, 85};
+
+		CubicSpline csa = CubicSpline.newAkimaSpline(x, y);
+		double[] xi = NumArrays.linspace(0, 10, 51);
+		double[] result = new double[xi.length];
+		for(int i = 0; i < xi.length; ++i) {
+			result[i] = csa.evaluateAt(xi[i]);
+		}
+		System.out.println(Arrays.toString(result));
 	}
 }

@@ -3,6 +3,7 @@ package com.wildbitsfoundry.etk4j.math.calculus;
 import java.util.function.BiFunction;
 
 import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
+import com.wildbitsfoundry.etk4j.exceptions.MaximumNumberOfEvaluationsReached;
 import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
 
 public final class Integrals {
@@ -174,7 +175,7 @@ public final class Integrals {
         	String error = String.format("Maximum number of evaluations reached in qadrat.%n"
         			+ "If increasing the number of evaluations doesn't help, try loosening the%n"
         			+ "relative and absolute tolerances.");
-            throw new RuntimeException(error);
+            throw new MaximumNumberOfEvaluationsReached(error);
         }
 
         numEval.setValue(numEval.getValue() + 1);
