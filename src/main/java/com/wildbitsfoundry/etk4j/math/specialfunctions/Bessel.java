@@ -401,50 +401,32 @@ public final class Bessel {
             Complex t1;
             sum0 = x.invert().multiply(2.0).log().subtract(0.5772156649015328606);
             d = Complex.newComplex(sum0);
-            //sum0 = d = Math.log(2.0 / x) - 0.5772156649015328606;
             sum1 = d.multiply(-2.0).subtract(1.0);
             c = Complex.newComplex(sum1);
-            //sum1 = c = -1.0 - 2.0 * d;
             term = Complex.fromReal(1.0);
             r = Complex.fromReal(1.0);
-            //r = term = 1.0;
             t = x.multiply(x).multiply(0.25);
-                    // x * x / 4.0;
             k = 1;
             do {
                 term.multiplyEquals(t.multiply(r.multiply(r)));
-                // term *= t * r * r;
                 d.addEquals(r);
-                // d += r;
                 c.subtractEquals(r);
-                //c -= r;
                 r = Complex.fromReal(1.0 / (k + 1));
-                        // 1.0 / (k + 1);
                 c.subtractEquals(r);
-                //c -= r;
                 t0 = term.multiply(d);
-                //t0 = term * d;
                 t1 = term.multiply(c.multiply(r));
-                //t1 = term * c * r;
                 sum0.addEquals(t0);
-                //sum0 += t0;
                 sum1.addEquals(t1);
-                //sum1 += t1;
                 k++;
             } while (t0.divide(sum0).abs() + t1.divide(sum1).abs() > 1.0e-15);
-            //(Math.abs(t0 / sum0) + Math.abs(t1 / sum1) > 1.0e-15);
             k0[0] = sum0;
             k1[0] = t.multiply(sum1).add(1.0).divide(x);
-            // (1.0 + t * sum1) / x;
         } else {
             Complex expx;
             expx = x.uminus().exp();
-                    // Math.exp(-x);
             nonexpbessk01(x, k0, k1);
-            //k1[0] *= expx;
             k1[0].multiplyEquals(expx);
             k0[0].multiplyEquals(expx);
-            //k0[0] *= expx;
         }
     }
 
@@ -1512,6 +1494,16 @@ public final class Bessel {
         kaaa = new Complex[1];
         kaaa1 = new Complex[1];
         nonexpbesska01(0.0, Complex.newComplex(0.5, 0.5), kaaa, kaaa1);
+        System.out.println(kaaa[0]);
+
+        kaaa = new Complex[1];
+        kaaa1 = new Complex[1];
+        nonexpbesska01(0.0, Complex.newComplex(1.0, Math.sqrt(1.25)), kaaa, kaaa1);
+        System.out.println(kaaa[0]);
+
+        kaaa = new Complex[1];
+        kaaa1 = new Complex[1];
+        nonexpbesska01(0.0, Complex.newComplex(1.0, Math.sqrt(1.25) + 0.5), kaaa, kaaa1);
         System.out.println(kaaa[0]);
     }
 
