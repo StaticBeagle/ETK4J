@@ -387,6 +387,67 @@ public final class Bessel {
         }
     }
 
+    public static void bessk01(Complex x, Complex[] k0, Complex[] k1) {
+        if (x.abs() <= 1.5) {
+            int k;
+            Complex c;
+            Complex d;
+            Complex r;
+            Complex sum0;
+            Complex sum1;
+            Complex t;
+            Complex term;
+            Complex t0;
+            Complex t1;
+            sum0 = x.invert().multiply(2.0).log().subtract(0.5772156649015328606);
+            d = Complex.newComplex(sum0);
+            //sum0 = d = Math.log(2.0 / x) - 0.5772156649015328606;
+            sum1 = d.multiply(-2.0).subtract(1.0);
+            c = Complex.newComplex(sum1);
+            //sum1 = c = -1.0 - 2.0 * d;
+            term = Complex.fromReal(1.0);
+            r = Complex.fromReal(1.0);
+            //r = term = 1.0;
+            t = x.multiply(x).multiply(0.25);
+                    // x * x / 4.0;
+            k = 1;
+            do {
+                term.multiplyEquals(t.multiply(r.multiply(r)));
+                // term *= t * r * r;
+                d.addEquals(r);
+                // d += r;
+                c.subtractEquals(r);
+                //c -= r;
+                r = Complex.fromReal(1.0 / (k + 1));
+                        // 1.0 / (k + 1);
+                c.subtractEquals(r);
+                //c -= r;
+                t0 = term.multiply(d);
+                //t0 = term * d;
+                t1 = term.multiply(c.multiply(r));
+                //t1 = term * c * r;
+                sum0.addEquals(t0);
+                //sum0 += t0;
+                sum1.addEquals(t1);
+                //sum1 += t1;
+                k++;
+            } while (t0.divide(sum0).abs() + t1.divide(sum1).abs() > 1.0e-15);
+            //(Math.abs(t0 / sum0) + Math.abs(t1 / sum1) > 1.0e-15);
+            k0[0] = sum0;
+            k1[0] = t.multiply(sum1).add(1.0).divide(x);
+            // (1.0 + t * sum1) / x;
+        } else {
+            Complex expx;
+            expx = x.uminus().exp();
+                    // Math.exp(-x);
+            nonexpbessk01(x, k0, k1);
+            //k1[0] *= expx;
+            k1[0].multiplyEquals(expx);
+            k0[0].multiplyEquals(expx);
+            //k0[0] *= expx;
+        }
+    }
+
     public static void bessk(double x, int n, double k[]) {
         int i;
         double k0, k1, k2;
@@ -567,7 +628,7 @@ public final class Bessel {
         if (x.abs() <= 1.5) {
             Complex expx;
             expx = x.exp();
-            //bessk01(x, k0, k1);
+            bessk01(x, k0, k1);
             k0[0].multiplyEquals(expx);
             k1[0].multiplyEquals(expx);
         } else if (x.abs() <= 5.0) {
@@ -1190,108 +1251,96 @@ public final class Bessel {
         }
     }
 
-//    public static void besska01(double a, Complex x, Complex[] ka, Complex[] ka1) {
-//        if (a == 0.0) {
-//            //bessk01(x, ka, ka1);
-//        } else {
-//            int n, na;
-//            boolean rec, rev;
-//            Complex f;
-//            Complex g;
-//            Complex h;
-//            na = 0;
-//            rev = (a < -0.5);
-//            if (rev)
-//                a = -a - 1.0;
-//            rec = (a >= 0.5);
-//            if (rec) {
-//                na = (int) Math.floor(a + 0.5);
-//                a -= na;
-//            }
-//            if (a == 0.5) {
-//                f = x.uminus().exp().multiply(Complex.fromReal(Math.PI).divide(x).multiply(0.5));
-//                g = Complex.newComplex(f);
-//            }
-//            else if (x.abs() < 1.0) {
-//                Complex a1;
-//                Complex b;
-//                Complex c;
-//                Complex d;
-//                Complex e;
-//                Complex p;
-//                Complex q;
-//                Complex s;
-//                Complex[] tmp1 = new Complex[1];
-//                Complex[] tmp2 = new Complex[1];
-//                b = x.multiply(0.5);
-//                d = b.log().uminus();
-//                e = d.multiply(a);
-//                c = Complex.fromReal(a * Math.PI);
-//                c = (c.abs() < 1.0e-15) ? Complex.fromReal(1.0) : c.divide(c.sin());
-//                s = (e.abs() < 1.0e-15) ? Complex.fromReal(1.0) : e.sinh().divide(e);
-//                e = e.exp();
-//                a1 = e.invert().add(e).multiply(0.5);
-//                //a1 = (e + 1.0 / e) / 2.0;
-//                g = recipgamma(Complex.fromReal(a), tmp1, tmp2).multiply(e);
-//                p = tmp1[0];
-//                q = tmp2[0];
-//                ka[0] = p.multiply(a1).add(q.multiply(s).multiply(d)).multiply(c);
-//                f = Complex.newComplex(ka[0]);
-//                c = Complex.newComplex(f);
-//                        //f = c * (p * a1 + q * s * d);
-//                e = Complex.fromReal(a * a);
-//                p = g.multiply(c).multiply(0.5);
-//                        // 0.5 * g * c;
-//                q = g.invert().multiply(0.5);
-//                c = Complex.fromReal(1.0);
-//                d = b.multiply(b);
-//                ka1[0] = p;
-//                n = 1;
-//                do {
-//                    f = f.multiply(n).add(p).add(q).divide(e.uminus().add(n * n));
-//                            // (f * n + p + q) / (n * n - e);
-//                    c = c.multiply(d).divide(n);
-//                            // c * d / n;
-//                    p.divideEquals(n - a);
-//                    //p /= (n - a);
-//                    q.divideEquals(n + a);
-//                    //q /= (n + a);
-//                    g = c.multiply(p.subtract(f.multiply(n)));
-//                            // c * (p - n * f);
-//                    h = c.multiply(f);
-//                            // c * f;
-//                    ka[0].addEquals(h);
-//                    ka1[0].addEquals(g);
-//                    n++;
-//                } while (h.divide(ka[0]).add(ka1[0].invert().multiply(g.abs())).abs() > 1.0e-15);
-//                // (h / ka[0] + Math.abs(g) / ka1[0] > 1.0e-15);
-//                f = ka[0];
-//                g = ka1[0].divide(b);
-//            } else {
-//                Complex expon;
-//                expon = x.uminus().exp();
-//                nonexpbesska01(a, x, ka, ka1);
-//                f = expon.multiply(ka[0]);
-//                g = expon.multiply(ka1[0]);
-//            }
-//            if (rec) {
-//                x = x.invert().multiply(2.0);
-//                for (n = 1; n <= na; n++) {
-//                    h = x.multiply(g).multiply(a + n).add(f);
-//                            // f + (a + n) * x * g;
-//                    f = g;
-//                    g = h;
-//                }
-//            }
-//            if (rev) {
-//                ka1[0] = f;
-//                ka[0] = g;
-//            } else {
-//                ka[0] = f;
-//                ka1[0] = g;
-//            }
-//        }
-//    }
+    public static void besska01(double a, Complex x, Complex[] ka, Complex[] ka1) {
+        if (a == 0.0) {
+            bessk01(x, ka, ka1);
+        } else {
+            int n, na;
+            boolean rec, rev;
+            Complex f;
+            Complex g;
+            Complex h;
+            na = 0;
+            rev = (a < -0.5);
+            if (rev)
+                a = -a - 1.0;
+            rec = (a >= 0.5);
+            if (rec) {
+                na = (int) Math.floor(a + 0.5);
+                a -= na;
+            }
+            if (a == 0.5) {
+                f = Complex.fromReal(Math.PI).divide(x).multiply(0.5).multiply(x.uminus().exp());
+                g = Complex.newComplex(f);
+            }
+            else if (x.abs() < 1.0) {
+                Complex a1;
+                Complex b;
+                Complex c;
+                Complex d;
+                Complex e;
+                Complex p;
+                Complex q;
+                Complex s;
+                double tmp1[] = new double[1];
+                double tmp2[] = new double[1];
+                b = x.multiply(0.5);
+                d = b.log().uminus();
+                e = d.multiply(a);
+                c = Complex.fromReal(a * Math.PI);
+                c = (c.abs() < 1.0e-15) ? Complex.fromReal(1.0) : c.divide(c.sin());
+                s = (e.abs() < 1.0e-15) ? Complex.fromReal(1.0) : e.sinh().divide(e);
+                e = e.exp();
+                a1 = e.invert().add(e).multiply(0.5);
+                g = e.multiply(recipgamma(a, tmp1, tmp2));
+                p = Complex.fromReal(tmp1[0]);
+                q = Complex.fromReal(tmp2[0]);
+                ka[0] = d.multiply(s).multiply(q).add(a1.multiply(p)).multiply(c);
+                f = Complex.newComplex(ka[0]);
+                e = Complex.fromReal(a * a);
+                p = g.multiply(c).multiply(0.5);
+                q = g.invert().multiply(0.5);
+                c = Complex.fromReal(1.0);
+                d = b.multiply(b);
+                ka1[0] = p;
+                n = 1;
+                do {
+                    f = f.multiply(n).add(p).add(q).divide(e.uminus().add(n * n));
+                    c = d.multiply(c).divide(n);
+                    p.divideEquals(n - a);
+                    q.divideEquals(n + a);
+                    g = f.multiply(n).uminus().add(p).multiply(c);
+                    h = c.multiply(f);
+                    ka[0].addEquals(h);
+                    ka1[0].addEquals(g);
+                    n++;
+                } while(h.divide(ka[0]).add(ka1[0].invert().multiply(g.abs())).abs() > 1.0e-15);
+                f = ka[0];
+                g = ka1[0].divide(b);
+            } else {
+                Complex expon;
+                expon = x.uminus().exp();
+                nonexpbesska01(a, x, ka, ka1);
+                f = expon.multiply(ka[0]);
+                g = expon.multiply(ka1[0]);
+            }
+            if (rec) {
+                x = x.invert().multiply(2.0);
+                for (n = 1; n <= na; n++) {
+                    h = g.multiply(x).multiply(a + n).add(f);
+                    f = g;
+                    g = h;
+                }
+            }
+            if (rev) {
+                ka1[0] = f;
+                ka[0] = g;
+            } else {
+                ka[0] = f;
+                ka1[0] = g;
+            }
+        }
+    }
 
     public static void nonexpbesska01(double a, double x, double ka[], double ka1[]) {
         if (a == 0.0) {
@@ -1384,10 +1433,9 @@ public final class Bessel {
             else if (x.abs() < 1.0) {
                 Complex expon;
                 expon = x.exp();
-                //besska01(a, x, ka, ka1);
+                besska01(a, x, ka, ka1);
                 f = expon.multiply(ka[0]);
                 g = expon.multiply(ka1[0]);
-                System.out.println("here");
             } else {
                 Complex b;
                 double c;
@@ -1443,8 +1491,28 @@ public final class Bessel {
 
         Complex[] kaa = new Complex[1];
         Complex[] kaa1 = new Complex[1];
-        nonexpbesska01(0.0, Complex.newComplex(5.0, 5.0), kaa, kaa1);
+        besska01(0.1, Complex.newComplex(0.25, 0.25), kaa, kaa1);
         System.out.println(kaa[0]);
+
+        Complex[] kaaa = new Complex[1];
+        Complex[] kaaa1 = new Complex[1];
+        nonexpbesska01(0.1, Complex.newComplex(0.25, 0.25), kaaa, kaaa1);
+        System.out.println(kaaa[0]);
+
+        kaaa = new Complex[1];
+        kaaa1 = new Complex[1];
+        nonexpbesska01(0.0, Complex.newComplex(5, 5), kaaa, kaaa1);
+        System.out.println(kaaa[0]);
+
+        kaaa = new Complex[1];
+        kaaa1 = new Complex[1];
+        nonexpbesska01(1.0, Complex.newComplex(5, 5), kaaa, kaaa1);
+        System.out.println(kaaa[0]);
+
+        kaaa = new Complex[1];
+        kaaa1 = new Complex[1];
+        nonexpbesska01(0.0, Complex.newComplex(0.5, 0.5), kaaa, kaaa1);
+        System.out.println(kaaa[0]);
     }
 
 }
