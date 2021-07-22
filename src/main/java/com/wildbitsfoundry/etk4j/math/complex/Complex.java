@@ -392,4 +392,12 @@ public class Complex implements Comparable<Complex> {
 		c._real *= d;
 		c._imag *= d;
 	}
+
+	public Complex sinh() {
+		return newComplex(Math.sinh(_real) * Math.cos(_imag), Math.cosh(_real) * Math.sin(_imag));
+	}
+
+	public Complex cosh() {
+		return newComplex(Math.cosh(_real) * Math.cos(_imag), Math.sinh(_real) * Math.sin(_imag));
+	}
 }

@@ -153,6 +153,12 @@ public class AnalogFilter {
         wp[1] = goldenSectionMinimum(AnalogFilter::bandStopObjMinimize, fs2 + 1e-12, fp2,
                 1e-5, 500, specs, type, 1);
 
+        double wp0 = brentsMinimizer(AnalogFilter::bandStopObjMinimize, fp1, fs1 - 1e-12,
+                1e-5, 500, specs, type, 0);
+
+        double wp1 = brentsMinimizer(AnalogFilter::bandStopObjMinimize, fs2 + 1e-12, fp2,
+                1e-5, 500, specs, type, 1);
+
         double w1 = (specs.getLowerStopBandFrequency() * (wp[0] - wp[1]) /
                 (specs.getLowerStopBandFrequency() * specs.getLowerStopBandFrequency() - wp[0] * wp[1]));
         double w2 = (specs.getUpperStopBandFrequency() * (wp[0] - wp[1]) /
