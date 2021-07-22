@@ -311,12 +311,12 @@ public class ComplexTest {
 		assertEquals(-0.009884375038323, c.imag(), 1e-12);
 		
 		c = Complex.newComplex(1, 20.5).tanh();
-		assertEquals(0.0, c.real(), 1e-12);
-		assertEquals(1.0, c.imag(), 1e-12);
+		assertEquals(1.3070443537632264, c.real(), 1e-12);
+		assertEquals(-0.05716427993519685, c.imag(), 1e-12);
 		
 		c = Complex.newComplex(1, -20.5).tanh();
-		assertEquals(0.0, c.real(), 1e-12);
-		assertEquals(-1.00, c.imag(), 1e-12);
+		assertEquals(1.3070443537632264, c.real(), 1e-12);
+		assertEquals(0.05716427993519685, c.imag(), 1e-12);
 	}
 	
 	

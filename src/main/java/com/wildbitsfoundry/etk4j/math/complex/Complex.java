@@ -323,21 +323,6 @@ public class Complex implements Comparable<Complex> {
 		return this.add(i).divide(i.subtract(this)).log().multiply(i.multiply(new Complex(0.5, 0.0)));
 	}
 
-	public Complex tanh() {
-		if (_imag > 20.0) {
-			return Complex.newComplex(0.0, 1.0);
-		}
-		if (_imag < -20) {
-			return Complex.newComplex(0.0, -1.0);
-		}
-
-		double dreal = 2.0 * _real;
-		double dimag = 2.0 * _imag;
-
-		double tmp = 1.0 / (Math.cosh(dreal) + Math.cos(dimag));
-		return Complex.newComplex(Math.sinh(dreal) * tmp, Math.sin(dimag) * tmp);
-	}
-
 	public Complex uminus() {
 		return new Complex(-_real, -_imag);
 	}
@@ -399,5 +384,11 @@ public class Complex implements Comparable<Complex> {
 
 	public Complex cosh() {
 		return newComplex(Math.cosh(_real) * Math.cos(_imag), Math.sinh(_real) * Math.sin(_imag));
+	}
+
+	public Complex tanh() {
+		Complex num = newComplex(Math.tanh(_real), Math.tan(_imag));
+		Complex den = newComplex(1.0, Math.tanh(_real) * Math.tan(_imag));
+		return num.divide(den);
 	}
 }

@@ -1505,6 +1505,11 @@ public final class Bessel {
         kaaa1 = new Complex[1];
         nonexpbesska01(0.0, Complex.newComplex(1.0, Math.sqrt(1.25) + 0.5), kaaa, kaaa1);
         System.out.println(kaaa[0]);
+
+        kaaa = new Complex[1];
+        kaaa1 = new Complex[1];
+        nonexpbesska01(0.0, Complex.newComplex(1.0, Math.sqrt(1.25) - 0.5), kaaa, kaaa1);
+        System.out.println(kaaa[0]);
     }
 
 }
