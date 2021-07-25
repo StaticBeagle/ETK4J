@@ -186,7 +186,7 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 	/***
 	 * Multiply two polynomials and stores the result
 	 * 
-	 * @param p
+	 * @param coefs
 	 *            Another polynomial
 	 */
 	public void multiplyEquals(double... coefs) {
@@ -542,6 +542,20 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 		for (int i = 0, j = 0; j < length; ++i, ++j) {
 			result *= x;
 			result += _coefs[i] * (length - j);
+		}
+		return result;
+	}
+
+	public static double polyval(double[] coefficients, double x) {
+		return Polynomial.of(coefficients).evaluateAt(x);
+	}
+
+	public static double[] polyval(double[] coefficients, double[] x) {
+		final int length = x.length;
+		double[] result = new double[length];
+		for(int i = 0; i < length; ++i) {
+			result[i] = polyval(coefficients, x[i]);
+
 		}
 		return result;
 	}

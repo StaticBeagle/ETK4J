@@ -101,4 +101,47 @@ public final class ComplexArrays {
 		}
 		return result;
 	}
+
+	public static Complex[] flatten(Complex[][] a) {
+		int rows = a.length;
+		int cols = a[0].length;
+		Complex[] result = new Complex[rows * cols];
+		for (int i = 0; i < rows; i++) {
+			if(a[i].length != cols) {
+				throw new IllegalArgumentException("All rows must have the same length.");
+			}
+			System.arraycopy(a[i], 0, result, i * cols, cols);
+		}
+		return result;
+	}
+
+	public static Complex[] add(Complex[] a, Complex b, int start, int end) {
+		Complex[] result = new Complex[end - start];
+		for(int i = start, k = 0; i < end; ++i, ++k) {
+			result[k] = a[i].add(b);
+		}
+		return result;
+	}
+
+	public static Complex[] add(Complex[] a, Complex b) {
+		return add(a, b, 0, a.length);
+	}
+
+	public static Complex[] reverse(Complex[] a) {
+		final int length = a.length;
+		Complex[] result = new Complex[length];
+		for(int i = 0; i < length; ++i) {
+			result[length - i - 1] = a[i];
+		}
+		return result;
+	}
+
+	public static Complex sum(Complex[] a) {
+		final int length = a.length;
+		Complex sum = Complex.newComplex();
+		for(int i = 0; i < length; ++i) {
+			sum.addEquals(a[i]);
+		}
+		return sum;
+	}
 }

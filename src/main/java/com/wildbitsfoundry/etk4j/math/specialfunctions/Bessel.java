@@ -1390,6 +1390,11 @@ public final class Bessel {
         }
     }
 
+    public static void nonexpbesska01(double a, Complex x, Complex[] ka) {
+        Complex[] ka1 = new Complex[1];
+        nonexpbesska01(a, x, ka, ka1);
+    }
+
     public static void nonexpbesska01(double a, Complex x, Complex[] ka, Complex[] ka1) {
         if (a == 0.0) {
             nonexpbessk01(x, ka, ka1);
