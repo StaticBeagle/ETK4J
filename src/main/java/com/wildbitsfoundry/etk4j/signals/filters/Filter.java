@@ -11,8 +11,8 @@ import static com.wildbitsfoundry.etk4j.math.optimize.minimizers.GoldenSection.g
 
 public class Filter {
 
-    protected static Tuples.Tuple2<Integer, Double> lowPassFilterOrder(LowPassSpecs specs,
-                                                                       FilterOrderCalculationStrategy strategy) {
+    protected static FilterOrderResults.OrderAndCutoffFrequency lowPassFilterOrder(LowPassSpecs specs,
+                                                                                   FilterOrderCalculationStrategy strategy) {
         double wp = specs.getPassBandFrequency();
         double ws = specs.getStopBandFrequency();
         double rp = specs.getPassBandRipple();
@@ -25,10 +25,10 @@ public class Filter {
         int n = strategy.calculateMinOrder(nat, gPass, gStop);
         double wn = strategy.calculateLowPassWn(n, specs);
 
-        return new Tuples.Tuple2<>(n, wn);
+        return new FilterOrderResults.OrderAndCutoffFrequency(n, wn);
     }
 
-    protected static Tuples.Tuple2<Integer, Double> highPassFilterOrder(HighPassSpecs specs, FilterOrderCalculationStrategy strategy) {
+    protected static FilterOrderResults.OrderAndCutoffFrequency highPassFilterOrder(HighPassSpecs specs, FilterOrderCalculationStrategy strategy) {
         double wp = specs.getPassBandFrequency();
         double ws = specs.getStopBandFrequency();
         double rp = specs.getPassBandRipple();
@@ -41,10 +41,10 @@ public class Filter {
         int n = strategy.calculateMinOrder(nat, gPass, gStop);
         double wn = strategy.calculateHighPassWn(n, specs);
 
-        return new Tuples.Tuple2<>(n, wn);
+        return new FilterOrderResults.OrderAndCutoffFrequency(n, wn);
     }
 
-    protected static Tuples.Tuple3<Integer, Double, Double> bandPassFilterOrder(FilterSpecs.BandPassSpecs specs,
+    protected static FilterOrderResults.OrderAndCutoffFrequencies bandPassFilterOrder(FilterSpecs.BandPassSpecs specs,
                                                                                 FilterOrderCalculationStrategy strategy) {
         double wp1 = specs.getLowerPassBandFrequency();
         double wp2 = specs.getUpperPassBandFrequency();
@@ -63,10 +63,10 @@ public class Filter {
 
         int n = strategy.calculateMinOrder(nat, gPass, gStop);
         double[] wn = strategy.calculateBandPassWn(n, specs);
-        return new Tuples.Tuple3<>(n, wn[0], wn[1]);
+        return new FilterOrderResults.OrderAndCutoffFrequencies(n, wn[0], wn[1]);
     }
 
-    protected static Tuples.Tuple3<Integer, Double, Double> bandStopFilterOrder(FilterSpecs.BandStopSpecs specs,
+    protected static FilterOrderResults.OrderAndCutoffFrequencies bandStopFilterOrder(FilterSpecs.BandStopSpecs specs,
                                                                                 FilterOrderCalculationStrategy strategy) {
         double wp1 = specs.getLowerPassBandFrequency();
         double wp2 = specs.getUpperPassBandFrequency();
@@ -100,7 +100,7 @@ public class Filter {
         double[] wn = strategy.calculateBandStopWn(n, specs);
 
         Arrays.sort(wn);
-        return new Tuples.Tuple3<>(n, wn[0], wn[1]);
+        return new FilterOrderResults.OrderAndCutoffFrequencies(n, wn[0], wn[1]);
     }
 
     private static double bandStopObjMinimize(double wp, Object... params) {

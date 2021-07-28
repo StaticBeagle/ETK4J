@@ -20,6 +20,7 @@ public class Bessel {
         MAGNITUDE
     }
 
+    // TODO add newLowPass, newHighPass, newBandPass, newStopBand
     public static ZeroPoleGain BesselAp(int n) {
         return BesselAp(n, FrequencyNormalization.PHASE);
     }
@@ -148,7 +149,7 @@ public class Bessel {
         return ComplexArrays.flatten(result);
     };
 
-    public static Complex[] camposZeros(int n) {
+    private static Complex[] camposZeros(int n) {
         if (n == 1) {
             return new Complex[]{Complex.newComplex(-1, 0)};
         }

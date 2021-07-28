@@ -1,6 +1,5 @@
 package com.wildbitsfoundry.etk4j.signals.filters;
 
-import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
 import com.wildbitsfoundry.etk4j.control.TransferFunction;
 import com.wildbitsfoundry.etk4j.control.ZeroPoleGain;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
@@ -16,19 +15,98 @@ import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 import java.util.Arrays;
 import java.util.function.BiFunction;
 
+import static com.wildbitsfoundry.etk4j.math.optimize.minimizers.Brent.brentsMinimizer;
+import static com.wildbitsfoundry.etk4j.math.optimize.minimizers.GoldenSection.goldenSectionMinimizer;
+
 public class AnalogFilter {
 
     private int _order;
     private TransferFunction _tf;
 
-    public static TransferFunction lpTobs(ZeroPoleGain zpk, double w0, double bw) {
+    private static int getRelativeDegree(Complex[] zeros, Complex[] poles) {
+        int degree = poles.length - zeros.length;
+        if(degree < 0) {
+            // throw
+        }
+        return degree;
+    }
+
+    public static NumeratorDenominatorPair lpTolp(ZeroPoleGain zpk, double w0) {
         Complex[] zeros = zpk.getZeros();
         Complex[] poles = zpk.getPoles();
         double k = zpk.getGain();
+        int degree = getRelativeDegree(zeros, poles);
+        ComplexArrays.multiplyInPlace(zeros, w0);
+        ComplexArrays.multiplyInPlace(poles, w0);
+        k *= Math.pow(w0, degree);
+        RationalFunction rf = new RationalFunction(zeros, poles, k);
+        return new NumeratorDenominatorPair(rf.getNumerator().getCoefficients(), rf.getDenominator().getCoefficients());
+    }
+
+    public static NumeratorDenominatorPair lpTobp(ZeroPoleGain zpk, double w0, double bw) {
+        Complex[] zeros = zpk.getZeros();
+        Complex[] poles = zpk.getPoles();
+        double k = zpk.getGain();
+        Complex[] zlp = ComplexArrays.multiply(zeros, bw * 0.5);
+        Complex[] plp = ComplexArrays.multiply(poles, bw * 0.5);
 
         // TODO make this a method
         int degree = poles.length - zeros.length;
         // TODO if degree < 0 throw
+
+        Complex[] left = new Complex[zlp.length];
+        Complex[] right = new Complex[zlp.length];
+        for(int i = 0; i < zlp.length; ++i) {
+            left[i] = zlp[i].pow(2.0).subtract(w0 * w0).sqrt().add(zlp[i]);
+            right[i] = zlp[i].pow(2.0).subtract(w0 * w0).sqrt().uminus().add(zlp[i]);
+            if(zlp[i].real() == 0.0) {
+                left[i] = Complex.fromImaginary(left[i].imag());
+                right[i] = Complex.fromImaginary(right[i].imag());
+            }
+        }
+        Complex[] zbp = ComplexArrays.concat(left, right);
+
+        left = new Complex[plp.length];
+        right = new Complex[plp.length];
+        for(int i = 0; i < plp.length; ++i) {
+            left[i] = plp[i].pow(2.0).subtract(w0 * w0).sqrt().add(plp[i]);
+            right[i] = plp[i].pow(2.0).subtract(w0 * w0).sqrt().uminus().add(plp[i]);
+        }
+        Complex[] pbp = ComplexArrays.concat(left, right);
+
+        zbp = ComplexArrays.concat(zbp, ComplexArrays.zeros(degree));
+        k *= Math.pow(bw, degree);
+
+        RationalFunction rf = new RationalFunction(zbp, pbp, k);
+        return new NumeratorDenominatorPair(rf.getNumerator().getCoefficients(), rf.getDenominator().getCoefficients());
+    }
+
+    public static NumeratorDenominatorPair lpTohp(ZeroPoleGain zpk, double w0) {
+        Complex[] zeros = zpk.getZeros();
+        Complex[] poles = zpk.getPoles();
+        double k = zpk.getGain();
+        int degree = poles.length - zeros.length;
+        // TODO if degree < 0 throw
+
+        Complex[] zhp = ComplexArrays.divide(w0, zeros);
+        Complex[] php = ComplexArrays.divide(w0, poles);
+
+        zhp = ComplexArrays.concat(zhp, ComplexArrays.zeros(degree));
+
+        zeros = Arrays.stream(zeros).map(Complex::uminus).toArray(Complex[]::new);
+        poles = Arrays.stream(poles).map(Complex::uminus).toArray(Complex[]::new);
+        k *= ComplexArrays.product(zeros).divide(ComplexArrays.product(poles)).real();
+
+        RationalFunction rf = new RationalFunction(zhp, php, k);
+        return new NumeratorDenominatorPair(rf.getNumerator().getCoefficients(), rf.getDenominator().getCoefficients());
+    }
+
+    public static NumeratorDenominatorPair lpTobs(ZeroPoleGain zpk, double w0, double bw) {
+        Complex[] zeros = zpk.getZeros();
+        Complex[] poles = zpk.getPoles();
+        double k = zpk.getGain();
+
+        int degree = getRelativeDegree(zeros, poles);
 
         Complex[] zhp = ComplexArrays.divide(bw * 0.5, zeros);
         Complex[] php = ComplexArrays.divide(bw * 0.5, poles);
@@ -36,8 +114,9 @@ public class AnalogFilter {
         Complex[] left = new Complex[zhp.length];
         Complex[] right = new Complex[zhp.length];
         for(int i = 0; i < zhp.length; ++i) {
-            left[i] = zhp[i].pow(2.0).subtract(w0 * w0).sqrt().add(zhp[i]);
-            right[i] = zhp[i].pow(2.0).subtract(w0 * w0).sqrt().uminus().add(zhp[i]);
+            //left[i] = zhp[i].pow(2.0).subtract(w0 * w0).sqrt().add(zhp[i]);
+            left[i] = zhp[i].add(zhp[i].pow(2.0).subtract(w0 * w0).sqrt());
+            right[i] = zhp[i].subtract(zhp[i].pow(2.0).subtract(w0 * w0).sqrt());
             if(zhp[i].real() == 0.0) {
                 left[i] = Complex.fromImaginary(left[i].imag());
                 right[i] = Complex.fromImaginary(right[i].imag());
@@ -48,8 +127,8 @@ public class AnalogFilter {
         left = new Complex[php.length];
         right = new Complex[php.length];
         for(int i = 0; i < php.length; ++i) {
-            left[i] = php[i].pow(2.0).subtract(w0 * w0).sqrt().add(php[i]);
-            right[i] = php[i].pow(2.0).subtract(w0 * w0).sqrt().uminus().add(php[i]);
+            left[i] = php[i].add(php[i].pow(2.0).subtract(w0 * w0).sqrt());
+            right[i] = php[i].subtract(php[i].pow(2.0).subtract(w0 * w0).sqrt());
         }
         Complex[] pbs = ComplexArrays.concat(left, right);
 
@@ -63,7 +142,9 @@ public class AnalogFilter {
         zeros = Arrays.stream(zeros).map(Complex::uminus).toArray(Complex[]::new);
         poles = Arrays.stream(poles).map(Complex::uminus).toArray(Complex[]::new);
         k *= ComplexArrays.product(zeros).divide(ComplexArrays.product(poles)).real();
-        return new TransferFunction(zbs, pbs, k);
+
+        RationalFunction rf = new RationalFunction(zbs, pbs, k);
+        return new NumeratorDenominatorPair(rf.getNumerator().getCoefficients(), rf.getDenominator().getCoefficients());
     }
 
     static class LowPassPrototype {
@@ -180,43 +261,6 @@ public class AnalogFilter {
         return new TransferFunction(bp);
     }
 
-    public static TransferFunction lpTobp(ZeroPoleGain zpk, double w0, double bw) {
-        Complex[] zeros = zpk.getZeros();
-        Complex[] poles = zpk.getPoles();
-        double k = zpk.getGain();
-        Complex[] zlp = ComplexArrays.multiply(zeros, bw * 0.5);
-        Complex[] plp = ComplexArrays.multiply(poles, bw * 0.5);
-
-        // TODO make this a method
-        int degree = poles.length - zeros.length;
-        // TODO if degree < 0 throw
-
-        Complex[] left = new Complex[zlp.length];
-        Complex[] right = new Complex[zlp.length];
-        for(int i = 0; i < zlp.length; ++i) {
-            left[i] = zlp[i].pow(2.0).subtract(w0 * w0).sqrt().add(zlp[i]);
-            right[i] = zlp[i].pow(2.0).subtract(w0 * w0).sqrt().uminus().add(zlp[i]);
-            if(zlp[i].real() == 0.0) {
-                left[i] = Complex.fromImaginary(left[i].imag());
-                right[i] = Complex.fromImaginary(right[i].imag());
-            }
-        }
-        Complex[] zbp = ComplexArrays.concat(left, right);
-
-        left = new Complex[plp.length];
-        right = new Complex[plp.length];
-        for(int i = 0; i < plp.length; ++i) {
-            left[i] = plp[i].pow(2.0).subtract(w0 * w0).sqrt().add(plp[i]);
-            right[i] = plp[i].pow(2.0).subtract(w0 * w0).sqrt().uminus().add(plp[i]);
-        }
-        Complex[] pbp = ComplexArrays.concat(left, right);
-
-        zbp = ComplexArrays.concat(zbp, ComplexArrays.zeros(degree));
-
-        k *= Math.pow(bw, degree);
-        return new TransferFunction(zbp, pbp, k);
-    }
-
     public static TransferFunction lpTobp(double[] num, double[] den, double w0, double bw) {
         return lpTobp(new Polynomial(num), new Polynomial(den), w0, bw);
     }
@@ -232,10 +276,10 @@ public class AnalogFilter {
         double[] wp = new double[2];
         // maximize the pass band
         // https://github.com/scipy/scipy/blob/master/scipy/signal/filter_design.py
-        wp[0] = goldenSectionMinimum(AnalogFilter::bandStopObjMinimize, fp1, fs1 - 1e-12,
+        wp[0] = goldenSectionMinimizer(AnalogFilter::bandStopObjMinimize, fp1, fs1 - 1e-12,
                 1e-5, 500, specs, type, 0);
 
-        wp[1] = goldenSectionMinimum(AnalogFilter::bandStopObjMinimize, fs2 + 1e-12, fp2,
+        wp[1] = goldenSectionMinimizer(AnalogFilter::bandStopObjMinimize, fs2 + 1e-12, fp2,
                 1e-5, 500, specs, type, 1);
 
         double wp0 = brentsMinimizer(AnalogFilter::bandStopObjMinimize, fp1, fs1 - 1e-12,
@@ -258,151 +302,6 @@ public class AnalogFilter {
         tf = lpTobs(tf.getNumerator(), tf.getDenominator(), f0, bw);
         tf.normalize();
         return new AnalogFilter(2 * n, tf);
-    }
-
-    // TODO move this somewhere where it fits better
-    // Maybe improve it and roll out our own implementation
-    // https://www.mathworks.com/matlabcentral/fileexchange/25919-golden-section-method-algorithm
-    private static double goldenSectionMinimum(BiFunction<Double, Object[], Double> func,
-                                               double a, double b, double tol, int maxIter, Object... params) {
-        double gold = (Math.sqrt(5.0) - 1.0) / 2.0;
-
-        double x1 = a + (1 - gold) * (b - a);
-        double x2 = a + gold * (b - a);
-
-        double fx1 = func.apply(x1, params);
-        double fx2 = func.apply(x2, params);
-
-        int k = 1;
-        while ((Math.abs(b - a) > tol) && (k < maxIter)) {
-            k = k + 1;
-            if (fx1 < fx2) {
-                b = x2;
-                x2 = x1;
-                x1 = a + (1 - gold) * (b - a);
-            } else {
-                a = x1;
-                x1 = x2;
-                x2 = a + gold * (b - a);
-            }
-            fx1 = func.apply(x1, params);
-            fx2 = func.apply(x2, params);
-        }
-        if (fx1 < fx2)
-            return x1;
-        return x2;
-    }
-
-    private static double brentsMinimizer(BiFunction<Double, Object[], Double> func,
-                                          double a, double b, double tol, int maxIter, Object... params) {
-
-        double sqrtEPS = Math.sqrt(ConstantsETK.DOUBLE_EPS);
-        double goldenMean = 0.5 * (3.0 - Math.sqrt(5.0));
-        double fulc = a + goldenMean * (b - a);
-        double nfc = fulc;
-        double xf = fulc;
-        double rat = 0;
-        double e = 0.0;
-        double x = xf;
-        double fx = func.apply(x, params);
-        int num = 1;
-        double fu = Double.POSITIVE_INFINITY;
-
-        double ffulc = fx;
-        double fnfc = fx;
-        double xm = 0.5 * (a + b);
-        double tol1 = sqrtEPS * Math.abs(xf) + tol / 3.0;
-        double tol2 = 2.0 * tol1;
-
-
-        while (Math.abs(xf - xm) > (tol2 - 0.5 * (b - a))) {
-            int golden = 1;
-            // Check for parabolic fit
-            if (Math.abs(e) > tol1) {
-                golden = 0;
-                double r = (xf - nfc) * (fx - ffulc);
-                double q = (xf - fulc) * (fx - fnfc);
-                double p = (xf - fulc) * q - (xf - nfc) * r;
-                q = 2.0 * (q - r);
-                if (q > 0.0) {
-                    p = -p;
-                }
-                q = Math.abs(q);
-                r = e;
-                e = rat;
-
-                // Check for acceptability of parabola
-                if ((Math.abs(p) < Math.abs(0.5 * q * r)) && (p > q * (a - xf)) && (p < q * (b - xf))) {
-                    rat = (p + 0.0) / q;
-                    x = xf + rat;
-
-
-                    if (x - a < tol2 || b - x < tol2) {
-                        double si = Math.signum(xm - xf) + ((xm - xf) == 0 ? 1 : 0);
-                        rat = tol1 * si;
-                    }
-                } else {      // #do a golden -section step
-                    golden = 1;
-                }
-            }
-
-            if (golden != 0) { //#do a golden -section step
-                if (xf >= xm) {
-                    e = a - xf;
-                } else {
-                    e = b - xf;
-                }
-                rat = goldenMean * e;
-            }
-
-
-            double si = Math.signum(rat) + (rat == 0 ? 1 : 0);
-            x = xf + si * Math.max(Math.abs(rat), tol1);
-            fu = func.apply(x, params);
-            num += 1;
-
-            if (fu <= fx) {
-                if (x >= xf) {
-                    a = xf;
-                } else {
-                    b = xf;
-                }
-                fulc = nfc;
-                ffulc = fnfc;
-                nfc = xf;
-                fnfc = fx;
-                xf = x;
-                fx = fu;
-            } else {
-                if (x < xf) {
-                    a = x;
-                } else {
-                    b = x;
-                }
-                if (fu <= fnfc || nfc == xf) {
-                    fulc = nfc;
-                    ffulc = fnfc;
-                    nfc = x;
-                    fnfc = fu;
-                } else if (fu <= ffulc || fulc == xf || fulc == nfc) {
-                    fulc = x;
-                    ffulc = fu;
-                }
-            }
-
-            xm = 0.5 * (a + b);
-            tol1 = sqrtEPS * Math.abs(xf) + tol / 3.0;
-            tol2 = 2.0 * tol1;
-
-            if (num >= maxIter)
-                // max number of iterations exceeded
-                break;
-        }
-
-        if(Double.isNaN(xf) || Double.isNaN(fx) || Double.isNaN(fu)) {
-            // not converged
-        }
-        return xf;
     }
 
     private static double bandStopObjMinimize(double wp, Object... params) {
@@ -465,37 +364,6 @@ public class AnalogFilter {
         TransferFunction tf = new TransferFunction(num, den);
         tf.substituteInPlace(1.0 / wo);
         return tf;
-    }
-
-    public static TransferFunction lpTolp(ZeroPoleGain zpk, double w0) {
-        Complex[] zeros = zpk.getZeros();
-        Complex[] poles = zpk.getPoles();
-        double k = zpk.getGain();
-        int degree = poles.length - zeros.length;
-        // TODO if degree < 0 throw
-        ComplexArrays.multiplyInPlace(zeros, w0);
-        ComplexArrays.multiplyInPlace(poles, w0);
-        k *= Math.pow(w0, degree);
-        return new TransferFunction(zeros, poles, k);
-    }
-
-    public static TransferFunction lpTohp(ZeroPoleGain zpk, double w0) {
-        Complex[] zeros = zpk.getZeros();
-        Complex[] poles = zpk.getPoles();
-        double k = zpk.getGain();
-        int degree = poles.length - zeros.length;
-        // TODO if degree < 0 throw
-
-        Complex[] zhp = ComplexArrays.divide(w0, zeros);
-        Complex[] php = ComplexArrays.divide(w0, poles);
-
-        zhp = ComplexArrays.concat(zhp, ComplexArrays.zeros(degree));
-
-        zeros = Arrays.stream(zeros).map(Complex::uminus).toArray(Complex[]::new);
-        poles = Arrays.stream(poles).map(Complex::uminus).toArray(Complex[]::new);
-        k *= ComplexArrays.product(zeros).divide(ComplexArrays.product(poles)).real();
-
-        return new TransferFunction(zhp, php, k);
     }
 
     public static TransferFunction zpkToTF(ZeroPoleGain zpk) {

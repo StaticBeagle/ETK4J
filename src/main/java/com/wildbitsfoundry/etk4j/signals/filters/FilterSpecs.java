@@ -2,12 +2,23 @@ package com.wildbitsfoundry.etk4j.signals.filters;
 
 public abstract class FilterSpecs {
 
-    protected double passBandFrequency;
-    protected double stopBandFrequency;
-    protected double passBandRipple;
-    protected double stopBandAttenuation;
+
 
     public static class LowPassSpecs extends FilterSpecs {
+
+        private double passBandFrequency;
+        private double stopBandFrequency;
+        private double passBandRipple;
+        private double stopBandAttenuation;
+
+        public LowPassSpecs() {}
+
+        public LowPassSpecs(LowPassSpecs specs) {
+            this.passBandFrequency = specs.passBandFrequency;
+            this.stopBandFrequency = specs.stopBandFrequency;
+            this.passBandRipple = specs.passBandRipple;
+            this.stopBandAttenuation = specs.stopBandAttenuation;
+        }
 
         public double getPassBandFrequency() {
             return passBandFrequency;
@@ -44,6 +55,20 @@ public abstract class FilterSpecs {
 
     public static class HighPassSpecs extends FilterSpecs {
 
+        private double passBandFrequency;
+        private double stopBandFrequency;
+        private double passBandRipple;
+        private double stopBandAttenuation;
+
+        public HighPassSpecs() {}
+
+        public HighPassSpecs(HighPassSpecs specs) {
+            this.passBandFrequency = specs.passBandFrequency;
+            this.stopBandFrequency = specs.stopBandFrequency;
+            this.passBandRipple = specs.passBandRipple;
+            this.stopBandAttenuation = specs.stopBandAttenuation;
+        }
+
         public double getPassBandFrequency() {
             return passBandFrequency;
         }
@@ -79,13 +104,25 @@ public abstract class FilterSpecs {
 
     public static class BandPassSpecs extends FilterSpecs {
 
-        private double lowerPassBandFrequency = 900;
-        private double upperPassBandFrequency = 1000;
-        private double lowerStopBandFrequency = 90;
-        private double upperStopBandFrequency = 10000;
-        private double lowerStopBandAttenuation = 40;
-        private double upperStopBandAttenuation = 40;
-        private double stopBandAttenuation = 40;
+        private double lowerPassBandFrequency;
+        private double upperPassBandFrequency;
+        private double lowerStopBandFrequency;
+        private double upperStopBandFrequency;
+        private double lowerStopBandAttenuation;
+        private double upperStopBandAttenuation;
+        private double passBandRipple;
+        private double stopBandAttenuation;
+
+        public BandPassSpecs() {}
+
+        public BandPassSpecs(BandPassSpecs specs) {
+            this.lowerPassBandFrequency = specs.lowerPassBandFrequency;
+            this.upperPassBandFrequency = specs.upperPassBandFrequency;
+            this.lowerStopBandFrequency = specs.lowerStopBandFrequency;
+            this.upperStopBandFrequency = specs.upperStopBandFrequency;
+            this.passBandRipple = specs.passBandRipple;
+            this.stopBandAttenuation = specs.stopBandAttenuation;
+        }
 
         public double getLowerPassBandFrequency() {
             return lowerPassBandFrequency;
@@ -153,10 +190,24 @@ public abstract class FilterSpecs {
     }
 
     public static class BandStopSpecs extends FilterSpecs {
-        private double lowerPassBandFrequency = 3.6e3;
-        private double upperPassBandFrequency = 9.1e3;
-        private double lowerStopBandFrequency = 5.45e3;
-        private double upperStopBandFrequency = 5.90e3;
+
+        private double lowerPassBandFrequency;
+        private double upperPassBandFrequency;
+        private double lowerStopBandFrequency;
+        private double upperStopBandFrequency;
+        private double passBandRipple;
+        private double stopBandAttenuation;
+
+        public BandStopSpecs() {}
+
+        public BandStopSpecs(BandStopSpecs specs) {
+            this.lowerPassBandFrequency = specs.lowerPassBandFrequency;
+            this.upperPassBandFrequency = specs.upperPassBandFrequency;
+            this.lowerStopBandFrequency = specs.lowerStopBandFrequency;
+            this.upperStopBandFrequency = specs.upperStopBandFrequency;
+            this.passBandRipple = specs.passBandRipple;
+            this.stopBandAttenuation = specs.stopBandAttenuation;
+        }
 
         public double getLowerPassBandFrequency() {
             return lowerPassBandFrequency;
