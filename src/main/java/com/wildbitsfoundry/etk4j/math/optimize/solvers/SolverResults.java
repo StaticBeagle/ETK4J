@@ -1,6 +1,6 @@
-package com.wildbitsfoundry.etk4j.math.optimize;
+package com.wildbitsfoundry.etk4j.math.optimize.solvers;
 
-
+// TODO remove min max value from solverstatus? Add String message?
 public class SolverResults<T> {
 	private T value;
 	private int numberOfIterations;

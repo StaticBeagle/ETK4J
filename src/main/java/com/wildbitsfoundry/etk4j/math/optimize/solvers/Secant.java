@@ -1,9 +1,10 @@
-package com.wildbitsfoundry.etk4j.math.optimize;
+package com.wildbitsfoundry.etk4j.math.optimize.solvers;
 
 import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
 
 public class Secant {
 
+    // TODO fix issues below
     // make this return a solver result
     public static double solve(UnivariateFunction fn, double x0, double x1, double absTol, double relTol, int maxIter) {
         if(x1 == x0) {

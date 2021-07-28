@@ -2,12 +2,12 @@ package com.wildbitsfoundry.etk4j.signals.filters;
 
 public abstract class FilterSpecs {
 
-    public static class LowPassSpecs extends FilterSpecs {
+    protected double passBandFrequency;
+    protected double stopBandFrequency;
+    protected double passBandRipple;
+    protected double stopBandAttenuation;
 
-        private double passBandFrequency = 1;
-        private double stopBandFrequency = 10;
-        private double passBandRipple = 0.2;
-        private double stopBandAttenuation = 40;
+    public static class LowPassSpecs extends FilterSpecs {
 
         public double getPassBandFrequency() {
             return passBandFrequency;
@@ -43,11 +43,6 @@ public abstract class FilterSpecs {
     }
 
     public static class HighPassSpecs extends FilterSpecs {
-
-        private double passBandFrequency = 1;
-        private double stopBandFrequency = 10;
-        private double passBandRipple = 0.2;
-        private double stopBandAttenuation = 40;
 
         public double getPassBandFrequency() {
             return passBandFrequency;
@@ -88,9 +83,9 @@ public abstract class FilterSpecs {
         private double upperPassBandFrequency = 1000;
         private double lowerStopBandFrequency = 90;
         private double upperStopBandFrequency = 10000;
-        private double passBandRipple = 0.2;
         private double lowerStopBandAttenuation = 40;
         private double upperStopBandAttenuation = 40;
+        private double stopBandAttenuation = 40;
 
         public double getLowerPassBandFrequency() {
             return lowerPassBandFrequency;
@@ -132,6 +127,14 @@ public abstract class FilterSpecs {
             this.passBandRipple = passBandRipple;
         }
 
+        public double getStopBandAttenuation() {
+            return stopBandAttenuation;
+        }
+
+        public void setStopBandAttenuation(double stopBandAttenuation) {
+            this.stopBandAttenuation = stopBandAttenuation;
+        }
+
         public double getLowerStopBandAttenuation() {
             return lowerStopBandAttenuation;
         }
@@ -154,8 +157,6 @@ public abstract class FilterSpecs {
         private double upperPassBandFrequency = 9.1e3;
         private double lowerStopBandFrequency = 5.45e3;
         private double upperStopBandFrequency = 5.90e3;
-        private double passBandRipple = 1.5;
-        private double stopBandAttenuation = 40;
 
         public double getLowerPassBandFrequency() {
             return lowerPassBandFrequency;

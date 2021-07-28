@@ -47,13 +47,22 @@ public class TransferFunction {
 	public TransferFunction(RationalFunction rf) {
 		_rf = rf;
 	}
-	
+
+	// TODO test
 	public TransferFunction(ZeroPoleGain zpk) {
 		this(zpk.getZeros(), zpk.getPoles(), zpk.getGain());
 	}
 
 	public TransferFunction(Complex[] zeros, Complex[] poles, double gain) {
 		_rf = new RationalFunction(zeros, poles, gain);
+	}
+
+	// TODO test
+	public ZeroPoleGain toZeroPoleGain() {
+		Complex[] zeros = _rf.getZeros();
+		Complex[] poles = _rf.getPoles();
+		double k = RationalFunction.calculateGain(zeros, poles);
+		return new ZeroPoleGain(zeros, poles, k);
 	}
 
 	public Complex[] getZeros() {

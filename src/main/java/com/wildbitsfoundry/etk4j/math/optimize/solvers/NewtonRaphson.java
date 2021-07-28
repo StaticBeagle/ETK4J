@@ -1,9 +1,9 @@
-package com.wildbitsfoundry.etk4j.math.optimize;
+package com.wildbitsfoundry.etk4j.math.optimize.solvers;
 
 import com.wildbitsfoundry.etk4j.math.calculus.Derivatives;
 import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
 
-import static com.wildbitsfoundry.etk4j.math.optimize.SolverResults.SolverStatus;
+import static com.wildbitsfoundry.etk4j.math.optimize.solvers.SolverResults.SolverStatus;
 
 
 public final class NewtonRaphson {

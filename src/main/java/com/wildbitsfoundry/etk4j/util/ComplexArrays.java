@@ -144,4 +144,50 @@ public final class ComplexArrays {
 		}
 		return sum;
 	}
+
+	public static void multiplyInPlace(Complex[] a, double d) {
+		for(int i = 0; i < a.length; ++i) {
+			a[i].multiplyEquals(d);
+		}
+	}
+
+	public static void divideInPlace(double d, Complex[] a) {
+		for(int i = 0; i < a.length; ++i) {
+			a[i].invertEquals();
+			a[i].multiplyEquals(d);
+		}
+	}
+
+	public static Complex[] divide(double d, Complex[] a) {
+		Complex[] result = new Complex[a.length];
+		for(int i = 0; i < a.length; ++i) {
+			result[i] = a[i].invert().multiply(d);
+		}
+		return result;
+	}
+
+	public static Complex[] concat(Complex[] a, Complex[] b) {
+		int aLength = a.length;
+		int bLength = b.length;
+		Complex[] result = new Complex[aLength + bLength];
+		System.arraycopy(a, 0, result, 0, aLength);
+		System.arraycopy(b, 0, result, aLength, bLength);
+		return result;
+	}
+
+	public static Complex product(Complex[] a) {
+		Complex prod = Complex.fromReal(1.0);
+		for(int i = 0; i < a.length; ++i) {
+			prod.multiplyEquals(a[i]);
+		}
+		return prod;
+	}
+
+	public static Complex[] multiply(Complex[] a, double d) {
+		Complex[] result = new Complex[a.length];
+		for(int i = 0; i < a.length; ++i) {
+			result[i] = a[i].multiply(d);
+		}
+		return result;
+	}
 }

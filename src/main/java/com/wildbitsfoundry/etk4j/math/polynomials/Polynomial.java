@@ -330,7 +330,7 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 	 * 
 	 * @param real
 	 *            part of the complex number
-	 * @param imaginary
+	 * @param imag
 	 *            part of the complex number
 	 * @return The value of the polynomial at real + j * imag
 	 */

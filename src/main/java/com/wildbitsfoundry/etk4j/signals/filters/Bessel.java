@@ -3,9 +3,9 @@ package com.wildbitsfoundry.etk4j.signals.filters;
 import com.wildbitsfoundry.etk4j.control.ZeroPoleGain;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
-import com.wildbitsfoundry.etk4j.math.optimize.NewtonRaphsonComplex;
-import com.wildbitsfoundry.etk4j.math.optimize.Secant;
-import com.wildbitsfoundry.etk4j.math.optimize.SolverResults;
+import com.wildbitsfoundry.etk4j.math.optimize.solvers.NewtonRaphsonComplex;
+import com.wildbitsfoundry.etk4j.math.optimize.solvers.Secant;
+import com.wildbitsfoundry.etk4j.math.optimize.solvers.SolverResults;
 import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
 import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 import com.wildbitsfoundry.etk4j.util.NumArrays;
@@ -109,7 +109,7 @@ public class Bessel {
 
         // zeros should sum to -1
         if(ComplexArrays.sum(x).add(1.0).abs() > 1e-15) {
-            // throw exception
+            // throw exception TODO
         }
         return x;
     }

@@ -1,13 +1,11 @@
-package com.wildbitsfoundry.etk4j.math.optimize;
+package com.wildbitsfoundry.etk4j.math.optimize.solvers;
 
 import com.wildbitsfoundry.etk4j.math.MathETK;
-import com.wildbitsfoundry.etk4j.math.calculus.Derivatives;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
-import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
 
 import java.util.function.Function;
 
-import static com.wildbitsfoundry.etk4j.math.optimize.SolverResults.SolverStatus;
+import static com.wildbitsfoundry.etk4j.math.optimize.solvers.SolverResults.SolverStatus;
 
 
 public final class NewtonRaphsonComplex {
