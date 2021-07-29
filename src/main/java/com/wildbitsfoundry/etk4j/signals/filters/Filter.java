@@ -95,9 +95,10 @@ public class Filter {
         double gPass = Math.pow(10, 0.1 * rp);
         int n = strategy.calculateMinOrder(nat, gPass, gStop);
 
-        specs.setLowerPassBandFrequency(wp1);
-        specs.setUpperPassBandFrequency(wp2);
-        double[] wn = strategy.calculateBandStopWn(n, specs);
+        BandStopSpecs specsCopy = new BandStopSpecs(specs);
+        specsCopy.setLowerPassBandFrequency(wp1);
+        specsCopy.setUpperPassBandFrequency(wp2);
+        double[] wn = strategy.calculateBandStopWn(n, specsCopy);
 
         Arrays.sort(wn);
         return new FilterOrderResults.OrderAndCutoffFrequencies(n, wn[0], wn[1]);
