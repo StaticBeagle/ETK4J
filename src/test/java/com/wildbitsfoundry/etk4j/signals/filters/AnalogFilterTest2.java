@@ -46,26 +46,26 @@ public class AnalogFilterTest2 {
     @Test
     public void testButterworth() {
 
-        FilterOrderResults.OrderAndCutoffFrequency nWn = ButterWorth.buttOrd(lpSpecs);
+        FilterOrderResults.OrderAndCutoffFrequency nWn = ButterWorth.buttord(lpSpecs);
         NumeratorDenominatorPair ba = ButterWorth.newLowPass(nWn.getOrder(), nWn.getCutoffFrequency());
         assertArrayEquals(new double[]{6.416238909177711E-4}, ba.getNumerator(), 1e-12);
         assertArrayEquals(new double[]{1.0, 0.4158919086417555, 0.08648303983684116, 0.010534665112713422,
                 6.416238909177713E-4}, ba.getDenominator(), 1e-12);
 
-        nWn = ButterWorth.buttOrd(hpSpecs);
+        nWn = ButterWorth.buttord(hpSpecs);
         ba = ButterWorth.newHighPass(nWn.getOrder(), nWn.getCutoffFrequency());
         assertArrayEquals(new double[]{1.0, 0.0, 0.0, 0.0, 0.0}, ba.getNumerator(), 1e-12);
         assertArrayEquals(new double[]{1.0, 0.4158919086417555, 0.08648303983684116, 0.010534665112713422,
                 6.416238909177713E-4}, ba.getDenominator(), 1e-12);
 
-        FilterOrderResults.OrderAndCutoffFrequencies nW0W1 = ButterWorth.buttOrd(bpSpecs);
+        FilterOrderResults.OrderAndCutoffFrequencies nW0W1 = ButterWorth.buttord(bpSpecs);
         ba = ButterWorth.newBandPass(nW0W1.getOrder(), nW0W1.getLowerCutoffFrequency(), nW0W1.getUpperCutoffFrequency());
         assertArrayEquals(new double[]{160000.0, 0.0, 0.0, 0.0, 0.0}, ba.getNumerator(), 1e-12);
         assertArrayEquals(new double[]{1.0, 52.26251859505506, 160965.68542494922, 6276728.483266111,
                 9.66120169691095E9, 2.5044146648231787E11, 2.562589808533734E14, 3.319777843917693E15,
                 2.5344958400999997E18}, ba.getDenominator(), 1e-12);
 
-        nW0W1 = ButterWorth.buttOrd(bsSpecs);
+        nW0W1 = ButterWorth.buttord(bsSpecs);
         ba = ButterWorth.newBandStop(nW0W1.getOrder(), nW0W1.getLowerCutoffFrequency(), nW0W1.getUpperCutoffFrequency());
         assertArrayEquals(new double[]{1.0, 0.0, 6.4310000046798006E7, 0.0, 1.0339440265047899E15},
 				ba.getNumerator(), 1e-12);

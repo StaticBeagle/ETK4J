@@ -31,20 +31,20 @@ public final class ButterWorth extends Filter {
         return new ZeroPoleGain(zeros, poles, k);
     }
 
-    public static FilterOrderResults.OrderAndCutoffFrequency buttOrd(LowPassSpecs specs) {
+    public static FilterOrderResults.OrderAndCutoffFrequency buttord(LowPassSpecs specs) {
         // TODO validate inputs
         return lowPassFilterOrder(specs, new ButterworthOrderCalculationStrategy());
     }
 
-    public static FilterOrderResults.OrderAndCutoffFrequency buttOrd(HighPassSpecs specs) {
+    public static FilterOrderResults.OrderAndCutoffFrequency buttord(HighPassSpecs specs) {
         return highPassFilterOrder(specs, new ButterworthOrderCalculationStrategy());
     }
 
-    public static FilterOrderResults.OrderAndCutoffFrequencies buttOrd(BandPassSpecs specs) {
+    public static FilterOrderResults.OrderAndCutoffFrequencies buttord(BandPassSpecs specs) {
         return bandPassFilterOrder(specs, new ButterworthOrderCalculationStrategy());
     }
 
-    public static FilterOrderResults.OrderAndCutoffFrequencies buttOrd(BandStopSpecs specs) {
+    public static FilterOrderResults.OrderAndCutoffFrequencies buttord(BandStopSpecs specs) {
         return bandStopFilterOrder(specs, new ButterworthOrderCalculationStrategy());
     }
 
