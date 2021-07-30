@@ -1,12 +1,11 @@
 package com.wildbitsfoundry.etk4j.signals.filters;
 
+import static com.wildbitsfoundry.etk4j.signals.filters.AnalogFilter.lpTobp;
+
 import com.wildbitsfoundry.etk4j.control.ZeroPoleGain;
 import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.polynomials.RationalFunction;
-import com.wildbitsfoundry.etk4j.util.Tuples;
-
-import static com.wildbitsfoundry.etk4j.signals.filters.AnalogFilter.lpTobp;
 
 public class Chebyshev2 extends Filter {
     public static ZeroPoleGain cheb2ap(int n, double rs) {

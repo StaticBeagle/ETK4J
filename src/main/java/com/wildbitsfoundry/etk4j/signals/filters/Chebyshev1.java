@@ -4,7 +4,6 @@ import com.wildbitsfoundry.etk4j.control.ZeroPoleGain;
 import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.polynomials.RationalFunction;
-import com.wildbitsfoundry.etk4j.util.Tuples;
 
 public class Chebyshev1 extends Filter {
 

@@ -3,13 +3,12 @@ package com.wildbitsfoundry.etk4j.signals.filters;
 import com.wildbitsfoundry.etk4j.control.ZeroPoleGain;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.polynomials.RationalFunction;
-import com.wildbitsfoundry.etk4j.util.Tuples;
-
-import static com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.*;
+import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.BandPassSpecs;
+import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.BandStopSpecs;
+import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.HighPassSpecs;
+import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.LowPassSpecs;
 
 public final class ButterWorth extends Filter {
-
-    private static FilterOrderCalculationStrategy strategy = new ButterworthOrderCalculationStrategy();
 
     public static ZeroPoleGain buttAp(int n) {
         final double pid = Math.PI / 180.0;
@@ -82,12 +81,12 @@ public final class ButterWorth extends Filter {
         return AnalogFilter.lpTobs(zpk, w0, bw);
     }
 
-    private static void checkInputsLowPassHighPass(int n, double wn) {
-        if (n <= 0) {
-            // throw
-        }
-        if (wn <= 0) {
-            // throw
-        }
-    }
+//    private static void checkInputsLowPassHighPass(int n, double wn) {
+//        if (n <= 0) {
+//            // throw
+//        }
+//        if (wn <= 0) {
+//            // throw
+//        }
+//    }
 }

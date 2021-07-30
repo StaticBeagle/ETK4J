@@ -8,7 +8,7 @@ import static com.wildbitsfoundry.etk4j.math.optimize.solvers.SolverResults.Solv
 
 public final class NewtonRaphson {
 
-    private NewtonRaphson() {}
+    protected NewtonRaphson() {}
 
     protected int _maxIter = 100;
     protected double _absTol = 1e-9;
@@ -65,7 +65,7 @@ public final class NewtonRaphson {
         return this;
     }
 
-    protected static SolverResults buildResults(double xfinal, SolverStatus status, int iterCount, double error) {
+    protected static SolverResults<Double> buildResults(double xfinal, SolverStatus status, int iterCount, double error) {
         SolverResults<Double> sr = new SolverResults<>();
         sr.setValue(xfinal);
         sr.setSolverStatus(status);
@@ -74,11 +74,11 @@ public final class NewtonRaphson {
         return sr;
     }
 
-    public SolverResults solve() {
+    public SolverResults<Double> solve() {
         return this.solve(_derivative);
     }
 
-    protected SolverResults solve(UnivariateFunction derivative) {
+    protected SolverResults<Double> solve(UnivariateFunction derivative) {
         int maxiter = _maxIter;
         double maxval = _maxVal;
         double step = _step;

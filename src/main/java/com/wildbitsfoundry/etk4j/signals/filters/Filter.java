@@ -1,13 +1,12 @@
 package com.wildbitsfoundry.etk4j.signals.filters;
 
-import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.BandStopSpecs;
-import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.HighPassSpecs;
-import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.LowPassSpecs;
-import com.wildbitsfoundry.etk4j.util.Tuples;
+import static com.wildbitsfoundry.etk4j.math.optimize.minimizers.GoldenSection.goldenSectionMinimizer;
 
 import java.util.Arrays;
 
-import static com.wildbitsfoundry.etk4j.math.optimize.minimizers.GoldenSection.goldenSectionMinimizer;
+import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.BandStopSpecs;
+import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.HighPassSpecs;
+import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.LowPassSpecs;
 
 public class Filter {
 
