@@ -16,8 +16,14 @@ public class RefValue<T> {
     }
 
     public static class RefDouble extends RefValue<Double> {
-        public RefDouble(Double value) {
+        public RefDouble(double value) {
             super(value);
         }
+    }
+    
+    public static class RefInteger extends RefValue<Integer> {
+    	public RefInteger(int value) {
+    		super(value);
+    	}
     }
 }
