@@ -1,13 +1,12 @@
 package com.wildbitsfoundry.etk4j.signals.filters;
 
-import static com.wildbitsfoundry.etk4j.signals.filters.AnalogFilter.lpTobp;
-
+import com.wildbitsfoundry.etk4j.control.TransferFunction;
 import com.wildbitsfoundry.etk4j.control.ZeroPoleGain;
 import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.polynomials.RationalFunction;
 
-public class Chebyshev2 extends Filter {
+public class Chebyshev2 extends AnalogFilter {
     public static ZeroPoleGain cheb2ap(int n, double rs) {
         double eps = 1.0 / Math.sqrt(Math.pow(10, rs * 0.1) - 1);
 
@@ -58,27 +57,27 @@ public class Chebyshev2 extends Filter {
         return bandStopFilterOrder(specs, new Chebyshev2OrderCalculationStrategy());
     }
 
-    public static NumeratorDenominatorPair newLowPass(int n, double rs, double wn) {
+    public static TransferFunction newLowPass(int n, double rs, double wn) {
         ZeroPoleGain zpk = cheb2ap(n, rs);
-        return AnalogFilter.lpTolp(zpk, wn);
+        return lpTolp(zpk, wn);
     }
 
-    public static NumeratorDenominatorPair newHighPass(int n, double rs, double wn) {
+    public static TransferFunction newHighPass(int n, double rs, double wn) {
         ZeroPoleGain zpk = cheb2ap(n, rs);
-        return AnalogFilter.lpTohp(zpk, wn);
+        return lpTohp(zpk, wn);
     }
 
-    public static NumeratorDenominatorPair newBandPass(int n, double rs, double wp1, double wp2) {
+    public static TransferFunction newBandPass(int n, double rs, double wp1, double wp2) {
         ZeroPoleGain zpk = cheb2ap(n, rs);
         double w0 = Math.sqrt(wp1 * wp2);
         double bw = wp2 - wp1;
         return lpTobp(zpk, w0, bw);
     }
 
-    public static NumeratorDenominatorPair newBandStop(int n, double rs, double wp1, double wp2) {
+    public static TransferFunction newBandStop(int n, double rs, double wp1, double wp2) {
         ZeroPoleGain zpk = cheb2ap(n, rs);
         double w0 = Math.sqrt(wp1 * wp2);
         double bw = wp2 - wp1;
-        return AnalogFilter.lpTobs(zpk, w0, bw);
+        return lpTobs(zpk, w0, bw);
     }
 }

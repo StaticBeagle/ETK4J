@@ -96,4 +96,20 @@ public final class MathETK {
 		result = x / threshold;
 		return Math.ceil(result) * threshold;
 	}
+
+	/***
+	 *
+	 * @param a
+	 * @param b
+	 * @param absTol
+	 * @param relTol
+	 * @return {@code Math.abs(a - b) <= absTol + relTol * Math.abs(b)}
+	 */
+	public static boolean isClose(double a, double b, double absTol, double relTol) {
+		return Math.abs(a - b) <= absTol + relTol * Math.abs(b);
+	}
+
+	public static boolean isClose(double a, double b, double absTol) {
+		return isClose(a, b, absTol, 0.0);
+	}
 }

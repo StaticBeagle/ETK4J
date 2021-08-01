@@ -3,12 +3,13 @@ package com.wildbitsfoundry.etk4j.signals.filters;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.wildbitsfoundry.etk4j.control.TransferFunction;
 import com.wildbitsfoundry.etk4j.control.ZeroPoleGain;
 import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.polynomials.RationalFunction;
 
-public class Elliptic extends Filter {
+public class Elliptic extends AnalogFilter {
 
     // H. J. Orchard and A. N. Willson Jr., “Elliptic functions for filter design,”
     // IEEE Trans. Circuits Syst., vol. 44, pp. 273–287, 1997
@@ -140,27 +141,27 @@ public class Elliptic extends Filter {
         return bandStopFilterOrder(specsCopy, new EllipticOrderCalculationStrategy());
     }
 
-    public static NumeratorDenominatorPair newLowPass(int n, double rp, double rs, double wn) {
+    public static TransferFunction newLowPass(int n, double rp, double rs, double wn) {
         ZeroPoleGain zpk = ellipap(n, rp, rs);
-        return AnalogFilter.lpTolp(zpk, wn);
+        return lpTolp(zpk, wn);
     }
 
-    public static NumeratorDenominatorPair newHighPass(int n, double rp, double rs, double wn) {
+    public static TransferFunction newHighPass(int n, double rp, double rs, double wn) {
         ZeroPoleGain zpk = ellipap(n, rp, rs);
-        return AnalogFilter.lpTohp(zpk, wn);
+        return lpTohp(zpk, wn);
     }
 
-    public static NumeratorDenominatorPair newBandPass(int n, double rp, double rs, double wp1, double wp2) {
+    public static TransferFunction newBandPass(int n, double rp, double rs, double wp1, double wp2) {
         ZeroPoleGain zpk = ellipap(n, rp, rs);
         double w0 = Math.sqrt(wp1 * wp2);
         double bw = wp2 - wp1;
-        return AnalogFilter.lpTobp(zpk, w0, bw);
+        return lpTobp(zpk, w0, bw);
     }
 
-    public static NumeratorDenominatorPair newBandStop(int n, double rp, double rs, double wp1, double wp2) {
+    public static TransferFunction newBandStop(int n, double rp, double rs, double wp1, double wp2) {
         ZeroPoleGain zpk = ellipap(n, rp, rs);
         double w0 = Math.sqrt(wp1 * wp2);
         double bw = wp2 - wp1;
-        return AnalogFilter.lpTobs(zpk, w0, bw);
+        return lpTobs(zpk, w0, bw);
     }
 }

@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.wildbitsfoundry.etk4j.math.Formulas;
+import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.functions.DifferentiableFunction;
 import com.wildbitsfoundry.etk4j.math.functions.IntegrableFunction;
@@ -274,7 +275,7 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 			if(i == length) {
 				sb.append(String.format("%.4g", coef));
 			}
-			else if (coef != 1.0) {
+			else if (!MathETK.isClose(coef, 1.0, 1e-12)) {
 				String x = power == 1 ? " * x" : " * x^" + power;
 				sb.append(String.format("%.4g", coef)).append(x);
 			} else {

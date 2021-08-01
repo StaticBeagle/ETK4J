@@ -108,8 +108,6 @@ public abstract class FilterSpecs {
         private double upperPassBandFrequency;
         private double lowerStopBandFrequency;
         private double upperStopBandFrequency;
-        private double lowerStopBandAttenuation;
-        private double upperStopBandAttenuation;
         private double passBandRipple;
         private double stopBandAttenuation;
 
@@ -170,22 +168,6 @@ public abstract class FilterSpecs {
 
         public void setStopBandAttenuation(double stopBandAttenuation) {
             this.stopBandAttenuation = stopBandAttenuation;
-        }
-
-        public double getLowerStopBandAttenuation() {
-            return lowerStopBandAttenuation;
-        }
-
-        public void setLowerStopBandAttenuation(double lowerStopBandAttenuation) {
-            this.lowerStopBandAttenuation = lowerStopBandAttenuation;
-        }
-
-        public double getUpperStopBandAttenuation() {
-            return upperStopBandAttenuation;
-        }
-
-        public void setUpperStopBandAttenuation(double upperStopBandAttenuation) {
-            this.upperStopBandAttenuation = upperStopBandAttenuation;
         }
     }
 

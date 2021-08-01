@@ -1,5 +1,6 @@
 package com.wildbitsfoundry.etk4j.signals.filters;
 
+import com.wildbitsfoundry.etk4j.control.TransferFunction;
 import com.wildbitsfoundry.etk4j.control.ZeroPoleGain;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.polynomials.RationalFunction;
@@ -8,7 +9,7 @@ import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.BandStopSpecs;
 import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.HighPassSpecs;
 import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.LowPassSpecs;
 
-public final class ButterWorth extends Filter {
+public final class ButterWorth extends AnalogFilter {
 
     public static ZeroPoleGain buttAp(int n) {
         final double pid = Math.PI / 180.0;
@@ -47,18 +48,18 @@ public final class ButterWorth extends Filter {
         return bandStopFilterOrder(specs, new ButterworthOrderCalculationStrategy());
     }
 
-    public static NumeratorDenominatorPair newLowPass(int n, double wn) {
+    public static TransferFunction newLowPass(int n, double wn) {
         ZeroPoleGain zpk = buttAp(n);
-        return AnalogFilter.lpTolp(zpk, wn);
+        return lpTolp(zpk, wn);
     }
 
-    public static NumeratorDenominatorPair newHighPass(int n, double wn) {
+    public static TransferFunction newHighPass(int n, double wn) {
         ZeroPoleGain zpk = buttAp(n);
-        return AnalogFilter.lpTohp(zpk, wn);
+        return lpTohp(zpk, wn);
     }
 
     // TODO create exceptions. add checks to other filters
-    public static NumeratorDenominatorPair newBandPass(int n, double wp1, double wp2) {
+    public static TransferFunction newBandPass(int n, double wp1, double wp2) {
         if(n <= 0) {
             // throw
         }
@@ -71,14 +72,14 @@ public final class ButterWorth extends Filter {
         ZeroPoleGain zpk = buttAp(n);
         double w0 = Math.sqrt(wp1 * wp2);
         double bw = wp2 - wp1;
-        return AnalogFilter.lpTobp(zpk, w0, bw);
+        return lpTobp(zpk, w0, bw);
     }
 
-    public static NumeratorDenominatorPair newBandStop(int n, double wp1, double wp2) {
+    public static TransferFunction newBandStop(int n, double wp1, double wp2) {
         ZeroPoleGain zpk = buttAp(n);
         double w0 = Math.sqrt(wp1 * wp2);
         double bw = wp2 - wp1;
-        return AnalogFilter.lpTobs(zpk, w0, bw);
+        return lpTobs(zpk, w0, bw);
     }
 
 //    private static void checkInputsLowPassHighPass(int n, double wn) {

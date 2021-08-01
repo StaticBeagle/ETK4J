@@ -83,6 +83,16 @@ public class Complex implements Comparable<Complex> {
 		return true;
 	}
 
+	public boolean isClose(Complex other, double tol) {
+		if(!MathETK.isClose(Double.doubleToLongBits(_imag), Double.doubleToLongBits(other._imag), tol)) {
+			return false;
+		}
+		if(!MathETK.isClose(Double.doubleToLongBits(_real), Double.doubleToLongBits(other._real), tol)) {
+			return false;
+		}
+		return true;
+	}
+
 	@Override
 	public int compareTo(Complex obj) {
 		final int SMALLER = -1;
