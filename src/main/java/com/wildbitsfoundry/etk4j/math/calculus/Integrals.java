@@ -2,9 +2,9 @@ package com.wildbitsfoundry.etk4j.math.calculus;
 
 import java.util.function.BiFunction;
 
-import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
 import com.wildbitsfoundry.etk4j.exceptions.MaximumNumberOfEvaluationsReached;
 import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
+import com.wildbitsfoundry.etk4j.util.RefValue.RefInteger;
 
 public final class Integrals {
     private Integrals() {
@@ -217,38 +217,5 @@ public final class Integrals {
                     (lint(func, x0, xm, f0, f1, f2, f3, f4, f5, f6, f7, hmin, re, ae, numEval, maxEval) -
                             lint(func, xn, xm, f14, f13, f12, f11, f10, f9, f8, f7, hmin, re, ae, numEval, maxEval)));
         }
-    }
-
-    private static class RefInteger {
-        private int val;
-
-        public RefInteger(int val) {
-            this.val = val;
-        }
-
-        public int getValue() {
-            return val;
-        }
-
-        public void setValue(int val) {
-            this.val = val;
-        }
-    }
-
-    public static void main(String[] args) {
-        UnivariateFunction fx = x -> Math.sin(x * x);
-        double[] e = new double[3];
-        e[0] = ConstantsETK.FLOAT_EPS; // relative tol
-        e[1] = ConstantsETK.FLOAT_EPS; // absolute tol
-        double gg = qadrat(fx, 0, Math.PI / 2.0, e[0], e[1], 150);
-
-        System.out.println(gg);
-        
-        gg = trapz(fx, 0, Math.PI / 2.0, 1000);
-        System.out.println(gg);
-        
-        gg = simpson(fx, 0, Math.PI / 2.0, 1000);
-        System.out.println(gg);
-        
     }
 }
