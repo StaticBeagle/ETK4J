@@ -6,6 +6,7 @@ import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
 import com.wildbitsfoundry.etk4j.math.polynomials.RationalFunction;
+import com.wildbitsfoundry.etk4j.signals.filters.NumeratorDenominatorPair;
 import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 
 /***
@@ -55,6 +56,10 @@ public class TransferFunction {
 
 	public TransferFunction(Complex[] zeros, Complex[] poles, double gain) {
 		_rf = new RationalFunction(zeros, poles, gain);
+	}
+
+	public TransferFunction(NumeratorDenominatorPair pair) {
+		this(pair.getNumerator(), pair.getDenominator());
 	}
 
 	// TODO test

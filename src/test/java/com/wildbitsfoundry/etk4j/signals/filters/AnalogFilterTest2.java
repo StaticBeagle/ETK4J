@@ -68,7 +68,7 @@ public class AnalogFilterTest2 {
         nW0W1 = ButterWorth.buttord(bsSpecs);
         ba = ButterWorth.newBandStop(nW0W1.getOrder(), nW0W1.getLowerCutoffFrequency(), nW0W1.getUpperCutoffFrequency());
         assertArrayEquals(new double[]{1.0, 0.0, 6.4310000046798006E7, 0.0, 1.0339440265047899E15},
-				ba.getNumerator(), 1e-12);
+                ba.getNumerator(), 1e-12);
         assertArrayEquals(new double[]{1.0, 7540.508141142471, 9.273963156011595E7, 2.4246503945487653E11,
                 1.03394402650479E15}, ba.getDenominator(), 1e-12);
     }
@@ -165,7 +165,7 @@ public class AnalogFilterTest2 {
         assertArrayEquals(new double[]{0.10000000000000003, 0.0, 8198.997487421326, 0.0, 1.5920100000000003E8},
                 ba.getNumerator(), 1e-12);
         assertArrayEquals(new double[]{1.0, 11.824526997102488, 80109.70921683687, 471798.6271843893,
-                        1.5920099999999998E9}, ba.getDenominator(), 1e-12);
+                1.5920099999999998E9}, ba.getDenominator(), 1e-12);
 
         nW0W1 = Elliptic.ellipord(bsSpecs);
         ba = Elliptic.newBandStop(nW0W1.getOrder(), bsSpecs.getPassBandRipple(), bsSpecs.getStopBandAttenuation(),
@@ -174,5 +174,33 @@ public class AnalogFilterTest2 {
                 ba.getNumerator(), 1e-12);
         assertArrayEquals(new double[]{1.0, 4749.564494790547, 1.0401881300520346E8, 1.5272224644112512E11,
                 1.0339440265047894E15}, ba.getDenominator(), 1e-12);
+    }
+
+    @Test
+    public void testBessel() {
+
+        NumeratorDenominatorPair ba = Bessel.newLowPass(4, 1000);
+        assertArrayEquals(new double[]{1000000000000.0}, ba.getNumerator(), 1e-12);
+        assertArrayEquals(new double[]{1.0, 3123.9399369202556, 4391550.3282683985, 3.201085872943678E9,
+                9.999999999999995E11}, ba.getDenominator(), 1e-12);
+
+        ba = Bessel.newHighPass(4, 1000);
+        assertArrayEquals(new double[]{1.0, 0.0, 0.0, 0.0, 0.0}, ba.getNumerator(), 1e-12);
+        assertArrayEquals(new double[]{1.0, 3201.0858729436804, 4391550.328268401, 3.123939936920257E9,
+                1.0000000000000006E12}, ba.getDenominator(), 1e-12);
+
+        ba = Bessel.newBandPass(4, 190e6, 210e6);
+        assertArrayEquals(new double[]{1.6E29, 0.0, 0.0, 0.0, 0.0}, ba.getNumerator(), 1e-12);
+        assertArrayEquals(new double[]{1.0, 6.2478798738405116E7, 1.61356620131307328E17, 7.504320895970641E24,
+                9.692398286478327E33, 2.9942240374922867E41, 2.5688135281524276E50, 3.968728207943182E57,
+                2.534495840100001E66}, ba.getDenominator(), 1e-12);
+
+        ba = Bessel.newBandStop(4, 180e6, 220e6);
+        assertArrayEquals(new double[]{1.0000000000000004, 0.0, 1.584E17, 0.0, 9.408960000000003E33, 0.0,
+                2.4839654400000013E50, 0.0, 2.459125785600001E66},
+                ba.getNumerator(), 1e-12);
+        assertArrayEquals(new double[]{1.0, 1.280434349177472E8, 1.6542648052522944E17, 1.5411492224191265E25,
+                9.968017257598169E33, 6.1029509207797396E41, 2.5941518970044378E50, 7.95138667886433E57,
+                2.4591257855999993E66}, ba.getDenominator(), 1e-12);
     }
 }

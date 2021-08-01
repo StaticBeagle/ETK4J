@@ -8,8 +8,6 @@ import static com.wildbitsfoundry.etk4j.math.optimize.solvers.SolverResults.Solv
 
 public final class NewtonRaphson {
 
-    protected NewtonRaphson() {}
-
     protected int _maxIter = 100;
     protected double _absTol = 1e-9;
     protected double _relTol = 0;

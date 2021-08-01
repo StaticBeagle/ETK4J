@@ -13,18 +13,18 @@ import com.wildbitsfoundry.etk4j.util.NumArrays;
 import java.util.Arrays;
 import java.util.function.Function;
 
-public class Bessel {
+public class Bessel extends Filter {
     public enum FrequencyNormalization {
         PHASE,
         DELAY,
         MAGNITUDE
     }
 
-    // TODO add newLowPass, newHighPass, newBandPass, newStopBand
-    public static ZeroPoleGain BesselAp(int n) {
-        return BesselAp(n, FrequencyNormalization.PHASE);
+    public static ZeroPoleGain besselap(int n) {
+        return besselap(n, FrequencyNormalization.PHASE);
     }
-    public static ZeroPoleGain BesselAp(int n, FrequencyNormalization norm) { // change norm to enum
+
+    public static ZeroPoleGain besselap(int n, FrequencyNormalization norm) { // change norm to enum
         if(n == 0) {
             return new ZeroPoleGain(new Complex[]{}, new Complex[]{}, 1.0);
         }
@@ -54,7 +54,41 @@ public class Bessel {
         return new ZeroPoleGain(zeros, poles, k);
     }
 
-    public static Complex[] besselZeros(int n) {
+    public static NumeratorDenominatorPair newLowPass(int n, double wn) {
+        ZeroPoleGain zpk = besselap(n);
+        return AnalogFilter.lpTolp(zpk, wn);
+    }
+
+    public static NumeratorDenominatorPair newHighPass(int n, double wn) {
+        ZeroPoleGain zpk = besselap(n);
+        return AnalogFilter.lpTohp(zpk, wn);
+    }
+
+    // TODO create exceptions. add checks to other filters
+    public static NumeratorDenominatorPair newBandPass(int n, double wp1, double wp2) {
+        if(n <= 0) {
+            // throw
+        }
+        if(wp1 <= 0 || wp2 <= 0) {
+            // throw
+        }
+        if(wp1 <= wp2) {
+            // throw
+        }
+        ZeroPoleGain zpk = besselap(n);
+        double w0 = Math.sqrt(wp1 * wp2);
+        double bw = wp2 - wp1;
+        return AnalogFilter.lpTobp(zpk, w0, bw);
+    }
+
+    public static NumeratorDenominatorPair newBandStop(int n, double wp1, double wp2) {
+        ZeroPoleGain zpk = besselap(n);
+        double w0 = Math.sqrt(wp1 * wp2);
+        double bw = wp2 - wp1;
+        return AnalogFilter.lpTobs(zpk, w0, bw);
+    }
+
+    private static Complex[] besselZeros(int n) {
         if (n == 0) {
             return new Complex[0];
         }
@@ -238,6 +272,6 @@ public class Bessel {
     }
 
     public static void main(String[] args) {
-        BesselAp(4, FrequencyNormalization.MAGNITUDE);
+        besselap(4, FrequencyNormalization.MAGNITUDE);
     }
 }
