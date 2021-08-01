@@ -181,7 +181,7 @@ public class AnalogFilterTest2 {
 
         NumeratorDenominatorPair ba = Bessel.newLowPass(2, 1000);
         assertArrayEquals(new double[]{1000000.0}, ba.getNumerator(), 1e-12);
-        assertArrayEquals(new double[]{1.0, 1732.0508075688772, 999999.9999999995}, ba.getDenominator(), 1e-8);
+        assertArrayEquals(new double[]{1.0, 1732.0508075688772, 999999.9999999995}, ba.getDenominator(), 1e-12);
 
         ba = Bessel.newHighPass(2, 1000);
         assertArrayEquals(new double[]{1.0000000000000004, 0.0, 0.0}, ba.getNumerator(), 1e-12);
