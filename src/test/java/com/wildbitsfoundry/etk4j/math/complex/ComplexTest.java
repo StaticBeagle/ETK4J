@@ -344,6 +344,24 @@ public class ComplexTest {
 		assertEquals(-1.409921049596576, c.real(), 1e-12);
 		assertEquals(0.229072682968539, c.imag(), 1e-12);
 	}
+
+	@Test
+	public void testSinh() {
+		Complex a = new Complex(-2.0, 3.0);
+
+		Complex c = a.sinh();
+		assertEquals(3.59056458998578, c.real(), 1e-12);
+		assertEquals(0.5309210862485197, c.imag(), 1e-12);
+	}
+
+	@Test
+	public void testCosh() {
+		Complex a = new Complex(-2.0, 3.0);
+
+		Complex c = a.cosh();
+		assertEquals(-3.7245455049153224, c.real(), 1e-12);
+		assertEquals(-0.5118225699873846, c.imag(), 1e-12);
+	}
 	
 	@Test
 	public void testTanh() {
