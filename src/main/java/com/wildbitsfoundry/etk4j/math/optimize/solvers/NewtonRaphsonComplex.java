@@ -78,7 +78,7 @@ public final class NewtonRaphsonComplex {
         Function<Complex, Complex> func = _func;
 
         Complex xcurrent = _x0;
-        Complex xfinal = Complex.newComplex();
+        Complex xfinal = new Complex();
         double error = 0.0;
         while (maxiter-- > 0) {
 
@@ -104,7 +104,7 @@ public final class NewtonRaphsonComplex {
     public static void main(String[] args) {
         Function<Complex, Complex> fx = z -> z.pow(2).add(1.0);
         Function<Complex, Complex> fp = z -> z.multiply(2.0);
-        SolverResults<Complex> results = new NewtonRaphsonComplex(fx, fp, Complex.newComplex(5, -2))
+        SolverResults<Complex> results = new NewtonRaphsonComplex(fx, fp, new Complex(5, -2))
                 .absTolerance(1e-9)
                 .relTolerance(0.0)
                 .iterationLimit(50)

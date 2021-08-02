@@ -9,18 +9,12 @@ import org.junit.Test;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 
 public class ComplexTest {
-	
-	Complex a;
-	Complex b;
-	
-	@Before
-	public void before() {
-		a = Complex.newComplex(-2, 3);
-		b = Complex.newComplex(5, -6);
-	}
-	
+
+
 	@Test
 	public void testHashCode() {
+		Complex a = new Complex(-2.0, 3.0);
+		Complex b = new Complex(5.0, -6.0);
 		int hash = a.hashCode();
 		
 		assertEquals(-2131229759, hash);
@@ -28,7 +22,10 @@ public class ComplexTest {
 	
 	@Test
 	public void testEquals() {
-		Complex c = Complex.newComplex(a.real(), a.imag());
+		Complex a = new Complex(-2.0, 3.0);
+		Complex b = new Complex(5.0, -6.0);
+
+		Complex c = new Complex(a.real(), a.imag());
 		assertEquals(a, c);
 		
 		Complex d = Complex.newComplex(a);
@@ -45,13 +42,15 @@ public class ComplexTest {
 		c = a.add(1);
 		assertNotEquals(a, c);
 		
-		c = a.add(Complex.newComplex(0, 1));
+		c = a.add(Complex.fromImaginary(1.0));
 		assertNotEquals(a, c);
 	}
 	
 	@Test
 	public void testCompareTo() {
-		Complex c = Complex.newComplex(a.real(), a.imag());
+		Complex a = new Complex(-2.0, 3.0);
+		Complex b = new Complex(5.0, -6.0);
+		Complex c = new Complex(a.real(), a.imag());
 		
 		assertEquals(0.0, a.compareTo(c), 1e-12);
 		assertEquals(0.0, a.compareTo(a), 1e-12);
@@ -68,6 +67,7 @@ public class ComplexTest {
 	
 	@Test
 	public void testConj() {
+		Complex a = new Complex(-2.0, 3.0);
 		Complex c = a.conj();
 		assertEquals(a.real(), c.real(), 1e-12);
 		assertEquals(-a.imag(), c.imag(), 1e-12);
@@ -75,21 +75,25 @@ public class ComplexTest {
 	
 	@Test
 	public void testAbs() {
+		Complex a = new Complex(-2.0, 3.0);
 		assertEquals(3.605551275463989, a.abs(), 1e-12);
 	}
 	
 	@Test
 	public void testArg() {
+		Complex a = new Complex(-2.0, 3.0);
 		assertEquals( 2.158798930342464, a.arg(), 1e-12);
 	}
 	
 	@Test
 	public void testNorm() {
+		Complex a = new Complex(-2.0, 3.0);
 		assertEquals(13.0, a.norm(),  1e-12);
 	}
 	
 	@Test
 	public void testInvert() {
+		Complex a = new Complex(-2.0, 3.0);
 		Complex c = a.invert();
 		assertEquals(-0.153846153846154, c.real(), 1e-12);
 		assertEquals(-0.230769230769231, c.imag(), 1e-12);
@@ -102,6 +106,9 @@ public class ComplexTest {
 	
 	@Test
 	public void testAdd() {
+		Complex a = new Complex(-2.0, 3.0);
+		Complex b = new Complex(5.0, -6.0);
+
 		Complex c = a.add(b);
 		assertEquals(3.0, c.real(), 1e-12);
 		assertEquals(-3.0, c.imag(), 1e-12);
@@ -121,6 +128,9 @@ public class ComplexTest {
 	
 	@Test
 	public void testSubtract() {
+		Complex a = new Complex(-2.0, 3.0);
+		Complex b = new Complex(5.0, -6.0);
+
 		Complex c = a.subtract(b);
 		assertEquals(-7.0, c.real(), 1e-12);
 		assertEquals(9.0, c.imag(), 1e-12);
@@ -144,6 +154,9 @@ public class ComplexTest {
 	
 	@Test
 	public void testMultiply() {
+		Complex a = new Complex(-2.0, 3.0);
+		Complex b = new Complex(5.0, -6.0);
+
 		Complex c = a.multiply(b);
 		assertEquals(8.0, c.real(), 1e-12);
 		assertEquals(27.0, c.imag(), 1e-12);
@@ -167,6 +180,9 @@ public class ComplexTest {
 	
 	@Test
 	public void testDivide() {
+		Complex a = new Complex(-2.0, 3.0);
+		Complex b = new Complex(5.0, -6.0);
+
 		Complex c = a.divide(b);
 		assertEquals(-0.459016393442623, c.real(), 1e-12);
 		assertEquals(0.049180327868852, c.imag(), 1e-12);
@@ -186,11 +202,14 @@ public class ComplexTest {
 	
 	@Test
 	public void testSqrt() {
+		Complex a = new Complex(-2.0, 3.0);
+		Complex b = new Complex(5.0, -6.0);
+
 		Complex c = a.sqrt();
 		assertEquals(0.8959774761298381, c.real(), 1e-12);
 		assertEquals(1.6741492280355401, c.imag(), 1e-12);
 		
-		c = Complex.newComplex(0.0, 0.0).sqrt();
+		c = new Complex().sqrt();
 		assertEquals(0.0, c.real(), 1e-12);
 		assertEquals(0.0, c.imag(), 1e-12);
 		
@@ -201,6 +220,9 @@ public class ComplexTest {
 	
 	@Test
 	public void testPow() {
+		Complex a = new Complex(-2.0, 3.0);
+		Complex b = new Complex(5.0, -6.0);
+
 		Complex c = a.pow(b);
 		assertEquals(-2.5691757471583375E8, c.real(), 1e-12);
 		assertEquals(1.091169633199824E7, c.imag(), 1e-12);
@@ -236,12 +258,17 @@ public class ComplexTest {
 	
 	@Test
 	public void testPow2() {
+		Complex a = new Complex(-2.0, 3.0);
+		Complex b = new Complex(5.0, -6.0);
+
 		Complex c = a.pow2();
 		assertEquals(-5.0, c.real(), 1e-12);
 		assertEquals(-12.0, c.imag(), 1e-12);
 	}
 	@Test
 	public void testLog() {
+		Complex a = new Complex(-2.0, 3.0);
+
 		Complex c = a.log();
 		assertEquals(1.2824746787307684, c.real(), 1e-12);
 		assertEquals(2.1587989303424644, c.imag(), 1e-12);
@@ -249,6 +276,8 @@ public class ComplexTest {
 	
 	@Test
 	public void testExp() {
+		Complex a = new Complex(-2.0, 3.0);
+
 		Complex c = a.exp();
 		assertEquals(-0.13398091492954262, c.real(), 1e-12);
 		assertEquals(0.019098516261135196, c.imag(), 1e-12);
@@ -256,6 +285,8 @@ public class ComplexTest {
 	
 	@Test
 	public void testSin() {
+		Complex a = new Complex(-2.0, 3.0);
+
 		Complex c = a.sin();
 		assertEquals(-9.15449914691143, c.real(), 1e-12);
 		assertEquals(-4.168906959966565, c.imag(), 1e-12);
@@ -263,6 +294,8 @@ public class ComplexTest {
 	
 	@Test
 	public void testAsin() {
+		Complex a = new Complex(-2.0, 3.0);
+
 		Complex c = a.asin();
 		assertEquals(-0.570652784321099, c.real(), 1e-12);
 		assertEquals(1.983387029916536, c.imag(), 1e-12);
@@ -270,6 +303,8 @@ public class ComplexTest {
 
 	@Test
 	public void testCos() {
+		Complex a = new Complex(-2.0, 3.0);
+
 		Complex c = a.cos();
 		assertEquals(-4.189625690968807, c.real(), 1e-12);
 		assertEquals(9.109227893755337, c.imag(), 1e-12);
@@ -277,6 +312,8 @@ public class ComplexTest {
 	
 	@Test
 	public void testAcos() {
+		Complex a = new Complex(-2.0, 3.0);
+
 		Complex c = a.acos();
 		assertEquals(2.141449111115996, c.real(), 1e-12);
 		assertEquals(-1.983387029916536, c.imag(), 1e-12);
@@ -284,21 +321,25 @@ public class ComplexTest {
 
 	@Test
 	public void testTan() {
+		Complex a = new Complex(-2.0, 3.0);
+
 		Complex c = a.tan();
 		assertEquals(0.003764025641504, c.real(), 1e-12);
 		assertEquals(1.003238627353610, c.imag(), 1e-12);
 		
-		c = Complex.newComplex(1, 20.5).tan();
+		c = new Complex(1, 20.5).tan();
 		assertEquals(0.0, c.real(), 1e-12);
 		assertEquals(1.0, c.imag(), 1e-12);
 		
-		c = Complex.newComplex(1, -20.5).tan();
+		c = new Complex(1, -20.5).tan();
 		assertEquals(0.0, c.real(), 1e-12);
 		assertEquals(-1.00, c.imag(), 1e-12);
 	}
 	
 	@Test
 	public void testAtan() {
+		Complex a = new Complex(-2.0, 3.0);
+
 		Complex c = a.atan();
 		assertEquals(-1.409921049596576, c.real(), 1e-12);
 		assertEquals(0.229072682968539, c.imag(), 1e-12);
@@ -306,15 +347,17 @@ public class ComplexTest {
 	
 	@Test
 	public void testTanh() {
+		Complex a = new Complex(-2.0, 3.0);
+
 		Complex c = a.tanh();
 		assertEquals(-0.965385879022133, c.real(), 1e-12);
 		assertEquals(-0.009884375038323, c.imag(), 1e-12);
 		
-		c = Complex.newComplex(1, 20.5).tanh();
+		c = new Complex(1, 20.5).tanh();
 		assertEquals(1.3070443537632264, c.real(), 1e-12);
 		assertEquals(-0.05716427993519685, c.imag(), 1e-12);
 		
-		c = Complex.newComplex(1, -20.5).tanh();
+		c = new Complex(1, -20.5).tanh();
 		assertEquals(1.3070443537632264, c.real(), 1e-12);
 		assertEquals(0.05716427993519685, c.imag(), 1e-12);
 	}
@@ -322,6 +365,7 @@ public class ComplexTest {
 	
 	@Test
 	public void testToString() {
+		Complex a = new Complex(-2.0, 3.0);
 		assertEquals("(-2.0000, 3.0000)", a.toString());
 	}
 }

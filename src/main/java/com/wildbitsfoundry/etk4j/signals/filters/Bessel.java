@@ -10,6 +10,7 @@ import com.wildbitsfoundry.etk4j.math.optimize.solvers.SolverResults;
 import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
 import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 import com.wildbitsfoundry.etk4j.util.NumArrays;
+import static com.wildbitsfoundry.etk4j.signals.filters.Filters.*;
 
 import java.util.Arrays;
 import java.util.function.Function;
@@ -186,7 +187,7 @@ public class Bessel extends AnalogFilter {
 
     private static Complex[] camposZeros(int n) {
         if (n == 1) {
-            return new Complex[]{Complex.newComplex(-1, 0)};
+            return new Complex[]{Complex.fromReal(-1.0)};
         }
 
         double s = Polynomial.polyval(new double[]{1, -3, 0, 2, 0, 0}, n);
@@ -221,7 +222,7 @@ public class Bessel extends AnalogFilter {
             }
 
             for (int i = 0; i < n; ++i) {
-                beta[i] = Complex.newComplex();
+                beta[i] = new Complex();
                 for (int j = i + 1; j < n; ++j) {
                     beta[i].addEquals(x[i].subtract(x[j]).invert());
                 }
@@ -270,9 +271,5 @@ public class Bessel extends AnalogFilter {
 
         double result = Secant.solve(cutoff, 1.5, 1.5 * (1 + 1e-4), 1.48e-8, 0.0, 50);
         return result;
-    }
-
-    public static void main(String[] args) {
-        besselap(4, FrequencyNormalization.MAGNITUDE);
     }
 }

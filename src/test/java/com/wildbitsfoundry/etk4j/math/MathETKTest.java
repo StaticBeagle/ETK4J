@@ -12,22 +12,22 @@ public final class MathETKTest {
 	@Test
 	public void testQuadraticFormula() {
 		Complex[] q = Formulas.quadraticFormula(2.0, 2.0, 1.0);
-		assertArrayEquals(new Complex[] { Complex.newComplex(-0.5, 0.5), Complex.newComplex(-0.5, -0.5) }, q);
+		assertArrayEquals(new Complex[] { new Complex(-0.5, 0.5), new Complex(-0.5, -0.5) }, q);
 		
 		q = Formulas.quadraticFormula(3.0, 12.0, 0.0);
-		assertArrayEquals(new Complex[] { Complex.newComplex(0.0, 0.0), Complex.newComplex(-4.0, 0.0) }, q);
+		assertArrayEquals(new Complex[] { new Complex(), Complex.fromReal(-4.0) }, q);
 		
 		q = Formulas.quadraticFormula(2.0, 0.0, 8.0);
-		assertArrayEquals(new Complex[] { Complex.newComplex(0.0, 2.0), Complex.newComplex(0.0, -2.0) }, q);
+		assertArrayEquals(new Complex[] { Complex.fromImaginary(2.0), Complex.fromImaginary(-2.0) }, q);
 		
 		q = Formulas.quadraticFormula(2.0, 0.0, -8.0);
-		assertArrayEquals(new Complex[] { Complex.newComplex(2.0, 0.0), Complex.newComplex(-2.0, 0.0) }, q);
+		assertArrayEquals(new Complex[] { Complex.fromReal(2.0), Complex.fromReal(-2.0) }, q);
 		
 		q = Formulas.quadraticFormula(2.0, 0.0, 0.0);
-		assertArrayEquals(new Complex[] { Complex.newComplex(0.0, 0.0), Complex.newComplex(0.0, 0.0) }, q);
+		assertArrayEquals(new Complex[] { new Complex(), new Complex() }, q);
 
 		q = Formulas.quadraticFormula(1.0, 5.0, 6.0);
-		assertArrayEquals(new Complex[] { Complex.newComplex(-3.0, 0.0), Complex.newComplex(-2.0, 0.0) }, q);
+		assertArrayEquals(new Complex[] { Complex.fromReal(-3.0), Complex.fromReal(-2.0) }, q);
 	}
 	
 	@Test

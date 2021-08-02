@@ -1,138 +1,14 @@
 package com.wildbitsfoundry.etk4j.signals.filters;
 
-import static com.wildbitsfoundry.etk4j.math.optimize.minimizers.GoldenSection.goldenSectionMinimizer;
-
-import java.util.Arrays;
-
-import com.wildbitsfoundry.etk4j.control.TransferFunction;
-import com.wildbitsfoundry.etk4j.control.ZeroPoleGain;
-import com.wildbitsfoundry.etk4j.math.complex.Complex;
-import com.wildbitsfoundry.etk4j.math.polynomials.RationalFunction;
 import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.BandStopSpecs;
 import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.HighPassSpecs;
 import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.LowPassSpecs;
-import com.wildbitsfoundry.etk4j.util.ComplexArrays;
+
+import java.util.Arrays;
+
+import static com.wildbitsfoundry.etk4j.math.optimize.minimizers.GoldenSection.goldenSectionMinimizer;
 
 public class AnalogFilter {
-
-    private static int getRelativeDegree(Complex[] zeros, Complex[] poles) {
-        int degree = poles.length - zeros.length;
-        if(degree < 0) {
-            // throw
-        }
-        return degree;
-    }
-
-    public static TransferFunction lpTolp(ZeroPoleGain zpk, double w0) {
-        Complex[] zeros = zpk.getZeros();
-        Complex[] poles = zpk.getPoles();
-        double k = zpk.getGain();
-        int degree = getRelativeDegree(zeros, poles);
-        ComplexArrays.multiplyInPlace(zeros, w0);
-        ComplexArrays.multiplyInPlace(poles, w0);
-        k *= Math.pow(w0, degree);
-        return new TransferFunction(zeros, poles, k);
-    }
-
-    public static TransferFunction lpTobp(ZeroPoleGain zpk, double w0, double bw) {
-        Complex[] zeros = zpk.getZeros();
-        Complex[] poles = zpk.getPoles();
-        double k = zpk.getGain();
-        Complex[] zlp = ComplexArrays.multiply(zeros, bw * 0.5);
-        Complex[] plp = ComplexArrays.multiply(poles, bw * 0.5);
-
-        int degree = getRelativeDegree(zeros, poles);
-
-        Complex[] left = new Complex[zlp.length];
-        Complex[] right = new Complex[zlp.length];
-        for(int i = 0; i < zlp.length; ++i) {
-            left[i] = zlp[i].pow(2.0).subtract(w0 * w0).sqrt().add(zlp[i]);
-            right[i] = zlp[i].pow(2.0).subtract(w0 * w0).sqrt().uminus().add(zlp[i]);
-            if(zlp[i].real() == 0.0) {
-                left[i] = Complex.fromImaginary(left[i].imag());
-                right[i] = Complex.fromImaginary(right[i].imag());
-            }
-        }
-        Complex[] zbp = ComplexArrays.concat(left, right);
-
-        left = new Complex[plp.length];
-        right = new Complex[plp.length];
-        for(int i = 0; i < plp.length; ++i) {
-            left[i] = plp[i].pow(2.0).subtract(w0 * w0).sqrt().add(plp[i]);
-            right[i] = plp[i].pow(2.0).subtract(w0 * w0).sqrt().uminus().add(plp[i]);
-        }
-        Complex[] pbp = ComplexArrays.concat(left, right);
-
-        zbp = ComplexArrays.concat(zbp, ComplexArrays.zeros(degree));
-        k *= Math.pow(bw, degree);
-
-        RationalFunction rf = new RationalFunction(zbp, pbp, k);
-        return new TransferFunction(zbp, pbp, k);
-    }
-
-    public static TransferFunction lpTohp(ZeroPoleGain zpk, double w0) {
-        Complex[] zeros = zpk.getZeros();
-        Complex[] poles = zpk.getPoles();
-        double k = zpk.getGain();
-        int degree = getRelativeDegree(zeros, poles);
-
-        Complex[] zhp = ComplexArrays.divide(w0, zeros);
-        Complex[] php = ComplexArrays.divide(w0, poles);
-
-        zhp = ComplexArrays.concat(zhp, ComplexArrays.zeros(degree));
-
-        zeros = Arrays.stream(zeros).map(Complex::uminus).toArray(Complex[]::new);
-        poles = Arrays.stream(poles).map(Complex::uminus).toArray(Complex[]::new);
-        k *= ComplexArrays.product(zeros).divide(ComplexArrays.product(poles)).real();
-
-        RationalFunction rf = new RationalFunction(zhp, php, k);
-        return new TransferFunction(zhp, php, k);
-    }
-
-    public static TransferFunction lpTobs(ZeroPoleGain zpk, double w0, double bw) {
-        Complex[] zeros = zpk.getZeros();
-        Complex[] poles = zpk.getPoles();
-        double k = zpk.getGain();
-
-        int degree = getRelativeDegree(zeros, poles);
-
-        Complex[] zhp = ComplexArrays.divide(bw * 0.5, zeros);
-        Complex[] php = ComplexArrays.divide(bw * 0.5, poles);
-
-        Complex[] left = new Complex[zhp.length];
-        Complex[] right = new Complex[zhp.length];
-        for(int i = 0; i < zhp.length; ++i) {
-            //left[i] = zhp[i].pow(2.0).subtract(w0 * w0).sqrt().add(zhp[i]);
-            left[i] = zhp[i].add(zhp[i].pow(2.0).subtract(w0 * w0).sqrt());
-            right[i] = zhp[i].subtract(zhp[i].pow(2.0).subtract(w0 * w0).sqrt());
-            if(zhp[i].real() == 0.0) {
-                left[i] = Complex.fromImaginary(left[i].imag());
-                right[i] = Complex.fromImaginary(right[i].imag());
-            }
-        }
-        Complex[] zbs = ComplexArrays.concat(left, right);
-
-        left = new Complex[php.length];
-        right = new Complex[php.length];
-        for(int i = 0; i < php.length; ++i) {
-            left[i] = php[i].add(php[i].pow(2.0).subtract(w0 * w0).sqrt());
-            right[i] = php[i].subtract(php[i].pow(2.0).subtract(w0 * w0).sqrt());
-        }
-        Complex[] pbs = ComplexArrays.concat(left, right);
-
-        Complex[] full = new Complex[degree];
-        Arrays.fill(full, Complex.fromImaginary(w0));
-        zbs = ComplexArrays.concat(zbs, full);
-
-        Arrays.fill(full, Complex.fromImaginary(-w0));
-        zbs = ComplexArrays.concat(zbs, full);
-
-        zeros = Arrays.stream(zeros).map(Complex::uminus).toArray(Complex[]::new);
-        poles = Arrays.stream(poles).map(Complex::uminus).toArray(Complex[]::new);
-        k *= ComplexArrays.product(zeros).divide(ComplexArrays.product(poles)).real();
-
-        return new TransferFunction(zbs, pbs, k);
-    }
 
     protected static FilterOrderResults.OrderAndCutoffFrequency lowPassFilterOrder(LowPassSpecs specs,
                                                                                    FilterOrderCalculationStrategy strategy) {

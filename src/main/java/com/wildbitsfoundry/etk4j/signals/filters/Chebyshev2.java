@@ -5,6 +5,7 @@ import com.wildbitsfoundry.etk4j.control.ZeroPoleGain;
 import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.polynomials.RationalFunction;
+import static com.wildbitsfoundry.etk4j.signals.filters.Filters.*;
 
 public class Chebyshev2 extends AnalogFilter {
     public static ZeroPoleGain cheb2ap(int n, double rs) {
@@ -20,13 +21,13 @@ public class Chebyshev2 extends AnalogFilter {
         if (n % 2 == 0) {
             for (int k = (-n >> 1) + 1, i = 0; k <= n >> 1; ++k, ++i) {
                 double phik = nInv * (180.0 * k - 90.0);
-                poles[i] = Complex.newComplex(-sinha * Math.cos(phik * pid), cosha * Math.sin(phik * pid));
+                poles[i] = new Complex(-sinha * Math.cos(phik * pid), cosha * Math.sin(phik * pid));
                 poles[i].divideEquals(Math.pow(poles[i].abs(), 2));
             }
         } else {
             for (int k = -(n - 1) >> 1, i = 0; k <= (n - 1) >> 1; ++k, ++i) {
                 double phik = 180.0 * k * nInv;
-                poles[i] = Complex.newComplex(-sinha * Math.cos(phik * pid), cosha * Math.sin(phik * pid));
+                poles[i] = new Complex(-sinha * Math.cos(phik * pid), cosha * Math.sin(phik * pid));
                 poles[i].divideEquals(Math.pow(poles[i].abs(), 2));
             }
         }

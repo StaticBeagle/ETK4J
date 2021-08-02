@@ -8,6 +8,7 @@ import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.BandPassSpecs;
 import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.BandStopSpecs;
 import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.HighPassSpecs;
 import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.LowPassSpecs;
+import static com.wildbitsfoundry.etk4j.signals.filters.Filters.*;
 
 public final class ButterWorth extends AnalogFilter {
 
@@ -18,12 +19,12 @@ public final class ButterWorth extends AnalogFilter {
         if (n % 2 == 0) {
             for (int k = (-n >> 1) + 1, i = 0; k <= n >> 1; ++k, ++i) {
                 double phik = nInv * (180.0 * k - 90.0);
-                poles[n - i - 1] = Complex.newComplex(-Math.cos(phik * pid), Math.sin(phik * pid));
+                poles[n - i - 1] = new Complex(-Math.cos(phik * pid), Math.sin(phik * pid));
             }
         } else {
             for (int k = -(n - 1) >> 1, i = 0; k <= (n - 1) >> 1; ++k, ++i) {
                 double phik = nInv * 180.0 * k;
-                poles[n - i - 1] = Complex.newComplex(-Math.cos(phik * pid), Math.sin(phik * pid));
+                poles[n - i - 1] = new Complex(-Math.cos(phik * pid), Math.sin(phik * pid));
             }
         }
         Complex[] zeros = new Complex[0];

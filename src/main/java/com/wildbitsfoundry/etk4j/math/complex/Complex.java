@@ -7,17 +7,14 @@ public class Complex implements Comparable<Complex> {
 	private double _real;
 	private double _imag;
 
-	private Complex(double real, double imag) {
+	public Complex() {
+		_real = 0.0;
+		_imag = 0.0;
+	}
+
+	public Complex(double real, double imag) {
 		_real = real;
 		_imag = imag;
-	}
-
-	public static Complex newComplex() {
-		return new Complex(0.0, 0.0);
-	}
-
-	public static Complex newComplex(double real, double imag) {
-		return new Complex(real, imag);
 	}
 
 	public static Complex newComplex(Complex c) {
@@ -257,7 +254,7 @@ public class Complex implements Comparable<Complex> {
 
 	public Complex sqrt() {
 		if (_real == 0 && _imag == 0) {
-			return newComplex(0.0, 0.0);
+			return new Complex();
 		}
 
 		double z = Math.sqrt(0.5 * (Math.abs(_real) + this.abs()));
@@ -292,7 +289,7 @@ public class Complex implements Comparable<Complex> {
 	}
 
 	public Complex sqrt1z() {
-		Complex result = Complex.newComplex(1.0, 0.0);
+		Complex result = Complex.fromReal(1.0);
 		result.subtractEquals(this.pow2());
 		return result.sqrt();
 	}
@@ -315,21 +312,21 @@ public class Complex implements Comparable<Complex> {
 
 	public Complex tan() {
 		if (_imag > 20.0) {
-			return Complex.newComplex(0.0, 1.0);
+			return Complex.fromImaginary(1.0);
 		}
 		if (_imag < -20) {
-			return Complex.newComplex(0.0, -1.0);
+			return Complex.fromImaginary(-1.0);
 		}
 
 		double dreal = 2.0 * _real;
 		double dimag = 2.0 * _imag;
 
 		double tmp = 1.0 / (Math.cos(dreal) + Math.cosh(dimag));
-		return Complex.newComplex(Math.sin(dreal) * tmp, Math.sinh(dimag) * tmp);
+		return new Complex(Math.sin(dreal) * tmp, Math.sinh(dimag) * tmp);
 	}
 
 	public Complex atan() {
-		Complex i = Complex.newComplex(0.0, 1.0);
+		Complex i = Complex.fromImaginary(1.0);
 		return this.add(i).divide(i.subtract(this)).log().multiply(i.multiply(new Complex(0.5, 0.0)));
 	}
 
@@ -389,16 +386,16 @@ public class Complex implements Comparable<Complex> {
 	}
 
 	public Complex sinh() {
-		return newComplex(Math.sinh(_real) * Math.cos(_imag), Math.cosh(_real) * Math.sin(_imag));
+		return new Complex(Math.sinh(_real) * Math.cos(_imag), Math.cosh(_real) * Math.sin(_imag));
 	}
 
 	public Complex cosh() {
-		return newComplex(Math.cosh(_real) * Math.cos(_imag), Math.sinh(_real) * Math.sin(_imag));
+		return new Complex(Math.cosh(_real) * Math.cos(_imag), Math.sinh(_real) * Math.sin(_imag));
 	}
 
 	public Complex tanh() {
-		Complex num = newComplex(Math.tanh(_real), Math.tan(_imag));
-		Complex den = newComplex(1.0, Math.tanh(_real) * Math.tan(_imag));
+		Complex num = new Complex(Math.tanh(_real), Math.tan(_imag));
+		Complex den = new Complex(1.0, Math.tanh(_real) * Math.tan(_imag));
 		return num.divide(den);
 	}
 }

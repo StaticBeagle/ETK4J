@@ -11,8 +11,8 @@ public class RationalFunctionTest {
 	
 	@Test
 	public void testConstructors() {
-		Complex[] zeros = { Complex.newComplex(-1, 0) };
-		Complex[] poles = { Complex.newComplex(-1, 0), Complex.newComplex(-1, 0) };
+		Complex[] zeros = { Complex.fromReal(-1.0) };
+		Complex[] poles = { Complex.fromReal(-1.0), Complex.fromReal(-1.0) };
 		
 		RationalFunction rf = new RationalFunction(zeros, poles);
 		
@@ -27,12 +27,12 @@ public class RationalFunctionTest {
 		assertArrayEquals(new double[] { 1 }, rf2.getNumerator().getCoefficients(), 1e-12);
 		assertArrayEquals(new double[] { 1, 2, 1 }, rf2.getDenominator().getCoefficients(), 1e-12);
 		
-		rf = new RationalFunction(Polynomial.of(1, 1), Polynomial.of(1, 2, 1));
+		rf = new RationalFunction(new Polynomial(1, 1), new Polynomial(1, 2, 1));
 		
 		assertArrayEquals(new double[] { 1, 1 }, rf.getNumerator().getCoefficients(), 1e-12);
 		assertArrayEquals(new double[] { 1, 2, 1 }, rf.getDenominator().getCoefficients(), 1e-12);
 		
-		rf = new RationalFunction(1, Polynomial.of(1, 2, 1));
+		rf = new RationalFunction(1, new Polynomial(1, 2, 1));
 		
 		assertArrayEquals(new double[] { 1 }, rf.getNumerator().getCoefficients(), 1e-12);
 		
@@ -100,7 +100,7 @@ public class RationalFunctionTest {
 		assertArrayEquals(new double[] { 2, 2 }, rf2.getNumerator().getCoefficients(), 1e-12);
 		assertArrayEquals(new double[] { 1, 2, 1 }, rf2.getDenominator().getCoefficients(), 1e-12);
 		
-		rf2 = rf.multiply(Polynomial.of(1, 1));
+		rf2 = rf.multiply(new Polynomial(1, 1));
 		
 		assertArrayEquals(new double[] { 1, 2, 1  }, rf2.getNumerator().getCoefficients(), 1e-12);
 		assertArrayEquals(new double[] { 1, 2, 1  }, rf2.getDenominator().getCoefficients(), 1e-12);
@@ -124,28 +124,28 @@ public class RationalFunctionTest {
 		assertArrayEquals(new double[] { 1 }, rf2.getNumerator().getCoefficients(), 1e-12);
 		assertArrayEquals(new double[] { 1 }, rf2.getDenominator().getCoefficients(), 1e-12);
 		
-		rf2 = rf.substitute(Polynomial.of(1, 1));
+		rf2 = rf.substitute(new Polynomial(1, 1));
 		
 		assertArrayEquals(new double[] { 1, 2 }, rf2.getNumerator().getCoefficients(), 1e-12);
 		assertArrayEquals(new double[] { 1, 4, 4 }, rf2.getDenominator().getCoefficients(), 1e-12);
 		
-		rf2.substituteInPlace(Polynomial.of(1, 1));
+		rf2.substituteInPlace(new Polynomial(1, 1));
 		
 		assertArrayEquals(new double[] { 1, 3 }, rf2.getNumerator().getCoefficients(), 1e-12);
 		assertArrayEquals(new double[] { 1, 6, 9 }, rf2.getDenominator().getCoefficients(), 1e-12);
 		
-		rf2 = rf.substitute(new RationalFunction(Polynomial.of(1, 0), Polynomial.of(1, 1)));
+		rf2 = rf.substitute(new RationalFunction(new Polynomial(1, 0), new Polynomial(1, 1)));
 		
 		assertArrayEquals(new double[] { 2, 3, 1 }, rf2.getNumerator().getCoefficients(), 1e-12);
 		assertArrayEquals(new double[] { 4, 4, 1 }, rf2.getDenominator().getCoefficients(), 1e-12);
 		
 		rf = new RationalFunction(new double[] {1, 2, 1}, new double[] {1, 1});
-		rf2 = rf.substitute(new RationalFunction(Polynomial.of(1, 0), Polynomial.of(1, 1)));
+		rf2 = rf.substitute(new RationalFunction(new Polynomial(1, 0), new Polynomial(1, 1)));
 		
 		assertArrayEquals(new double[] { 4, 4, 1 }, rf2.getNumerator().getCoefficients(), 1e-12);
 		assertArrayEquals(new double[] { 2, 3, 1 }, rf2.getDenominator().getCoefficients(), 1e-12);
 		
-		rf.substituteInPlace(new RationalFunction(Polynomial.of(1, 0), Polynomial.of(1, 1)));
+		rf.substituteInPlace(new RationalFunction(new Polynomial(1, 0), new Polynomial(1, 1)));
 		
 		assertArrayEquals(new double[] { 4, 4, 1 }, rf.getNumerator().getCoefficients(), 1e-12);
 		assertArrayEquals(new double[] { 2, 3, 1 }, rf.getDenominator().getCoefficients(), 1e-12);

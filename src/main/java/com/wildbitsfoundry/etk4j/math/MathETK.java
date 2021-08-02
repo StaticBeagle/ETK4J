@@ -44,10 +44,10 @@ public final class MathETK {
 		if(z < 1) {	// -1 < x < 1
 			double at = 0.5 * Math.log((1 + x) / (1 - x));
 			Math.copySign(at, x);
-			return Complex.newComplex(at, 0.0);
+			return Complex.fromReal(at);
 		}
-		Complex at = Complex.newComplex(0.0, x).atan();
-		at.divideEquals(Complex.newComplex(0.0, 1.0));
+		Complex at = Complex.fromImaginary(x).atan();
+		at.divideEquals(Complex.fromImaginary(1.0));
 		return at;
 	}
 	

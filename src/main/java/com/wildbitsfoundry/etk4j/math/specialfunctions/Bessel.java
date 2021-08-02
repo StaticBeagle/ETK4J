@@ -629,7 +629,7 @@ public final class Bessel {
                     0.45753387694459e-7, 0.30748798795865e-8, 0.16918979226151e-9, 0.76218651945127e-11,
                     0.28111852987891e-12, 0.84890440338729e-14, 0.2098791048793e-15, 0.42483542552916e-17 };
             s1 = Complex.fromReal(0.5);
-            s2 = Complex.newComplex();
+            s2 = new Complex();
             r = 0;
             x2 = x.add(x);
             exph2 = x.multiply(5.0).sqrt().invert();
@@ -666,12 +666,12 @@ public final class Bessel {
             y = x.invert().multiply(10.0).subtract(1.0);
             y2 = y.add(y);
             r = 30;
-            br1 = Complex.newComplex();
-            br2 = Complex.newComplex();
-            cr1 = Complex.newComplex();
-            cr2 = Complex.newComplex();
-            erplus1 = Complex.newComplex();;
-            er = Complex.newComplex();
+            br1 = new Complex();
+            br2 = new Complex();
+            cr1 = new Complex();
+            cr2 = new Complex();
+            erplus1 = new Complex();;
+            er = new Complex();
             for (i = 0; i <= 13; i++) {
                 r -= 2;
                 br = y2.multiply(br1).subtract(br2).add(dr[i]);
@@ -1388,7 +1388,7 @@ public final class Bessel {
                 c = 0.25 - a * a;
                 b = x.add(x);
                 g = Complex.fromReal(1.0);
-                f = Complex.newComplex();
+                f = new Complex();
                 e = Complex.fromReal(Math.cos(a * Math.PI)).divide(Math.PI).multiply(x).multiply(1.0e15);
                 n = 1;
                 do {
@@ -1425,53 +1425,5 @@ public final class Bessel {
             }
         }
     }
-
-    public static void main(String[] args) {
-        double[] ka = new double[1];
-        double[] ka1 = new double[1];
-        nonexpbesska01(1, 0.5, ka, ka1);
-        System.out.println(ka[0]);
-
-        Complex[] kaa = new Complex[1];
-        Complex[] kaa1 = new Complex[1];
-        besska01(0.1, Complex.newComplex(0.25, 0.25), kaa, kaa1);
-        System.out.println(kaa[0]);
-
-        Complex[] kaaa = new Complex[1];
-        Complex[] kaaa1 = new Complex[1];
-        nonexpbesska01(0.1, Complex.newComplex(0.25, 0.25), kaaa, kaaa1);
-        System.out.println(kaaa[0]);
-
-        kaaa = new Complex[1];
-        kaaa1 = new Complex[1];
-        nonexpbesska01(0.0, Complex.newComplex(5, 5), kaaa, kaaa1);
-        System.out.println(kaaa[0]);
-
-        kaaa = new Complex[1];
-        kaaa1 = new Complex[1];
-        nonexpbesska01(1.0, Complex.newComplex(5, 5), kaaa, kaaa1);
-        System.out.println(kaaa[0]);
-
-        kaaa = new Complex[1];
-        kaaa1 = new Complex[1];
-        nonexpbesska01(0.0, Complex.newComplex(0.5, 0.5), kaaa, kaaa1);
-        System.out.println(kaaa[0]);
-
-        kaaa = new Complex[1];
-        kaaa1 = new Complex[1];
-        nonexpbesska01(0.0, Complex.newComplex(1.0, Math.sqrt(1.25)), kaaa, kaaa1);
-        System.out.println(kaaa[0]);
-
-        kaaa = new Complex[1];
-        kaaa1 = new Complex[1];
-        nonexpbesska01(0.0, Complex.newComplex(1.0, Math.sqrt(1.25) + 0.5), kaaa, kaaa1);
-        System.out.println(kaaa[0]);
-
-        kaaa = new Complex[1];
-        kaaa1 = new Complex[1];
-        nonexpbesska01(0.0, Complex.newComplex(1.0, Math.sqrt(1.25) - 0.5), kaaa, kaaa1);
-        System.out.println(kaaa[0]);
-    }
-
 }
 

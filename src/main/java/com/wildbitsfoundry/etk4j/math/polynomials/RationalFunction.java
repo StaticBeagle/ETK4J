@@ -22,7 +22,7 @@ public class RationalFunction implements UnivariateFunction {
 		_numerator = new Polynomial(num);
 		_denominator = new Polynomial(poles);
 
-		_numerator.multiplyEquals(calculateGain(new Complex[] { Complex.newComplex(-1.0, 0.0) }, poles));
+		_numerator.multiplyEquals(calculateGain(new Complex[] { Complex.fromReal(-1.0) }, poles));
 	}
 
 	public RationalFunction(RationalFunction rf) {

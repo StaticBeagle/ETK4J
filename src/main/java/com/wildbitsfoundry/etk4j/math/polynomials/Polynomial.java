@@ -68,18 +68,6 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 		this._coefs = i == length ? new double[] { 0.0 } : Arrays.copyOfRange(coefficients, i, length);
 
 	}
-	
-	/***
-	 * Constructs a polynomial P(x) and initializes its coefficients to the
-	 * coefficients passed as parameters. The coefficients are assumed to be in
-	 * descending order i.e. [1, 3, 2] will generate P(x) = x^2 + 3x + 2
-	 * 
-	 * @param coefficients
-	 *            Array of coefficients in descending order
-	 */
-	public static Polynomial of(double... coefficients) {
-		return new Polynomial(coefficients);
-	}
 
 	/***
 	 * Creates a polynomial P(x) from an array of its roots. Say we have the
@@ -96,7 +84,7 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 		Complex[] result = new Complex[size + 1];
 
 		for (int i = 1; i <= size; ++i) {
-			result[i] = Complex.newComplex();
+			result[i] = new Complex();
 		}
 		result[0] = Complex.fromReal(1.0);
 
@@ -337,7 +325,7 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 	 */
 	public Complex evaluateAt(double real, double imag) {
 		// Horner's method
-		Complex result = Complex.newComplex();
+		Complex result = new Complex();
 		for (double coef : _coefs) {
 			result.multiplyEquals(real, imag);
 			result.addEquals(coef);
@@ -347,7 +335,7 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 	
 	public Complex evaluateAt(Complex c) {
 		// Horner's method
-		Complex result = Complex.newComplex();
+		Complex result = new Complex();
 		for (double coef : _coefs) {
 			result.multiplyEquals(c);
 			result.addEquals(coef);
@@ -364,7 +352,7 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 				_roots = new Complex[0];
 				break;
 			case 1:
-				_roots = new Complex[] { Complex.newComplex(-_coefs[1] / _coefs[0], 0) };
+				_roots = new Complex[] { new Complex(-_coefs[1] / _coefs[0], 0) };
 				break;
 			case 2:
 				_roots = Formulas.quadraticFormula(_coefs[0], _coefs[1], _coefs[2]);
@@ -377,7 +365,7 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 				double[] realEig = evd.getRealEigenvalues();
 				double[] imagEig = evd.getImagEigenvalues();
 				for (int i = 0; i < N; i++) {
-					_roots[i] = Complex.newComplex(realEig[i], imagEig[i]);
+					_roots[i] = new Complex(realEig[i], imagEig[i]);
 				}
 			}
 		}
@@ -386,7 +374,9 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 	}
 
 	/***
-	 * Scales polynomial coefficients
+	 * Substitutes polynomial coefficients
+	 * For a polynomial P(x) = x^2 + x + 1, it substitutes the x by x * d
+	 * thus P(x * d) = x^2 * d^2 + x * d + 1
 	 * 
 	 * @param d
 	 */
@@ -406,9 +396,11 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 	}
 
 	/***
-	 * Scales polynomial coefficients
-	 * 
+	 * Substitutes polynomial coefficients
+	 * For a polynomial P(x) = x^2 + x + 1, it substitutes the x by x * d
+	 * thus P(x * d) = x^2 * d^2 + x * d + 1
 	 * @param d
+	 * @return P(x * d)
 	 */
 	public Polynomial substitute(double d) {
 		final int deg = this.degree();
@@ -419,12 +411,27 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 		return new Polynomial(result);
 	}
 
+	/***
+	 * Substitutes polynomial coefficients with another polynomial
+	 * For a polynomial P(x) = 2 * x + 1, it substitutes the x by p(x).
+	 * Say p(x) = 3 * x + 2
+	 * then P(p(x)) = (3 * x + 2) * 2 + 1 = 6 * x + 5
+	 * @param p polynomial to be inserted into P(x)
+	 */
 	public void substituteInPlace(Polynomial p) {
 		Polynomial result = substituteOp(this, p);
 		_coefs = result._coefs;
 		_roots = null;
 	}
 
+	/***
+	 * Substitutes polynomial coefficients with another polynomial
+	 * For a polynomial P(x) = 2 * x + 1, it substitutes the x by p(x).
+	 * Say p(x) = 3 * x + 2
+	 * then P(p(x)) = (3 * x + 2) * 2 + 1 = 6 * x + 5
+	 * @param p polynomial to be inserted into P(x)
+	 * @return P(p(x))
+	 */
 	public Polynomial substitute(Polynomial p) {
 		return substituteOp(this, p);
 	}
@@ -513,7 +520,7 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 		for (int i = 0; i <= n; i++) {
 			coeffs[i] = c.get(n - i, 0);
 		}
-		return Polynomial.of(coeffs);
+		return new Polynomial(coeffs);
 	}
 
 	public Polynomial integral() {
@@ -548,7 +555,7 @@ public class Polynomial implements UnivariateFunction, DifferentiableFunction, I
 	}
 
 	public static double polyval(double[] coefficients, double x) {
-		return Polynomial.of(coefficients).evaluateAt(x);
+		return new Polynomial(coefficients).evaluateAt(x);
 	}
 
 	public static double[] polyval(double[] coefficients, double[] x) {

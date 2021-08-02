@@ -74,7 +74,7 @@ public class FFTExample {
     	Complex[] data = new Complex[n];
     	
     	for(int i = 0; i < n; ++i) {
-    		data[i] = Complex.newComplex(real[i], imag[i]);
+    		data[i] = new Complex(real[i], imag[i]);
         	StringBuilder sb = new StringBuilder();
         	sb.append(String.format("%s", data[i]));
         	table.add(sb);

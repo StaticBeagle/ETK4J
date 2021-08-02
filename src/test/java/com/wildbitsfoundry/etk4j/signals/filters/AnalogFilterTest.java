@@ -11,13 +11,15 @@ import org.junit.Test;
 import static org.junit.Assert.assertArrayEquals;
 
 public class AnalogFilterTest {
-    static LowPassSpecs lpSpecs = new LowPassSpecs();
-    static HighPassSpecs hpSpecs = new HighPassSpecs();
-    static BandPassSpecs bpSpecs = new BandPassSpecs();
-    static BandStopSpecs bsSpecs = new BandStopSpecs();
 
-    @BeforeClass
-    public static void setUpClass() {
+    @Test
+    public void testButterworth() {
+
+        final LowPassSpecs lpSpecs = new LowPassSpecs();
+        final HighPassSpecs hpSpecs = new HighPassSpecs();
+        final BandPassSpecs bpSpecs = new BandPassSpecs();
+        final BandStopSpecs bsSpecs = new BandStopSpecs();
+
         final double passBandRipple = -20.0 * Math.log10(1.0 / Math.sqrt(2.0));
         lpSpecs.setPassBandRipple(passBandRipple);
         lpSpecs.setStopBandAttenuation(70.0);
@@ -42,10 +44,6 @@ public class AnalogFilterTest {
         bsSpecs.setUpperStopBandFrequency(5.90e3);
         bsSpecs.setPassBandRipple(passBandRipple);
         bsSpecs.setStopBandAttenuation(38.0);
-    }
-
-    @Test
-    public void testButterworth() {
 
         FilterOrderResults.OrderAndCutoffFrequency nWn = ButterWorth.buttord(lpSpecs);
         TransferFunction ba = ButterWorth.newLowPass(nWn.getOrder(), nWn.getCutoffFrequency());
@@ -76,6 +74,36 @@ public class AnalogFilterTest {
 
     @Test
     public void testCheby() {
+
+        final LowPassSpecs lpSpecs = new LowPassSpecs();
+        final HighPassSpecs hpSpecs = new HighPassSpecs();
+        final BandPassSpecs bpSpecs = new BandPassSpecs();
+        final BandStopSpecs bsSpecs = new BandStopSpecs();
+
+        final double passBandRipple = -20.0 * Math.log10(1.0 / Math.sqrt(2.0));
+        lpSpecs.setPassBandRipple(passBandRipple);
+        lpSpecs.setStopBandAttenuation(70.0);
+        lpSpecs.setPassBandFrequency(1.0 / (2.0 * Math.PI));
+        lpSpecs.setStopBandFrequency(10.0 / (2.0 * Math.PI));
+
+        hpSpecs.setPassBandRipple(passBandRipple);
+        hpSpecs.setStopBandAttenuation(70.0);
+        hpSpecs.setPassBandFrequency(1.0 / (2.0 * Math.PI));
+        hpSpecs.setStopBandFrequency(0.1 / (2.0 * Math.PI));
+
+        bpSpecs.setLowerPassBandFrequency(190.0);
+        bpSpecs.setUpperPassBandFrequency(210.0);
+        bpSpecs.setLowerStopBandFrequency(180.0);
+        bpSpecs.setUpperStopBandFrequency(220.0);
+        bpSpecs.setPassBandRipple(passBandRipple);
+        bpSpecs.setStopBandAttenuation(20.0);
+
+        bsSpecs.setLowerPassBandFrequency(3.6e3);
+        bsSpecs.setUpperPassBandFrequency(9.1e3);
+        bsSpecs.setLowerStopBandFrequency(5.45e3);
+        bsSpecs.setUpperStopBandFrequency(5.90e3);
+        bsSpecs.setPassBandRipple(passBandRipple);
+        bsSpecs.setStopBandAttenuation(38.0);
 
         FilterOrderResults.OrderAndCutoffFrequency nWn = Chebyshev1.cheb1ord(lpSpecs);
         TransferFunction ba = Chebyshev1.newLowPass(nWn.getOrder(), lpSpecs.getPassBandRipple(),
@@ -109,6 +137,36 @@ public class AnalogFilterTest {
 
     @Test
     public void testInverseCheby() {
+
+        final LowPassSpecs lpSpecs = new LowPassSpecs();
+        final HighPassSpecs hpSpecs = new HighPassSpecs();
+        final BandPassSpecs bpSpecs = new BandPassSpecs();
+        final BandStopSpecs bsSpecs = new BandStopSpecs();
+
+        final double passBandRipple = -20.0 * Math.log10(1.0 / Math.sqrt(2.0));
+        lpSpecs.setPassBandRipple(passBandRipple);
+        lpSpecs.setStopBandAttenuation(70.0);
+        lpSpecs.setPassBandFrequency(1.0 / (2.0 * Math.PI));
+        lpSpecs.setStopBandFrequency(10.0 / (2.0 * Math.PI));
+
+        hpSpecs.setPassBandRipple(passBandRipple);
+        hpSpecs.setStopBandAttenuation(70.0);
+        hpSpecs.setPassBandFrequency(1.0 / (2.0 * Math.PI));
+        hpSpecs.setStopBandFrequency(0.1 / (2.0 * Math.PI));
+
+        bpSpecs.setLowerPassBandFrequency(190.0);
+        bpSpecs.setUpperPassBandFrequency(210.0);
+        bpSpecs.setLowerStopBandFrequency(180.0);
+        bpSpecs.setUpperStopBandFrequency(220.0);
+        bpSpecs.setPassBandRipple(passBandRipple);
+        bpSpecs.setStopBandAttenuation(20.0);
+
+        bsSpecs.setLowerPassBandFrequency(3.6e3);
+        bsSpecs.setUpperPassBandFrequency(9.1e3);
+        bsSpecs.setLowerStopBandFrequency(5.45e3);
+        bsSpecs.setUpperStopBandFrequency(5.90e3);
+        bsSpecs.setPassBandRipple(passBandRipple);
+        bsSpecs.setStopBandAttenuation(38.0);
 
         FilterOrderResults.OrderAndCutoffFrequency nWn = Chebyshev2.cheb2ord(lpSpecs);
         TransferFunction ba = Chebyshev2.newLowPass(nWn.getOrder(), lpSpecs.getStopBandAttenuation(),
@@ -144,6 +202,36 @@ public class AnalogFilterTest {
 
     @Test
     public void testElliptic() {
+
+        final LowPassSpecs lpSpecs = new LowPassSpecs();
+        final HighPassSpecs hpSpecs = new HighPassSpecs();
+        final BandPassSpecs bpSpecs = new BandPassSpecs();
+        final BandStopSpecs bsSpecs = new BandStopSpecs();
+
+        final double passBandRipple = -20.0 * Math.log10(1.0 / Math.sqrt(2.0));
+        lpSpecs.setPassBandRipple(passBandRipple);
+        lpSpecs.setStopBandAttenuation(70.0);
+        lpSpecs.setPassBandFrequency(1.0 / (2.0 * Math.PI));
+        lpSpecs.setStopBandFrequency(10.0 / (2.0 * Math.PI));
+
+        hpSpecs.setPassBandRipple(passBandRipple);
+        hpSpecs.setStopBandAttenuation(70.0);
+        hpSpecs.setPassBandFrequency(1.0 / (2.0 * Math.PI));
+        hpSpecs.setStopBandFrequency(0.1 / (2.0 * Math.PI));
+
+        bpSpecs.setLowerPassBandFrequency(190.0);
+        bpSpecs.setUpperPassBandFrequency(210.0);
+        bpSpecs.setLowerStopBandFrequency(180.0);
+        bpSpecs.setUpperStopBandFrequency(220.0);
+        bpSpecs.setPassBandRipple(passBandRipple);
+        bpSpecs.setStopBandAttenuation(20.0);
+
+        bsSpecs.setLowerPassBandFrequency(3.6e3);
+        bsSpecs.setUpperPassBandFrequency(9.1e3);
+        bsSpecs.setLowerStopBandFrequency(5.45e3);
+        bsSpecs.setUpperStopBandFrequency(5.90e3);
+        bsSpecs.setPassBandRipple(passBandRipple);
+        bsSpecs.setStopBandAttenuation(38.0);
 
         FilterOrderResults.OrderAndCutoffFrequency nWn = Elliptic.ellipord(lpSpecs);
         TransferFunction ba = Elliptic.newLowPass(nWn.getOrder(), lpSpecs.getPassBandRipple(),
