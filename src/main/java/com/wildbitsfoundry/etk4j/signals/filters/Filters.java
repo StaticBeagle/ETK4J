@@ -69,7 +69,6 @@ public final class Filters {
         poles = Arrays.stream(poles).map(Complex::uminus).toArray(Complex[]::new);
         k *= ComplexArrays.product(zeros).divide(ComplexArrays.product(poles)).real();
 
-        RationalFunction rf = new RationalFunction(zhp, php, k);
         return new TransferFunction(zhp, php, k);
     }
 
@@ -117,7 +116,6 @@ public final class Filters {
         zbp = ComplexArrays.concat(zbp, ComplexArrays.zeros(degree));
         k *= Math.pow(bw, degree);
 
-        RationalFunction rf = new RationalFunction(zbp, pbp, k);
         return new TransferFunction(zbp, pbp, k);
     }
 
@@ -144,7 +142,6 @@ public final class Filters {
         Complex[] left = new Complex[zhp.length];
         Complex[] right = new Complex[zhp.length];
         for (int i = 0; i < zhp.length; ++i) {
-            //left[i] = zhp[i].pow(2.0).subtract(w0 * w0).sqrt().add(zhp[i]);
             left[i] = zhp[i].add(zhp[i].pow(2.0).subtract(w0 * w0).sqrt());
             right[i] = zhp[i].subtract(zhp[i].pow(2.0).subtract(w0 * w0).sqrt());
             if (zhp[i].real() == 0.0) {
