@@ -235,6 +235,7 @@ public class Bessel extends AnalogFilter {
                 x[i].addEquals(alpha[i].divide(alpha[i].multiply(beta[i]).add(1.0)));
             }
 
+            // TODO
             // if not all are finite throw exception
 
             boolean done = true;

@@ -1,9 +1,10 @@
 package com.wildbitsfoundry.etk4j.math.polynomials;
 
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
+import com.wildbitsfoundry.etk4j.math.functions.ComplexUnivariateFunction;
 import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
 
-public class RationalFunction implements UnivariateFunction {
+public class RationalFunction implements UnivariateFunction, ComplexUnivariateFunction {
 	private Polynomial _numerator;
 	private Polynomial _denominator;
 
@@ -162,6 +163,11 @@ public class RationalFunction implements UnivariateFunction {
 	@Override
 	public double evaluateAt(double x) {
 		return _numerator.evaluateAt(x) / _denominator.evaluateAt(x);
+	}
+
+	@Override
+	public Complex evaluateAt(Complex c) {
+		return _numerator.evaluateAt(c).divide(_denominator.evaluateAt(c));
 	}
 
 	public Complex evaluateAt(double real, double imag) {

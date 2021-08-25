@@ -8,6 +8,9 @@ import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
 import com.wildbitsfoundry.etk4j.math.polynomials.RationalFunction;
 import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 
+import static com.wildbitsfoundry.etk4j.signals.laplace.Laplace.InverseTransform;
+import static com.wildbitsfoundry.etk4j.signals.laplace.Laplace.InverseTransformTalbot;
+
 /***
  *
  * @author StaticBeagle
@@ -106,8 +109,8 @@ public class TransferFunction {
         int length = phase.length;
         double[] dp = new double[length];
         double[] dps = new double[length];
-        double[] dpcorr = new double[length];
-        double[] cumulativesum = new double[length];
+        double[] C = new double[length];
+        double[] cumulativeSum = new double[length];
 
         double cutoff = 180.0;
         int j;
@@ -128,22 +131,22 @@ public class TransferFunction {
         }
         // incremental phase correction
         for (j = 0; j < length - 1; j++) {
-            dpcorr[j] = dps[j] - dp[j];
+            C[j] = dps[j] - dp[j];
         }
         // Ignore correction when incremental variation is smaller than cutoff
         for (j = 0; j < length - 1; j++) {
             if (Math.abs(dp[j]) < cutoff) {
-                dpcorr[j] = 0;
+                C[j] = 0;
             }
         }
         // Find cumulative sum of deltas
-        cumulativesum[0] = dpcorr[0];
+        cumulativeSum[0] = C[0];
         for (j = 1; j < length - 1; j++) {
-            cumulativesum[j] = cumulativesum[j - 1] + dpcorr[j];
+            cumulativeSum[j] = cumulativeSum[j - 1] + C[j];
         }
         // Integrate corrections and add to P to produce smoothed phase values
         for (j = 1; j < length; j++) {
-            phase[j] += cumulativesum[j - 1];
+            phase[j] += cumulativeSum[j - 1];
         }
     }
 
@@ -422,6 +425,16 @@ public class TransferFunction {
             }
         }
         return phase;
+    }
+
+    public double[] step(double... timePoints) {
+        TransferFunction step = new TransferFunction(new double[]{1.0}, new double[] {1.0, 0});
+        RationalFunction rf = this.multiply(step)._rf;
+        double[] result = new double[timePoints.length];
+        for(int i = 0; i < timePoints.length; ++i) {
+            result[i] = InverseTransformTalbot(rf, timePoints[i], 64);
+        }
+        return result;
     }
 
     public static void main(String[] args) {

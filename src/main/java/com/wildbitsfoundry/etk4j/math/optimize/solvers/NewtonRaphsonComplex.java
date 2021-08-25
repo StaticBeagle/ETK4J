@@ -2,6 +2,7 @@ package com.wildbitsfoundry.etk4j.math.optimize.solvers;
 
 import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
+import com.wildbitsfoundry.etk4j.math.functions.ComplexUnivariateFunction;
 
 import java.util.function.Function;
 
@@ -18,12 +19,12 @@ public final class NewtonRaphsonComplex {
     protected double _step = 0.001;
     protected Complex _x0;
 
-    protected Function<Complex, Complex> _func;
-    protected Function<Complex, Complex> _derivative;
+    protected ComplexUnivariateFunction _func;
+    protected ComplexUnivariateFunction _derivative;
 
     // create constructor that takes in derivative type
 
-    public NewtonRaphsonComplex(Function<Complex, Complex> func, Function<Complex, Complex> derivative, Complex initialGuess) {
+    public NewtonRaphsonComplex(ComplexUnivariateFunction func, ComplexUnivariateFunction derivative, Complex initialGuess) {
         _func = func;
         _derivative = derivative;
         _x0 = initialGuess;
@@ -72,17 +73,17 @@ public final class NewtonRaphsonComplex {
         return this.solve(_derivative);
     }
 
-    protected SolverResults<Complex> solve(Function<Complex, Complex> derivative) {
+    protected SolverResults<Complex> solve(ComplexUnivariateFunction derivative) {
         int maxiter = _maxIter;
         double maxval = _maxVal;
-        Function<Complex, Complex> func = _func;
+        ComplexUnivariateFunction func = _func;
 
         Complex xcurrent = _x0;
         Complex xfinal = new Complex();
         double error = 0.0;
         while (maxiter-- > 0) {
 
-            xfinal = xcurrent.subtract(func.apply(xcurrent).divide(derivative.apply(xcurrent)));
+            xfinal = xcurrent.subtract(func.evaluateAt(xcurrent).divide(derivative.evaluateAt(xcurrent)));
 
             error = xfinal.subtract(xcurrent).abs();
             if (error < _absTol + _relTol * xcurrent.abs()) {
@@ -102,8 +103,8 @@ public final class NewtonRaphsonComplex {
     }
 
     public static void main(String[] args) {
-        Function<Complex, Complex> fx = z -> z.pow(2).add(1.0);
-        Function<Complex, Complex> fp = z -> z.multiply(2.0);
+        ComplexUnivariateFunction fx = z -> z.pow(2).add(1.0);
+        ComplexUnivariateFunction fp = z -> z.multiply(2.0);
         SolverResults<Complex> results = new NewtonRaphsonComplex(fx, fp, new Complex(5, -2))
                 .absTolerance(1e-9)
                 .relTolerance(0.0)
