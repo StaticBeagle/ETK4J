@@ -8,8 +8,7 @@ import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
 import com.wildbitsfoundry.etk4j.math.polynomials.RationalFunction;
 import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 
-import static com.wildbitsfoundry.etk4j.signals.laplace.Laplace.InverseTransform;
-import static com.wildbitsfoundry.etk4j.signals.laplace.Laplace.InverseTransformTalbot;
+import static com.wildbitsfoundry.etk4j.signals.laplace.Laplace.*;
 
 /***
  *
@@ -430,7 +429,7 @@ public class TransferFunction {
         RationalFunction rf = this.multiply(step)._rf;
         double[] result = new double[timePoints.length];
         for(int i = 0; i < timePoints.length; ++i) {
-            result[i] = InverseTransformTalbot(rf, timePoints[i], 64);
+            result[i] = InverseTransformDeHoog(rf, timePoints[i], 1e-16);
         }
         return result;
     }
