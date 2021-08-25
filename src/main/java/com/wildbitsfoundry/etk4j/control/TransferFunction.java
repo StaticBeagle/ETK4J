@@ -51,7 +51,6 @@ public class TransferFunction {
         _rf = rf;
     }
 
-    // TODO test
     public TransferFunction(ZeroPoleGain zpk) {
         this(zpk.getZeros(), zpk.getPoles(), zpk.getGain());
     }
@@ -60,11 +59,10 @@ public class TransferFunction {
         _rf = new RationalFunction(zeros, poles, gain);
     }
 
-    // TODO test
     public ZeroPoleGain toZeroPoleGain() {
         Complex[] zeros = _rf.getZeros();
         Complex[] poles = _rf.getPoles();
-        double k = RationalFunction.calculateGain(zeros, poles);
+        double k = _rf.getNumerator().getCoefficientAt(0);
         return new ZeroPoleGain(zeros, poles, k);
     }
 

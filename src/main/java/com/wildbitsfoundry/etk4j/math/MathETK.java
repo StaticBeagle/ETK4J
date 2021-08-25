@@ -110,6 +110,10 @@ public final class MathETK {
 	}
 
 	public static boolean isClose(double a, double b, double absTol) {
-		return isClose(a, b, absTol, 0.0);
+		return isClose(a, b, absTol, 1e-5);
+	}
+
+	public static boolean isClose(double a, double b) {
+		return isClose(a, b, 1e-8, 1e-5);
 	}
 }

@@ -55,11 +55,11 @@ public class RationalFunction implements UnivariateFunction, ComplexUnivariateFu
 	}
 
 	public Polynomial getNumerator() {
-		return _numerator;
+		return new Polynomial(_numerator);
 	}
 
 	public Polynomial getDenominator() {
-		return _denominator;
+		return new Polynomial(_denominator);
 	}
 
 	public RationalFunction add(final RationalFunction rf) {
