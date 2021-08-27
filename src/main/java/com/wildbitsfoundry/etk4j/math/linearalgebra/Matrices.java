@@ -32,6 +32,10 @@ public final class Matrices {
         return Matrices.Identity(n, n);
     }
 
+    public static Matrix Random(int n) {
+        return Random(n, n);
+    }
+
     public static Matrix Random(int rows, int cols) {
         Random rand = new Random();
         double[] data = new double[rows * cols];
