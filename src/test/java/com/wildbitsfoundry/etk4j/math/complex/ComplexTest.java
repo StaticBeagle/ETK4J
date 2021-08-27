@@ -3,10 +3,7 @@ package com.wildbitsfoundry.etk4j.math.complex;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
-import org.junit.Before;
 import org.junit.Test;
-
-import com.wildbitsfoundry.etk4j.math.complex.Complex;
 
 public class ComplexTest {
 
@@ -14,7 +11,7 @@ public class ComplexTest {
 	@Test
 	public void testHashCode() {
 		Complex a = new Complex(-2.0, 3.0);
-		Complex b = new Complex(5.0, -6.0);
+		new Complex(5.0, -6.0);
 		int hash = a.hashCode();
 		
 		assertEquals(-2131229759, hash);
@@ -23,7 +20,7 @@ public class ComplexTest {
 	@Test
 	public void testEquals() {
 		Complex a = new Complex(-2.0, 3.0);
-		Complex b = new Complex(5.0, -6.0);
+		new Complex(5.0, -6.0);
 
 		Complex c = new Complex(a.real(), a.imag());
 		assertEquals(a, c);
@@ -49,7 +46,7 @@ public class ComplexTest {
 	@Test
 	public void testCompareTo() {
 		Complex a = new Complex(-2.0, 3.0);
-		Complex b = new Complex(5.0, -6.0);
+		new Complex(5.0, -6.0);
 		Complex c = new Complex(a.real(), a.imag());
 		
 		assertEquals(0.0, a.compareTo(c), 1e-12);
@@ -203,7 +200,7 @@ public class ComplexTest {
 	@Test
 	public void testSqrt() {
 		Complex a = new Complex(-2.0, 3.0);
-		Complex b = new Complex(5.0, -6.0);
+		new Complex(5.0, -6.0);
 
 		Complex c = a.sqrt();
 		assertEquals(0.8959774761298381, c.real(), 1e-12);
@@ -259,7 +256,7 @@ public class ComplexTest {
 	@Test
 	public void testPow2() {
 		Complex a = new Complex(-2.0, 3.0);
-		Complex b = new Complex(5.0, -6.0);
+		new Complex(5.0, -6.0);
 
 		Complex c = a.pow2();
 		assertEquals(-5.0, c.real(), 1e-12);
@@ -343,6 +340,24 @@ public class ComplexTest {
 		Complex c = a.atan();
 		assertEquals(-1.409921049596576, c.real(), 1e-12);
 		assertEquals(0.229072682968539, c.imag(), 1e-12);
+	}
+
+	@Test
+	public void testSinh() {
+		Complex a = new Complex(-2.0, 3.0);
+
+		Complex c = a.sinh();
+		assertEquals(3.59056458998578, c.real(), 1e-12);
+		assertEquals(0.5309210862485197, c.imag(), 1e-12);
+	}
+
+	@Test
+	public void testCosh() {
+		Complex a = new Complex(-2.0, 3.0);
+
+		Complex c = a.cosh();
+		assertEquals(-3.7245455049153224, c.real(), 1e-12);
+		assertEquals(-0.5118225699873846, c.imag(), 1e-12);
 	}
 	
 	@Test

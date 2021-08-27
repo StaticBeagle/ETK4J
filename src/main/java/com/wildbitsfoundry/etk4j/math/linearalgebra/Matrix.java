@@ -756,6 +756,64 @@ public class Matrix {
         return new EigenvalueDecomposition(A, balance);
     }
 
+    /***
+     * Balances the matrix in place using algorithm #3 described in
+     * https://arxiv.org/pdf/1401.5766.pdf with norm p = 2. This method changes
+     * the content of the input <pre>matrix</pre> so use with caution.
+     *
+     * @param matrix input matrix to be balanced. The resulting balanced matrix is stored in this matrix.
+     * @return The Diagonal matrix such that A<sub>balanced</sub> = DAD<sup>-1</sup>
+     *
+     * @see "https://stackoverflow.com/a/43169781/6383857"
+     */
+    public static Matrix balance(Matrix matrix) {
+        if(!matrix.isSquared()) {
+            throw new IllegalArgumentException("Matrix must be squared.");
+        }
+        double beta = 2;
+        int rows = matrix.getRowCount();
+        Matrix D = Matrices.Identity(rows);
+        double[] data = matrix.getArray();
+        boolean converged = false;
+        do {
+            converged = true;
+            for(int i = 0; i < rows; ++i) {
+                double c = 0.0;
+                double r = 0.0;
+                // norm - 2
+                for (int j = 0; j < rows; ++j) {
+                    c += data[j * rows + i] * data[j * rows + i];
+                    r += data[i * rows + j] * data[i * rows + j];
+                }
+                c = Math.sqrt(c);
+                r = Math.sqrt(r);
+                double f = 1.0;
+                double s = c * c + r * r;
+                double alpha = 1.0 / beta;
+                while(c < r / beta) {
+                    c *= beta;
+                    r *= alpha;
+                    f *= beta;
+                }
+                while(c >= r * beta) {
+                    c *= alpha;
+                    r *= beta;
+                    f *= alpha;
+                }
+                if(c * c + r * r < 0.95 * s) {
+                    converged = false;
+                    D.set(i, i, D.get(i, i) * f);
+                    double g = 1.0 / f;
+                    for (int j = 0; j < rows; ++j) {
+                        data[j * rows + i] *= f;
+                        data[i * rows + j] *= g;
+                    }
+                }
+            }
+        } while(!converged);
+        return D;
+    }
+
     public int getRowCount() {
         return _rows;
     }
@@ -769,6 +827,14 @@ public class Matrix {
         int rowIndex = row * _cols;
         for (int j = 0; j < _cols; ++j) {
             result[j] = _data[rowIndex + j];
+        }
+        return result;
+    }
+
+    public double[] getCol(int col) {
+        double[] result = new double[_rows];
+        for (int i = 0; i < _rows; ++i) {
+            result[i] = _data[i * _rows + col];
         }
         return result;
     }
@@ -875,6 +941,37 @@ public class Matrix {
 			throw new IllegalArgumentException();
 		}
 		System.arraycopy(row, 0, _data, i * _cols, _cols);
-		
 	}
+
+	public static void main(String[] args) {
+        Matrix a = Matrices.Magic(3);
+        double[] rowPacked = a.getRowPackedCopy();
+        double[] colPacked = a.getColumnPackedCopy();
+
+        System.out.println(a);
+        System.out.println(Arrays.toString(rowPacked));
+        System.out.println(Arrays.toString(colPacked));
+
+        System.out.println(Arrays.toString(a.getRow(1)));
+        System.out.println(Arrays.toString(a.getCol(2)));
+
+        Matrix b = Matrices.Magic(3);
+        Matrix c = new Matrix(b);
+
+        balance(b);
+
+        System.out.println();
+        System.out.println(b);
+        System.out.println();
+        System.out.println(c);
+
+        double[] data = {1,  0.01,  0.0001, 100,  1,  0.01, 10000,  100,  1};
+        Matrix d = new Matrix(data, 3);
+        System.out.println();
+        System.out.println(d);
+
+        balance(d);
+        System.out.println();
+        System.out.println(d);
+    }
 }

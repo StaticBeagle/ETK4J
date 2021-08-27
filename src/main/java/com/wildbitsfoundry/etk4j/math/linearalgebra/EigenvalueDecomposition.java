@@ -859,56 +859,6 @@ public class EigenvalueDecomposition {
 		}
 	}
 
-	/***
-	 * Using norm 2
-	 * @param matrix
-	 */
-	private static void balanceMatrix(Matrix matrix) {
-		int rows = matrix.getRowCount();
-		double[] data = matrix.getArray();
-		double radix = 2.0;				// radix base
-		double radix2 = radix * radix;	// radix base squared
-		boolean done = false;
-		while (!done) {
-			done = true;
-			for (int i = 0; i < rows; i++) {
-				double r = 0.0, c = 0.0;
-				for (int j = 0; j < rows; j++) {
-					if (j != i) {
-						// Compute row[i] and col[i] (norm2)^2
- 						c += Math.abs(data[j * rows + i]);
-						r += Math.abs(data[i * rows + j]);
-					}
-				}
-				if (c != 0 && r != 0) {
-					double s = c + r;
-					double f = 1.0;
-					double g = r / radix;
-					while (c < g) {
-						f *= radix;
-						c *= radix2;
-					}
-					g = r * radix;
-					while (c > g) {
-						f /= radix;
-						c /= radix2;
-					}
-					if ((c + r) / f < 0.95 * s) {
-						done = false;
-						g = 1.0 / f;
-						//scaling[i] *= f;
-						for (int j = 0; j < rows; j++) {
-							data[i * rows + j] *= g;
-						}
-						for (int j = 0; j < rows; j++) {
-							data[j * rows + i] *= f;
-						}
-					}
-				}
-			}
-		}
-	}
-
 	/*
 	 * ------------------------ Constructor ------------------------
 	 */
@@ -935,7 +885,7 @@ public class EigenvalueDecomposition {
 			}
 		}
 		if(balance && !issymmetric) {
-			EigenvalueDecomposition.balanceMatrix(Arg);
+			Matrix.balance(Arg);
 		}
 
 		V = new double[_dim * _dim];

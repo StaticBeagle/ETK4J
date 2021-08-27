@@ -2,7 +2,12 @@ package com.wildbitsfoundry.etk4j.signals.filters;
 
 public class NegativeFilterOrderException extends RuntimeException {
 
-    public NegativeFilterOrderException(String message) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 3135934681615853289L;
+
+	public NegativeFilterOrderException(String message) {
         super(message);
     }
 

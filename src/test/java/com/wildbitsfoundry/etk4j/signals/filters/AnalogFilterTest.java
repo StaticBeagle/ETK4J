@@ -1,14 +1,14 @@
 package com.wildbitsfoundry.etk4j.signals.filters;
 
+import static org.junit.Assert.assertArrayEquals;
+
+import org.junit.Test;
+
 import com.wildbitsfoundry.etk4j.control.TransferFunction;
 import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.BandPassSpecs;
 import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.BandStopSpecs;
 import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.HighPassSpecs;
 import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.LowPassSpecs;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import static org.junit.Assert.assertArrayEquals;
 
 public class AnalogFilterTest {
 

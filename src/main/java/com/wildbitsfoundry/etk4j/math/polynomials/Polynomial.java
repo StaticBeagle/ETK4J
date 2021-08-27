@@ -45,7 +45,6 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
         if (polynomial._roots != null) {
             this._roots = ComplexArrays.deepCopy(polynomial._roots);
         }
-
     }
 
     /***
