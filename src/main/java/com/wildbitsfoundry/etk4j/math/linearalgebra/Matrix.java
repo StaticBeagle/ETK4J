@@ -748,70 +748,111 @@ public class Matrix {
     }
 
     public EigenvalueDecomposition eig() {
-        return this.eig(true);
+        return new EigenvalueDecomposition(this);
     }
 
     public EigenvalueDecomposition eig(boolean balance) {
-        Matrix A = balance ? new Matrix(this) : this;
-        return new EigenvalueDecomposition(A, balance);
+        return new EigenvalueDecomposition(this, balance);
     }
 
     /***
-     * Balances the matrix in place using algorithm #3 described in
-     * https://arxiv.org/pdf/1401.5766.pdf with norm p = 2. This method changes
-     * the content of the input <pre>matrix</pre> so use with caution.
+     * Balances the matrix using the algorithm by parlett and reinsch.
+     * http://www.netlib.org/eispack/balanc.f
+     * https://arxiv.org/pdf/1401.5766.pdf algorithm #2
      *
-     * @param matrix input matrix to be balanced. The resulting balanced matrix is stored in this matrix.
-     * @return The Diagonal matrix such that A<sub>balanced</sub> = DAD<sup>-1</sup>
+     * @return
      *
      * @see "https://stackoverflow.com/a/43169781/6383857"
      */
-    public static Matrix balance(Matrix matrix) {
-        if(!matrix.isSquared()) {
+    public Matrix balance() {
+        if(!this.isSquared()) {
             throw new IllegalArgumentException("Matrix must be squared.");
         }
-        double beta = 2;
-        int rows = matrix.getRowCount();
-        Matrix D = Matrices.Identity(rows);
-        double[] data = matrix.getArray();
-        boolean converged = false;
-        do {
-            converged = true;
-            for(int i = 0; i < rows; ++i) {
-                double c = 0.0;
-                double r = 0.0;
-                // norm - 2
-                for (int j = 0; j < rows; ++j) {
-                    c += data[j * rows + i] * data[j * rows + i];
-                    r += data[i * rows + j] * data[i * rows + j];
+        int rows = _rows;
+        double[] data = this.getArrayCopy();
+        double radix = 2.0;				// radix base
+        double radix2 = radix * radix;	// radix base squared
+        boolean done = false;
+        while (!done) {
+            done = true;
+            for (int i = 0; i < rows; i++) {
+                double r = 0.0, c = 0.0;
+                for (int j = 0; j < rows; j++) {
+                    if (j != i) {
+                        // Compute row[i] and col[i] norm - 1
+                        c += Math.abs(data[j * rows + i]);
+                        r += Math.abs(data[i * rows + j]);
+                    }
                 }
-                c = Math.sqrt(c);
-                r = Math.sqrt(r);
-                double f = 1.0;
-                double s = c * c + r * r;
-                double alpha = 1.0 / beta;
-                while(c < r / beta) {
-                    c *= beta;
-                    r *= alpha;
-                    f *= beta;
-                }
-                while(c >= r * beta) {
-                    c *= alpha;
-                    r *= beta;
-                    f *= alpha;
-                }
-                if(c * c + r * r < 0.95 * s) {
-                    converged = false;
-                    D.set(i, i, D.get(i, i) * f);
-                    double g = 1.0 / f;
-                    for (int j = 0; j < rows; ++j) {
-                        data[j * rows + i] *= f;
-                        data[i * rows + j] *= g;
+                if (c != 0 && r != 0) {
+                    double s = c + r;
+                    double f = 1.0;
+                    double g = r / radix;
+                    while (c < g) {
+                        f *= radix;
+                        c *= radix2;
+                    }
+                    g = r * radix;
+                    while (c > g) {
+                        f /= radix;
+                        c /= radix2;
+                    }
+                    if ((c + r) / f < 0.95 * s) {
+                        done = false;
+                        g = 1.0 / f;
+                        //scaling[i] *= f;
+                        for (int j = 0; j < rows; j++) {
+                            data[i * rows + j] *= g;
+                        }
+                        for (int j = 0; j < rows; j++) {
+                            data[j * rows + i] *= f;
+                        }
                     }
                 }
             }
-        } while(!converged);
-        return D;
+        }
+//        double beta = 2;
+//        int rows = this.getRowCount();
+//        double[] data = this.getArrayCopy();
+//        boolean converged = false;
+//        do {
+//            converged = true;
+//            for(int i = 0; i < rows; ++i) {
+//                double c = 0.0;
+//                double r = 0.0;
+//                // norm - 2
+//                for (int j = 0; j < rows; ++j) {
+//                    c += data[j * rows + i] * data[j * rows + i];
+//                    r += data[i * rows + j] * data[i * rows + j];
+//                }
+//                c = Math.sqrt(c);
+//                r = Math.sqrt(r);
+//                if(c != 0.0 && r != 0.0) {
+//                    double f = 1.0;
+//                    double s = c * c + r * r;
+//                    double alpha = 1.0 / beta;
+//                    while (c < r / beta) {
+//                        c *= beta;
+//                        r *= alpha;
+//                        f *= beta;
+//                    }
+//                    while (c >= r * beta) {
+//                        c *= alpha;
+//                        r *= beta;
+//                        f *= alpha;
+//                    }
+//                    if (c * c + r * r < 0.95 * s) {
+//                        converged = false;
+//                        double g = 1.0 / f;
+//                        for (int j = 0; j < rows; ++j) {
+//                            data[j * rows + i] *= f;
+//                            data[i * rows + j] *= g;
+//                        }
+//                    }
+//                }
+//            }
+//        } while(!converged);
+        return new Matrix(data, rows, rows);
     }
 
     public int getRowCount() {
@@ -958,7 +999,7 @@ public class Matrix {
         Matrix b = Matrices.Magic(3);
         Matrix c = new Matrix(b);
 
-        balance(b);
+        b = b.balance();
 
         System.out.println();
         System.out.println(b);
@@ -970,7 +1011,7 @@ public class Matrix {
         System.out.println();
         System.out.println(d);
 
-        balance(d);
+        d = d.balance();
         System.out.println();
         System.out.println(d);
     }

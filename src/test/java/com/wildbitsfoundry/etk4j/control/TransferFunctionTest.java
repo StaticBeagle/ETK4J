@@ -41,7 +41,6 @@ public class TransferFunctionTest {
 		double[] denominator = { 1.0, 2.0, 1.0, 0.0 };
 
 		TransferFunction tf = new TransferFunction(numerator, denominator);
-		ZeroPoleGain gg = tf.toZeroPoleGain();
 
 		Complex[] zeros = tf.getZeros();
 		Complex[] poles = tf.getPoles();
@@ -67,8 +66,6 @@ public class TransferFunctionTest {
 		assertArrayEquals(zpk.getZeros(), tf.toZeroPoleGain().getZeros());
 		assertArrayEquals(zpk.getPoles(), tf.toZeroPoleGain().getPoles());
 		assertEquals(zpk.getGain(), tf.toZeroPoleGain().getGain(), 1e-12);
-
-
 	}
 
 	@Test
