@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
 import com.wildbitsfoundry.etk4j.math.MathETK;
+import com.wildbitsfoundry.etk4j.math.curvefitting.CurveFitting;
 import com.wildbitsfoundry.etk4j.util.NumArrays;
 
 public class Matrix {
@@ -38,7 +39,7 @@ public class Matrix {
             }
         }
     }
-    
+
     // row packed
     // _rows = rows
     // _cols = cols
@@ -47,12 +48,6 @@ public class Matrix {
     public Matrix(double[][] data) {
         _rows = data.length;
         _cols = data[0].length;
-        _data = NumArrays.flatten(data);
-    }
-
-    public Matrix(double[][] data, int rows, int cols) {
-        _rows = rows;
-        _cols = cols;
         _data = NumArrays.flatten(data);
     }
 
@@ -622,28 +617,41 @@ public class Matrix {
         NumArrays.multiplyInPlace(_data, s);
     }
 
-    public Matrix multiply(Matrix mat) {
-        if (mat._rows != this._cols) {
+    public Matrix multiply(Matrix matrix) {
+        double[] data = null;
+        Matrix c = new Matrix(data, 0, 0);
+        multiplyOp(this, matrix, c);
+        return c;
+    }
+
+    private static void multiplyOp(Matrix a, Matrix b, Matrix c) {
+        if (b._rows != a._cols) {
             throw new IllegalArgumentException("Matrix inner dimensions must agree.");
         }
-        double[] result = new double[this._rows * mat._cols];
-        double[] Bcolj = new double[this._cols];
-        for (int j = 0; j < mat._cols; j++) {
-            for (int k = 0; k < this._cols; k++) {
-                Bcolj[k] = mat.get(k, j);
+        double[] result = new double[a._rows * b._cols];
+        double[] Bcolj = new double[a._cols];
+        for (int j = 0; j < b._cols; j++) {
+            for (int k = 0; k < a._cols; k++) {
+                Bcolj[k] = b.get(k, j);
             }
-            for (int i = 0; i < this._rows; i++) {
-                double[] Arowi = new double[this._cols];
-                System.arraycopy(this._data, i * this._cols, Arowi, 0, this._cols);
+            for (int i = 0; i < a._rows; i++) {
+                double[] Arowi = new double[a._cols];
+                System.arraycopy(a._data, i * a._cols, Arowi, 0, a._cols);
 
                 double s = 0;
-                for (int k = 0; k < this._cols; k++) {
-                    s += Arowi[k]*Bcolj[k];
+                for (int k = 0; k < a._cols; k++) {
+                    s += Arowi[k] * Bcolj[k];
                 }
-                result[i * mat._cols + j] = s;
+                result[i * b._cols + j] = s;
             }
         }
-        return new Matrix(result, this._rows, mat._cols);
+        c._data = result;
+        c._rows = a._rows;
+        c._cols = b._cols;
+    }
+
+    public void multiplyEquals(Matrix matrix) {
+        multiplyOp(this, matrix, this);
     }
 
     public Matrix solve(Matrix B) {
@@ -756,7 +764,7 @@ public class Matrix {
     }
 
     /***
-     * Balances the matrix using the algorithm by parlett and reinsch.
+     * Balances the matrix using the algorithm by parlett and reinsch with norm - 1.
      * http://www.netlib.org/eispack/balanc.f
      * https://arxiv.org/pdf/1401.5766.pdf algorithm #2
      *
@@ -765,13 +773,13 @@ public class Matrix {
      * @see "https://stackoverflow.com/a/43169781/6383857"
      */
     public Matrix balance() {
-        if(!this.isSquared()) {
+        if (!this.isSquared()) {
             throw new IllegalArgumentException("Matrix must be squared.");
         }
         int rows = _rows;
         double[] data = this.getArrayCopy();
-        double radix = 2.0;				// radix base
-        double radix2 = radix * radix;	// radix base squared
+        double radix = 2.0;                // radix base
+        double radix2 = radix * radix;    // radix base squared
         boolean done = false;
         while (!done) {
             done = true;
@@ -913,44 +921,43 @@ public class Matrix {
         }
         return vals;
     }
-    
-    
+
 
     @Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + _cols;
-		result = prime * result + Arrays.hashCode(_data);
-		result = prime * result + _rows;
-		return result;
-	}
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + _cols;
+        result = prime * result + Arrays.hashCode(_data);
+        result = prime * result + _rows;
+        return result;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (!(obj instanceof Matrix)) {
-			return false;
-		}
-		Matrix other = (Matrix) obj;
-		if (_cols != other._cols) {
-			return false;
-		}
-		if (!Arrays.equals(_data, other._data)) {
-			return false;
-		}
-		if (_rows != other._rows) {
-			return false;
-		}
-		return true;
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof Matrix)) {
+            return false;
+        }
+        Matrix other = (Matrix) obj;
+        if (_cols != other._cols) {
+            return false;
+        }
+        if (!Arrays.equals(_data, other._data)) {
+            return false;
+        }
+        if (_rows != other._rows) {
+            return false;
+        }
+        return true;
+    }
 
-	/**
+    /**
      * Make a one-dimensional row packed copy of the internal array.
      *
      * @return Matrix elements packed in a one-dimensional array by rows.
@@ -974,17 +981,108 @@ public class Matrix {
         }
     }
 
-	public void setRow(int i, double[] row) {
-		if(i < 0 || i >= _rows) {
-			throw new IndexOutOfBoundsException("f");
-		}
-		if(row.length != _cols) {
-			throw new IllegalArgumentException();
-		}
-		System.arraycopy(row, 0, _data, i * _cols, _cols);
-	}
+    public void setRow(int i, double[] row) {
+        if (i < 0 || i >= _rows) {
+            throw new IndexOutOfBoundsException("f");
+        }
+        if (row.length != _cols) {
+            throw new IllegalArgumentException();
+        }
+        System.arraycopy(row, 0, _data, i * _cols, _cols);
+    }
 
-	public static void main(String[] args) {
+    public Matrix pow(int n) {
+        if (!this.isSquared()) {
+            throw new IllegalArgumentException("Matrix must be squared");
+        }
+        n = Math.abs(n);
+        if (n == 0) {
+            return Matrices.Identity(_rows);
+        }
+        Matrix a = n < 0 ? inv() : new Matrix(this);
+
+        if (n == 1) {
+            return a;
+        } else if (n == 2) {
+            a.multiplyEquals(a);
+            return a;
+        } else if (n == 3) {
+            a.multiplyEquals(a.multiply(a));
+            return a;
+        }
+        Matrix z = null, result = null;
+        while(n > 0) {
+            if(z == null) {
+                z = a;
+            } else {
+                z = z.multiply(z);
+            }
+            int bit = n % 2;
+            n = n / 2;
+            if(bit > 0) {
+                if(result == null) {
+                    result = z;
+                } else {
+                    result.multiplyEquals(z);
+                }
+            }
+        }
+        return result;
+    }
+
+    public Matrix expm() {
+        FRexpResult result = frexp(this.normInf());
+        double s = Math.max(0.0, result.exponent + 1);
+        Matrix A = this.multiply(1 / Math.pow(2.0, s));
+
+        Matrix X = new Matrix(A);
+        double c = 0.5;
+        Matrix E = Matrices.Identity(A._rows, A._cols).add(A.multiply(c));
+        Matrix D = Matrices.Identity(A._rows, A._cols).subtract(A.multiply(c));
+        double q = 6.0;
+        boolean p = true;
+        for(int k = 2; k <= q; ++k) {
+            c = c * (q - k + 1) / (k * (2 * q - k + 1));
+            X.multiplyEquals(A);
+            Matrix cX = X.multiply(c);
+            E.addEquals(cX);
+            if(p) {
+                D.addEquals(cX);
+            } else {
+                D.subtractEquals(cX);
+            }
+            p = !p;
+        }
+        E = D.solve(E);
+
+        for(int k = 0; k < s; ++k) {
+            E.multiplyEquals(E);
+        }
+        return E;
+
+    }
+
+//    public Matrix pow(double n) {
+//        if (!this.isSquared()) {
+//            throw new IllegalArgumentException("Matrix must be squared");
+//        }
+//        n = Math.abs(n);
+//        if (n == 0.0 || n == 1.0 || n == 2.0 || n == 3.0) {
+//            return pow((int) n);
+//        }
+//        Matrix a = n < 0 ? inv() : new Matrix(this);
+//        EigenvalueDecomposition eig = a.eig();
+//        Matrix D = eig.getD();
+//        for(int i = 0, j = 0; i < D._rows; ++i, ++j) {
+//            D.set(i, j, Math.pow(D.get(i, j), n));
+//        }
+//        Matrix result = eig.getV().multiply(D);
+//        result.multiplyEquals(eig.getV().inv());
+//        return result;
+//    }
+
+    // TODO add more matrix multiplication tests?
+    public static void main(String[] args) {
         Matrix a = Matrices.Magic(3);
         double[] rowPacked = a.getRowPackedCopy();
         double[] colPacked = a.getColumnPackedCopy();
@@ -1006,7 +1104,7 @@ public class Matrix {
         System.out.println();
         System.out.println(c);
 
-        double[] data = {1,  0.01,  0.0001, 100,  1,  0.01, 10000,  100,  1};
+        double[] data = {1, 0.01, 0.0001, 100, 1, 0.01, 10000, 100, 1};
         Matrix d = new Matrix(data, 3);
         System.out.println();
         System.out.println(d);
@@ -1014,5 +1112,88 @@ public class Matrix {
         d = d.balance();
         System.out.println();
         System.out.println(d);
+
+        Matrix mul = Matrices.Magic(3);
+        System.out.println();
+        System.out.println(mul);
+        System.out.println();
+        System.out.println(mul.pow(0));
+        System.out.println();
+        System.out.println(mul.pow(1));
+        System.out.println();
+        System.out.println(mul.pow(2));
+        System.out.println();
+        System.out.println(mul.pow(3));
+        System.out.println();
+        System.out.println(mul.pow(4));
+        System.out.println();
+        System.out.println(mul.pow(5));
+
+        double[][] ddata = {{1,2,3}, {4,5,6},{7,8,9}};
+
+        Matrix E = new Matrix(ddata);
+        System.out.println();
+        System.out.println(E.expm());
+    }
+
+    public static class FRexpResult
+    {
+        public int exponent = 0;
+        public double mantissa = 0.;
+    }
+
+    public static FRexpResult frexp(double value)
+    {
+        final FRexpResult result = new FRexpResult();
+        long bits = Double.doubleToLongBits(value);
+        double realMant = 1.;
+
+        // Test for NaN, infinity, and zero.
+        if (Double.isNaN(value) ||
+                value + value == value ||
+                Double.isInfinite(value))
+        {
+            result.exponent = 0;
+            result.mantissa = value;
+        }
+        else
+        {
+
+            boolean neg = (bits < 0);
+            int exponent = (int)((bits >> 52) & 0x7ffL);
+            long mantissa = bits & 0xfffffffffffffL;
+
+            if(exponent == 0)
+            {
+                exponent++;
+            }
+            else
+            {
+                mantissa = mantissa | (1L<<52);
+            }
+
+            // bias the exponent - actually biased by 1023.
+            // we are treating the mantissa as m.0 instead of 0.m
+            //  so subtract another 52.
+            exponent -= 1075;
+            realMant = mantissa;
+
+            // normalize
+            while(realMant >= 1.0)
+            {
+                mantissa >>= 1;
+                realMant /= 2.;
+                exponent++;
+            }
+
+            if(neg)
+            {
+                realMant = realMant * -1;
+            }
+
+            result.exponent = exponent;
+            result.mantissa = realMant;
+        }
+        return result;
     }
 }

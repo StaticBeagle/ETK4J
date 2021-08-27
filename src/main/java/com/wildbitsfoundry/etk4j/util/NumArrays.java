@@ -288,7 +288,8 @@ public final class NumArrays {
      * @return
      *
      *         <pre>
-     *         sqrt((a[i] - b[i])<sup>2</sup>)
+     *         sqrt(sum((a[i] - b[i])<sup>2</sup>))
+     *         </pre>
      */
     public static double distance(double[] a, double[] b) {
         double norm = 0.0;
@@ -298,6 +299,12 @@ public final class NumArrays {
         return norm;
     }
 
+    /***
+     * Kronecker array product.
+     * @param a input array
+     * @param b input array
+     * @return an array formed by taking all possible products between the elements of a and b
+     */
     public static double[] kron(final double[] a, final double[] b) {
         int aLength = a.length;
         int bLength = b.length;
@@ -401,11 +408,16 @@ public final class NumArrays {
     }
 
     /**
-     * Helper method to copy a 2 dimensional array
-     *
-     * @param a array
-     *          to copy
-     * @return a newly created array containing the copy of array
+     * Converts (flattens) a 2d array into a 1d array by copying
+     * every row of the 2d array into the 1d array.
+     * <pre>
+     * let a = {{1, 2, 3}, {4, 5, 6}};
+     * thus flatten(a) returns:
+     * {1, 2, 3, 4, 5, 6}
+     *</pre>
+     * @param a array to flatten
+     * @return a new row-packed 1d array
+     * @throws IllegalArgumentException if the input array a is jagged (i.e. not all rows have the same length)
      */
     public static double[] flatten(double[][] a) {
         int rows = a.length;
@@ -537,6 +549,11 @@ public final class NumArrays {
     }
 
     public static void main(String[] args) {
+
         System.out.println(min(2,9,1,5));
+        double[] a = {1, 2, 3};
+        double[] b = {4, 5, 6};
+
+        System.out.println(Arrays.toString(kron(a, b)));
     }
 }
