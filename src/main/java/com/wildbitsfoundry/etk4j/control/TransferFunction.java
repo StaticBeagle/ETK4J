@@ -4,9 +4,12 @@ import java.util.Arrays;
 
 import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
+import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrices;
+import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
 import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
 import com.wildbitsfoundry.etk4j.math.polynomials.RationalFunction;
 import com.wildbitsfoundry.etk4j.util.ComplexArrays;
+import com.wildbitsfoundry.etk4j.util.NumArrays;
 
 import static com.wildbitsfoundry.etk4j.signals.laplace.Laplace.*;
 
@@ -425,13 +428,75 @@ public class TransferFunction {
     }
 
     public double[] step(double... timePoints) {
-        TransferFunction step = new TransferFunction(new double[]{1.0}, new double[] {1.0, 0});
+        TransferFunction step = new TransferFunction(new double[]{1.0}, new double[]{1.0, 0});
         RationalFunction rf = this.multiply(step)._rf;
         double[] result = new double[timePoints.length];
-        for(int i = 0; i < timePoints.length; ++i) {
+        for (int i = 0; i < timePoints.length; ++i) {
             result[i] = InverseTransformDeHoog(rf, timePoints[i], 1e-16);
         }
         return result;
+    }
+
+    public boolean isProper() {
+        return _rf.isProper();
+    }
+
+    public boolean isStrictlyProper() {
+        return _rf.isStrictlyProper();
+    }
+
+    /***
+     * Transform SISO only single input single output TFs
+     * @return
+     */
+    public StateSpace toStateSpace() {
+
+        normalize();
+        if (!isProper()) {
+            throw new ImproperTransferFunctionException();
+        }
+        double[] num = _rf.getNumerator().getCoefficients();
+        double[] den = _rf.getDenominator().getCoefficients();
+
+        if (num.length == 0.0 || den.length == 0.0) {
+            // Null system
+            return new StateSpace();
+        }
+        // Pad numerator with zeros to match denominator size
+        double[] numPadded = new double[den.length];
+        System.arraycopy(num, 0, numPadded, den.length - num.length, num.length);
+
+        double[][] D = new double[1][];
+        if (numPadded.length > 0) {
+            D[0] = new double[]{numPadded[0]};
+        } else {
+            /*
+                We don't assign it an empty array because this system
+                is not 'null'. It just doesn't have a non-zero D
+                matrix. Thus, it should have a non-zero shape so that
+                it can be operated on by functions like 'ss2tf'
+             */
+            D[0] = new double[]{0};
+        }
+        int k = den.length;
+        if (k == 1) {
+            return new StateSpace(new double[][]{{0.0}}, new double[][]{{0.0}}, new double[][]{{0.0}}, D);
+        }
+        double[] fRow = new double[k - 1];
+        System.arraycopy(den, 1, fRow, 0, fRow.length);
+        NumArrays.multiplyInPlace(fRow, -1.0);
+
+        double[][] eye = Matrices.Identity(k - 2, k - 1).getAs2DArray();
+        double[][] A = new double[eye.length + 1][];
+        A[0] = fRow;
+        for (int i = 0; i < eye.length; ++i) {
+            A[i + 1] = Arrays.copyOf(eye[i], eye[0].length);
+        }
+        double[][] B = Matrices.Identity(k - 1, 1).getAs2DArray();
+        double[][] C = new double[1][];
+        double[][] outer = NumArrays.outer(new double[]{numPadded[0]}, Arrays.copyOfRange(den, 1, den.length));
+        C[0] = NumArrays.subtract(Arrays.copyOfRange(numPadded, 1, numPadded.length), outer[0]);
+        return new StateSpace(A, B, C, D);
     }
 
     public static void main(String[] args) {
@@ -441,6 +506,16 @@ public class TransferFunction {
 
         double phase = tf1.getPhaseAt(70.4);
         System.out.println(phase);
+
+        TransferFunction tff = new TransferFunction(new double[]{1, 3, 3}, new double[]{1, 2, 1});
+        System.out.println(tff.toStateSpace());
+
+        TransferFunction tfff = new TransferFunction(new double[]{5, 3, 4}, new double[]{8, 2, 9, 10});
+        System.out.println(tfff.toStateSpace());
+
+        TransferFunction tffff = new TransferFunction(new double[]{5}, new double[]{3});
+        System.out.println(tffff.toStateSpace());
+
 
 //		double[] phase = tf1.getPhaseAt(logspace);
 //		System.out.println(Arrays.toString(phase));

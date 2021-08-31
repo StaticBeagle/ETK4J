@@ -15,7 +15,7 @@ public class MatrixTest {
 		Matrix magic = Matrices.Magic(1);
 		assertEquals(sol, magic);
 
-		sol = Matrices.emtpty();
+		sol = Matrices.empty();
 		magic = Matrices.Magic(2);
 		assertEquals(sol, magic);
 

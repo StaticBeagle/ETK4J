@@ -190,4 +190,12 @@ public class RationalFunction implements UnivariateFunction, ComplexUnivariateFu
 		kden.divideEquals(knum);
 		return kden.real();
 	}
+
+	public boolean isProper() {
+		return _numerator.degree() <= _denominator.degree();
+	}
+
+	public boolean isStrictlyProper() {
+		return _numerator.degree() < _denominator.degree();
+	}
 }

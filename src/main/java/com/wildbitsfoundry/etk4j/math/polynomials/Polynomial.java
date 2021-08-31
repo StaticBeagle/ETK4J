@@ -566,4 +566,6 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
         }
         return result;
     }
+
+
 }

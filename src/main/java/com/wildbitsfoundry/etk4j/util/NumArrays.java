@@ -1,6 +1,7 @@
 package com.wildbitsfoundry.etk4j.util;
 
 import java.util.Arrays;
+import java.util.function.Predicate;
 
 import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.interpolation.CubicSpline;
@@ -545,6 +546,18 @@ public final class NumArrays {
             xi += step;
         }
         result[newSize - 1] = a[length - 1];
+        return result;
+    }
+
+    public static double[][] outer(double[] a, double[] b) {
+        int M = a.length;
+        int N = b.length;
+        double[][] result = new double[M][N];
+        for(int i = 0; i < M; ++i) {
+            for(int j = 0; j < N; ++j) {
+                result[i][j] = a[i] * b[j];
+            }
+        }
         return result;
     }
 

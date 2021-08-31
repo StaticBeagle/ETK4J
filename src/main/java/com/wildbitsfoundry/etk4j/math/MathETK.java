@@ -116,4 +116,8 @@ public final class MathETK {
 	public static boolean isClose(double a, double b) {
 		return isClose(a, b, 1e-8, 1e-5);
 	}
+
+	public static double logb(double x, int base) {
+		return Math.log(x) / Math.log(base);
+	}
 }

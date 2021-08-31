@@ -60,7 +60,7 @@ public final class Matrices {
         return c;
     }
 
-    public static Matrix emtpty() {
+    public static Matrix empty() {
         return new Matrix(0, 0);
     }
 
@@ -70,7 +70,7 @@ public final class Matrices {
             magicMatrix = new Matrix(n, n);
             magicMatrix.set(0, 0, 1.0);
         } else if (n == 2) {
-            return Matrices.emtpty();
+            return Matrices.empty();
         }
 
         double[][] M = new double[n][n];
