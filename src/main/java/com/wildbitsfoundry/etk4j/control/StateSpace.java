@@ -31,6 +31,22 @@ public class StateSpace {
         this.D = new Matrix(D);
     }
 
+    public Matrix getA() {
+        return new Matrix(A);
+    }
+
+    public Matrix getB() {
+        return new Matrix(B);
+    }
+
+    public Matrix getC() {
+        return new Matrix(C);
+    }
+
+    public Matrix getD() {
+        return new Matrix(D);
+    }
+
     @Override
     public String toString() {
         return String.format("A:%n%s%nB:%n%s%nC:%n%s%nD%n%s%n", A, B, C, D);

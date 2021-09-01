@@ -363,9 +363,7 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
                     EigenvalueDecomposition evd = c.eig();
                     double[] realEig = evd.getRealEigenvalues();
                     double[] imagEig = evd.getImagEigenvalues();
-                    for (int i = 0; i < N; i++) {
-                        _roots[i] = new Complex(realEig[i], imagEig[i]);
-                    }
+                    _roots = ComplexArrays.zip(realEig, imagEig);
             }
         }
         // Defensive copy

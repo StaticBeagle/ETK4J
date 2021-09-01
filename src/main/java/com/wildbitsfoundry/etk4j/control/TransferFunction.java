@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
+import com.wildbitsfoundry.etk4j.math.linearalgebra.EigenvalueDecomposition;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrices;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
 import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
@@ -428,13 +429,79 @@ public class TransferFunction {
     }
 
     public double[] step(double... timePoints) {
-        TransferFunction step = new TransferFunction(new double[]{1.0}, new double[]{1.0, 0});
-        RationalFunction rf = this.multiply(step)._rf;
-        double[] result = new double[timePoints.length];
-        for (int i = 0; i < timePoints.length; ++i) {
-            result[i] = InverseTransformDeHoog(rf, timePoints[i], 1e-16);
+        StateSpace ss = this.toStateSpace();
+        if(timePoints == null || timePoints.length == 0) {
+            timePoints = defaultReponseTimes(ss.getA(), 100);
         }
-        return result;
+        double[][] U = new double[timePoints.length][1];
+        for(int i = 0; i < U.length; ++i) {
+            U[i][0] = 1.0;
+        }
+
+        // lsim
+        Matrix A = ss.getA();
+        Matrix B = ss.getB();
+        Matrix C = ss.getC();
+        Matrix D = ss.getD();
+
+        final int nStates = A.getRowCount();
+        final int nInputs = B.getColumnCount();
+        final int nSteps = timePoints.length;
+
+        // initial conditions
+        double[] x0 = new double[nStates];
+        double[][] xOut = new double[nSteps][nStates];
+
+        if(timePoints[0] == 0.0) {
+            xOut[0] = x0;
+        }
+
+        // TODO
+        // check if number of steps == 1
+
+        double dt = timePoints[1] - timePoints[0];
+        // TODO
+        // Check if the steps are not uniform. If not throw exception
+        A.multiplyEquals(dt);
+        B.multiplyEquals(dt);
+        double[][] M = new double[nStates + nInputs][];
+        for(int i = 0; i < M.length - 1; ++i) {
+            M[i] = NumArrays.concat(A.getRow(i), B.getRow(i));
+        }
+        M[M.length - 1] = new double[nStates + nInputs];
+
+        Matrix expMT = new Matrix(M).transpose().expm();
+        double[][] Ad = new double[nStates][nStates];
+        for(int i = 0; i < nStates; ++i) {
+            double[] row = expMT.getRow(i);
+            Ad[i] = Arrays.copyOf(row, row.length - 1);
+        }
+        double[][] Bd = new double[1][nStates];
+        Bd[0] = expMT.subMatrix(nStates, nStates, 0, nStates - 1).getArray();
+        for(int i = 1; i < nSteps; ++i) {
+            xOut[i] = NumArrays.add(NumArrays.dot(xOut[i - 1], Ad), NumArrays.multiply(Bd[0], U[i - 1][0]));
+        }
+        double[] yOut = new double[nSteps];
+        double[] c = C.transpose().getArray();
+        double[] d = D.transpose().getArray();
+        for(int i = 0; i < nSteps; ++i) {
+            yOut[i] = NumArrays.dot(xOut[i], c) + NumArrays.dot(U[i], d);
+        }
+        return yOut;
+    }
+
+    private double[] defaultReponseTimes(Matrix A, int numberOfPoints) {
+        EigenvalueDecomposition eig = A.eig();
+        double[] realEig = eig.getRealEigenvalues();
+        for(int i = 0; i < realEig.length; ++i) {
+            realEig[i] = Math.abs(realEig[i]);
+        }
+        double r = NumArrays.min(realEig);
+        if(r == 0.0) {
+            r = 1.0;
+        }
+        double tc = 1.0 / r;
+        return NumArrays.linspace(0.0, 7 * tc, numberOfPoints);
     }
 
     public boolean isProper() {
@@ -451,12 +518,14 @@ public class TransferFunction {
      */
     public StateSpace toStateSpace() {
 
-        normalize();
-        if (!isProper()) {
+        TransferFunction tf = new TransferFunction(this);
+
+        tf.normalize();
+        if (!tf.isProper()) {
             throw new ImproperTransferFunctionException();
         }
-        double[] num = _rf.getNumerator().getCoefficients();
-        double[] den = _rf.getDenominator().getCoefficients();
+        double[] num = tf._rf.getNumerator().getCoefficients();
+        double[] den = tf._rf.getDenominator().getCoefficients();
 
         if (num.length == 0.0 || den.length == 0.0) {
             // Null system
@@ -516,6 +585,8 @@ public class TransferFunction {
         TransferFunction tffff = new TransferFunction(new double[]{5}, new double[]{3});
         System.out.println(tffff.toStateSpace());
 
+        TransferFunction tfffff = new TransferFunction(new double[] {1.0, 3, 3}, new double[] {1.0, 2.0, 1});
+        tfffff.step();
 
 //		double[] phase = tf1.getPhaseAt(logspace);
 //		System.out.println(Arrays.toString(phase));

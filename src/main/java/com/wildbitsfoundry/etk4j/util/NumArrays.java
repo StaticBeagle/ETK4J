@@ -1,7 +1,6 @@
 package com.wildbitsfoundry.etk4j.util;
 
 import java.util.Arrays;
-import java.util.function.Predicate;
 
 import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.interpolation.CubicSpline;
@@ -561,6 +560,43 @@ public final class NumArrays {
         return result;
     }
 
+    public static double dot(double[] a, double[] b) {
+        if(a.length != b.length) {
+            throw new IllegalArgumentException("Both arrays must be of the same length");
+        }
+        double result = 0.0;
+        for(int i = 0; i < a.length; ++i) {
+            result += a[i] * b[i];
+        }
+        return result;
+    }
+
+    public static double[] dot(double[][] a, double[] b) {
+        double[] result = new double[a[0].length];
+        for(int i = 0; i < a.length; ++i) {
+            result[i] = dot(a[i], b);
+        }
+        return result;
+    }
+
+    // TODO check all b[0].length and a[0].length dimensions
+    public static double[] dot(double[] a, double[][] b) {
+        double[] result = new double[b[0].length];
+        for(int i = 0; i < b.length; ++i) {
+            if(a.length != b[i].length) {
+                throw new IllegalArgumentException("Both arrays must be of the same length");
+            }
+            for(int j = 0; j < b[0].length; ++ j) {
+                result[i] += a[j] * b[j][i];
+            }
+        }
+        return result;
+    }
+
+    public static double[] dot(double[] a, double b) {
+        return multiply(a, b);
+    }
+
     public static void main(String[] args) {
 
         System.out.println(min(2,9,1,5));
@@ -568,5 +604,11 @@ public final class NumArrays {
         double[] b = {4, 5, 6};
 
         System.out.println(Arrays.toString(kron(a, b)));
+
+        double[][] aa = {{1, 2}, {3, 4}};
+        double[] bb = {5, 6};
+        System.out.println(Arrays.toString(dot(bb, aa)));
+
+        System.out.println(Arrays.toString(dot(aa, bb)));
     }
 }
