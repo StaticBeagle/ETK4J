@@ -21,7 +21,7 @@ public final class NumArrays {
      *            number of samples
      * @return Array of n equally spaced samples between [x0, x1]
      */
-    public static double[] linspace(double x0, double x1, int n) {
+    public static double[] linSpace(double x0, double x1, int n) {
         double[] result = new double[n];
         int i = 0;
         double delta = (x1 - x0) / --n;
@@ -38,13 +38,13 @@ public final class NumArrays {
      *
      * @param x0
      *            starting point
-     * @param step
-     *            step size
      * @param x1
      *            end point
+     * @param step
+     *            step size
      * @return Array of n equally spaced samples between [x0, x1]
      */
-    public static double[] linsteps(double x0, double step, double x1) {
+    public static double[] linSteps(double x0, double x1, double step) {
         final int n = (int) Math.ceil((x1 - x0) / step);
         double[] result = new double[n + 1];
         int i = 0;
@@ -66,8 +66,8 @@ public final class NumArrays {
      * @return Array of n equally spaced samples between [x0, x1]. Step size is
      *         assumed to be 1
      */
-    public static double[] linsteps(double x0, double x1) {
-        return linsteps(x0, 1.0, x1);
+    public static double[] linSteps(double x0, double x1) {
+        return linSteps(x0, x1, 1.0);
     }
 
     /***
@@ -81,7 +81,7 @@ public final class NumArrays {
      *            number of samples
      * @return Array of n logarithmically spaced samples between [x0, x1]
      */
-    public static double[] logspace(int x0, int x1, int n) {
+    public static double[] logSpace(int x0, int x1, int n) {
         double[] result = new double[n];
         int i = 0;
         double delta = (double) (x1 - x0) / --n;
@@ -117,7 +117,7 @@ public final class NumArrays {
         return result;
     }
 
-    public static double[] conv(double[] a, double[] b) {
+    public static double[] convolution(double[] a, double[] b) {
         double[] result = new double[a.length + b.length - 1];
 
         for (int i = 0; i < result.length; ++i) {
@@ -194,14 +194,6 @@ public final class NumArrays {
         for (int i = 0; i < length; ++i) {
             a[i] /= b[i];
         }
-    }
-
-    public static double normFast(double[] a) {
-        double norm = 0.0;
-        for (int i = 0; i < a.length; ++i) {
-            norm += a[i] * a[i];
-        }
-        return Math.sqrt(norm);
     }
 
     public static double max(double... a) {
@@ -323,7 +315,7 @@ public final class NumArrays {
         return c;
     }
 
-    public static double[] concat(double[] a, double[] b) {
+    public static double[] concatenate(double[] a, double[] b) {
         int aLength = a.length;
         int bLength = b.length;
         double[] result = new double[aLength + bLength];
@@ -332,7 +324,7 @@ public final class NumArrays {
         return result;
     }
 
-    public static double[] concatAll(double[] a, double[]... rest) {
+    public static double[] concatenateAll(double[] a, double[]... rest) {
         int totalLength = a.length;
         for (double[] array : rest) {
             totalLength += array.length;
@@ -382,7 +374,7 @@ public final class NumArrays {
         return result;
     }
 
-    public static double[] cummulativeSum(double[] a) {
+    public static double[] cumulativeSum(double[] a) {
         final int length = a.length;
         double[] result = new double[length];
         result[0] = a[0];
@@ -406,6 +398,7 @@ public final class NumArrays {
         }
         return true;
     }
+
 
     /**
      * Converts (flattens) a 2d array into a 1d array by copying
@@ -439,24 +432,6 @@ public final class NumArrays {
             sum += y[i];
         }
         return sum / n;
-    }
-
-    public static Double[] box(double[] a) {
-        final int length = a.length;
-        Double[] boxed = new Double[length];
-        for (int i = 0; i < length; ++i) {
-            boxed[i] = a[i];
-        }
-        return boxed;
-    }
-
-    public static double[] unbox(Double[] a) {
-        final int length = a.length;
-        double[] unboxed = new double[length];
-        for (int i = 0; i < length; ++i) {
-            unboxed[i] = a[i].doubleValue();
-        }
-        return unboxed;
     }
 
     public static double[] scaleRange(double[] a, double curMin, double curMax, double newMin, double newMax) {
@@ -579,7 +554,6 @@ public final class NumArrays {
         return result;
     }
 
-    // TODO check all b[0].length and a[0].length dimensions
     public static double[] dot(double[] a, double[][] b) {
         double[] result = new double[b[0].length];
         for(int i = 0; i < b.length; ++i) {
@@ -597,6 +571,14 @@ public final class NumArrays {
         return multiply(a, b);
     }
 
+    public static double product(double[] a) {
+        double prod = 1.0;
+        for(int i = 0; i < a.length; ++i) {
+            prod *= a[i];
+        }
+        return prod;
+    }
+
     public static void main(String[] args) {
 
         System.out.println(min(2,9,1,5));
@@ -610,5 +592,7 @@ public final class NumArrays {
         System.out.println(Arrays.toString(dot(bb, aa)));
 
         System.out.println(Arrays.toString(dot(aa, bb)));
+
+        System.out.println(product(a));
     }
 }

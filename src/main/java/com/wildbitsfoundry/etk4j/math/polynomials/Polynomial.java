@@ -153,11 +153,11 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
      * @return Pnew(x) = P(x) * poly
      */
     public Polynomial multiply(final Polynomial p) {
-        return new Polynomial(NumArrays.conv(_coefs, p._coefs));
+        return new Polynomial(NumArrays.convolution(_coefs, p._coefs));
     }
 
     public Polynomial multiply(double... coefs) {
-        return new Polynomial(NumArrays.conv(_coefs, coefs));
+        return new Polynomial(NumArrays.convolution(_coefs, coefs));
     }
 
     /***
@@ -167,7 +167,7 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
      *            Another polynomial
      */
     public void multiplyEquals(final Polynomial p) {
-        _coefs = NumArrays.conv(_coefs, p._coefs);
+        _coefs = NumArrays.convolution(_coefs, p._coefs);
         _roots = null;
     }
 
@@ -178,7 +178,7 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
      *            Another polynomial
      */
     public void multiplyEquals(double... coefs) {
-        _coefs = NumArrays.conv(_coefs, coefs);
+        _coefs = NumArrays.convolution(_coefs, coefs);
         _roots = null;
     }
 
@@ -480,7 +480,7 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
         }
         double[] tmp = Arrays.copyOf(_coefs, _coefs.length);
         while (--n > 0) {
-            tmp = NumArrays.conv(tmp, _coefs);
+            tmp = NumArrays.convolution(tmp, _coefs);
         }
         return new Polynomial(tmp);
     }

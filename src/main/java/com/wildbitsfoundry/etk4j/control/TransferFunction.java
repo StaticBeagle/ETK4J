@@ -12,8 +12,6 @@ import com.wildbitsfoundry.etk4j.math.polynomials.RationalFunction;
 import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 import com.wildbitsfoundry.etk4j.util.NumArrays;
 
-import static com.wildbitsfoundry.etk4j.signals.laplace.Laplace.*;
-
 /***
  *
  * @author StaticBeagle
@@ -431,7 +429,7 @@ public class TransferFunction {
     public double[] step(double... timePoints) {
         StateSpace ss = this.toStateSpace();
         if(timePoints == null || timePoints.length == 0) {
-            timePoints = defaultReponseTimes(ss.getA(), 100);
+            timePoints = defaultResponseTimes(ss.getA(), 100);
         }
         double[][] U = new double[timePoints.length][1];
         for(int i = 0; i < U.length; ++i) {
@@ -466,7 +464,7 @@ public class TransferFunction {
         B.multiplyEquals(dt);
         double[][] M = new double[nStates + nInputs][];
         for(int i = 0; i < M.length - 1; ++i) {
-            M[i] = NumArrays.concat(A.getRow(i), B.getRow(i));
+            M[i] = NumArrays.concatenate(A.getRow(i), B.getRow(i));
         }
         M[M.length - 1] = new double[nStates + nInputs];
 
@@ -490,7 +488,7 @@ public class TransferFunction {
         return yOut;
     }
 
-    private double[] defaultReponseTimes(Matrix A, int numberOfPoints) {
+    private double[] defaultResponseTimes(Matrix A, int numberOfPoints) {
         EigenvalueDecomposition eig = A.eig();
         double[] realEig = eig.getRealEigenvalues();
         for(int i = 0; i < realEig.length; ++i) {
@@ -501,7 +499,7 @@ public class TransferFunction {
             r = 1.0;
         }
         double tc = 1.0 / r;
-        return NumArrays.linspace(0.0, 7 * tc, numberOfPoints);
+        return NumArrays.linSpace(0.0, 7 * tc, numberOfPoints);
     }
 
     public boolean isProper() {

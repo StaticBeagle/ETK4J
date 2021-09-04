@@ -8,8 +8,6 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.wildbitsfoundry.etk4j.util.NumArrays;
-
 public class NumArraysTest {
 	double[] a;
 	double[] b;
@@ -24,23 +22,23 @@ public class NumArraysTest {
 
 	@Test
 	public void testLinspace() {
-		assertArrayEquals(a, NumArrays.linspace(-1.0, 1.0, 5), 1e-12);
+		assertArrayEquals(a, NumArrays.linSpace(-1.0, 1.0, 5), 1e-12);
 	}
 
 	@Test
 	public void testLinspaceStep() {
-		assertArrayEquals(a, NumArrays.linsteps(-1.0, 0.5, 1.0), 1e-12);
+		assertArrayEquals(a, NumArrays.linSteps(-1.0, 1.0, 0.5), 1e-12);
 	}
 
 	@Test
 	public void testLogspace() {
-		assertArrayEquals(b, NumArrays.logspace(-1, 1, 5), 1e-12);
+		assertArrayEquals(b, NumArrays.logSpace(-1, 1, 5), 1e-12);
 	}
 
 	@Test
 	public void testConv() {
 		double[] conv = new double[] { 1.0000, 1.0000, 0.2500, -1.0000, -2.5000, -1.0000, 0.2500, 1.0000, 1.0000 };
-		assertArrayEquals(conv, NumArrays.conv(a, a), 1e-12);
+		assertArrayEquals(conv, NumArrays.convolution(a, a), 1e-12);
 	}
 
 	@Test
@@ -51,11 +49,6 @@ public class NumArraysTest {
 	@Test
 	public void testNorm1() {
 		assertEquals(5.0, NumArrays.norm1(c), 1e-12);
-	}
-
-	@Test
-	public void testNormFast() {
-		assertEquals(Math.sqrt(7.5), NumArrays.normFast(c), 1e-12);
 	}
 
 	@Test
@@ -71,7 +64,7 @@ public class NumArraysTest {
 	@Test
 	public void testConcat() {
 		double[] concat = new double[] { -1.0, -0.5, 0.0, 0.5, 1.0, -2.0, 1.0, -0.5, 0.0, 1.5 };
-		assertArrayEquals(concat, NumArrays.concat(a, c), 1e-12);
+		assertArrayEquals(concat, NumArrays.concatenate(a, c), 1e-12);
 	}
 
 	@Test
@@ -90,7 +83,7 @@ public class NumArraysTest {
 	@Test
 	public void testCummulativeSum() {
 		double[] a = {1, 2, 3, 4 ,5 ,6};
-		double[] sum = NumArrays.cummulativeSum(a);
+		double[] sum = NumArrays.cumulativeSum(a);
 		assertArrayEquals(new double[] {1.0, 3.0, 6.0, 10.0, 15.0, 21.0}, sum, 1e-12);
 	}
 	

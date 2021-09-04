@@ -295,11 +295,11 @@ public class CubicSpline extends Spline {
 		System.out.println(cs.integrate(1.0, 3.0));
 		System.out.println(cs.evaluateAt(7.5));
 
-		x = NumArrays.linsteps(0, 10);
+		x = NumArrays.linSteps(0, 10);
 		y = new double[] {10, 10, 10, 10, 10, 10, 10.5, 15, 50, 60, 85};
 
 		CubicSpline csa = CubicSpline.newAkimaSpline(x, y);
-		double[] xi = NumArrays.linspace(0, 10, 51);
+		double[] xi = NumArrays.linSpace(0, 10, 51);
 		double[] result = new double[xi.length];
 		for(int i = 0; i < xi.length; ++i) {
 			result[i] = csa.evaluateAt(xi[i]);

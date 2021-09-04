@@ -77,7 +77,7 @@ public class TransferFunctionTest {
 		double phase = tf.getPhaseAt(100.0);
 		assertEquals(-268.2811839069496, phase, 1e-12);
 
-		double[] frequencies = NumArrays.logspace(-3, 3, 10);
+		double[] frequencies = NumArrays.logSpace(-3, 3, 10);
 
 		double[] magnitudeResponse = { 9.999985000018752, 9.999676843499255, 9.993041654128266, 9.851853368415734,
 				7.462732134984385, 0.7462732134984399, 0.009851853368415734, 9.993041654128302E-5, 9.999676843499274E-7,

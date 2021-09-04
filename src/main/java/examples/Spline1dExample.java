@@ -19,7 +19,7 @@ public class Spline1dExample {
 		CubicSpline cs = newCubicSpline(x, y);
 
 		// Create an array from 1.0 to 4.0 using a step size of 0.2
-		double[] xi = NumArrays.linsteps(1.0, 0.2, 4.0);
+		double[] xi = NumArrays.linSteps(1.0, 4.0, 0.2);
 		System.out.println(cs);
 		for (double xii : xi) {
 			System.out.printf("y(%.4f) = %.4f%n", xii, cs.evaluateAt(xii));

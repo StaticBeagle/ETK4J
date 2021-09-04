@@ -219,7 +219,7 @@ public class Bessel extends AnalogFilter {
         double a1 = Polynomial.polyval(new double[]{-6, -6}, n) / r;
         double a2 = 6 / r;
 
-        double[] k = NumArrays.linsteps(1, n);
+        double[] k = NumArrays.linSteps(1, n);
         double[] x = Polynomial.polyval(new double[]{a2, a1, 0}, k);
         double[] y = Polynomial.polyval(new double[]{b3, b2, b1, b0}, k);
         return ComplexArrays.zip(x, y);
