@@ -31,7 +31,7 @@ public class Chebyshev1 extends AnalogFilter {
             }
         }
         Complex[] zeros = new Complex[0];
-        double k = RationalFunction.calculateGain(zeros, poles);
+        double k = RationalFunction.calculateZeroPoleGain(zeros, poles);
         if (n % 2 == 0) {
             k /= Math.sqrt(1.0 + eps * eps);
         }

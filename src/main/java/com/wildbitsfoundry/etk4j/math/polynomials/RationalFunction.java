@@ -9,7 +9,7 @@ public class RationalFunction implements UnivariateFunction, ComplexUnivariateFu
 	private Polynomial _denominator;
 
 	public RationalFunction(Complex[] zeros, Complex[] poles) {
-		this(zeros, poles, calculateGain(zeros, poles));
+		this(zeros, poles, calculateZeroPoleGain(zeros, poles));
 	}
 
 	public RationalFunction(Complex[] zeros, Complex[] poles, double gain) {
@@ -23,7 +23,7 @@ public class RationalFunction implements UnivariateFunction, ComplexUnivariateFu
 		_numerator = new Polynomial(num);
 		_denominator = new Polynomial(poles);
 
-		_numerator.multiplyEquals(calculateGain(new Complex[] { Complex.fromReal(-1.0) }, poles));
+		_numerator.multiplyEquals(calculateZeroPoleGain(new Complex[] { Complex.fromReal(-1.0) }, poles));
 	}
 
 	public RationalFunction(RationalFunction rf) {
@@ -177,18 +177,18 @@ public class RationalFunction implements UnivariateFunction, ComplexUnivariateFu
 		return resultNum;
 	}
 
-	public static double calculateGain(Complex[] zeros, Complex[] poles) {
+	public static double calculateZeroPoleGain(Complex[] zeros, Complex[] poles) {
 		// Compute gain k
-		Complex knum = Complex.fromReal(1.0);
+		Complex kNum = Complex.fromReal(1.0);
 		for (Complex zero : zeros) {
-			knum.multiplyEquals(zero.uminus());
+			kNum.multiplyEquals(zero.uminus());
 		}
-		Complex kden = Complex.fromReal(1.0);
+		Complex kDen = Complex.fromReal(1.0);
 		for (Complex pole : poles) {
-			kden.multiplyEquals(pole.uminus());
+			kDen.multiplyEquals(pole.uminus());
 		}
-		kden.divideEquals(knum);
-		return kden.real();
+		kDen.divideEquals(kNum);
+		return kDen.real();
 	}
 
 	public boolean isProper() {

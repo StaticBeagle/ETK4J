@@ -28,7 +28,7 @@ public final class ButterWorth extends AnalogFilter {
             }
         }
         Complex[] zeros = new Complex[0];
-        double k = RationalFunction.calculateGain(zeros, poles);
+        double k = RationalFunction.calculateZeroPoleGain(zeros, poles);
         return new ZeroPoleGain(zeros, poles, k);
     }
 

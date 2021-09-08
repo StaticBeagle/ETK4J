@@ -507,10 +507,11 @@ public class Matrix {
         }
     }
 
+    // TODO documents all this multiply methods. Change m for B
     /**
      * Element-by-element multiplication, C = A.*B
      *
-     * @param B another matrix
+     * @param m another matrix
      * @return A.*B
      */
 
@@ -522,7 +523,7 @@ public class Matrix {
     /**
      * Element-by-element multiplication in place, A = A.*B
      *
-     * @param B another matrix
+     * @param m another matrix
      * @return A.*B
      */
 
@@ -534,7 +535,7 @@ public class Matrix {
     /**
      * Element-by-element right division, C = A./B
      *
-     * @param B another matrix
+     * @param m another matrix
      * @return A./B
      */
 
@@ -546,7 +547,7 @@ public class Matrix {
     /**
      * Element-by-element right division in place, A = A./B
      *
-     * @param B another matrix
+     * @param m another matrix
      * @return A./B
      */
 
@@ -558,7 +559,7 @@ public class Matrix {
     /**
      * Element-by-element left division, C = A.\B
      *
-     * @param B another matrix
+     * @param m another matrix
      * @return A.\B
      */
 
@@ -579,7 +580,7 @@ public class Matrix {
     /**
      * Element-by-element left division in place, A = A.\B
      *
-     * @param B another matrix
+     * @param m another matrix
      * @return A.\B
      */
 
@@ -619,7 +620,7 @@ public class Matrix {
 
     public Matrix multiply(Matrix matrix) {
         double[] data = null;
-        Matrix c = new Matrix(data, 0, 0);
+        Matrix c = new Matrix(0, 0);
         multiplyOp(this, matrix, c);
         return c;
     }
@@ -629,18 +630,18 @@ public class Matrix {
             throw new IllegalArgumentException("Matrix inner dimensions must agree.");
         }
         double[] result = new double[a._rows * b._cols];
-        double[] Bcolj = new double[a._cols];
+        double[] bColJ = new double[a._cols];
         for (int j = 0; j < b._cols; j++) {
             for (int k = 0; k < a._cols; k++) {
-                Bcolj[k] = b.get(k, j);
+                bColJ[k] = b.get(k, j);
             }
             for (int i = 0; i < a._rows; i++) {
-                double[] Arowi = new double[a._cols];
-                System.arraycopy(a._data, i * a._cols, Arowi, 0, a._cols);
+                double[] aRowI = new double[a._cols];
+                System.arraycopy(a._data, i * a._cols, aRowI, 0, a._cols);
 
                 double s = 0;
                 for (int k = 0; k < a._cols; k++) {
-                    s += Arowi[k] * Bcolj[k];
+                    s += aRowI[k] * bColJ[k];
                 }
                 result[i * b._cols + j] = s;
             }
@@ -752,6 +753,7 @@ public class Matrix {
             }
             sb.append(String.format("%.4g", _data[i])).append(" ");
         }
+        sb.setLength(sb.length() - 1);
         return sb.toString();
     }
 

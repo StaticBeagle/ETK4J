@@ -98,7 +98,7 @@ public class Elliptic extends AnalogFilter {
             }
             poles[n - 1] = Complex.fromReal(-1.0 / a);
         }
-        double k = RationalFunction.calculateGain(zeros, poles);
+        double k = RationalFunction.calculateZeroPoleGain(zeros, poles);
         if (n % 2 == 0) {
             double eps0 = e.get(0);
             k /= Math.sqrt(1 + eps0 * eps0);

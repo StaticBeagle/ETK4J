@@ -77,7 +77,14 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
      *            Array of roots
      */
     public Polynomial(Complex... roots) {
-        final int size = roots.length;
+        List<Complex> finiteRoots = new ArrayList<>(roots.length);
+        for(int i = 0; i < roots.length; ++i) {
+            if(Math.abs(roots[i].real()) != Double.POSITIVE_INFINITY
+                    && Math.abs(roots[i].imag()) != Double.POSITIVE_INFINITY) {
+                finiteRoots.add(roots[i]);
+            }
+        }
+        final int size = finiteRoots.size();
 
         Complex[] tmp = new Complex[size];
         Complex[] result = new Complex[size + 1];
@@ -90,7 +97,7 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
         for (int i = 0; i < size; ++i) {
             // Fill up tmp
             for (int j = 0; j <= i; ++j) {
-                tmp[j] = roots[i].multiply(result[j]);
+                tmp[j] = finiteRoots.get(i).multiply(result[j]);
             }
             for (int j = 0; j <= i; ++j) {
                 result[j + 1].subtractEquals(tmp[j]);

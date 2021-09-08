@@ -38,7 +38,7 @@ public class Chebyshev2 extends AnalogFilter {
             zeros[k++] = zero;
             zeros[k++] = zero.conj();
         }
-        double k = RationalFunction.calculateGain(zeros, poles);
+        double k = RationalFunction.calculateZeroPoleGain(zeros, poles);
         return new ZeroPoleGain(zeros, poles, k);
     }
 

@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.interpolation.CubicSpline;
+import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
 
 public final class NumArrays {
 
@@ -555,16 +556,12 @@ public final class NumArrays {
     }
 
     public static double[] dot(double[] a, double[][] b) {
-        double[] result = new double[b[0].length];
-        for(int i = 0; i < b.length; ++i) {
-            if(a.length != b[i].length) {
-                throw new IllegalArgumentException("Both arrays must be of the same length");
-            }
-            for(int j = 0; j < b[0].length; ++ j) {
-                result[i] += a[j] * b[j][i];
-            }
+        if(a.length != b.length) {
+            throw new IllegalArgumentException("The number of elements in a must match the number of rows in b");
         }
-        return result;
+        Matrix A = new Matrix(a, 1);
+        Matrix B = new Matrix(b);
+        return A.multiply(B).getArray();
     }
 
     public static double[] dot(double[] a, double b) {
@@ -577,6 +574,39 @@ public final class NumArrays {
             prod *= a[i];
         }
         return prod;
+    }
+
+    public static boolean allClose(double[] a, double target) {
+        for(int i = 0; i < a.length; ++i) {
+            if(!MathETK.isClose(a[i], target)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static boolean allClose(double[] a, double target, double absTol, double relTol) {
+        for(int i = 0; i < a.length; ++i) {
+            if(!MathETK.isClose(a[i], target, absTol, relTol)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static boolean allClose(double[] a, double target, double absTol) {
+        for(int i = 0; i < a.length; ++i) {
+            if(!MathETK.isClose(a[i], target, absTol)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static double[] ones(int n) {
+        double[] result = new double[n];
+        Arrays.fill(result, 1.0);
+        return result;
     }
 
     public static void main(String[] args) {

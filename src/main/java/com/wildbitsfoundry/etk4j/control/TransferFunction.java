@@ -426,66 +426,117 @@ public class TransferFunction {
         return phase;
     }
 
-    public double[] step(double... timePoints) {
-        StateSpace ss = this.toStateSpace();
-        if(timePoints == null || timePoints.length == 0) {
-            timePoints = defaultResponseTimes(ss.getA(), 100);
-        }
-        double[][] U = new double[timePoints.length][1];
-        for(int i = 0; i < U.length; ++i) {
-            U[i][0] = 1.0;
+    private TimeResponseResults lSim(double[][] input, double[] time, double[] initialConditions,
+                                     StateSpace ss) {
+        if(input.length != time.length) {
+            throw new IllegalArgumentException("The input array and the time array must have the same length");
         }
 
-        // lsim
+        double[][] U = input;
+
         Matrix A = ss.getA();
         Matrix B = ss.getB();
         Matrix C = ss.getC();
         Matrix D = ss.getD();
 
-        final int nStates = A.getRowCount();
-        final int nInputs = B.getColumnCount();
-        final int nSteps = timePoints.length;
+        final int noStates = A.getRowCount();
+        final int noInputs = B.getColumnCount();
+        final int noSteps = time.length;
 
         // initial conditions
-        double[] x0 = new double[nStates];
-        double[][] xOut = new double[nSteps][nStates];
+        double[] x0 = initialConditions == null ? new double[noStates] : initialConditions;
+        double[][] xOut = new double[noSteps][noStates];
 
-        if(timePoints[0] == 0.0) {
+        if(time[0] == 0.0) {
             xOut[0] = x0;
+        } else if(time[0] > 0.0) {
+            xOut[0] = NumArrays.dot(x0, A.transpose().multiply(time[0]).expm().getAs2DArray());
+        } else {
+            throw new IllegalArgumentException("Initial time must be non negative");
         }
 
         // TODO
-        // check if number of steps == 1
+        if(noSteps == 1) {
 
-        double dt = timePoints[1] - timePoints[0];
-        // TODO
-        // Check if the steps are not uniform. If not throw exception
+        }
+
+        double dt = time[1] - time[0];
+        double[] delta = new double[time.length - 2];
+        for(int i = 1; i < time.length - 1; ++i) {
+            delta[i - 1] = (time[i + 1] - time[i]) / dt;
+        }
+        if(!NumArrays.allClose(delta, 1.0)) {
+            throw new NonUniformTimeStepsException();
+        }
+
         A.multiplyEquals(dt);
         B.multiplyEquals(dt);
-        double[][] M = new double[nStates + nInputs][];
+        double[][] M = new double[noStates + noInputs][];
         for(int i = 0; i < M.length - 1; ++i) {
             M[i] = NumArrays.concatenate(A.getRow(i), B.getRow(i));
         }
-        M[M.length - 1] = new double[nStates + nInputs];
+        M[M.length - 1] = new double[noStates + noInputs];
 
         Matrix expMT = new Matrix(M).transpose().expm();
-        double[][] Ad = new double[nStates][nStates];
-        for(int i = 0; i < nStates; ++i) {
+        double[][] Ad = new double[noStates][noStates];
+        for(int i = 0; i < noStates; ++i) {
             double[] row = expMT.getRow(i);
             Ad[i] = Arrays.copyOf(row, row.length - 1);
         }
-        double[][] Bd = new double[1][nStates];
-        Bd[0] = expMT.subMatrix(nStates, nStates, 0, nStates - 1).getArray();
-        for(int i = 1; i < nSteps; ++i) {
-            xOut[i] = NumArrays.add(NumArrays.dot(xOut[i - 1], Ad), NumArrays.multiply(Bd[0], U[i - 1][0]));
+        double[][] Bd = expMT.subMatrix(noStates, noStates, 0, noStates - 1).getAs2DArray();
+        for(int i = 1; i < noSteps; ++i) {
+            xOut[i] = NumArrays.add(NumArrays.dot(xOut[i - 1], Ad), NumArrays.dot(U[i - 1], Bd));
         }
-        double[] yOut = new double[nSteps];
+        double[] yOut = new double[noSteps];
         double[] c = C.transpose().getArray();
         double[] d = D.transpose().getArray();
-        for(int i = 0; i < nSteps; ++i) {
+        for(int i = 0; i < noSteps; ++i) {
             yOut[i] = NumArrays.dot(xOut[i], c) + NumArrays.dot(U[i], d);
         }
-        return yOut;
+        return new TimeResponseResults(time, yOut, xOut);
+    }
+
+//    public StepResponse simulateTimeResponse(double[] input, double[] time) {
+//        StateSpace ss = this.toStateSpace();
+//        return lSim(input, time, null, ss);
+//    }
+//
+//    public StepResponse simulateTimeResponse(double[] input, double[] time, double[] initialConditions) {
+//        StateSpace ss = this.toStateSpace();
+//        return lSim(input, time, initialConditions, ss);
+//    }
+
+    public StepResponse step() {
+        return step(100);
+    }
+
+    public StepResponse step(int numberOfPoints) {
+        return stepResponse(null, null, numberOfPoints);
+    }
+
+    public StepResponse step(double[] initialConditions, int numberOfPoints) {
+        return stepResponse(null, initialConditions, numberOfPoints);
+    }
+
+    public StepResponse step(double[] time) {
+        return stepResponse(time, null, time.length);
+    }
+
+    public StepResponse step(double[] time, double[] initialConditions) {
+        return stepResponse(time, initialConditions, time.length);
+    }
+
+    private StepResponse stepResponse(double[] time, double[] initialConditions, int numberOfPoints) {
+        StateSpace ss = this.toStateSpace();
+        numberOfPoints = numberOfPoints == -1 ? 100 : numberOfPoints;
+        time = time == null ? defaultResponseTimes(ss.getA(), numberOfPoints) : time;
+        double[] input = NumArrays.ones(time.length);
+        double[][] U = new double[time.length][1];
+        for(int i = 0; i < U.length; ++i) {
+            U[i][0] = input[i];
+        }
+        TimeResponseResults lSim = lSim(U, time, initialConditions, ss);
+        return new StepResponse(lSim.getTime(), lSim.getResponse());
     }
 
     private double[] defaultResponseTimes(Matrix A, int numberOfPoints) {
@@ -574,17 +625,45 @@ public class TransferFunction {
         double phase = tf1.getPhaseAt(70.4);
         System.out.println(phase);
 
-        TransferFunction tff = new TransferFunction(new double[]{1, 3, 3}, new double[]{1, 2, 1});
-        System.out.println(tff.toStateSpace());
+        TransferFunction tf2 = new TransferFunction(new double[]{1, 3, 3}, new double[]{1, 2, 1});
+        System.out.println(tf2.toStateSpace());
 
-        TransferFunction tfff = new TransferFunction(new double[]{5, 3, 4}, new double[]{8, 2, 9, 10});
-        System.out.println(tfff.toStateSpace());
+        TransferFunction tf3 = new TransferFunction(new double[]{5, 3, 4}, new double[]{8, 2, 9, 10});
+        System.out.println(tf3.toStateSpace());
 
-        TransferFunction tffff = new TransferFunction(new double[]{5}, new double[]{3});
-        System.out.println(tffff.toStateSpace());
+        TransferFunction tf4 = new TransferFunction(new double[]{5}, new double[]{3});
+        System.out.println(tf4.toStateSpace());
 
-        TransferFunction tfffff = new TransferFunction(new double[] {1.0, 3, 3}, new double[] {1.0, 2.0, 1});
-        tfffff.step();
+        TransferFunction tf5 = new TransferFunction(new double[] {1.0, 3, 3}, new double[] {1.0, 2.0, 1});
+        tf5.step();
+
+        double[] timePoints = {0.0, 0.0707070707070707, 0.1414141414141414, 0.2121212121212121, 0.2828282828282828,
+                0.35353535353535354, 0.4242424242424242, 0.4949494949494949, 0.5656565656565656, 0.6363636363636364,
+                0.7070707070707071, 0.7777777777777778, 0.8484848484848484, 0.9191919191919191, 0.9898989898989898,
+                1.0606060606060606, 1.1313131313131313, 1.202020202020202, 1.2727272727272727, 1.3434343434343434,
+                1.4141414141414141, 1.4848484848484849, 1.5555555555555556, 1.6262626262626263, 1.6969696969696968,
+                1.7676767676767675, 1.8383838383838382, 1.909090909090909, 1.9797979797979797, 2.0505050505050506,
+                2.121212121212121, 2.191919191919192, 2.2626262626262625, 2.333333333333333, 2.404040404040404,
+                2.4747474747474745, 2.5454545454545454, 2.616161616161616, 2.686868686868687, 2.7575757575757573,
+                2.8282828282828283, 2.898989898989899, 2.9696969696969697, 3.04040404040404, 3.111111111111111,
+                3.1818181818181817, 3.2525252525252526, 3.323232323232323, 3.3939393939393936, 3.4646464646464645,
+                3.535353535353535, 3.606060606060606, 3.6767676767676765, 3.7474747474747474, 3.818181818181818,
+                3.888888888888889, 3.9595959595959593, 4.03030303030303, 4.101010101010101, 4.171717171717171,
+                4.242424242424242, 4.313131313131313, 4.383838383838384, 4.454545454545454, 4.525252525252525,
+                4.595959595959596, 4.666666666666666, 4.737373737373737, 4.808080808080808, 4.878787878787879,
+                4.949494949494949, 5.02020202020202, 5.090909090909091, 5.161616161616162, 5.232323232323232,
+                5.303030303030303, 5.373737373737374, 5.444444444444445, 5.515151515151515, 5.585858585858586,
+                5.656565656565657, 5.727272727272727, 5.797979797979798, 5.8686868686868685, 5.9393939393939394,
+                6.0101010101010095, 6.08080808080808, 6.151515151515151, 6.222222222222222, 6.292929292929292,
+                6.363636363636363, 6.434343434343434, 6.505050505050505, 6.575757575757575, 6.646464646464646,
+                6.717171717171717, 6.787878787878787, 6.858585858585858, 6.929292929292929, 7.0};
+
+        TransferFunction tf6 = new TransferFunction(new double[] {1.0, 3.0, 3.0}, new double[] {1.0, 2.0, 1.0});
+        double[] yOut = tf6.step(timePoints, new double[] {1.0, 0.0}).getResponse();
+
+        System.out.println(Arrays.toString(yOut));
+
+
 
 //		double[] phase = tf1.getPhaseAt(logspace);
 //		System.out.println(Arrays.toString(phase));
