@@ -65,11 +65,7 @@ public abstract class LinearTimeInvariantSystem {
             }
 
             Matrix expMT = new Matrix(M).transpose().expm();
-            double[][] Ad = new double[noStates][noStates];
-            for (int i = 0; i < noStates; ++i) {
-                double[] row = expMT.getRow(i);
-                Ad[i] = Arrays.copyOf(row, noStates);
-            }
+            double[][] Ad = expMT.subMatrix(0, noStates - 1, 0, noStates - 1).getAs2DArray();
             double[][] Bd = expMT.subMatrix(noStates, expMT.getRowCount() - 1, 0, noStates - 1).getAs2DArray();
             for (int i = 1; i < noSteps; ++i) {
                 xOut[i] = NumArrays.add(NumArrays.dot(xOut[i - 1], Ad), NumArrays.dot(U[i - 1], Bd));

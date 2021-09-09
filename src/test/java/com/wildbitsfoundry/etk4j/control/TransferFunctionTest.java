@@ -182,6 +182,12 @@ public class TransferFunctionTest {
 		assertArrayEquals(timePoints, sr.getTime(), 1e-12);
 		assertArrayEquals(yOut, sr.getResponse(), 1e-12);
 
+		// Test single point
+		sr = tf.step(1);
+
+		assertArrayEquals(new double[] {7.0}, sr.getTime(), 1e-12);
+		assertArrayEquals(new double[] {1.0}, sr.getResponse(), 1e-12);
+
 		// Test with initial conditions
 		yOut = new double[] {6.0, 5.926964828289961, 5.849920761127837, 5.769755488835639, 5.687254187005841,
 				5.6031093761207185, 5.517929912766562, 5.432249185059296, 5.346532579030544, 5.261184277318395,
