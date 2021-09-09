@@ -40,17 +40,16 @@ public class Matrix {
         }
     }
 
-    // row packed
-    // _rows = rows
-    // _cols = cols
-    // _data = data;
-
     public Matrix(double[][] data) {
         _rows = data.length;
         _cols = data[0].length;
         _data = NumArrays.flatten(data);
     }
 
+    // row packed
+    // _rows = rows
+    // _cols = cols
+    // _data = data;
     public Matrix(double[] data, int rows, int cols) {
         _rows = rows;
         _cols = cols;
@@ -385,7 +384,17 @@ public class Matrix {
         return this.solve(Matrices.Identity(_rows));
     }
 
+    public boolean isEmpty() {
+        if((_rows == 0 && _cols == 0) || _data == null || _data.length == 0) {
+            return true;
+        }
+        return false;
+    }
+
     public Matrix transpose() {
+        if(this.isEmpty()) {
+            return Matrices.empty();
+        }
         double[] result = new double[_rows * _cols];
         final int trows = _cols;
         final int tcols = _rows;
@@ -619,7 +628,6 @@ public class Matrix {
     }
 
     public Matrix multiply(Matrix matrix) {
-        double[] data = null;
         Matrix c = new Matrix(0, 0);
         multiplyOp(this, matrix, c);
         return c;
@@ -627,7 +635,8 @@ public class Matrix {
 
     private static void multiplyOp(Matrix a, Matrix b, Matrix c) {
         if (b._rows != a._cols) {
-            throw new IllegalArgumentException("Matrix inner dimensions must agree.");
+            throw new IllegalArgumentException("Matrix inner dimensions must agree. Check that the number of" +
+                    "columns of the first matrix equal the number of rows of the second matrix.");
         }
         double[] result = new double[a._rows * b._cols];
         double[] bColJ = new double[a._cols];
@@ -661,7 +670,7 @@ public class Matrix {
             return new LUDecomposition(this).solve(B);
         } else if (_rows > _cols) { // Matrix is thin (Overdetermined system)
             return new QRDecomposition(this).solve(B);
-        } else { // Matrix is fat (Underdetermined system)
+        } else { // Matrix is fat (Under-determined system)
             QRDecomposition qr = this.transpose().QR();
             Matrix R1 = fwdSubsSolve(qr.getRT(), B);
             R1.appendRows(_cols - R1._rows);

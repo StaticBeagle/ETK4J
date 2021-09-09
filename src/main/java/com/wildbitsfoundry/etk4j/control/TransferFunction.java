@@ -1,23 +1,21 @@
 package com.wildbitsfoundry.etk4j.control;
 
-import java.util.Arrays;
-
 import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
-import com.wildbitsfoundry.etk4j.math.linearalgebra.EigenvalueDecomposition;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrices;
-import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
 import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
 import com.wildbitsfoundry.etk4j.math.polynomials.RationalFunction;
 import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 import com.wildbitsfoundry.etk4j.util.NumArrays;
+
+import java.util.Arrays;
 
 /***
  *
  * @author StaticBeagle
  *
  */
-public class TransferFunction {
+public class TransferFunction extends LinearTimeInvariantSystem {
     private RationalFunction _rf;
 
     /***
@@ -426,133 +424,6 @@ public class TransferFunction {
         return phase;
     }
 
-    private TimeResponseResults lSim(double[][] input, double[] time, double[] initialConditions,
-                                     StateSpace ss) {
-        if(input.length != time.length) {
-            throw new IllegalArgumentException("The input array and the time array must have the same length");
-        }
-
-        double[][] U = input;
-
-        Matrix A = ss.getA();
-        Matrix B = ss.getB();
-        Matrix C = ss.getC();
-        Matrix D = ss.getD();
-
-        final int noStates = A.getRowCount();
-        final int noInputs = B.getColumnCount();
-        final int noSteps = time.length;
-
-        // initial conditions
-        double[] x0 = initialConditions == null ? new double[noStates] : initialConditions;
-        double[][] xOut = new double[noSteps][noStates];
-
-        if(time[0] == 0.0) {
-            xOut[0] = x0;
-        } else if(time[0] > 0.0) {
-            xOut[0] = NumArrays.dot(x0, A.transpose().multiply(time[0]).expm().getAs2DArray());
-        } else {
-            throw new IllegalArgumentException("Initial time must be non negative");
-        }
-
-        // TODO
-        if(noSteps == 1) {
-
-        }
-
-        double dt = time[1] - time[0];
-        double[] delta = new double[time.length - 2];
-        for(int i = 1; i < time.length - 1; ++i) {
-            delta[i - 1] = (time[i + 1] - time[i]) / dt;
-        }
-        if(!NumArrays.allClose(delta, 1.0)) {
-            throw new NonUniformTimeStepsException();
-        }
-
-        A.multiplyEquals(dt);
-        B.multiplyEquals(dt);
-        double[][] M = new double[noStates + noInputs][];
-        for(int i = 0; i < M.length - 1; ++i) {
-            M[i] = NumArrays.concatenate(A.getRow(i), B.getRow(i));
-        }
-        M[M.length - 1] = new double[noStates + noInputs];
-
-        Matrix expMT = new Matrix(M).transpose().expm();
-        double[][] Ad = new double[noStates][noStates];
-        for(int i = 0; i < noStates; ++i) {
-            double[] row = expMT.getRow(i);
-            Ad[i] = Arrays.copyOf(row, row.length - 1);
-        }
-        double[][] Bd = expMT.subMatrix(noStates, noStates, 0, noStates - 1).getAs2DArray();
-        for(int i = 1; i < noSteps; ++i) {
-            xOut[i] = NumArrays.add(NumArrays.dot(xOut[i - 1], Ad), NumArrays.dot(U[i - 1], Bd));
-        }
-        double[] yOut = new double[noSteps];
-        double[] c = C.transpose().getArray();
-        double[] d = D.transpose().getArray();
-        for(int i = 0; i < noSteps; ++i) {
-            yOut[i] = NumArrays.dot(xOut[i], c) + NumArrays.dot(U[i], d);
-        }
-        return new TimeResponseResults(time, yOut, xOut);
-    }
-
-//    public StepResponse simulateTimeResponse(double[] input, double[] time) {
-//        StateSpace ss = this.toStateSpace();
-//        return lSim(input, time, null, ss);
-//    }
-//
-//    public StepResponse simulateTimeResponse(double[] input, double[] time, double[] initialConditions) {
-//        StateSpace ss = this.toStateSpace();
-//        return lSim(input, time, initialConditions, ss);
-//    }
-
-    public StepResponse step() {
-        return step(100);
-    }
-
-    public StepResponse step(int numberOfPoints) {
-        return stepResponse(null, null, numberOfPoints);
-    }
-
-    public StepResponse step(double[] initialConditions, int numberOfPoints) {
-        return stepResponse(null, initialConditions, numberOfPoints);
-    }
-
-    public StepResponse step(double[] time) {
-        return stepResponse(time, null, time.length);
-    }
-
-    public StepResponse step(double[] time, double[] initialConditions) {
-        return stepResponse(time, initialConditions, time.length);
-    }
-
-    private StepResponse stepResponse(double[] time, double[] initialConditions, int numberOfPoints) {
-        StateSpace ss = this.toStateSpace();
-        numberOfPoints = numberOfPoints == -1 ? 100 : numberOfPoints;
-        time = time == null ? defaultResponseTimes(ss.getA(), numberOfPoints) : time;
-        double[] input = NumArrays.ones(time.length);
-        double[][] U = new double[time.length][1];
-        for(int i = 0; i < U.length; ++i) {
-            U[i][0] = input[i];
-        }
-        TimeResponseResults lSim = lSim(U, time, initialConditions, ss);
-        return new StepResponse(lSim.getTime(), lSim.getResponse());
-    }
-
-    private double[] defaultResponseTimes(Matrix A, int numberOfPoints) {
-        EigenvalueDecomposition eig = A.eig();
-        double[] realEig = eig.getRealEigenvalues();
-        for(int i = 0; i < realEig.length; ++i) {
-            realEig[i] = Math.abs(realEig[i]);
-        }
-        double r = NumArrays.min(realEig);
-        if(r == 0.0) {
-            r = 1.0;
-        }
-        double tc = 1.0 / r;
-        return NumArrays.linSpace(0.0, 7 * tc, numberOfPoints);
-    }
-
     public boolean isProper() {
         return _rf.isProper();
     }
@@ -565,6 +436,7 @@ public class TransferFunction {
      * Transform SISO only single input single output TFs
      * @return
      */
+    @Override
     public StateSpace toStateSpace() {
 
         TransferFunction tf = new TransferFunction(this);
@@ -617,6 +489,22 @@ public class TransferFunction {
         return new StateSpace(A, B, C, D);
     }
 
+    @Override
+    protected TransferFunction toTransferFunction() {
+        return this;
+    }
+
+    public SingleInputSingleOutputTimeResponse simulateTimeResponse(double[] input, double[] time) {
+        return simulateTimeResponse(input, time, null);
+    }
+
+    public SingleInputSingleOutputTimeResponse simulateTimeResponse(double[] input, double[] time, double[] initialConditions) {
+        double[][] U = new double[1][time.length];
+        U[0] = NumArrays.ones(time.length);
+        TimeResponse tr = lsim(U, time, initialConditions, this.toStateSpace());
+        return new SingleInputSingleOutputTimeResponse(tr.getTime(), tr.getResponse()[0], tr.getEvolutionOfStateVector());
+    }
+
     public static void main(String[] args) {
         TransferFunction tf1 = new TransferFunction(new double[]{1000, 0}, new double[]{1, 25, 100, 9, 4});
         System.out.println(tf1);
@@ -662,6 +550,11 @@ public class TransferFunction {
         double[] yOut = tf6.step(timePoints, new double[] {1.0, 0.0}).getResponse();
 
         System.out.println(Arrays.toString(yOut));
+
+        TransferFunction tf7 = new TransferFunction(new double[] {1.0, 3.0, 3.0}, new double[] {1.0, 2.0, 1.0});
+        double[] yOut2 = tf7.step(new double[] {0.0}).getResponse();
+
+        System.out.println(Arrays.toString(yOut2));
 
 
 

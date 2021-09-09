@@ -1,5 +1,6 @@
 package com.wildbitsfoundry.etk4j.util;
 
+import java.lang.reflect.Array;
 import java.util.Arrays;
 
 import com.wildbitsfoundry.etk4j.math.MathETK;
@@ -149,9 +150,24 @@ public final class NumArrays {
         return result;
     }
 
+    public static double[] addElementWise(double[] a, double[] b) {
+        double[] result = Arrays.copyOf(a, a.length);
+        addElementWiseInPlace(result, b);
+        return result;
+    }
+
     public static void addElementWiseInPlace(double[] a, double b) {
         for (int i = 0; i < a.length; ++i) {
             a[i] += b;
+        }
+    }
+
+    public static void addElementWiseInPlace(double[] a, double[] b) {
+        if (a.length != b.length) {
+            throw new IllegalArgumentException("a and b dimensions must match");
+        }
+        for (int i = 0; i < a.length; ++i) {
+            a[i] += b[i];
         }
     }
 
@@ -335,6 +351,31 @@ public final class NumArrays {
         for (double[] array : rest) {
             System.arraycopy(array, 0, result, offset, array.length);
             offset += array.length;
+        }
+        return result;
+    }
+
+    public static double[][] stack(double[] a, double[] b) {
+        double[][] result = new double[2][];
+        result[0] = Arrays.copyOf(a, a.length);
+        result[1] = Arrays.copyOf(b, b.length);
+        return result;
+    }
+
+    public static double[][] stack(double[][] a, double[] b) {
+        double[][] result = new double[a.length + 1][];
+        for(int i = 0; i < a.length - 1; ++i) {
+            result[i] = Arrays.copyOf(a[i], a[i].length);
+        }
+        result[result.length - 1] = Arrays.copyOf(b, b.length);
+        return result;
+    }
+
+    public static double[][] stack(double[] a, double[][] b) {
+        double[][] result = new double[b.length + 1][];
+        result[0] = Arrays.copyOf(a, a.length);
+        for(int i = 1; i < a.length; ++i) {
+            result[i] = Arrays.copyOf(b[i], b[i].length);
         }
         return result;
     }
@@ -560,8 +601,8 @@ public final class NumArrays {
             throw new IllegalArgumentException("The number of elements in a must match the number of rows in b");
         }
         Matrix A = new Matrix(a, 1);
-        Matrix B = new Matrix(b);
-        return A.multiply(B).getArray();
+        A.multiplyEquals(new Matrix(b));
+        return A.getArray();
     }
 
     public static double[] dot(double[] a, double b) {
@@ -606,6 +647,27 @@ public final class NumArrays {
     public static double[] ones(int n) {
         double[] result = new double[n];
         Arrays.fill(result, 1.0);
+        return result;
+    }
+
+    // TODO concat and stack operations in place?
+
+    // https://stackoverflow.com/a/17634025/6383857
+    public static double[][] transpose(double[][] a) {
+        // empty or unset array, nothing do to here
+        if (a == null || a.length == 0)
+            return a;
+
+        int width = a.length;
+        int height = a[0].length;
+
+        double[][] result = new double[height][width];
+
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                result[y][x] = a[x][y];
+            }
+        }
         return result;
     }
 

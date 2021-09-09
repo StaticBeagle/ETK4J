@@ -3,7 +3,7 @@ package com.wildbitsfoundry.etk4j.control;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrices;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
 
-public class StateSpace {
+public class StateSpace extends LinearTimeInvariantSystem {
 
     private Matrix A;
     private Matrix B;
@@ -50,5 +50,29 @@ public class StateSpace {
     @Override
     public String toString() {
         return String.format("A:%n%s%nB:%n%s%nC:%n%s%nD%n%s%n", A, B, C, D);
+    }
+
+    @Override
+    protected StateSpace toStateSpace() {
+        return this;
+    }
+
+    // TODO implement this and make them public
+    @Override
+    protected TransferFunction toTransferFunction() {
+        throw null;
+    }
+
+    @Override
+    protected ZeroPoleGain toZeroPoleGain() {
+        throw null;
+    }
+
+    public TimeResponse simulateTimeResponse(double[][] input, double[] time) {
+        return simulateTimeResponse(input, time, null);
+    }
+
+    public TimeResponse simulateTimeResponse(double[][] input, double[] time, double[] initialConditions) {
+        return lsim(input, time, initialConditions, this);
     }
 }
