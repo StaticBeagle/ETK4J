@@ -4,7 +4,7 @@ import com.wildbitsfoundry.etk4j.math.complex.Complex;
 
 import static com.wildbitsfoundry.etk4j.util.ComplexArrays.deepCopy;
 
-public class ZeroPoleGain {
+public class ZeroPoleGain extends LinearTimeInvariantSystem {
 	private final Complex[] zeros;
 	private final Complex[] poles;
 	private final double gain;
@@ -25,5 +25,20 @@ public class ZeroPoleGain {
 
 	public double getGain() {
 		return gain;
+	}
+
+	@Override
+	public StateSpace toStateSpace() {
+		return new TransferFunction(this).toStateSpace();
+	}
+
+	@Override
+	public TransferFunction toTransferFunction() {
+		return new TransferFunction(this);
+	}
+
+	@Override
+	protected ZeroPoleGain toZeroPoleGain() {
+		return null;
 	}
 }

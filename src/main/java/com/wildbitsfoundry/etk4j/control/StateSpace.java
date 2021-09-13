@@ -69,10 +69,19 @@ public class StateSpace extends LinearTimeInvariantSystem {
     }
 
     public TimeResponse simulateTimeResponse(double[][] input, double[] time) {
-        return simulateTimeResponse(input, time, null);
+        return simulateTimeResponse(input, time, IntegrationMethod.INTERPOLATION);
     }
 
     public TimeResponse simulateTimeResponse(double[][] input, double[] time, double[] initialConditions) {
-        return lsim(input, time, initialConditions, this);
+        return simulateTimeResponse(input, time, initialConditions, IntegrationMethod.INTERPOLATION);
+    }
+
+    public TimeResponse simulateTimeResponse(double[][] input, double[] time, IntegrationMethod integrationMethod) {
+        return simulateTimeResponse(input, time, null, IntegrationMethod.INTERPOLATION);
+    }
+
+    public TimeResponse simulateTimeResponse(double[][] input, double[] time, double[] initialConditions,
+                                             IntegrationMethod integrationMethod) {
+        return lsim(input, time, initialConditions, this, integrationMethod);
     }
 }

@@ -16,6 +16,27 @@ import java.util.Arrays;
  *
  */
 public class TransferFunction extends LinearTimeInvariantSystem {
+    public static class FrequencyResponse {
+        private double[] magnitude;
+        private double[] phase;
+
+        FrequencyResponse(double[] magnitude, double[] phase) {
+            this.magnitude = magnitude;
+            this.phase = phase;
+        }
+
+        public double[] getMagnitude() {
+            return magnitude;
+        }
+
+        public double[] getPhase() {
+            return phase;
+        }
+
+        public void unwrapPhase() {
+            TransferFunction.unwrapPhase(phase);
+        }
+    }
     private RationalFunction _rf;
 
     /***
@@ -58,6 +79,7 @@ public class TransferFunction extends LinearTimeInvariantSystem {
         _rf = new RationalFunction(zeros, poles, gain);
     }
 
+    @Override
     public ZeroPoleGain toZeroPoleGain() {
         Complex[] zeros = _rf.getZeros();
         Complex[] poles = _rf.getPoles();
@@ -94,13 +116,31 @@ public class TransferFunction extends LinearTimeInvariantSystem {
     }
 
     public double[] getPhaseAt(double[] frequencies) {
+        return getPhaseAt(frequencies, true);
+    }
+
+    public double[] getPhaseAt(double[] frequencies, boolean unwrapPhase) {
         double[] phase = new double[frequencies.length];
         for (int i = 0; i < frequencies.length; ++i) {
             phase[i] = this.evaluateAt(frequencies[i]).arg() * (180 / Math.PI);
         }
-        unwrapPhase(phase);
+        if(unwrapPhase) {
+            unwrapPhase(phase);
+        }
         return phase;
     }
+
+    public FrequencyResponse getFrequencyResponse(double[] frequencies) {
+        double[] magnitude = new double[frequencies.length];
+        double[] phase = new double[frequencies.length];
+        for (int i = 0; i < frequencies.length; ++i) {
+            magnitude[i] = this.evaluateAt(frequencies[i]).abs();
+            phase[i] = this.evaluateAt(frequencies[i]).arg() * (180 / Math.PI);
+        }
+        return new FrequencyResponse(magnitude, phase);
+    }
+
+    // TODO implement getFrequencyResponse(void)
 
     public static void unwrapPhase(double[] phase) {
         int length = phase.length;
@@ -494,14 +534,27 @@ public class TransferFunction extends LinearTimeInvariantSystem {
         return this;
     }
 
+
     public SingleInputSingleOutputTimeResponse simulateTimeResponse(double[] input, double[] time) {
-        return simulateTimeResponse(input, time, null);
+        return simulateTimeResponse(input, time, IntegrationMethod.INTERPOLATION);
     }
 
-    public SingleInputSingleOutputTimeResponse simulateTimeResponse(double[] input, double[] time, double[] initialConditions) {
+    public SingleInputSingleOutputTimeResponse simulateTimeResponse(double[] input, double[] time,
+                                                                    double[] initialConditions) {
+        return simulateTimeResponse(input, time, initialConditions, IntegrationMethod.INTERPOLATION);
+    }
+
+    public SingleInputSingleOutputTimeResponse simulateTimeResponse(double[] input, double[] time,
+                                                                    IntegrationMethod integrationMethod) {
+        return simulateTimeResponse(input, time, null, integrationMethod);
+    }
+
+    public SingleInputSingleOutputTimeResponse simulateTimeResponse(double[] input, double[] time,
+                                                                    double[] initialConditions,
+                                                                    IntegrationMethod integrationMethod) {
         double[][] U = new double[1][time.length];
-        U[0] = NumArrays.ones(time.length);
-        TimeResponse tr = lsim(U, time, initialConditions, this.toStateSpace());
+        U[0] = input;
+        TimeResponse tr = lsim(U, time, initialConditions, this.toStateSpace(), integrationMethod);
         return new SingleInputSingleOutputTimeResponse(tr.getTime(), tr.getResponse()[0], tr.getEvolutionOfStateVector());
     }
 

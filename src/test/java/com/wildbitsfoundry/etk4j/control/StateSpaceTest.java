@@ -74,6 +74,7 @@ public class StateSpaceTest {
         assertArrayEquals(timePoints, sr.getTime(), 1e-12);
         assertArrayEquals(yOut, sr.getResponse(), 1e-12);
 
+        // TODO test with initial conditions
     }
 
     @Test
@@ -210,5 +211,6 @@ public class StateSpaceTest {
         assertArrayEquals(xOut[1], transposedStateVector[1], 1e-12);
         assertArrayEquals(xOut[2], transposedStateVector[2], 1e-12);
 
+        // TODO test with initial conditions
     }
 }

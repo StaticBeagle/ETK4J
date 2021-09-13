@@ -1,19 +1,28 @@
 package com.wildbitsfoundry.etk4j.control;
 
 import com.wildbitsfoundry.etk4j.math.linearalgebra.EigenvalueDecomposition;
+import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrices;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
 import com.wildbitsfoundry.etk4j.util.NumArrays;
 
-import java.util.Arrays;
-
 public abstract class LinearTimeInvariantSystem {
+
+    public enum IntegrationMethod {
+        ZERO_ORDER_HOLD,
+        INTERPOLATION
+    }
 
     protected abstract StateSpace toStateSpace();
     protected abstract TransferFunction toTransferFunction();
     protected abstract ZeroPoleGain toZeroPoleGain();
 
     protected TimeResponse lsim(double[][] input, double[] time, double[] initialConditions,
-                              StateSpace ss) {
+                                StateSpace ss) {
+        return lsim(input, time, initialConditions, ss, IntegrationMethod.INTERPOLATION);
+    }
+
+    protected TimeResponse lsim(double[][] input, double[] time, double[] initialConditions,
+                              StateSpace ss, IntegrationMethod integrationMethod) {
         double[][] U = NumArrays.transpose(input);
 
         if(U.length != time.length) {
@@ -54,21 +63,57 @@ public abstract class LinearTimeInvariantSystem {
                 throw new NonUniformTimeStepsException();
             }
 
-            A.multiplyEquals(dt);
-            B.multiplyEquals(dt);
-            double[][] M = new double[noStates + noInputs][];
-            for (int i = 0; i < noStates; ++i) {
-                M[i] = NumArrays.concatenate(A.getRow(i), B.getRow(i));
-            }
-            for(int i = noStates; i < noStates + noInputs; ++i) {
-                M[i] = new double[noStates + noInputs];
-            }
+            switch (integrationMethod) {
+                case ZERO_ORDER_HOLD: {
+                    A.multiplyEquals(dt);
+                    B.multiplyEquals(dt);
+                    double[][] M = new double[noStates + noInputs][];
+                    for (int i = 0; i < noStates; ++i) {
+                        M[i] = NumArrays.concatenate(A.getRow(i), B.getRow(i));
+                    }
+                    for (int i = noStates; i < noStates + noInputs; ++i) {
+                        M[i] = new double[noStates + noInputs];
+                    }
 
-            Matrix expMT = new Matrix(M).transpose().expm();
-            double[][] Ad = expMT.subMatrix(0, noStates - 1, 0, noStates - 1).getAs2DArray();
-            double[][] Bd = expMT.subMatrix(noStates, expMT.getRowCount() - 1, 0, noStates - 1).getAs2DArray();
-            for (int i = 1; i < noSteps; ++i) {
-                xOut[i] = NumArrays.add(NumArrays.dot(xOut[i - 1], Ad), NumArrays.dot(U[i - 1], Bd));
+                    Matrix expMT = new Matrix(M).transpose().expm();
+                    double[][] Ad = expMT.subMatrix(0, noStates - 1, 0, noStates - 1).getAs2DArray();
+                    double[][] Bd = expMT.subMatrix(noStates, expMT.getRowCount() - 1, 0, noStates - 1).getAs2DArray();
+                    for (int i = 1; i < noSteps; ++i) {
+                        xOut[i] = NumArrays.add(NumArrays.dot(xOut[i - 1], Ad), NumArrays.dot(U[i - 1], Bd));
+                    }
+                    break;
+                }
+                case INTERPOLATION: {
+                    A.multiplyEquals(dt);
+                    B.multiplyEquals(dt);
+                    double[][] M = new double[noStates + 2 * noInputs][];
+                    for (int i = 0; i < noStates; ++i) {
+                        M[i] = NumArrays.concatenateAll(A.getRow(i), B.getRow(i), new double[noInputs]);
+                    }
+                    double[][] identity = Matrices.Identity(noInputs).getAs2DArray();
+                    for (int i = noStates, j = 0; i < noStates + noInputs; ++i, ++j) {
+                        M[i] = NumArrays.concatenate(new double[noStates + noInputs], identity[j]);
+                    }
+                    for (int i = noStates + noInputs; i < noStates + 2 * noInputs; ++i) {
+                        M[i] = new double[noStates + 2 * noInputs];
+                    }
+
+                    Matrix expMT = new Matrix(M).transpose().expm();
+                    double[][] Ad = expMT.subMatrix(0, noStates - 1, 0, noStates - 1).getAs2DArray();
+                    double[][] Bd1 = expMT.subMatrix(noStates + noInputs, expMT.getRowCount() - 1, 0, noStates - 1).getAs2DArray();
+                    double[][] Bd0 = expMT.subMatrix(noStates, noStates + noInputs - 1, 0, noStates - 1).getAs2DArray();
+                    for (int i = 0; i < Bd0.length; ++i) {
+                        // TODO make an in place for this
+                        Bd0[i] = NumArrays.subtract(Bd0[i], Bd1[i]);
+                    }
+                    for (int i = 1; i < noSteps; ++i) {
+                        xOut[i] = NumArrays.add(NumArrays.dot(xOut[i - 1], Ad), NumArrays.dot(U[i - 1], Bd0));
+                        NumArrays.addElementWiseInPlace(xOut[i], NumArrays.dot(U[i], Bd1));
+                    }
+                    break;
+                }
+                default:
+                    throw new IllegalArgumentException("Unknown integration method.");
             }
         }
         double[][] yOut = new double[noSteps][noStates];
@@ -106,7 +151,7 @@ public abstract class LinearTimeInvariantSystem {
         time = time == null ? defaultResponseTimes(ss.getA(), numberOfPoints) : time;
         double[][] U = new double[1][];
         U[0] = NumArrays.ones(time.length);
-        TimeResponse lSim = lsim(U, time, initialConditions, ss);
+        TimeResponse lSim = lsim(U, time, initialConditions, ss, IntegrationMethod.ZERO_ORDER_HOLD);
         return new StepResponse(lSim.getTime(), lSim.getResponse()[0]);
     }
 

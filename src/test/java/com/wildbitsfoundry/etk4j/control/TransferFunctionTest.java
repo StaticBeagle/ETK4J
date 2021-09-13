@@ -318,7 +318,8 @@ public class TransferFunctionTest {
 		};
 
 		TransferFunction tf = new TransferFunction(new double[] {1.0, 3.0, 3.0}, new double[] {1.0, 2.0, 1.0});
-		SingleInputSingleOutputTimeResponse SISOtr = tf.simulateTimeResponse(NumArrays.ones(timePoints.length), timePoints);
+		SingleInputSingleOutputTimeResponse SISOtr = tf.simulateTimeResponse(NumArrays.ones(timePoints.length),
+				timePoints);
 
 		double[][] transposedStateVector = NumArrays.transpose(SISOtr.getEvolutionOfStateVector());
 
@@ -326,5 +327,7 @@ public class TransferFunctionTest {
 		assertArrayEquals(yOut, SISOtr.getResponse(), 1e-12);
 		assertArrayEquals(xOut[0], transposedStateVector[0], 1e-12);
 		assertArrayEquals(xOut[1], transposedStateVector[1], 1e-12);
+
+		// TODO test with inital conditions
 	}
 }

@@ -162,6 +162,7 @@ public final class NumArrays {
         }
     }
 
+    // TODO remove the ElementWise
     public static void addElementWiseInPlace(double[] a, double[] b) {
         if (a.length != b.length) {
             throw new IllegalArgumentException("a and b dimensions must match");
@@ -351,6 +352,17 @@ public final class NumArrays {
         for (double[] array : rest) {
             System.arraycopy(array, 0, result, offset, array.length);
             offset += array.length;
+        }
+        return result;
+    }
+
+    public static double[][] concatenate(double[][] a, double[][] b) {
+        if(a.length != b.length) {
+            throw new IllegalArgumentException("Both arrays must have the same number of rows.");
+        }
+        double[][] result = new double[a.length][];
+        for(int i = 0; i < a.length; ++i) {
+            result[i] = concatenate(a[i], b[i]);
         }
         return result;
     }
