@@ -37,6 +37,7 @@ public class TransferFunction extends LinearTimeInvariantSystem {
             TransferFunction.unwrapPhase(phase);
         }
     }
+
     private RationalFunction _rf;
 
     /***
@@ -124,7 +125,7 @@ public class TransferFunction extends LinearTimeInvariantSystem {
         for (int i = 0; i < frequencies.length; ++i) {
             phase[i] = this.evaluateAt(frequencies[i]).arg() * (180 / Math.PI);
         }
-        if(unwrapPhase) {
+        if (unwrapPhase) {
             unwrapPhase(phase);
         }
         return phase;
@@ -575,7 +576,7 @@ public class TransferFunction extends LinearTimeInvariantSystem {
         TransferFunction tf4 = new TransferFunction(new double[]{5}, new double[]{3});
         System.out.println(tf4.toStateSpace());
 
-        TransferFunction tf5 = new TransferFunction(new double[] {1.0, 3, 3}, new double[] {1.0, 2.0, 1});
+        TransferFunction tf5 = new TransferFunction(new double[]{1.0, 3, 3}, new double[]{1.0, 2.0, 1});
         tf5.step();
 
         double[] timePoints = {0.0, 0.0707070707070707, 0.1414141414141414, 0.2121212121212121, 0.2828282828282828,
@@ -599,16 +600,17 @@ public class TransferFunction extends LinearTimeInvariantSystem {
                 6.363636363636363, 6.434343434343434, 6.505050505050505, 6.575757575757575, 6.646464646464646,
                 6.717171717171717, 6.787878787878787, 6.858585858585858, 6.929292929292929, 7.0};
 
-        TransferFunction tf6 = new TransferFunction(new double[] {1.0, 3.0, 3.0}, new double[] {1.0, 2.0, 1.0});
-        double[] yOut = tf6.step(timePoints, new double[] {1.0, 0.0}).getResponse();
+        TransferFunction tf6 = new TransferFunction(new double[]{1.0, 3.0, 3.0}, new double[]{1.0, 2.0, 1.0});
+        double[] yOut = tf6.step(timePoints, new double[]{1.0, 0.0}).getResponse();
 
         System.out.println(Arrays.toString(yOut));
 
-        TransferFunction tf7 = new TransferFunction(new double[] {1.0, 3.0, 3.0}, new double[] {1.0, 2.0, 1.0});
-        double[] yOut2 = tf7.step(new double[] {0.0}).getResponse();
+        TransferFunction tf7 = new TransferFunction(new double[]{1.0, 3.0, 3.0}, new double[]{1.0, 2.0, 1.0});
+        double[] yOut2 = tf7.step(new double[]{0.0}).getResponse();
 
         System.out.println(Arrays.toString(yOut2));
 
+        findClosest(new Integer[] {1, 2, 3, 4, 9}, 5);
 
 
 //		double[] phase = tf1.getPhaseAt(logspace);
@@ -645,6 +647,26 @@ public class TransferFunction extends LinearTimeInvariantSystem {
 //		double[] freq = ArrayUtils.logspace(-3, 3, 100);
 //
 //		freq = ArrayUtils.logspace(-3, 3, 10000000);
+
+    }
+
+    public static int findClosest(Integer[] arr, int target) {
+        int idx = 0;
+        int dist = Math.abs(arr[0] - target);
+
+
+        for (int i = 1; i < arr.length; i++) {
+            int cdist = Math.abs(arr[i] - target);
+
+            if (cdist < dist && arr[i] - target >= 0) {
+                idx = i;
+                dist = cdist;
+            }
+        }
+        System.out.println("FIND!!!, CLOSEST MINUTE IS --->" + arr[idx]);
+        int minute_of_day = arr[idx];
+
+        return minute_of_day;
 
     }
 

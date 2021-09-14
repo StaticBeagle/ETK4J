@@ -20,7 +20,7 @@ public final class Filters {
         return tf;
     }
 
-    public static TransferFunction lpTolp(ZeroPoleGain zpk, double w0) {
+    public static ZeroPoleGain lpTolpZPK(ZeroPoleGain zpk, double w0) {
         Complex[] zeros = zpk.getZeros();
         Complex[] poles = zpk.getPoles();
         double k = zpk.getGain();
@@ -28,7 +28,11 @@ public final class Filters {
         ComplexArrays.multiplyInPlace(zeros, w0);
         ComplexArrays.multiplyInPlace(poles, w0);
         k *= Math.pow(w0, degree);
-        return new TransferFunction(zeros, poles, k);
+        return new ZeroPoleGain(zeros, poles, k);
+    }
+
+    public static TransferFunction lpTolp(ZeroPoleGain zpk, double w0) {
+        return new TransferFunction(lpTolpZPK(zpk, w0));
     }
 
     public static TransferFunction lpTohp(double[] num, double[] den, double w0) {
@@ -54,7 +58,7 @@ public final class Filters {
         return tf;
     }
 
-    public static TransferFunction lpTohp(ZeroPoleGain zpk, double w0) {
+    public static ZeroPoleGain lpTohpZPK(ZeroPoleGain zpk, double w0) {
         Complex[] zeros = zpk.getZeros();
         Complex[] poles = zpk.getPoles();
         double k = zpk.getGain();
@@ -69,7 +73,11 @@ public final class Filters {
         poles = Arrays.stream(poles).map(Complex::uminus).toArray(Complex[]::new);
         k *= ComplexArrays.product(zeros).divide(ComplexArrays.product(poles)).real();
 
-        return new TransferFunction(zhp, php, k);
+        return new ZeroPoleGain(zhp, php, k);
+    }
+
+    public static TransferFunction lpTohp(ZeroPoleGain zpk, double w0) {
+        return new TransferFunction(lpTohpZPK(zpk, w0));
     }
 
     public static TransferFunction lpTobp(double[] num, double[] den, double w0, double bw) {
@@ -84,7 +92,7 @@ public final class Filters {
         return tf;
     }
 
-    public static TransferFunction lpTobp(ZeroPoleGain zpk, double w0, double bw) {
+    public static ZeroPoleGain lpTobpZPK(ZeroPoleGain zpk, double w0, double bw) {
         Complex[] zeros = zpk.getZeros();
         Complex[] poles = zpk.getPoles();
         double k = zpk.getGain();
@@ -116,7 +124,11 @@ public final class Filters {
         zbp = ComplexArrays.concat(zbp, ComplexArrays.zeros(degree));
         k *= Math.pow(bw, degree);
 
-        return new TransferFunction(zbp, pbp, k);
+        return new ZeroPoleGain(zbp, pbp, k);
+    }
+
+    public static TransferFunction lpTobp(ZeroPoleGain zpk, double w0, double bw) {
+        return new TransferFunction(lpTobpZPK(zpk, w0, bw));
     }
 
     public static TransferFunction lpTobs(double[] num, double[] den, double w0, double bw) {
@@ -129,7 +141,7 @@ public final class Filters {
         return new TransferFunction(bp);
     }
 
-    public static TransferFunction lpTobs(ZeroPoleGain zpk, double w0, double bw) {
+    public static ZeroPoleGain lpTobsZPK(ZeroPoleGain zpk, double w0, double bw) {
         Complex[] zeros = zpk.getZeros();
         Complex[] poles = zpk.getPoles();
         double k = zpk.getGain();
@@ -170,14 +182,18 @@ public final class Filters {
         poles = Arrays.stream(poles).map(Complex::uminus).toArray(Complex[]::new);
         k *= ComplexArrays.product(zeros).divide(ComplexArrays.product(poles)).real();
 
-        return new TransferFunction(zbs, pbs, k);
+        return new ZeroPoleGain(zbs, pbs, k);
+    }
+
+    public static TransferFunction lpTobs(ZeroPoleGain zpk, double w0, double bw) {
+        return new TransferFunction(lpTobsZPK(zpk, w0, bw));
     }
 
     private static int getRelativeDegree(Complex[] zeros, Complex[] poles) {
         int degree = poles.length - zeros.length;
         if (degree < 0) {
-            throw new NegativeFilterOrderException("The number of poles for the filter is less than the number of zeros." +
-                    "Please check your inputs.");
+            throw new NegativeFilterOrderException("The number of poles for the filter is less than the number of zeros."
+                    + "Please check your inputs.");
         }
         return degree;
     }

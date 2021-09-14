@@ -1147,6 +1147,7 @@ public class Matrix {
         System.out.println(E.expm());
     }
 
+    // TODO move this to MathETK or Formulas
     public static class FRexpResult
     {
         public int exponent = 0;

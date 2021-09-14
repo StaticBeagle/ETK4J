@@ -1,6 +1,5 @@
 package com.wildbitsfoundry.etk4j.util;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 
 import com.wildbitsfoundry.etk4j.math.MathETK;
@@ -144,6 +143,9 @@ public final class NumArrays {
         }
     }
 
+    // TODO these element-wise functions can be rewritten without the elementWise
+    // I think the add function overlaps
+    // Maybe intead of add in place, add equals?
     public static double[] addElementWise(double[] a, double b) {
         double[] result = Arrays.copyOf(a, a.length);
         addElementWiseInPlace(result, b);
@@ -266,17 +268,6 @@ public final class NumArrays {
         return max;
     }
 
-    public static double normInf(Double[] a) {
-        double max = Math.abs(a[0].doubleValue());
-        for (int i = 1; i < a.length; ++i) {
-            double abs = Math.abs(a[i].doubleValue());
-            if (abs > max) {
-                max = abs;
-            }
-        }
-        return max;
-    }
-
     public static double normNegInf(double[] a) {
         double min = Math.abs(a[0]);
         for (int i = 1; i < a.length; ++i) {
@@ -315,7 +306,7 @@ public final class NumArrays {
      * @param b input array
      * @return an array formed by taking all possible products between the elements of a and b
      */
-    public static double[] kron(final double[] a, final double[] b) {
+    public static double[] kronecker(final double[] a, final double[] b) {
         int aLength = a.length;
         int bLength = b.length;
         double[] c = new double[aLength * bLength];
@@ -419,7 +410,7 @@ public final class NumArrays {
         return result;
     }
 
-    public static double sumSquare(double[] a) {
+    public static double sumSquares(double[] a) {
         final int length = a.length;
         double result = 0;
         for (int i = 0; i < length; ++i) {
@@ -519,6 +510,14 @@ public final class NumArrays {
         return true;
     }
 
+    public static double[] difference(double[] a) {
+        double[] result = new double[a.length - 1];
+        for(int i = 0; i < result.length; ++i) {
+            result[i] = a[i + 1] - a[i];
+        }
+        return result;
+    }
+
     public static double[] gradient(double[] a) {
         // check bounds
 
@@ -535,13 +534,14 @@ public final class NumArrays {
     }
 
     public static double[] gradient(double[] a, double[] h) {
+        // TODO
         // check bounds
         // check that arrays have the same size
 
         double[] grad = new double[a.length];
         final int end = a.length - 1;
         grad[0] = (a[1] - a[0]) / (h[1] - h[0]); // once sided difference
-        grad[end] = (a[end] - a[end - 1]) / (h[end] - h[end - 1]); // once sided difference
+        grad[end] = (a[end] - a[end - 1]) / (h[end] - h[end - 1]); // one sided difference
 
         // central difference
         for (int i = 1; i < end; ++i) {
@@ -689,7 +689,7 @@ public final class NumArrays {
         double[] a = {1, 2, 3};
         double[] b = {4, 5, 6};
 
-        System.out.println(Arrays.toString(kron(a, b)));
+        System.out.println(Arrays.toString(kronecker(a, b)));
 
         double[][] aa = {{1, 2}, {3, 4}};
         double[] bb = {5, 6};
@@ -698,5 +698,9 @@ public final class NumArrays {
         System.out.println(Arrays.toString(dot(aa, bb)));
 
         System.out.println(product(a));
+
+        // TODO unit tests
+        double[] aaa = {1, 1, 2, 3, 5, 8, 13, 21};
+        System.out.println(Arrays.toString(difference(aaa)));
     }
 }

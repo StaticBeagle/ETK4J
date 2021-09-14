@@ -47,31 +47,31 @@ public class LinearSplineTest {
 	public void testLinearSplineExtrapolateLeft() {
 		LinearSpline lspline = LinearSpline.newLinearSpline(x, y);
 
-		lspline.setExtrapolationMethod(ExtrapolationMethod.ClampToEndPoint);
+		lspline.setExtrapolationMethod(ExtrapolationMethod.CLAMP_TO_END_POINT);
 		double yi = lspline.evaluateAt(left);
 		assertEquals("Linear Spline ClampToEndPoint lower bound extrapolation", 1.3, yi, 0.0);
 
-		lspline.setExtrapolationMethod(ExtrapolationMethod.ClampToNaN);
+		lspline.setExtrapolationMethod(ExtrapolationMethod.CLAMP_TO_NAN);
 		yi = lspline.evaluateAt(left);
 		assertTrue("Linear Spline ClampToEndNaN lower bound extrapolation", Double.isNaN(yi));
 
-		lspline.setExtrapolationMethod(ExtrapolationMethod.ClampToZero);
+		lspline.setExtrapolationMethod(ExtrapolationMethod.CLAMP_TO_ZERO);
 		yi = lspline.evaluateAt(left);
 		assertEquals("Linear Spline ClampToZero lower bound extrapolation", 0.0, yi, 0.0);
 
-		lspline.setExtrapolationMethod(ExtrapolationMethod.Linear);
+		lspline.setExtrapolationMethod(ExtrapolationMethod.LINEAR);
 		yi = lspline.evaluateAt(left);
 		assertEquals("Linear Spline Linear lower bound extrapolation", 0.6000000000000002, yi, 1e-12);
 		
-		lspline.setExtrapolationMethod(ExtrapolationMethod.Natural);
+		lspline.setExtrapolationMethod(ExtrapolationMethod.NATURAL);
 		yi = lspline.evaluateAt(left);
 		assertEquals("Linear Spline Natural lower bound extrapolation", 0.6000000000000002, yi, 1e-12);
 		
-		lspline.setExtrapolationMethod(ExtrapolationMethod.Periodic);
+		lspline.setExtrapolationMethod(ExtrapolationMethod.PERIODIC);
 		yi = lspline.evaluateAt(left);
 		assertEquals("Linear Spline Periodic lower bound extrapolation", 1.8500000000000005, yi, 1e-12);
 		
-		lspline.setExtrapolationMethod(ExtrapolationMethod.Throw);
+		lspline.setExtrapolationMethod(ExtrapolationMethod.THROW);
 		exception.expect(IndexOutOfBoundsException.class);
 		yi = lspline.evaluateAt(left);
 	}
@@ -80,31 +80,31 @@ public class LinearSplineTest {
 	public void testLinearSplineExtrapolateRight() {
 		LinearSpline lspline = LinearSpline.newLinearSpline(x, y);
 
-		lspline.setExtrapolationMethod(ExtrapolationMethod.ClampToEndPoint);
+		lspline.setExtrapolationMethod(ExtrapolationMethod.CLAMP_TO_END_POINT);
 		double yi = lspline.evaluateAt(right);
 		assertEquals("Linear Spline ClampToEndPoint upper bound extrapolation", 2.1, yi, 0.0);
 
-		lspline.setExtrapolationMethod(ExtrapolationMethod.ClampToNaN);
+		lspline.setExtrapolationMethod(ExtrapolationMethod.CLAMP_TO_NAN);
 		yi = lspline.evaluateAt(right);
 		assertTrue("Linear Spline ClampToEndNaN upper bound extrapolation", Double.isNaN(yi));
 
-		lspline.setExtrapolationMethod(ExtrapolationMethod.ClampToZero);
+		lspline.setExtrapolationMethod(ExtrapolationMethod.CLAMP_TO_ZERO);
 		yi = lspline.evaluateAt(right);
 		assertEquals("Linear Spline ClampToZero upper bound extrapolation", 0.0, yi, 0.0);
 
-		lspline.setExtrapolationMethod(ExtrapolationMethod.Linear);
+		lspline.setExtrapolationMethod(ExtrapolationMethod.LINEAR);
 		yi = lspline.evaluateAt(right);
 		assertEquals("Linear Spline Linear upper bound extrapolation", 3.2249999999999988, yi, 1e-12);
 		
-		lspline.setExtrapolationMethod(ExtrapolationMethod.Natural);
+		lspline.setExtrapolationMethod(ExtrapolationMethod.NATURAL);
 		yi = lspline.evaluateAt(right);
 		assertEquals("Linear Spline Natural upper bound extrapolation", 3.2249999999999988, yi, 1e-12);
 		
-		lspline.setExtrapolationMethod(ExtrapolationMethod.Periodic);
+		lspline.setExtrapolationMethod(ExtrapolationMethod.PERIODIC);
 		yi = lspline.evaluateAt(right);
 		assertEquals("Linear Spline Periodic upper bound extrapolation", 1.7916666666666667, yi, 1e-12);
 		
-		lspline.setExtrapolationMethod(ExtrapolationMethod.Throw);
+		lspline.setExtrapolationMethod(ExtrapolationMethod.THROW);
 		exception.expect(IndexOutOfBoundsException.class);
 		yi = lspline.evaluateAt(right);
 	}

@@ -17,6 +17,7 @@ public abstract class PiecewiseFunction implements UnivariateFunction {
 		_x0 = x[0];
 		_numberOfSegments = _x.length - 1;
 		_xn = x[_numberOfSegments];
+		// TODO check Default extrapolator is throw
 		_extrapolator = xi -> {
 			throw new IndexOutOfBoundsException(String.format("x is outside of [%.4f, %.4f]", _x0, _xn));
 		};

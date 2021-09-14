@@ -54,6 +54,11 @@ public final class ButterWorth extends AnalogFilter {
         return lpTolp(zpk, wn);
     }
 
+    public static ZeroPoleGain newLowPassZPK(int n, double wn) {
+        ZeroPoleGain zpk = buttAp(n);
+        return lpTolpZPK(zpk, wn);
+    }
+
     public static TransferFunction newHighPass(int n, double wn) {
         ZeroPoleGain zpk = buttAp(n);
         return lpTohp(zpk, wn);
