@@ -17,7 +17,7 @@ public final class ComplexArrays {
 		return result;
 	}
 
-	public static Complex[] conv(Complex[] a, Complex[] b) {
+	public static Complex[] convolution(Complex[] a, Complex[] b) {
 		Complex[] result = new Complex[a.length + b.length - 1];
 		for (int i = 0; i < result.length; ++i) {
 			result[i] = new Complex();
@@ -166,7 +166,7 @@ public final class ComplexArrays {
 		return result;
 	}
 
-	public static Complex[] concat(Complex[] a, Complex[] b) {
+	public static Complex[] concatenate(Complex[] a, Complex[] b) {
 		int aLength = a.length;
 		int bLength = b.length;
 		Complex[] result = new Complex[aLength + bLength];

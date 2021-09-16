@@ -67,7 +67,7 @@ public final class Filters {
         Complex[] zhp = ComplexArrays.divide(w0, zeros);
         Complex[] php = ComplexArrays.divide(w0, poles);
 
-        zhp = ComplexArrays.concat(zhp, ComplexArrays.zeros(degree));
+        zhp = ComplexArrays.concatenate(zhp, ComplexArrays.zeros(degree));
 
         zeros = Arrays.stream(zeros).map(Complex::uminus).toArray(Complex[]::new);
         poles = Arrays.stream(poles).map(Complex::uminus).toArray(Complex[]::new);
@@ -111,7 +111,7 @@ public final class Filters {
                 right[i] = Complex.fromImaginary(right[i].imag());
             }
         }
-        Complex[] zbp = ComplexArrays.concat(left, right);
+        Complex[] zbp = ComplexArrays.concatenate(left, right);
 
         left = new Complex[plp.length];
         right = new Complex[plp.length];
@@ -119,9 +119,9 @@ public final class Filters {
             left[i] = plp[i].pow(2.0).subtract(w0 * w0).sqrt().add(plp[i]);
             right[i] = plp[i].pow(2.0).subtract(w0 * w0).sqrt().uminus().add(plp[i]);
         }
-        Complex[] pbp = ComplexArrays.concat(left, right);
+        Complex[] pbp = ComplexArrays.concatenate(left, right);
 
-        zbp = ComplexArrays.concat(zbp, ComplexArrays.zeros(degree));
+        zbp = ComplexArrays.concatenate(zbp, ComplexArrays.zeros(degree));
         k *= Math.pow(bw, degree);
 
         return new ZeroPoleGain(zbp, pbp, k);
@@ -161,7 +161,7 @@ public final class Filters {
                 right[i] = Complex.fromImaginary(right[i].imag());
             }
         }
-        Complex[] zbs = ComplexArrays.concat(left, right);
+        Complex[] zbs = ComplexArrays.concatenate(left, right);
 
         left = new Complex[php.length];
         right = new Complex[php.length];
@@ -169,14 +169,14 @@ public final class Filters {
             left[i] = php[i].add(php[i].pow(2.0).subtract(w0 * w0).sqrt());
             right[i] = php[i].subtract(php[i].pow(2.0).subtract(w0 * w0).sqrt());
         }
-        Complex[] pbs = ComplexArrays.concat(left, right);
+        Complex[] pbs = ComplexArrays.concatenate(left, right);
 
         Complex[] full = new Complex[degree];
         Arrays.fill(full, Complex.fromImaginary(w0));
-        zbs = ComplexArrays.concat(zbs, full);
+        zbs = ComplexArrays.concatenate(zbs, full);
 
         Arrays.fill(full, Complex.fromImaginary(-w0));
-        zbs = ComplexArrays.concat(zbs, full);
+        zbs = ComplexArrays.concatenate(zbs, full);
 
         zeros = Arrays.stream(zeros).map(Complex::uminus).toArray(Complex[]::new);
         poles = Arrays.stream(poles).map(Complex::uminus).toArray(Complex[]::new);

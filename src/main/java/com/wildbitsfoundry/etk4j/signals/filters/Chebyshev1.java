@@ -5,6 +5,8 @@ import com.wildbitsfoundry.etk4j.control.ZeroPoleGain;
 import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.polynomials.RationalFunction;
+import com.wildbitsfoundry.etk4j.util.ComplexArrays;
+
 import static com.wildbitsfoundry.etk4j.signals.filters.Filters.*;
 
 public class Chebyshev1 extends AnalogFilter {
@@ -31,7 +33,10 @@ public class Chebyshev1 extends AnalogFilter {
             }
         }
         Complex[] zeros = new Complex[0];
-        double k = RationalFunction.calculateZeroPoleGain(zeros, poles);
+        Complex num = ComplexArrays.product(zeros).multiply(Math.pow(-1, zeros.length));
+        Complex den = ComplexArrays.product(poles).multiply(Math.pow(-1, poles.length));
+        den.divideEquals(num);
+        double k = den.real();
         if (n % 2 == 0) {
             k /= Math.sqrt(1.0 + eps * eps);
         }

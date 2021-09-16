@@ -8,6 +8,8 @@ import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.BandPassSpecs;
 import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.BandStopSpecs;
 import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.HighPassSpecs;
 import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.LowPassSpecs;
+import com.wildbitsfoundry.etk4j.util.ComplexArrays;
+
 import static com.wildbitsfoundry.etk4j.signals.filters.Filters.*;
 
 public final class ButterWorth extends AnalogFilter {
@@ -28,8 +30,10 @@ public final class ButterWorth extends AnalogFilter {
             }
         }
         Complex[] zeros = new Complex[0];
-        double k = RationalFunction.calculateZeroPoleGain(zeros, poles);
-        return new ZeroPoleGain(zeros, poles, k);
+        Complex num = ComplexArrays.product(zeros).multiply(Math.pow(-1, zeros.length));
+        Complex den = ComplexArrays.product(poles).multiply(Math.pow(-1, poles.length));
+        den.divideEquals(num);
+        return new ZeroPoleGain(zeros, poles, den.real());
     }
 
     public static FilterOrderResults.OrderAndCutoffFrequency buttord(LowPassSpecs specs) {

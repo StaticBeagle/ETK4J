@@ -1,7 +1,6 @@
 package com.wildbitsfoundry.etk4j.control;
 
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
-import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
 import com.wildbitsfoundry.etk4j.util.NumArrays;
 import org.junit.Test;
 
@@ -93,7 +92,7 @@ public class TransferFunctionTest {
 
 		TransferFunction tf = new TransferFunction(10.0, poles);
 
-		double phase = tf.getPhaseAt(100.0);
+		double phase = tf.getPhaseInDegreesAt(100.0);
 		assertEquals(-268.2811839069496, phase, 1e-12);
 
 		double[] frequencies = NumArrays.logSpace(-3, 3, 10);
@@ -107,7 +106,9 @@ public class TransferFunctionTest {
 				-269.8281127187565 };
 		
 		assertArrayEquals(magnitudeResponse, tf.getMagnitudeAt(frequencies), 1e-12);
-		assertArrayEquals(phaseResponse, tf.getPhaseAt(frequencies), 1e-12);
+		double[] systemPhaseResponse = tf.getPhaseInDegreesAt(frequencies);
+		TransferFunction.unwrapPhase(systemPhaseResponse);
+		assertArrayEquals(phaseResponse, systemPhaseResponse, 1e-12);
 	}
 
 	@Test

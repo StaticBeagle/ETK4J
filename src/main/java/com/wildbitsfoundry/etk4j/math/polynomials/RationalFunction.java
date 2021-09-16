@@ -3,6 +3,7 @@ package com.wildbitsfoundry.etk4j.math.polynomials;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.functions.ComplexUnivariateFunction;
 import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
+import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 
 public class RationalFunction implements UnivariateFunction, ComplexUnivariateFunction {
 	private Polynomial _numerator;
@@ -177,18 +178,12 @@ public class RationalFunction implements UnivariateFunction, ComplexUnivariateFu
 		return resultNum;
 	}
 
-	public static double calculateZeroPoleGain(Complex[] zeros, Complex[] poles) {
+	private static double calculateZeroPoleGain(Complex[] zeros, Complex[] poles) {
 		// Compute gain k
-		Complex kNum = Complex.fromReal(1.0);
-		for (Complex zero : zeros) {
-			kNum.multiplyEquals(zero.uminus());
-		}
-		Complex kDen = Complex.fromReal(1.0);
-		for (Complex pole : poles) {
-			kDen.multiplyEquals(pole.uminus());
-		}
-		kDen.divideEquals(kNum);
-		return kDen.real();
+		Complex num = ComplexArrays.product(zeros).multiply(Math.pow(-1, zeros.length));
+		Complex den = ComplexArrays.product(poles).multiply(Math.pow(-1, poles.length));
+		den.divideEquals(num);
+		return den.real();
 	}
 
 	public boolean isProper() {

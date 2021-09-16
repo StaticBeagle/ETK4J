@@ -120,4 +120,13 @@ public final class MathETK {
 	public static double logb(double x, int base) {
 		return Math.log(x) / Math.log(base);
 	}
+
+	/***
+	 * Round to the next even number.
+	 * @param d number to be rounded.
+	 * @return the input number rounded to the next even number.
+	 */
+	public static long roundEven(double d) {
+		return Math.round(d / 2) * 2;
+	}
 }
