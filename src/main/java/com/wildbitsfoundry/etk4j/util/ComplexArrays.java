@@ -1,6 +1,15 @@
 package com.wildbitsfoundry.etk4j.util;
 
+import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.IntStream;
+
 import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkXYDimensions;
 
 public final class ComplexArrays {
@@ -40,11 +49,41 @@ public final class ComplexArrays {
 		}
 		return result;
 	}
+
+	public static Complex[] fromReal(double[] a) {
+		Complex[] result = new Complex[a.length];
+		for(int i = 0; i < a.length; ++i) {
+			result[i] = Complex.fromReal(a[i]);
+		}
+		return result;
+	}
 	
 	public static double[] imag(Complex[] a) {
 		double[] result = new double[a.length];
 		for(int i = 0; i < a.length; ++i) {
 			result[i] = a[i].imag();
+		}
+		return result;
+	}
+
+	public static Complex[] fromImaginary(double[] a) {
+		Complex[] result = new Complex[a.length];
+		for(int i = 0; i < a.length; ++i) {
+			result[i] = Complex.fromImaginary(a[i]);
+		}
+		return result;
+	}
+
+	public static double[] abs(Complex[] a) {
+		if(a.length == 0) {
+			return new double[0];
+		}
+		if(a == null) {
+			return null;
+		}
+		double[] result = new double[a.length];
+		for(int i = 0; i < a.length; ++i) {
+			result[i] = a[i].abs();
 		}
 		return result;
 	}
@@ -81,14 +120,6 @@ public final class ComplexArrays {
 			imagMean += a[i].imag();
 		}
 		return new Complex(realMean / a.length, imagMean / a.length);
-	}
-
-	public static double[] abs(Complex[] a) {
-		double[] abs = new double[a.length];
-		for(int i = 0; i < a.length; ++i) {
-			abs[i] = a[i].abs();
-		}
-		return abs;
 	}
 
 	public static Complex[] zeros(int length) {
@@ -187,6 +218,87 @@ public final class ComplexArrays {
 		Complex[] result = new Complex[a.length];
 		for(int i = 0; i < a.length; ++i) {
 			result[i] = a[i].multiply(d);
+		}
+		return result;
+	}
+
+	public static Complex[] remove(Complex[] a, int index) {
+		if(index < 0 || index >= a.length) {
+			throw new IllegalArgumentException("index must be within the length of array a.");
+		}
+		Complex[] result = new Complex[a.length - 1];
+		for(int i = 0, j = 0; i < result.length;) {
+			if(j == index) {
+				++j;
+				continue;
+			} else {
+				result[i++] = a[j++];
+			}
+		}
+		return result;
+	}
+
+	public static Complex[] remove(Complex[] a, Complex c) {
+		int index = 0;
+		for(int i = 0; i < a.length; ++i) {
+			if(c.equals(a[i])) {
+				index = i;
+				break;
+			}
+		}
+		return remove(a, index);
+	}
+
+	public static int[] argSort(Complex[] a) {
+		Integer[] indexes = IntStream.range(0, a.length).boxed().toArray(Integer[]::new);
+		Arrays.sort(indexes, Comparator.comparing(i -> a[i]));
+		return Arrays.stream(indexes).mapToInt(Integer::intValue).toArray();
+	}
+
+	public static void main(String[] args) {
+		Complex[] a = new Complex[]{
+				Complex.fromReal(4.0),
+				Complex.fromReal(3.0),
+				Complex.fromReal(1.0),
+				new Complex(2, -2),
+				new Complex(2, 2),
+				new Complex(2, -1),
+				new Complex(2, 1),
+				new Complex(2, -1),
+				new Complex(2, 1),
+				new Complex(1, 1),
+				new Complex(1, -1)
+		};
+
+		Complex[] b = remove(a, 3);
+		System.out.println(Arrays.toString(a));
+		System.out.println(Arrays.toString(b));
+		Complex[] c = remove(a, new Complex(2,2));
+		System.out.println(Arrays.toString(c));
+
+		System.out.println(Arrays.toString(argSort(a)));
+	}
+
+	public static Complex[] subtract(Complex[] a, Complex c) {
+		Complex[] result = new Complex[a.length];
+		for(int i = 0; i < a.length; ++i) {
+			result[i] = a[i].subtract(c);
+		}
+		return result;
+	}
+
+	public static Complex[] subtract(Complex[] a, double d) {
+		Complex[] result = new Complex[a.length];
+		for(int i = 0; i < a.length; ++i) {
+			result[i] = a[i].subtract(d);
+		}
+		return result;
+	}
+
+	public static Complex[] subtract(Complex c, Complex[] a) {
+		Complex[] result = new Complex[a.length];
+		for(int i = 0; i < a.length; ++i) {
+			result[i] = c.subtract(a[i]);
 		}
 		return result;
 	}

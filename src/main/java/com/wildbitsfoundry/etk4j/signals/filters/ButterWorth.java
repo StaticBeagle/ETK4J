@@ -36,6 +36,8 @@ public final class ButterWorth extends AnalogFilter {
         return new ZeroPoleGain(zeros, poles, den.real());
     }
 
+    // TODO maybe instead of OrderAndCutoffFrequency we can have
+    // lowpass results, highpass results, etc
     public static FilterOrderResults.OrderAndCutoffFrequency buttord(LowPassSpecs specs) {
         // TODO validate inputs
         return lowPassFilterOrder(specs, new ButterworthOrderCalculationStrategy());

@@ -75,6 +75,7 @@ public class Bessel extends AnalogFilter {
         return new ZeroPoleGain(zeros, poles, k);
     }
 
+    // TODO add normalization phase,delay,mag as an overload
     public static TransferFunction newLowPass(int n, double wn) {
         ZeroPoleGain zpk = besselap(n);
         return lpTolp(zpk, wn);
@@ -288,7 +289,7 @@ public class Bessel extends AnalogFilter {
             return prod.invert().multiply(k).abs();
         };
         UnivariateFunction cutoff = w -> gw.evaluateAt(w) - 1.0 / Math.sqrt(2.0);
-
+        // 1.0 / Math.sqrt(2.0) = -3 db which is equal to 10 ^ (-3.0 / 20.0) TODO change -3 to an arbitrary input
         double result = Secant.solve(cutoff, 1.5, 1.5 * (1 + 1e-4), 1.48e-8, 0.0, 50);
         return result;
     }

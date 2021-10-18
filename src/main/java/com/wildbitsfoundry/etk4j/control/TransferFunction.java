@@ -177,12 +177,12 @@ public class TransferFunction extends LinearTimeInvariantSystem {
     }
 
     public FrequencyResponse getFrequencyResponse() {
-        double[] frequencies = findFrequencies(this, 200);
+        double[] frequencies = findFrequencies(200);
         return this.getFrequencyResponse(frequencies);
     }
 
     public FrequencyResponse getFrequencyResponse(int numberOfPoints) {
-        double[] frequencies = findFrequencies(this, numberOfPoints);
+        double[] frequencies = findFrequencies(numberOfPoints);
         return this.getFrequencyResponse(frequencies);
     }
 
@@ -196,12 +196,12 @@ public class TransferFunction extends LinearTimeInvariantSystem {
     }
 
     public BodeResponse getBode() {
-        double[] frequencies = findFrequencies(this, 200);
+        double[] frequencies = findFrequencies(200);
         return this.getBode(frequencies);
     }
 
     public BodeResponse getBode(int numberOfPoints) {
-        double[] frequencies = findFrequencies(this, numberOfPoints);
+        double[] frequencies = findFrequencies(numberOfPoints);
         return this.getBode(frequencies);
     }
 
@@ -217,9 +217,9 @@ public class TransferFunction extends LinearTimeInvariantSystem {
     }
 
     // TODO rename to numberOfPoints?
-    private static double[] findFrequencies(TransferFunction tf, int numberOfPoints) {
-        Complex[] ep = tf.getPoles();
-        Complex[] tz = tf.getZeros();
+    private double[] findFrequencies(int numberOfPoints) {
+        Complex[] ep = this.getPoles();
+        Complex[] tz = this.getZeros();
 
         // TODO check if length of the poles == 0?
         Complex[] ez = ComplexArrays.concatenate(
@@ -640,6 +640,10 @@ public class TransferFunction extends LinearTimeInvariantSystem {
         return new StateSpace(A, B, C, D);
     }
 
+    public void normalize() {
+        this._rf.normalize();
+    }
+    // TODO add getOrder
     @Override
     protected TransferFunction toTransferFunction() {
         return this;
@@ -731,13 +735,13 @@ public class TransferFunction extends LinearTimeInvariantSystem {
         System.out.println(Arrays.toString(yOut2));
 
         TransferFunction tf8 = new TransferFunction(new double[] {1, 1, 0}, new double[] {1, 8, 25, 12, 1, 9 , 8, 10});
-        double[] wn = findFrequencies(tf8, 9);
+        double[] wn = tf8.findFrequencies(9);
 
         System.out.println(Arrays.toString(wn));
 
         TransferFunction tf9 = new TransferFunction(new double[] {1, 0.1, 7.5}, new double[] {1, 0.12, 9, 0, 0});
 
-        System.out.println(Arrays.toString(findFrequencies(tf9,9)));
+        System.out.println(Arrays.toString(tf9.findFrequencies(9)));
 
         // Specs for band pass filter
         FilterSpecs.BandPassSpecs bpSpecs = new FilterSpecs.BandPassSpecs();
@@ -760,7 +764,7 @@ public class TransferFunction extends LinearTimeInvariantSystem {
         TransferFunction el = Elliptic.newBandPass(nW0W1.getOrder(), bpSpecs.getPassBandRipple(),
                 bpSpecs.getStopBandAttenuation(), nW0W1.getLowerCutoffFrequency(), nW0W1.getUpperCutoffFrequency());
 
-        System.out.println(Arrays.toString(findFrequencies(el,9)));
+        System.out.println(Arrays.toString(el.findFrequencies(9)));
 
         FilterSpecs.BandStopSpecs bsSpecs = new FilterSpecs.BandStopSpecs();
         // The notch of the filter starts at the LowerStopBandFrequency and
@@ -783,12 +787,12 @@ public class TransferFunction extends LinearTimeInvariantSystem {
         el = Elliptic.newBandStop(nW0W1.getOrder(), bsSpecs.getPassBandRipple(),
                 bsSpecs.getStopBandAttenuation(), nW0W1.getLowerCutoffFrequency(), nW0W1.getUpperCutoffFrequency());
 
-        System.out.println(Arrays.toString(findFrequencies(el,9)));
+        System.out.println(Arrays.toString(el.findFrequencies(9)));
 
         TransferFunction tf10 = new TransferFunction(new double[] {1, 0.1, 7.5, 0, 1, 0, 0 ,-10},
                 new double[] {1, 0, -20, 1e13, 0, 8, 1, 0.12, 9, 0, 0});
 
-        System.out.println(Arrays.toString(findFrequencies(tf10,9)));
+        System.out.println(Arrays.toString(tf10.findFrequencies(9)));
 //		double[] phase = tf1.getPhaseAt(logspace);
 //		System.out.println(Arrays.toString(phase));
 //		for(int i = 0; i < phase.length; ++i) {
@@ -824,8 +828,5 @@ public class TransferFunction extends LinearTimeInvariantSystem {
 //
 //		freq = ArrayUtils.logspace(-3, 3, 10000000);
 
-    }
-    public void normalize() {
-        this._rf.normalize();
     }
 }

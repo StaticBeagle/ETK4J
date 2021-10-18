@@ -1,6 +1,11 @@
 package com.wildbitsfoundry.etk4j.util;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.IntStream;
 
 import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.interpolation.CubicSpline;
@@ -114,6 +119,32 @@ public final class NumArrays {
         double[] result = new double[length];
         for (int i = 0; i < length; ++i) {
             result[i] = a[i] - b[i];
+        }
+        return result;
+    }
+
+    public static double[] subtract(double a, double[] b) {
+        final int length = b.length;
+        double[] result = new double[length];
+        for (int i = 0; i < length; ++i) {
+            result[i] = a - b[i];
+        }
+        return result;
+    }
+
+    public static double[] subtract(double[] a, double b) {
+        final int length = a.length;
+        double[] result = new double[length];
+        for (int i = 0; i < length; ++i) {
+            result[i] = a[i] - b;
+        }
+        return result;
+    }
+
+    public static double[] abs(double[] a) {
+        double[] result = new double[a.length];
+        for(int i = 0; i < a.length; ++i) {
+            result[i] = Math.abs(a[i]);
         }
         return result;
     }
@@ -234,6 +265,24 @@ public final class NumArrays {
             }
         }
         return min;
+    }
+
+    public static int argMin(double[] a) {
+        int index = 0;
+        double min = a[0];
+        for (int i = 1; i < a.length; ++i) {
+            if (a[i] < min) {
+                min = a[i];
+                index = i;
+            }
+        }
+        return index;
+    }
+
+    public static int[] argSort(double[] a) {
+        Integer[] indexes = IntStream.range(0, a.length).boxed().toArray(Integer[]::new);
+        Arrays.sort(indexes, Comparator.comparing(i -> a[i]));
+        return Arrays.stream(indexes).mapToInt(Integer::intValue).toArray();
     }
 
     public static double norm1(double[] a) {
@@ -702,5 +751,8 @@ public final class NumArrays {
         // TODO unit tests
         double[] aaa = {1, 1, 2, 3, 5, 8, 13, 21};
         System.out.println(Arrays.toString(difference(aaa)));
+
+        double[] aaaa = {0, 1, 1, 0, 2, 3, 5, 0, 8, 13, 21};
+        System.out.println(argMin(aaaa));
     }
 }
