@@ -8,6 +8,8 @@ import com.wildbitsfoundry.etk4j.control.ZeroPoleGain;
 import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.polynomials.RationalFunction;
+import com.wildbitsfoundry.etk4j.util.ComplexArrays;
+
 import static com.wildbitsfoundry.etk4j.signals.filters.Filters.*;
 
 public class Elliptic extends AnalogFilter {
@@ -98,7 +100,10 @@ public class Elliptic extends AnalogFilter {
             }
             poles[n - 1] = Complex.fromReal(-1.0 / a);
         }
-        double k = RationalFunction.calculateGain(zeros, poles);
+        Complex num = ComplexArrays.product(zeros).multiply(Math.pow(-1, zeros.length));
+        Complex den = ComplexArrays.product(poles).multiply(Math.pow(-1, poles.length));
+        den.divideEquals(num);
+        double k = den.real();
         if (n % 2 == 0) {
             double eps0 = e.get(0);
             k /= Math.sqrt(1 + eps0 * eps0);

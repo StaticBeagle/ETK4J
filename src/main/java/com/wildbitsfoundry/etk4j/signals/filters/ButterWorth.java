@@ -8,6 +8,8 @@ import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.BandPassSpecs;
 import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.BandStopSpecs;
 import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.HighPassSpecs;
 import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.LowPassSpecs;
+import com.wildbitsfoundry.etk4j.util.ComplexArrays;
+
 import static com.wildbitsfoundry.etk4j.signals.filters.Filters.*;
 
 public final class ButterWorth extends AnalogFilter {
@@ -28,10 +30,14 @@ public final class ButterWorth extends AnalogFilter {
             }
         }
         Complex[] zeros = new Complex[0];
-        double k = RationalFunction.calculateGain(zeros, poles);
-        return new ZeroPoleGain(zeros, poles, k);
+        Complex num = ComplexArrays.product(zeros).multiply(Math.pow(-1, zeros.length));
+        Complex den = ComplexArrays.product(poles).multiply(Math.pow(-1, poles.length));
+        den.divideEquals(num);
+        return new ZeroPoleGain(zeros, poles, den.real());
     }
 
+    // TODO maybe instead of OrderAndCutoffFrequency we can have
+    // lowpass results, highpass results, etc
     public static FilterOrderResults.OrderAndCutoffFrequency buttord(LowPassSpecs specs) {
         // TODO validate inputs
         return lowPassFilterOrder(specs, new ButterworthOrderCalculationStrategy());
@@ -52,6 +58,11 @@ public final class ButterWorth extends AnalogFilter {
     public static TransferFunction newLowPass(int n, double wn) {
         ZeroPoleGain zpk = buttAp(n);
         return lpTolp(zpk, wn);
+    }
+
+    public static ZeroPoleGain newLowPassZPK(int n, double wn) {
+        ZeroPoleGain zpk = buttAp(n);
+        return lpTolpZPK(zpk, wn);
     }
 
     public static TransferFunction newHighPass(int n, double wn) {

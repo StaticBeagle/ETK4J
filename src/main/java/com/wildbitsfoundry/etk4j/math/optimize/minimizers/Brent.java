@@ -7,6 +7,7 @@ import java.util.function.BiFunction;
 // TODO move brent from solvers here
 public class Brent {
 
+    // TODO test
     public static double brentsMinimizer(BiFunction<Double, Object[], Double> func,
                                           double a, double b, double tol, int maxIter, Object... params) {
 

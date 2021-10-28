@@ -70,5 +70,12 @@ public class LinearSpline extends Spline {
 		System.out.println(cs.integrate(1, 4));
 
 		System.out.println(nh.evaluateAt(1.6));
+
+		double[] vgs = {1.25, 1.5, 2.0, 3.5, 4.5, 5.5};
+		double[] rdson = {95, 75, 47, 30, 25, 24};
+
+		// TODO integrable function
+		LinearSpline ls2 = newLinearSpline(vgs, rdson);
+		System.out.println(ls2.evaluateAt(2.0));
 	}
 }

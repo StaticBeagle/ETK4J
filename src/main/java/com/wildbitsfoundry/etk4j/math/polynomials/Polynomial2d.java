@@ -95,7 +95,7 @@ public class Polynomial2d implements BivariateFunction {
 			vandermonde[i] = buildPowerSeriesDescending(vars[k][i], degrees[k]);
 			for (int j = k - 1; j >= 0; --j) {
 				double[] tmp = buildPowerSeriesDescending(vars[j][i], degrees[j]);
-				vandermonde[i] = NumArrays.kron(vandermonde[i], tmp);
+				vandermonde[i] = NumArrays.kronecker(vandermonde[i], tmp);
 			}
 		}
 

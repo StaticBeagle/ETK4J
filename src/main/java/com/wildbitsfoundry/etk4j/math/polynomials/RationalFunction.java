@@ -3,13 +3,14 @@ package com.wildbitsfoundry.etk4j.math.polynomials;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.functions.ComplexUnivariateFunction;
 import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
+import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 
 public class RationalFunction implements UnivariateFunction, ComplexUnivariateFunction {
 	private Polynomial _numerator;
 	private Polynomial _denominator;
 
 	public RationalFunction(Complex[] zeros, Complex[] poles) {
-		this(zeros, poles, calculateGain(zeros, poles));
+		this(zeros, poles, calculateZeroPoleGain(zeros, poles));
 	}
 
 	public RationalFunction(Complex[] zeros, Complex[] poles, double gain) {
@@ -23,7 +24,7 @@ public class RationalFunction implements UnivariateFunction, ComplexUnivariateFu
 		_numerator = new Polynomial(num);
 		_denominator = new Polynomial(poles);
 
-		_numerator.multiplyEquals(calculateGain(new Complex[] { Complex.fromReal(-1.0) }, poles));
+		_numerator.multiplyEquals(calculateZeroPoleGain(new Complex[] { Complex.fromReal(-1.0) }, poles));
 	}
 
 	public RationalFunction(RationalFunction rf) {
@@ -177,17 +178,19 @@ public class RationalFunction implements UnivariateFunction, ComplexUnivariateFu
 		return resultNum;
 	}
 
-	public static double calculateGain(Complex[] zeros, Complex[] poles) {
+	private static double calculateZeroPoleGain(Complex[] zeros, Complex[] poles) {
 		// Compute gain k
-		Complex knum = Complex.fromReal(1.0);
-		for (Complex zero : zeros) {
-			knum.multiplyEquals(zero.uminus());
-		}
-		Complex kden = Complex.fromReal(1.0);
-		for (Complex pole : poles) {
-			kden.multiplyEquals(pole.uminus());
-		}
-		kden.divideEquals(knum);
-		return kden.real();
+		Complex num = ComplexArrays.product(zeros).multiply(Math.pow(-1, zeros.length));
+		Complex den = ComplexArrays.product(poles).multiply(Math.pow(-1, poles.length));
+		den.divideEquals(num);
+		return den.real();
+	}
+
+	public boolean isProper() {
+		return _numerator.degree() <= _denominator.degree();
+	}
+
+	public boolean isStrictlyProper() {
+		return _numerator.degree() < _denominator.degree();
 	}
 }

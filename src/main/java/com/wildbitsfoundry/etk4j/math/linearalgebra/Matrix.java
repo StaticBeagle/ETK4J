@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
 import com.wildbitsfoundry.etk4j.math.MathETK;
+import com.wildbitsfoundry.etk4j.math.curvefitting.CurveFitting;
 import com.wildbitsfoundry.etk4j.util.NumArrays;
 
 public class Matrix {
@@ -38,11 +39,6 @@ public class Matrix {
             }
         }
     }
-    
-    // row packed
-    // _rows = rows
-    // _cols = cols
-    // _data = data;
 
     public Matrix(double[][] data) {
         _rows = data.length;
@@ -50,12 +46,10 @@ public class Matrix {
         _data = NumArrays.flatten(data);
     }
 
-    public Matrix(double[][] data, int rows, int cols) {
-        _rows = rows;
-        _cols = cols;
-        _data = NumArrays.flatten(data);
-    }
-
+    // row packed
+    // _rows = rows
+    // _cols = cols
+    // _data = data;
     public Matrix(double[] data, int rows, int cols) {
         _rows = rows;
         _cols = cols;
@@ -390,7 +384,17 @@ public class Matrix {
         return this.solve(Matrices.Identity(_rows));
     }
 
+    public boolean isEmpty() {
+        if((_rows == 0 && _cols == 0) || _data == null || _data.length == 0) {
+            return true;
+        }
+        return false;
+    }
+
     public Matrix transpose() {
+        if(this.isEmpty()) {
+            return Matrices.empty();
+        }
         double[] result = new double[_rows * _cols];
         final int trows = _cols;
         final int tcols = _rows;
@@ -512,10 +516,11 @@ public class Matrix {
         }
     }
 
+    // TODO documents all this multiply methods. Change m for B
     /**
      * Element-by-element multiplication, C = A.*B
      *
-     * @param B another matrix
+     * @param m another matrix
      * @return A.*B
      */
 
@@ -527,7 +532,7 @@ public class Matrix {
     /**
      * Element-by-element multiplication in place, A = A.*B
      *
-     * @param B another matrix
+     * @param m another matrix
      * @return A.*B
      */
 
@@ -539,7 +544,7 @@ public class Matrix {
     /**
      * Element-by-element right division, C = A./B
      *
-     * @param B another matrix
+     * @param m another matrix
      * @return A./B
      */
 
@@ -551,7 +556,7 @@ public class Matrix {
     /**
      * Element-by-element right division in place, A = A./B
      *
-     * @param B another matrix
+     * @param m another matrix
      * @return A./B
      */
 
@@ -563,7 +568,7 @@ public class Matrix {
     /**
      * Element-by-element left division, C = A.\B
      *
-     * @param B another matrix
+     * @param m another matrix
      * @return A.\B
      */
 
@@ -584,7 +589,7 @@ public class Matrix {
     /**
      * Element-by-element left division in place, A = A.\B
      *
-     * @param B another matrix
+     * @param m another matrix
      * @return A.\B
      */
 
@@ -622,28 +627,41 @@ public class Matrix {
         NumArrays.multiplyInPlace(_data, s);
     }
 
-    public Matrix multiply(Matrix mat) {
-        if (mat._rows != this._cols) {
-            throw new IllegalArgumentException("Matrix inner dimensions must agree.");
+    public Matrix multiply(Matrix matrix) {
+        Matrix c = new Matrix(0, 0);
+        multiplyOp(this, matrix, c);
+        return c;
+    }
+
+    private static void multiplyOp(Matrix a, Matrix b, Matrix c) {
+        if (b._rows != a._cols) {
+            throw new IllegalArgumentException("Matrix inner dimensions must agree. Check that the number of" +
+                    "columns of the first matrix equal the number of rows of the second matrix.");
         }
-        double[] result = new double[this._rows * mat._cols];
-        double[] Bcolj = new double[this._cols];
-        for (int j = 0; j < mat._cols; j++) {
-            for (int k = 0; k < this._cols; k++) {
-                Bcolj[k] = mat.get(k, j);
+        double[] result = new double[a._rows * b._cols];
+        double[] bColJ = new double[a._cols];
+        for (int j = 0; j < b._cols; j++) {
+            for (int k = 0; k < a._cols; k++) {
+                bColJ[k] = b.get(k, j);
             }
-            for (int i = 0; i < this._rows; i++) {
-                double[] Arowi = new double[this._cols];
-                System.arraycopy(this._data, i * this._cols, Arowi, 0, this._cols);
+            for (int i = 0; i < a._rows; i++) {
+                double[] aRowI = new double[a._cols];
+                System.arraycopy(a._data, i * a._cols, aRowI, 0, a._cols);
 
                 double s = 0;
-                for (int k = 0; k < this._cols; k++) {
-                    s += Arowi[k]*Bcolj[k];
+                for (int k = 0; k < a._cols; k++) {
+                    s += aRowI[k] * bColJ[k];
                 }
-                result[i * mat._cols + j] = s;
+                result[i * b._cols + j] = s;
             }
         }
-        return new Matrix(result, this._rows, mat._cols);
+        c._data = result;
+        c._rows = a._rows;
+        c._cols = b._cols;
+    }
+
+    public void multiplyEquals(Matrix matrix) {
+        multiplyOp(this, matrix, this);
     }
 
     public Matrix solve(Matrix B) {
@@ -652,7 +670,7 @@ public class Matrix {
             return new LUDecomposition(this).solve(B);
         } else if (_rows > _cols) { // Matrix is thin (Overdetermined system)
             return new QRDecomposition(this).solve(B);
-        } else { // Matrix is fat (Underdetermined system)
+        } else { // Matrix is fat (Under-determined system)
             QRDecomposition qr = this.transpose().QR();
             Matrix R1 = fwdSubsSolve(qr.getRT(), B);
             R1.appendRows(_cols - R1._rows);
@@ -744,74 +762,116 @@ public class Matrix {
             }
             sb.append(String.format("%.4g", _data[i])).append(" ");
         }
+        sb.setLength(sb.length() - 1);
         return sb.toString();
     }
 
     public EigenvalueDecomposition eig() {
-        return this.eig(true);
+        return new EigenvalueDecomposition(this);
     }
 
     public EigenvalueDecomposition eig(boolean balance) {
-        Matrix A = balance ? new Matrix(this) : this;
-        return new EigenvalueDecomposition(A, balance);
+        return new EigenvalueDecomposition(this, balance);
     }
 
     /***
-     * Balances the matrix in place using algorithm #3 described in
-     * https://arxiv.org/pdf/1401.5766.pdf with norm p = 2. This method changes
-     * the content of the input <pre>matrix</pre> so use with caution.
+     * Balances the matrix using the algorithm by parlett and reinsch with norm - 1.
+     * http://www.netlib.org/eispack/balanc.f
+     * https://arxiv.org/pdf/1401.5766.pdf algorithm #2
      *
-     * @param matrix input matrix to be balanced. The resulting balanced matrix is stored in this matrix.
-     * @return The Diagonal matrix such that A<sub>balanced</sub> = DAD<sup>-1</sup>
+     * @return
      *
      * @see "https://stackoverflow.com/a/43169781/6383857"
      */
-    public static Matrix balance(Matrix matrix) {
-        if(!matrix.isSquared()) {
+    public Matrix balance() {
+        if (!this.isSquared()) {
             throw new IllegalArgumentException("Matrix must be squared.");
         }
-        double beta = 2;
-        int rows = matrix.getRowCount();
-        Matrix D = Matrices.Identity(rows);
-        double[] data = matrix.getArray();
-        boolean converged = false;
-        do {
-            converged = true;
-            for(int i = 0; i < rows; ++i) {
-                double c = 0.0;
-                double r = 0.0;
-                // norm - 2
-                for (int j = 0; j < rows; ++j) {
-                    c += data[j * rows + i] * data[j * rows + i];
-                    r += data[i * rows + j] * data[i * rows + j];
+        int rows = _rows;
+        double[] data = this.getArrayCopy();
+        double radix = 2.0;                // radix base
+        double radix2 = radix * radix;    // radix base squared
+        boolean done = false;
+        while (!done) {
+            done = true;
+            for (int i = 0; i < rows; i++) {
+                double r = 0.0, c = 0.0;
+                for (int j = 0; j < rows; j++) {
+                    if (j != i) {
+                        // Compute row[i] and col[i] norm - 1
+                        c += Math.abs(data[j * rows + i]);
+                        r += Math.abs(data[i * rows + j]);
+                    }
                 }
-                c = Math.sqrt(c);
-                r = Math.sqrt(r);
-                double f = 1.0;
-                double s = c * c + r * r;
-                double alpha = 1.0 / beta;
-                while(c < r / beta) {
-                    c *= beta;
-                    r *= alpha;
-                    f *= beta;
-                }
-                while(c >= r * beta) {
-                    c *= alpha;
-                    r *= beta;
-                    f *= alpha;
-                }
-                if(c * c + r * r < 0.95 * s) {
-                    converged = false;
-                    D.set(i, i, D.get(i, i) * f);
-                    double g = 1.0 / f;
-                    for (int j = 0; j < rows; ++j) {
-                        data[j * rows + i] *= f;
-                        data[i * rows + j] *= g;
+                if (c != 0 && r != 0) {
+                    double s = c + r;
+                    double f = 1.0;
+                    double g = r / radix;
+                    while (c < g) {
+                        f *= radix;
+                        c *= radix2;
+                    }
+                    g = r * radix;
+                    while (c > g) {
+                        f /= radix;
+                        c /= radix2;
+                    }
+                    if ((c + r) / f < 0.95 * s) {
+                        done = false;
+                        g = 1.0 / f;
+                        //scaling[i] *= f;
+                        for (int j = 0; j < rows; j++) {
+                            data[i * rows + j] *= g;
+                        }
+                        for (int j = 0; j < rows; j++) {
+                            data[j * rows + i] *= f;
+                        }
                     }
                 }
             }
-        } while(!converged);
-        return D;
+        }
+//        double beta = 2;
+//        int rows = this.getRowCount();
+//        double[] data = this.getArrayCopy();
+//        boolean converged = false;
+//        do {
+//            converged = true;
+//            for(int i = 0; i < rows; ++i) {
+//                double c = 0.0;
+//                double r = 0.0;
+//                // norm - 2
+//                for (int j = 0; j < rows; ++j) {
+//                    c += data[j * rows + i] * data[j * rows + i];
+//                    r += data[i * rows + j] * data[i * rows + j];
+//                }
+//                c = Math.sqrt(c);
+//                r = Math.sqrt(r);
+//                if(c != 0.0 && r != 0.0) {
+//                    double f = 1.0;
+//                    double s = c * c + r * r;
+//                    double alpha = 1.0 / beta;
+//                    while (c < r / beta) {
+//                        c *= beta;
+//                        r *= alpha;
+//                        f *= beta;
+//                    }
+//                    while (c >= r * beta) {
+//                        c *= alpha;
+//                        r *= beta;
+//                        f *= alpha;
+//                    }
+//                    if (c * c + r * r < 0.95 * s) {
+//                        converged = false;
+//                        double g = 1.0 / f;
+//                        for (int j = 0; j < rows; ++j) {
+//                            data[j * rows + i] *= f;
+//                            data[i * rows + j] *= g;
+//                        }
+//                    }
+//                }
+//            }
+//        } while(!converged);
+        return new Matrix(data, rows, rows);
     }
 
     public int getRowCount() {
@@ -872,44 +932,43 @@ public class Matrix {
         }
         return vals;
     }
-    
-    
+
 
     @Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + _cols;
-		result = prime * result + Arrays.hashCode(_data);
-		result = prime * result + _rows;
-		return result;
-	}
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + _cols;
+        result = prime * result + Arrays.hashCode(_data);
+        result = prime * result + _rows;
+        return result;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (!(obj instanceof Matrix)) {
-			return false;
-		}
-		Matrix other = (Matrix) obj;
-		if (_cols != other._cols) {
-			return false;
-		}
-		if (!Arrays.equals(_data, other._data)) {
-			return false;
-		}
-		if (_rows != other._rows) {
-			return false;
-		}
-		return true;
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof Matrix)) {
+            return false;
+        }
+        Matrix other = (Matrix) obj;
+        if (_cols != other._cols) {
+            return false;
+        }
+        if (!Arrays.equals(_data, other._data)) {
+            return false;
+        }
+        if (_rows != other._rows) {
+            return false;
+        }
+        return true;
+    }
 
-	/**
+    /**
      * Make a one-dimensional row packed copy of the internal array.
      *
      * @return Matrix elements packed in a one-dimensional array by rows.
@@ -933,17 +992,108 @@ public class Matrix {
         }
     }
 
-	public void setRow(int i, double[] row) {
-		if(i < 0 || i >= _rows) {
-			throw new IndexOutOfBoundsException("f");
-		}
-		if(row.length != _cols) {
-			throw new IllegalArgumentException();
-		}
-		System.arraycopy(row, 0, _data, i * _cols, _cols);
-	}
+    public void setRow(int i, double[] row) {
+        if (i < 0 || i >= _rows) {
+            throw new IndexOutOfBoundsException("f");
+        }
+        if (row.length != _cols) {
+            throw new IllegalArgumentException();
+        }
+        System.arraycopy(row, 0, _data, i * _cols, _cols);
+    }
 
-	public static void main(String[] args) {
+    public Matrix pow(int n) {
+        if (!this.isSquared()) {
+            throw new IllegalArgumentException("Matrix must be squared");
+        }
+        n = Math.abs(n);
+        if (n == 0) {
+            return Matrices.Identity(_rows);
+        }
+        Matrix a = n < 0 ? inv() : new Matrix(this);
+
+        if (n == 1) {
+            return a;
+        } else if (n == 2) {
+            a.multiplyEquals(a);
+            return a;
+        } else if (n == 3) {
+            a.multiplyEquals(a.multiply(a));
+            return a;
+        }
+        Matrix z = null, result = null;
+        while(n > 0) {
+            if(z == null) {
+                z = a;
+            } else {
+                z = z.multiply(z);
+            }
+            int bit = n % 2;
+            n = n / 2;
+            if(bit > 0) {
+                if(result == null) {
+                    result = z;
+                } else {
+                    result.multiplyEquals(z);
+                }
+            }
+        }
+        return result;
+    }
+
+    public Matrix expm() {
+        FRexpResult result = frexp(this.normInf());
+        double s = Math.max(0.0, result.exponent + 1);
+        Matrix A = this.multiply(1 / Math.pow(2.0, s));
+
+        Matrix X = new Matrix(A);
+        double c = 0.5;
+        Matrix E = Matrices.Identity(A._rows, A._cols).add(A.multiply(c));
+        Matrix D = Matrices.Identity(A._rows, A._cols).subtract(A.multiply(c));
+        double q = 6.0;
+        boolean p = true;
+        for(int k = 2; k <= q; ++k) {
+            c = c * (q - k + 1) / (k * (2 * q - k + 1));
+            X.multiplyEquals(A);
+            Matrix cX = X.multiply(c);
+            E.addEquals(cX);
+            if(p) {
+                D.addEquals(cX);
+            } else {
+                D.subtractEquals(cX);
+            }
+            p = !p;
+        }
+        E = D.solve(E);
+
+        for(int k = 0; k < s; ++k) {
+            E.multiplyEquals(E);
+        }
+        return E;
+
+    }
+
+//    public Matrix pow(double n) {
+//        if (!this.isSquared()) {
+//            throw new IllegalArgumentException("Matrix must be squared");
+//        }
+//        n = Math.abs(n);
+//        if (n == 0.0 || n == 1.0 || n == 2.0 || n == 3.0) {
+//            return pow((int) n);
+//        }
+//        Matrix a = n < 0 ? inv() : new Matrix(this);
+//        EigenvalueDecomposition eig = a.eig();
+//        Matrix D = eig.getD();
+//        for(int i = 0, j = 0; i < D._rows; ++i, ++j) {
+//            D.set(i, j, Math.pow(D.get(i, j), n));
+//        }
+//        Matrix result = eig.getV().multiply(D);
+//        result.multiplyEquals(eig.getV().inv());
+//        return result;
+//    }
+
+    // TODO add more matrix multiplication tests?
+    public static void main(String[] args) {
         Matrix a = Matrices.Magic(3);
         double[] rowPacked = a.getRowPackedCopy();
         double[] colPacked = a.getColumnPackedCopy();
@@ -958,20 +1108,104 @@ public class Matrix {
         Matrix b = Matrices.Magic(3);
         Matrix c = new Matrix(b);
 
-        balance(b);
+        b = b.balance();
 
         System.out.println();
         System.out.println(b);
         System.out.println();
         System.out.println(c);
 
-        double[] data = {1,  0.01,  0.0001, 100,  1,  0.01, 10000,  100,  1};
+        double[] data = {1, 0.01, 0.0001, 100, 1, 0.01, 10000, 100, 1};
         Matrix d = new Matrix(data, 3);
         System.out.println();
         System.out.println(d);
 
-        balance(d);
+        d = d.balance();
         System.out.println();
         System.out.println(d);
+
+        Matrix mul = Matrices.Magic(3);
+        System.out.println();
+        System.out.println(mul);
+        System.out.println();
+        System.out.println(mul.pow(0));
+        System.out.println();
+        System.out.println(mul.pow(1));
+        System.out.println();
+        System.out.println(mul.pow(2));
+        System.out.println();
+        System.out.println(mul.pow(3));
+        System.out.println();
+        System.out.println(mul.pow(4));
+        System.out.println();
+        System.out.println(mul.pow(5));
+
+        double[][] ddata = {{1,2,3}, {4,5,6},{7,8,9}};
+
+        Matrix E = new Matrix(ddata);
+        System.out.println();
+        System.out.println(E.expm());
+    }
+
+    // TODO move this to MathETK or Formulas
+    public static class FRexpResult
+    {
+        public int exponent = 0;
+        public double mantissa = 0.;
+    }
+
+    public static FRexpResult frexp(double value)
+    {
+        final FRexpResult result = new FRexpResult();
+        long bits = Double.doubleToLongBits(value);
+        double realMant = 1.;
+
+        // Test for NaN, infinity, and zero.
+        if (Double.isNaN(value) ||
+                value + value == value ||
+                Double.isInfinite(value))
+        {
+            result.exponent = 0;
+            result.mantissa = value;
+        }
+        else
+        {
+
+            boolean neg = (bits < 0);
+            int exponent = (int)((bits >> 52) & 0x7ffL);
+            long mantissa = bits & 0xfffffffffffffL;
+
+            if(exponent == 0)
+            {
+                exponent++;
+            }
+            else
+            {
+                mantissa = mantissa | (1L<<52);
+            }
+
+            // bias the exponent - actually biased by 1023.
+            // we are treating the mantissa as m.0 instead of 0.m
+            //  so subtract another 52.
+            exponent -= 1075;
+            realMant = mantissa;
+
+            // normalize
+            while(realMant >= 1.0)
+            {
+                mantissa >>= 1;
+                realMant /= 2.;
+                exponent++;
+            }
+
+            if(neg)
+            {
+                realMant = realMant * -1;
+            }
+
+            result.exponent = exponent;
+            result.mantissa = realMant;
+        }
+        return result;
     }
 }

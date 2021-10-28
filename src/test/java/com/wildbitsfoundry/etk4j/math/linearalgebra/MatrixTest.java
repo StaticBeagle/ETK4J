@@ -15,7 +15,7 @@ public class MatrixTest {
 		Matrix magic = Matrices.Magic(1);
 		assertEquals(sol, magic);
 
-		sol = Matrices.emtpty();
+		sol = Matrices.empty();
 		magic = Matrices.Magic(2);
 		assertEquals(sol, magic);
 
@@ -47,11 +47,21 @@ public class MatrixTest {
 	@Test
 	public void testPinv() {
 		double[][] values = { { 1, 2 }, { 3, 4 }, { 5, 6 } };
-		Matrix matrix = new Matrix(values).pinv();
+		Matrix matrix = new Matrix(values);
 
 		double[] solution = { -1.3333333333333317, -0.3333333333333325, 0.6666666666666661, 1.0833333333333321,
 				0.33333333333333265, -0.4166666666666662 };
-		assertEquals(new Matrix(solution, 2, 3), matrix);
+		assertEquals(new Matrix(solution, 2, 3), matrix.pinv());
+	}
+
+	@Test
+	public void testExpm() {
+		double[][] data = {{1,2,3}, {4,5,6},{7,8,9}};
+		Matrix matrix = new Matrix(data);
+
+		double[] solution = { 1118906.6994131864, 1374815.0629358063, 1630724.4264584277, 2533881.0418989714,
+				3113415.0313805523, 3692947.020862136, 3948856.3843847574, 4852012.9998253, 5755170.615265846};
+		assertEquals(new Matrix(solution, 3, 3), matrix.expm());
 	}
 
 	@Test

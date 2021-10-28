@@ -116,4 +116,17 @@ public final class MathETK {
 	public static boolean isClose(double a, double b) {
 		return isClose(a, b, 1e-8, 1e-5);
 	}
+
+	public static double logb(double x, int base) {
+		return Math.log(x) / Math.log(base);
+	}
+
+	/***
+	 * Round to the next even number.
+	 * @param d number to be rounded.
+	 * @return the input number rounded to the next even number.
+	 */
+	public static long roundEven(double d) {
+		return Math.round(d / 2) * 2;
+	}
 }

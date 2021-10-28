@@ -885,7 +885,7 @@ public class EigenvalueDecomposition {
 			}
 		}
 		if(balance && !issymmetric) {
-			Matrix.balance(Arg);
+			A = Arg.balance().getArray();
 		}
 
 		V = new double[_dim * _dim];

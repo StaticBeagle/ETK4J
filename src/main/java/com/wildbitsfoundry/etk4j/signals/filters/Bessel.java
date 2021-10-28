@@ -26,6 +26,25 @@ public class Bessel extends AnalogFilter {
         return besselap(n, FrequencyNormalization.PHASE);
     }
 
+    /*
+        Port from scipy
+        ``phase``
+            The filter is normalized such that the phase response reaches its
+            midpoint at an angular (e.g., rad/s) cutoff frequency of 1. This
+            happens for both low-pass and high-pass filters, so this is the
+            "phase-matched" case. [6]_
+            The magnitude response asymptotes are the same as a Butterworth
+            filter of the same order with a cutoff of `Wn`.
+            This is the default, and matches MATLAB's implementation.
+        ``delay``
+            The filter is normalized such that the group delay in the passband
+            is 1 (e.g., 1 second). This is the "natural" type obtained by
+            solving Bessel polynomials
+        ``mag``
+            The filter is normalized such that the gain magnitude is -3 dB at
+            angular frequency 1. This is called "frequency normalization" by
+            Bond. [1]_
+     */
     public static ZeroPoleGain besselap(int n, FrequencyNormalization norm) { // change norm to enum
         if(n == 0) {
             return new ZeroPoleGain(new Complex[]{}, new Complex[]{}, 1.0);
@@ -56,6 +75,7 @@ public class Bessel extends AnalogFilter {
         return new ZeroPoleGain(zeros, poles, k);
     }
 
+    // TODO add normalization phase,delay,mag as an overload
     public static TransferFunction newLowPass(int n, double wn) {
         ZeroPoleGain zpk = besselap(n);
         return lpTolp(zpk, wn);
@@ -200,7 +220,7 @@ public class Bessel extends AnalogFilter {
         double a1 = Polynomial.polyval(new double[]{-6, -6}, n) / r;
         double a2 = 6 / r;
 
-        double[] k = NumArrays.linsteps(1, n);
+        double[] k = NumArrays.linSteps(1, n);
         double[] x = Polynomial.polyval(new double[]{a2, a1, 0}, k);
         double[] y = Polynomial.polyval(new double[]{b3, b2, b1, b0}, k);
         return ComplexArrays.zip(x, y);
@@ -269,7 +289,7 @@ public class Bessel extends AnalogFilter {
             return prod.invert().multiply(k).abs();
         };
         UnivariateFunction cutoff = w -> gw.evaluateAt(w) - 1.0 / Math.sqrt(2.0);
-
+        // 1.0 / Math.sqrt(2.0) = -3 db which is equal to 10 ^ (-3.0 / 20.0) TODO change -3 to an arbitrary input
         double result = Secant.solve(cutoff, 1.5, 1.5 * (1 + 1e-4), 1.48e-8, 0.0, 50);
         return result;
     }

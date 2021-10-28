@@ -10,16 +10,34 @@ import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkM
 import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkXYDimensions;
 
 public class NearestNeighbor extends PiecewiseFunction {
-	
+
 	interface NeighborCalculator {
 		int calculateNeighborIndex(double t);
 	}
 	
 	private double[] _y = null;
-	private NeighborCalculator _calculator = null;
-	protected NearestNeighbor(double[] x, double[] y) {
+	private double threshold = 0.5;
+	private NeighborCalculator neighborCalculator;
+
+	protected NearestNeighbor(double[] x, double[] y, double threshold, boolean roundUp) {
 		super(x);
 		_y = Arrays.copyOf(y, y.length);
+		this.threshold = threshold;
+		if(roundUp) {
+			this.neighborCalculator = new NeighborCalculator() {
+				@Override
+				public int calculateNeighborIndex(double t) {
+					return t >= threshold ? 1 : 0;
+				}
+			};
+		} else {
+			this.neighborCalculator = new NeighborCalculator() {
+				@Override
+				public int calculateNeighborIndex(double t) {
+					return t > threshold ? 1 : 0;
+				}
+			};
+		}
 		if(!NumArrays.isAscending(x)) {
 			throw new IllegalArgumentException("x must be monotonically increasing");
 		}
@@ -31,58 +49,49 @@ public class NearestNeighbor extends PiecewiseFunction {
 	}
 	
 	public static NearestNeighbor newNearestNeighbor(double[] x, double[] y) {
-		return newNearestNeighborInPlace(Arrays.copyOf(x, x.length), y);
+		return newNearestNeighborInPlace(Arrays.copyOf(x, x.length), y, 0.5, true);
+	}
+
+	public static NearestNeighbor newNearestNeighbor(double[] x, double[] y, double threshold) {
+		return newNearestNeighborInPlace(Arrays.copyOf(x, x.length), y, threshold, true);
+	}
+
+	public static NearestNeighbor newNearestNeighbor(double[] x, double[] y, boolean roundUp) {
+		return newNearestNeighborInPlace(Arrays.copyOf(x, x.length), y, 0.5, roundUp);
+	}
+
+	public static NearestNeighbor newNearestNeighbor(double[] x, double[] y, double threshold, boolean roundUp) {
+		return newNearestNeighborInPlace(Arrays.copyOf(x, x.length), y, threshold, roundUp);
 	}
 	
 	public static NearestNeighbor newNearestNeighborInPlace(double[] x, double[] y) {
+		return newNearestNeighborInPlace(x, y, 0.5, true);
+	}
+
+	public static NearestNeighbor newNearestNeighborInPlace(double[] x, double[] y, double threshold) {
+		return newNearestNeighborInPlace(x, y, threshold, true);
+	}
+
+	public static NearestNeighbor newNearestNeighborInPlace(double[] x, double[] y, boolean roundUp) {
+		return newNearestNeighborInPlace(x, y, 0.5, roundUp);
+	}
+
+	public static NearestNeighbor newNearestNeighborInPlace(double[] x, double[] y, double threshold, boolean roundUp) {
 		checkXYDimensions(x, y);
 		checkMinXLength(x, 2);
-		
-		NearestNeighbor nh = new NearestNeighbor(x, y);
-		nh._calculator = new NeighborCalculator() {
-			
-			@Override
-			public int calculateNeighborIndex(double t) {
-				return t >= 0.5 ? 1 : 0;
-			}
-		};
+		if(threshold < 0 || threshold > 1) {
+			throw new IllegalArgumentException("Threshold must be 0 < threshold <= 1.");
+		}
+
+		NearestNeighbor nh = new NearestNeighbor(x, y, threshold, roundUp);
 		return nh;
 	}
-	
-	public static NearestNeighbor newNextNeighbor(double[] x, double[] y) {
-		checkXYDimensions(x, y);
-		checkMinXLength(x, 2);
-		
-		NearestNeighbor nh = new NearestNeighbor(Arrays.copyOf(x, x.length), y);
-		nh._calculator = new NeighborCalculator() {
-			
-			@Override
-			public int calculateNeighborIndex(double t) {
-				return 1;
-			}
-		};
-		return nh;
-	}
-	
-	public static NearestNeighbor newPreviousNeighbor(double[] x, double[] y) {
-		checkXYDimensions(x, y);
-		checkMinXLength(x, 2);
-		
-		NearestNeighbor nh = new NearestNeighbor(Arrays.copyOf(x, x.length), y);
-		nh._calculator = new NeighborCalculator() {
-			
-			@Override
-			public int calculateNeighborIndex(double t) {
-				return 0;
-			}
-		};
-		return nh;
-	}
+
 
 	@Override
 	public double evaluateSegmentAt(int index, double x) {
 		double t = (x - _x[index]) / (_x[index + 1] - _x[index]);
-		return _y[index + _calculator.calculateNeighborIndex(t)];
+		return _y[index + neighborCalculator.calculateNeighborIndex(t)];
 	}
 
 	@Override
@@ -98,4 +107,15 @@ public class NearestNeighbor extends PiecewiseFunction {
 		return fn;
 	}
 
+	public static void main(String[] args) {
+		double[] x = { 1, 2, 3, 4 };
+		double[] y = { 1, 4, 9, 16 };
+
+		NearestNeighbor nh = NearestNeighbor.newNearestNeighbor(x, y);
+		double[] xi = {1, 1.5, 2, 2.5, 3, 3.5, 4};
+		System.out.println();
+		for(double d : xi) {
+			System.out.printf("x: %f, y: %f%n", d, nh.evaluateAt(d));
+		}
+	}
 }

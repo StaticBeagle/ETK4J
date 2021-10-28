@@ -34,34 +34,35 @@ public abstract class Spline extends PiecewiseFunction implements Differentiable
 		};
 		return fn;
 	}
-	
+
+	// TODO shouldn't this be in the parent?
 	public void setExtrapolationMethod(ExtrapolationMethod method) {
 		double x0 = _x[0];
 		double xn = _x[_x.length - 1];
 		double y0 = this.evaluateAt(x0);
 		double yn = this.evaluateAt(xn);
 		switch (method) {
-		case ClampToZero:
+		case CLAMP_TO_ZERO:
 			this.setExtrapolator(new ClampToZeroExtrapolator());
 			break;
-		case ClampToNaN:
+		case CLAMP_TO_NAN:
 			this.setExtrapolator(new ClampToNaNExtrapolator());
 			break;
-		case ClampToEndPoint:
+		case CLAMP_TO_END_POINT:
 			this.setExtrapolator(new ClampToEndPointExtrapolator(x0, xn, y0, yn));
 			break;
-		case Natural:
+		case NATURAL:
 			UnivariateFunction lfn = this.getFirstSegment();
 			UnivariateFunction rfn = this.getLastSegment();
 			this.setExtrapolator(new NaturalExtrapolator(lfn, rfn, x0, xn));
 			break;
-		case Linear:
+		case LINEAR:
 			this.setExtrapolator(new LinearExtrapolator(this, x0, xn, y0, yn));
 			break;
-		case Periodic:
+		case PERIODIC:
 			this.setExtrapolator(new PeriodicExtrapolator(this, x0, xn));
 			break;
-		case Throw:
+		case THROW:
 			this.setExtrapolator(new ThrowExtrapolator(x0, xn));
 			break;
 		default:

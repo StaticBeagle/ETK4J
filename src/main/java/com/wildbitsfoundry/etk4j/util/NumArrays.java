@@ -1,9 +1,15 @@
 package com.wildbitsfoundry.etk4j.util;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.IntStream;
 
 import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.interpolation.CubicSpline;
+import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
 
 public final class NumArrays {
 
@@ -21,7 +27,7 @@ public final class NumArrays {
      *            number of samples
      * @return Array of n equally spaced samples between [x0, x1]
      */
-    public static double[] linspace(double x0, double x1, int n) {
+    public static double[] linSpace(double x0, double x1, int n) {
         double[] result = new double[n];
         int i = 0;
         double delta = (x1 - x0) / --n;
@@ -38,13 +44,13 @@ public final class NumArrays {
      *
      * @param x0
      *            starting point
-     * @param step
-     *            step size
      * @param x1
      *            end point
+     * @param step
+     *            step size
      * @return Array of n equally spaced samples between [x0, x1]
      */
-    public static double[] linsteps(double x0, double step, double x1) {
+    public static double[] linSteps(double x0, double x1, double step) {
         final int n = (int) Math.ceil((x1 - x0) / step);
         double[] result = new double[n + 1];
         int i = 0;
@@ -66,8 +72,8 @@ public final class NumArrays {
      * @return Array of n equally spaced samples between [x0, x1]. Step size is
      *         assumed to be 1
      */
-    public static double[] linsteps(double x0, double x1) {
-        return linsteps(x0, 1.0, x1);
+    public static double[] linSteps(double x0, double x1) {
+        return linSteps(x0, x1, 1.0);
     }
 
     /***
@@ -81,7 +87,7 @@ public final class NumArrays {
      *            number of samples
      * @return Array of n logarithmically spaced samples between [x0, x1]
      */
-    public static double[] logspace(int x0, int x1, int n) {
+    public static double[] logSpace(int x0, int x1, int n) {
         double[] result = new double[n];
         int i = 0;
         double delta = (double) (x1 - x0) / --n;
@@ -117,7 +123,33 @@ public final class NumArrays {
         return result;
     }
 
-    public static double[] conv(double[] a, double[] b) {
+    public static double[] subtract(double a, double[] b) {
+        final int length = b.length;
+        double[] result = new double[length];
+        for (int i = 0; i < length; ++i) {
+            result[i] = a - b[i];
+        }
+        return result;
+    }
+
+    public static double[] subtract(double[] a, double b) {
+        final int length = a.length;
+        double[] result = new double[length];
+        for (int i = 0; i < length; ++i) {
+            result[i] = a[i] - b;
+        }
+        return result;
+    }
+
+    public static double[] abs(double[] a) {
+        double[] result = new double[a.length];
+        for(int i = 0; i < a.length; ++i) {
+            result[i] = Math.abs(a[i]);
+        }
+        return result;
+    }
+
+    public static double[] convolution(double[] a, double[] b) {
         double[] result = new double[a.length + b.length - 1];
 
         for (int i = 0; i < result.length; ++i) {
@@ -142,7 +174,16 @@ public final class NumArrays {
         }
     }
 
+    // TODO these element-wise functions can be rewritten without the elementWise
+    // I think the add function overlaps
+    // Maybe intead of add in place, add equals?
     public static double[] addElementWise(double[] a, double b) {
+        double[] result = Arrays.copyOf(a, a.length);
+        addElementWiseInPlace(result, b);
+        return result;
+    }
+
+    public static double[] addElementWise(double[] a, double[] b) {
         double[] result = Arrays.copyOf(a, a.length);
         addElementWiseInPlace(result, b);
         return result;
@@ -151,6 +192,16 @@ public final class NumArrays {
     public static void addElementWiseInPlace(double[] a, double b) {
         for (int i = 0; i < a.length; ++i) {
             a[i] += b;
+        }
+    }
+
+    // TODO remove the ElementWise
+    public static void addElementWiseInPlace(double[] a, double[] b) {
+        if (a.length != b.length) {
+            throw new IllegalArgumentException("a and b dimensions must match");
+        }
+        for (int i = 0; i < a.length; ++i) {
+            a[i] += b[i];
         }
     }
 
@@ -196,14 +247,6 @@ public final class NumArrays {
         }
     }
 
-    public static double normFast(double[] a) {
-        double norm = 0.0;
-        for (int i = 0; i < a.length; ++i) {
-            norm += a[i] * a[i];
-        }
-        return Math.sqrt(norm);
-    }
-
     public static double max(double... a) {
         double max = a[0];
         for (int i = 1; i < a.length; ++i) {
@@ -222,6 +265,24 @@ public final class NumArrays {
             }
         }
         return min;
+    }
+
+    public static int argMin(double[] a) {
+        int index = 0;
+        double min = a[0];
+        for (int i = 1; i < a.length; ++i) {
+            if (a[i] < min) {
+                min = a[i];
+                index = i;
+            }
+        }
+        return index;
+    }
+
+    public static int[] argSort(double[] a) {
+        Integer[] indexes = IntStream.range(0, a.length).boxed().toArray(Integer[]::new);
+        Arrays.sort(indexes, Comparator.comparing(i -> a[i]));
+        return Arrays.stream(indexes).mapToInt(Integer::intValue).toArray();
     }
 
     public static double norm1(double[] a) {
@@ -256,17 +317,6 @@ public final class NumArrays {
         return max;
     }
 
-    public static double normInf(Double[] a) {
-        double max = Math.abs(a[0].doubleValue());
-        for (int i = 1; i < a.length; ++i) {
-            double abs = Math.abs(a[i].doubleValue());
-            if (abs > max) {
-                max = abs;
-            }
-        }
-        return max;
-    }
-
     public static double normNegInf(double[] a) {
         double min = Math.abs(a[0]);
         for (int i = 1; i < a.length; ++i) {
@@ -288,7 +338,8 @@ public final class NumArrays {
      * @return
      *
      *         <pre>
-     *         sqrt((a[i] - b[i])<sup>2</sup>)
+     *         sqrt(sum((a[i] - b[i])<sup>2</sup>))
+     *         </pre>
      */
     public static double distance(double[] a, double[] b) {
         double norm = 0.0;
@@ -298,7 +349,13 @@ public final class NumArrays {
         return norm;
     }
 
-    public static double[] kron(final double[] a, final double[] b) {
+    /***
+     * Kronecker array product.
+     * @param a input array
+     * @param b input array
+     * @return an array formed by taking all possible products between the elements of a and b
+     */
+    public static double[] kronecker(final double[] a, final double[] b) {
         int aLength = a.length;
         int bLength = b.length;
         double[] c = new double[aLength * bLength];
@@ -316,7 +373,7 @@ public final class NumArrays {
         return c;
     }
 
-    public static double[] concat(double[] a, double[] b) {
+    public static double[] concatenate(double[] a, double[] b) {
         int aLength = a.length;
         int bLength = b.length;
         double[] result = new double[aLength + bLength];
@@ -325,7 +382,7 @@ public final class NumArrays {
         return result;
     }
 
-    public static double[] concatAll(double[] a, double[]... rest) {
+    public static double[] concatenateAll(double[] a, double[]... rest) {
         int totalLength = a.length;
         for (double[] array : rest) {
             totalLength += array.length;
@@ -335,6 +392,42 @@ public final class NumArrays {
         for (double[] array : rest) {
             System.arraycopy(array, 0, result, offset, array.length);
             offset += array.length;
+        }
+        return result;
+    }
+
+    public static double[][] concatenate(double[][] a, double[][] b) {
+        if(a.length != b.length) {
+            throw new IllegalArgumentException("Both arrays must have the same number of rows.");
+        }
+        double[][] result = new double[a.length][];
+        for(int i = 0; i < a.length; ++i) {
+            result[i] = concatenate(a[i], b[i]);
+        }
+        return result;
+    }
+
+    public static double[][] stack(double[] a, double[] b) {
+        double[][] result = new double[2][];
+        result[0] = Arrays.copyOf(a, a.length);
+        result[1] = Arrays.copyOf(b, b.length);
+        return result;
+    }
+
+    public static double[][] stack(double[][] a, double[] b) {
+        double[][] result = new double[a.length + 1][];
+        for(int i = 0; i < a.length - 1; ++i) {
+            result[i] = Arrays.copyOf(a[i], a[i].length);
+        }
+        result[result.length - 1] = Arrays.copyOf(b, b.length);
+        return result;
+    }
+
+    public static double[][] stack(double[] a, double[][] b) {
+        double[][] result = new double[b.length + 1][];
+        result[0] = Arrays.copyOf(a, a.length);
+        for(int i = 1; i < a.length; ++i) {
+            result[i] = Arrays.copyOf(b[i], b[i].length);
         }
         return result;
     }
@@ -366,7 +459,7 @@ public final class NumArrays {
         return result;
     }
 
-    public static double sumSquare(double[] a) {
+    public static double sumSquares(double[] a) {
         final int length = a.length;
         double result = 0;
         for (int i = 0; i < length; ++i) {
@@ -375,7 +468,7 @@ public final class NumArrays {
         return result;
     }
 
-    public static double[] cummulativeSum(double[] a) {
+    public static double[] cumulativeSum(double[] a) {
         final int length = a.length;
         double[] result = new double[length];
         result[0] = a[0];
@@ -400,12 +493,18 @@ public final class NumArrays {
         return true;
     }
 
+
     /**
-     * Helper method to copy a 2 dimensional array
-     *
-     * @param a array
-     *          to copy
-     * @return a newly created array containing the copy of array
+     * Converts (flattens) a 2d array into a 1d array by copying
+     * every row of the 2d array into the 1d array.
+     * <pre>
+     * let a = {{1, 2, 3}, {4, 5, 6}};
+     * thus flatten(a) returns:
+     * {1, 2, 3, 4, 5, 6}
+     *</pre>
+     * @param a array to flatten
+     * @return a new row-packed 1d array
+     * @throws IllegalArgumentException if the input array a is jagged (i.e. not all rows have the same length)
      */
     public static double[] flatten(double[][] a) {
         int rows = a.length;
@@ -427,24 +526,6 @@ public final class NumArrays {
             sum += y[i];
         }
         return sum / n;
-    }
-
-    public static Double[] box(double[] a) {
-        final int length = a.length;
-        Double[] boxed = new Double[length];
-        for (int i = 0; i < length; ++i) {
-            boxed[i] = a[i];
-        }
-        return boxed;
-    }
-
-    public static double[] unbox(Double[] a) {
-        final int length = a.length;
-        double[] unboxed = new double[length];
-        for (int i = 0; i < length; ++i) {
-            unboxed[i] = a[i].doubleValue();
-        }
-        return unboxed;
     }
 
     public static double[] scaleRange(double[] a, double curMin, double curMax, double newMin, double newMax) {
@@ -478,6 +559,14 @@ public final class NumArrays {
         return true;
     }
 
+    public static double[] difference(double[] a) {
+        double[] result = new double[a.length - 1];
+        for(int i = 0; i < result.length; ++i) {
+            result[i] = a[i + 1] - a[i];
+        }
+        return result;
+    }
+
     public static double[] gradient(double[] a) {
         // check bounds
 
@@ -494,13 +583,14 @@ public final class NumArrays {
     }
 
     public static double[] gradient(double[] a, double[] h) {
+        // TODO
         // check bounds
         // check that arrays have the same size
 
         double[] grad = new double[a.length];
         final int end = a.length - 1;
         grad[0] = (a[1] - a[0]) / (h[1] - h[0]); // once sided difference
-        grad[end] = (a[end] - a[end - 1]) / (h[end] - h[end - 1]); // once sided difference
+        grad[end] = (a[end] - a[end - 1]) / (h[end] - h[end - 1]); // one sided difference
 
         // central difference
         for (int i = 1; i < end; ++i) {
@@ -536,7 +626,133 @@ public final class NumArrays {
         return result;
     }
 
+    public static double[][] outer(double[] a, double[] b) {
+        int M = a.length;
+        int N = b.length;
+        double[][] result = new double[M][N];
+        for(int i = 0; i < M; ++i) {
+            for(int j = 0; j < N; ++j) {
+                result[i][j] = a[i] * b[j];
+            }
+        }
+        return result;
+    }
+
+    public static double dot(double[] a, double[] b) {
+        if(a.length != b.length) {
+            throw new IllegalArgumentException("Both arrays must be of the same length");
+        }
+        double result = 0.0;
+        for(int i = 0; i < a.length; ++i) {
+            result += a[i] * b[i];
+        }
+        return result;
+    }
+
+    public static double[] dot(double[][] a, double[] b) {
+        double[] result = new double[a[0].length];
+        for(int i = 0; i < a.length; ++i) {
+            result[i] = dot(a[i], b);
+        }
+        return result;
+    }
+
+    public static double[] dot(double[] a, double[][] b) {
+        if(a.length != b.length) {
+            throw new IllegalArgumentException("The number of elements in a must match the number of rows in b");
+        }
+        Matrix A = new Matrix(a, 1);
+        A.multiplyEquals(new Matrix(b));
+        return A.getArray();
+    }
+
+    public static double[] dot(double[] a, double b) {
+        return multiply(a, b);
+    }
+
+    public static double product(double[] a) {
+        double prod = 1.0;
+        for(int i = 0; i < a.length; ++i) {
+            prod *= a[i];
+        }
+        return prod;
+    }
+
+    public static boolean allClose(double[] a, double target) {
+        for(int i = 0; i < a.length; ++i) {
+            if(!MathETK.isClose(a[i], target)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static boolean allClose(double[] a, double target, double absTol, double relTol) {
+        for(int i = 0; i < a.length; ++i) {
+            if(!MathETK.isClose(a[i], target, absTol, relTol)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static boolean allClose(double[] a, double target, double absTol) {
+        for(int i = 0; i < a.length; ++i) {
+            if(!MathETK.isClose(a[i], target, absTol)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static double[] ones(int n) {
+        double[] result = new double[n];
+        Arrays.fill(result, 1.0);
+        return result;
+    }
+
+    // TODO concat and stack operations in place?
+
+    // https://stackoverflow.com/a/17634025/6383857
+    public static double[][] transpose(double[][] a) {
+        // empty or unset array, nothing do to here
+        if (a == null || a.length == 0)
+            return a;
+
+        int width = a.length;
+        int height = a[0].length;
+
+        double[][] result = new double[height][width];
+
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                result[y][x] = a[x][y];
+            }
+        }
+        return result;
+    }
+
     public static void main(String[] args) {
+
         System.out.println(min(2,9,1,5));
+        double[] a = {1, 2, 3};
+        double[] b = {4, 5, 6};
+
+        System.out.println(Arrays.toString(kronecker(a, b)));
+
+        double[][] aa = {{1, 2}, {3, 4}};
+        double[] bb = {5, 6};
+        System.out.println(Arrays.toString(dot(bb, aa)));
+
+        System.out.println(Arrays.toString(dot(aa, bb)));
+
+        System.out.println(product(a));
+
+        // TODO unit tests
+        double[] aaa = {1, 1, 2, 3, 5, 8, 13, 21};
+        System.out.println(Arrays.toString(difference(aaa)));
+
+        double[] aaaa = {0, 1, 1, 0, 2, 3, 5, 0, 8, 13, 21};
+        System.out.println(argMin(aaaa));
     }
 }

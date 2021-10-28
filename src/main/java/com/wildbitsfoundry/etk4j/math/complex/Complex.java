@@ -17,6 +17,13 @@ public class Complex implements Comparable<Complex> {
 		_imag = imag;
 	}
 
+	// TODO create actual copy constructor
+
+	public Complex(Complex c) {
+		_real = c._real;
+		_imag = c._imag;
+	}
+
 	public static Complex newComplex(Complex c) {
 		return new Complex(c._real, c._imag);
 	}
@@ -78,6 +85,10 @@ public class Complex implements Comparable<Complex> {
 		if (Double.doubleToLongBits(_real) != Double.doubleToLongBits(other._real))
 			return false;
 		return true;
+	}
+
+	public boolean isReal() {
+		return _imag == 0;
 	}
 
 	public boolean isClose(Complex other, double tol) {
