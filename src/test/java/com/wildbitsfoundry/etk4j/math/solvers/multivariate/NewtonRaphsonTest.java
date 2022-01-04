@@ -132,11 +132,11 @@ public class NewtonRaphsonTest {
 		SolverResults sol = new NewtonRaphson(functions, jacobian, initialguess).setAbsTolerance(1e-9).setRelTolerance(1e-6)
 				.setIterationLimit(100).solve();
 		assertArrayEquals(new double[] { 0.8332816138167558, 0.03533461613948315, -0.49854927781116914}, sol.Solution, 1e-12);
-		String expected = "Status: SUCCESS\r\n" + 
-				"Iterations: 9\r\n" + 
-				"Converged: true\r\n" + 
-				"Estimated Error: 2.0395127754881876E-8\r\n" + 
-				"Solution: [0.833282, 0.0353346, -0.498549]";
+		String expected = String.format("Status: SUCCESS%n" +
+				"Iterations: 9%n" +
+				"Converged: true%n" +
+				"Estimated Error: 2.0395127754881876E-8%n" +
+				"Solution: [0.833282, 0.0353346, -0.498549]");
 		assertEquals(expected, sol.toString());
 	}
 	

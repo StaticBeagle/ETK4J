@@ -58,11 +58,11 @@ public class NewtonRaphsonTest {
 				.relTolerance(1e-6)
 				.iterationLimit(100)
 				.solve();
-		String expected = "Status: SUCCESS\r\n" + 
-				"Iterations: 5\r\n" + 
-				"Converged: true\r\n" + 
-				"Estimated Error: 1.5947243525715749E-12\r\n" + 
-				"Solution: 1.41421";
+		String expected = String.format("Status: SUCCESS%n" +
+				"Iterations: 5%n" +
+				"Converged: true%n" +
+				"Estimated Error: 1.5947243525715749E-12%n" +
+				"Solution: 1.41421");
 		assertEquals(expected, sol.toString());
 	}
 	
