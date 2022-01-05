@@ -8,6 +8,7 @@ public abstract class PiecewiseFunction implements UnivariateFunction {
 	private int _numberOfSegments;
 	protected double[] _x = null;
 	protected double[] _coefs = null;
+	// TODO _coefs name doesn't make sense
 	Extrapolator _extrapolator;
 
 	private double _x0, _xn;

@@ -178,6 +178,12 @@ public class Matrix {
     }
 
     public void set(int i, int j, double val) {
+        if(i > _rows) {
+            // TODO throw
+        }
+        if(j > _cols) {
+            // throw
+        }
         _data[i * _cols + j] = val;
     }
 

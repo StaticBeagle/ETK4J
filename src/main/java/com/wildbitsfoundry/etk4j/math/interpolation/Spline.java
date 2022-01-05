@@ -133,6 +133,7 @@ public abstract class Spline extends PiecewiseFunction implements Differentiable
 	}
 
 	private void calcuateIntegral() {
+		// TODO fix typo
 		// Lazy creating the values
 		if (_indefiniteIntegral != null) {
 			return;
