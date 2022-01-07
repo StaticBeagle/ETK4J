@@ -47,11 +47,12 @@ public class ZeroPoleGain extends LinearTimeInvariantSystem {
         return new TransferFunction(this);
     }
 
-    @Override
+    @Override // TODO this should be public to comply with Liskov
     protected ZeroPoleGain toZeroPoleGain() {
         return this;
     }
 
+    // TODO this only works for digital filters
     public double[][] toSecondOrderSections() {
         if (zeros.length == 0 && poles.length == 0) {
             return new double[][]{{gain, 0.0, 0.0, 1.0, 0.0, 0.0}};

@@ -644,6 +644,8 @@ public class TransferFunction extends LinearTimeInvariantSystem {
         this._rf.normalize();
     }
     // TODO add getOrder
+
+    // TODO this should be public to comply with Liskov
     @Override
     protected TransferFunction toTransferFunction() {
         return this;

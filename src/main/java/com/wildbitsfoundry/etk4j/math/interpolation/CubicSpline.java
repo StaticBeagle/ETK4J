@@ -51,6 +51,7 @@ public class CubicSpline extends Spline {
 		for (int i = 0, j = 0; i < n - 1; ++i, ++j) {
 			double hx = _x[i + 1] - _x[i];
 			if (hx <= 0.0) {
+				// TODO create nonMonotonic exception
 				throw new IllegalArgumentException("x must be monotonically increasing");
 			}
 			double m0 = dydx[i] * hx;
@@ -281,7 +282,8 @@ public class CubicSpline extends Spline {
 					.append(d != 0d ? String.format(" + %.4g", d, _x[i]) : "").append(System.lineSeparator());
 		}
 		sb.setLength(Math.max(sb.length() - System.lineSeparator().length(), 0));
-		return sb.toString().replace("+ -", "- ").replace("- -", "+ ").replace("=  + ", "= ").replace("=  - ", "= -");
+		return sb.toString().replace("+ -", "- ").replace("- -", "+ ")
+				.replace("=  + ", "= ").replace("=  - ", "= -");
 	}
 
 	public static void main(String[] args) {

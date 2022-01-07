@@ -11,12 +11,15 @@ import org.junit.Test;
 
 public class InterpolantsTest {
 
+	// TODO test derivatives and definite/indefinite integrals
+
 	@Test
 	public void testLinear() {
 		double x = linear(1, 2, 1, 2, 1.5);
 		assertEquals(1.5, x, 1e-12);
 	}
-	
+
+	// TODO Maybe remove cosine
 	@Test
 	public void testCosine() {
 		double x = cosine(1, 2, 1, 2, 1.5);

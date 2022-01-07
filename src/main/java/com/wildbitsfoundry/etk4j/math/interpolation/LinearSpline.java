@@ -53,6 +53,23 @@ public class LinearSpline extends Spline {
 		return t * (_coefs[i + 1] + t * _coefs[i] * 0.5);
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0, j = 0; i < _x.length - 1; ++i, ++j) {
+			double a = _coefs[j];
+			double b = _coefs[++j];
+
+			sb.append("S").append(i + 1).append("(x) = ")
+					.append(a != 0d ? String.format("%.4g * (x - %.4f)", a, _x[i]) : "")
+					.append(b != 0d ? String.format(" + %.4g", b) : "")
+					.append(System.lineSeparator());
+		}
+		sb.setLength(Math.max(sb.length() - System.lineSeparator().length(), 0));
+		return sb.toString().replace("+ -", "- ").replace("- -", "+ ")
+				.replace("=  + ", "= ").replace("=  - ", "= -");
+	}
+
 	public static void main(String[] args) {
 		double[] x = { 1, 2, 3, 4 };
 		double[] y = { 1, 4, 9, 16 };

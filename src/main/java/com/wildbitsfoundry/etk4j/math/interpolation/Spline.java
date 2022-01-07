@@ -25,13 +25,7 @@ public abstract class Spline extends PiecewiseFunction implements Differentiable
 		int offset = index * _order;
 		final double[] coefs = Arrays.copyOfRange(_coefs, offset, offset + _order);
 		final double x0 = _x[index];
-		UnivariateFunction fn = new UnivariateFunction() {
-			
-			@Override
-			public double evaluateAt(double x) {
-				return NumArrays.horner(coefs, x - x0);
-			}
-		};
+		UnivariateFunction fn = x -> NumArrays.horner(coefs, x - x0);
 		return fn;
 	}
 
@@ -69,7 +63,8 @@ public abstract class Spline extends PiecewiseFunction implements Differentiable
 			throw new IllegalArgumentException("Invalid extrapolation option");
 		}
 	}
-		
+
+	// TODO this t and x is confusing, the interface should expose x not t
 	protected double evaluateDerivativeAt(int index, double t) {
 		index *= _order;
 		final int length = _order - 1;
@@ -80,7 +75,8 @@ public abstract class Spline extends PiecewiseFunction implements Differentiable
 		}
 		return result;
 	}
-	
+
+	// TODO this t and x is confusing, the interface should expose x not t
 	public double evaluateAntiDerivativeAt(int index, double t) {
 		index *= _order;
 		double result = 0.0;
@@ -124,7 +120,7 @@ public abstract class Spline extends PiecewiseFunction implements Differentiable
 	public double integrate(double x) {
 		// Lazy creating of values
 		if (_indefiniteIntegral == null) {
-			this.calcuateIntegral();
+			this.calculateIntegral();
 		}
 
 		int i = this.findSegmentIndex(x);
@@ -132,8 +128,7 @@ public abstract class Spline extends PiecewiseFunction implements Differentiable
 		return _indefiniteIntegral[i] + this.evaluateAntiDerivativeAt(i, t);
 	}
 
-	private void calcuateIntegral() {
-		// TODO fix typo
+	private void calculateIntegral() {
 		// Lazy creating the values
 		if (_indefiniteIntegral != null) {
 			return;

@@ -14,6 +14,9 @@ public class CubicSplineTest {
 	static double[] xi;
 	static double left;
 	static double right;
+
+	// TODO test derivatives and definite/indefinite integrals
+	// add tests for quadratic spline
 	
 	@Rule
 	public final ExpectedException exception = ExpectedException.none();
