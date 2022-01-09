@@ -176,6 +176,7 @@ public class TransferFunction extends LinearTimeInvariantSystem {
         return phase;
     }
 
+    // TODO implement getFrequencyResponse(void)?
     public FrequencyResponse getFrequencyResponse() {
         double[] frequencies = findFrequencies(200);
         return this.getFrequencyResponse(frequencies);
@@ -251,7 +252,7 @@ public class TransferFunction extends LinearTimeInvariantSystem {
         }
     }
 
-    // TODO implement getFrequencyResponse(void)
+
 
     public static void unwrapPhase(double[] phase) {
         int length = phase.length;

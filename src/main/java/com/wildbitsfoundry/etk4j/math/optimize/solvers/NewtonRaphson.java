@@ -1,112 +1,202 @@
 package com.wildbitsfoundry.etk4j.math.optimize.solvers;
 
-import com.wildbitsfoundry.etk4j.math.calculus.Derivatives;
+import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
 
-import static com.wildbitsfoundry.etk4j.math.optimize.solvers.SolverResults.SolverStatus;
+import static com.wildbitsfoundry.etk4j.math.optimize.solvers.NewtonSolverResults.NewtonSolverStatus;
 
 
 public final class NewtonRaphson {
 
-    protected int _maxIter = 100;
-    protected double _absTol = 1e-9;
-    protected double _relTol = 0;
-    protected double _maxVal = Double.POSITIVE_INFINITY;
-    private double _minVal = Double.NEGATIVE_INFINITY;
-    protected double _step = 0.001;
-    protected double _x0;
+    // TODO remove solver results?
+    private int maxNumberOfIterations = 100;
+    private double absTol = 1e-9;
+    private double relTol = 0;
+    private double x0 = 0;
+    private Double x1 = null;
 
-    protected UnivariateFunction _func;
-    protected UnivariateFunction _derivative;
+    private UnivariateFunction func;
+    private UnivariateFunction derivative;
+    private UnivariateFunction secondDerivative;
 
 
     public NewtonRaphson(UnivariateFunction func, double initialGuess) {
-        _func = func;
-        _x0 = initialGuess;
+        this.func = func;
+        x0 = initialGuess;
     }
 
-    // create constructor that takes in derivative type
+    public NewtonRaphson secondInitialGuess(double secondInitialGuess) {
+        this.x1 = secondInitialGuess;
+        return this;
+    }
 
-    public NewtonRaphson(UnivariateFunction func, UnivariateFunction derivative, double initialGuess) {
-        _func = func;
-        _derivative = derivative;
-        _x0 = initialGuess;
+    public NewtonRaphson derivative(UnivariateFunction derivative) {
+        this.derivative = derivative;
+        return this;
+    }
+
+    public NewtonRaphson secondDerivative(UnivariateFunction secondDerivative) {
+        this.secondDerivative = secondDerivative;
+        return this;
     }
 
     public NewtonRaphson iterationLimit(int limit) {
-        _maxIter = limit;
+        maxNumberOfIterations = limit;
         return this;
     }
 
     public NewtonRaphson absTolerance(double tol) {
-        _absTol = tol;
+        absTol = tol;
         return this;
     }
 
     public NewtonRaphson relTolerance(double tol) {
-        _relTol = tol;
+        relTol = tol;
         return this;
     }
 
-    public NewtonRaphson maxAllowedValue(double max) {
-        _maxVal = max;
-        return this;
-    }
+    public NewtonSolverResults<Double> solve() {
+        int maxNumberOfIterations = this.maxNumberOfIterations;
+        UnivariateFunction func = this.func;
 
-    public NewtonRaphson minAllowedValue(double min) {
-        _minVal = min;
-        return this;
-    }
-
-    public NewtonRaphson differentiationStepSize(double step) {
-        _step = step;
-        return this;
-    }
-
-    protected static SolverResults<Double> buildResults(double xfinal, SolverStatus status, int iterCount, double error) {
-        SolverResults<Double> sr = new SolverResults<>();
-        sr.setValue(xfinal);
-        sr.setSolverStatus(status);
-        sr.setNumberOfIterations(iterCount);
-        sr.setError(error);
-        return sr;
-    }
-
-    public SolverResults<Double> solve() {
-        return this.solve(_derivative);
-    }
-
-    protected SolverResults<Double> solve(UnivariateFunction derivative) {
-        int maxiter = _maxIter;
-        double maxval = _maxVal;
-        double step = _step;
-        UnivariateFunction func = _func;
-
-        double xcurrent = _x0;
-        double xfinal = 0.0;
-        double error = 0.0;
-        while (maxiter-- > 0) {
-            if (derivative != null) {
-                xfinal = xcurrent - func.evaluateAt(xcurrent) / derivative.evaluateAt(xcurrent);
+        double xCurrent = x0;
+        double xFinal = 0.0;
+        if (derivative != null) {
+            while (maxNumberOfIterations-- > 0) {
+                double funcValue = func.evaluateAt(xCurrent);
+                if (funcValue == 0) {
+                    double error = Math.abs(xFinal - xCurrent);
+                    NewtonSolverResults<Double> solverResults = new NewtonSolverResults<>();
+                    solverResults.setSolverStatus(NewtonSolverStatus.CONVERGED);
+                    solverResults.setError(error);
+                    solverResults.setValue(xFinal);
+                    solverResults.setNumberOfIterations(maxNumberOfIterations);
+                    return solverResults;
+                }
+                double funcDerivativeValue = derivative.evaluateAt(xCurrent);
+                if (funcDerivativeValue == 0) {
+                    double error = Math.abs(xFinal - xCurrent);
+                    NewtonSolverResults<Double> solverResults = new NewtonSolverResults<>();
+                    solverResults.setSolverStatus(NewtonSolverStatus.DERIVATIVE_WAS_ZERO);
+                    solverResults.setError(error);
+                    solverResults.setValue(xFinal);
+                    solverResults.setNumberOfIterations(maxNumberOfIterations);
+                    return solverResults;
+                }
+                // Newton Step
+                double newtonStep = funcValue / funcDerivativeValue;
+                if (secondDerivative != null) {
+                    // Use Halley's method
+                    double funcSecondDerivativeValue = secondDerivative.evaluateAt(xCurrent);
+                    double adj = newtonStep * funcSecondDerivativeValue / funcDerivativeValue / 2.0;
+                    if (Math.abs(adj) < 1) {
+                        newtonStep /= 1.0 - adj;
+                    }
+                }
+                xFinal = xCurrent - newtonStep;
+                if (MathETK.isClose(xFinal, xCurrent, absTol, relTol)) {
+                    double error = Math.abs(xFinal - xCurrent);
+                    NewtonSolverResults<Double> solverResults = new NewtonSolverResults<>();
+                    // TODO Make a boolean field converged and return the solver status as a string
+                    solverResults.setSolverStatus(NewtonSolverStatus.CONVERGED);
+                    solverResults.setError(error);
+                    solverResults.setValue(xFinal);
+                    solverResults.setNumberOfIterations(maxNumberOfIterations);
+                    return solverResults;
+                }
+                xCurrent = xFinal;
+            }
+        } else {
+            // Secant method
+            if (x1 != null) {
+                if (x1 == x0) {
+                    double error = Math.abs(xFinal - xCurrent);
+                    NewtonSolverResults<Double> solverResults = new NewtonSolverResults<>();
+                    solverResults.setSolverStatus(NewtonSolverStatus
+                            .SECOND_INITIAL_GUESS_EQUAL_TO_FIRST_INITIAL_GUESS);
+                    solverResults.setError(error);
+                    solverResults.setValue(xFinal);
+                    solverResults.setNumberOfIterations(maxNumberOfIterations);
+                    return solverResults;
+                }
             } else {
-                double fprime = Derivatives.centeredDifference7Points(func, xcurrent, step);
-                xfinal = xcurrent - func.evaluateAt(xcurrent) / fprime;
+                double eps = 1e-4;
+                xFinal = xCurrent * (1 + eps);
+                xFinal += xFinal >= 0 ? eps : -eps;
             }
-
-            error = Math.abs(xfinal - xcurrent);
-            if (error < _absTol + _relTol * Math.min(Math.abs(xfinal), Math.abs(xcurrent))) {
-                return buildResults(xfinal, SolverStatus.CONVERGED, _maxIter - maxiter, error);
+            double q0 = func.evaluateAt(xCurrent);
+            double q1 = func.evaluateAt(xFinal);
+            if(Math.abs(q1) < Math.abs(q0)) {
+                double swap = xCurrent;
+                xCurrent = xFinal;
+                xFinal = swap;
+                swap = q0;
+                q0 = q1;
+                q1 = swap;
             }
-
-            if (Double.compare(xcurrent, maxval) > 0) {
-                return buildResults(xfinal, SolverStatus.MAX_VALUE_EXCEEDED, _maxIter - maxiter, error);
+            while (maxNumberOfIterations-- > 0) {
+                double x = 0;
+                if(q1 == q0) {
+                    if(xFinal != xCurrent) {
+                        double error = Math.abs(xFinal - xCurrent);
+                        NewtonSolverResults<Double> newtonSolverResults = new NewtonSolverResults<>();
+                        newtonSolverResults.setSolverStatus(NewtonSolverStatus.TOLERANCE_WAS_REACHED);
+                        newtonSolverResults.setError(error);
+                        newtonSolverResults.setValue(xFinal);
+                        newtonSolverResults.setNumberOfIterations(maxNumberOfIterations);
+                        return newtonSolverResults;
+                    }
+                    x = (xFinal + xCurrent) / 2.0;
+                    double error = Math.abs(xFinal - xCurrent);
+                    NewtonSolverResults<Double> solverResults = new NewtonSolverResults<>();
+                    solverResults.setSolverStatus(NewtonSolverStatus.CONVERGED);
+                    solverResults.setError(error);
+                    solverResults.setValue(x);
+                    solverResults.setNumberOfIterations(maxNumberOfIterations);
+                    return solverResults;
+                } else {
+                    if(Math.abs(q1) > Math.abs(q0)) {
+                        x = (-q0 / q1 * xFinal + xCurrent) / (1 - q0 / q1);
+                    } else {
+                        x = (-q1 / q0 * xCurrent + xFinal) / (1 - q1 / q0);
+                    }
+                }
+                if(MathETK.isClose(x, xFinal, absTol, relTol)) {
+                    double error = Math.abs(xFinal - xCurrent);
+                    NewtonSolverResults<Double> solverResults = new NewtonSolverResults<>();
+                    solverResults.setSolverStatus(NewtonSolverStatus.CONVERGED);
+                    solverResults.setError(error);
+                    solverResults.setValue(x);
+                    solverResults.setNumberOfIterations(maxNumberOfIterations);
+                    return solverResults;
+                }
+                xCurrent = xFinal;
+                q0 = q1;
+                xFinal = x;
+                q1 = func.evaluateAt(xFinal);
             }
-            if (Double.compare(xcurrent, _minVal) < 0) {
-                return buildResults(xfinal, SolverStatus.MIN_VALUE_EXCEEDED, _maxIter - maxiter, error);
-            }
-
-            xcurrent = xfinal;
         }
-        return buildResults(xfinal, SolverStatus.MAX_NUMBER_OF_ITERATIONS_EXCEEDED, Math.abs(_maxIter - maxiter), error);
+        double error = Math.abs(xFinal - xCurrent);
+        NewtonSolverResults<Double> newtonSolverResults = new NewtonSolverResults<>();
+        newtonSolverResults.setSolverStatus(NewtonSolverStatus.MAX_NUMBER_OF_ITERATIONS_EXCEEDED);
+        newtonSolverResults.setError(error);
+        newtonSolverResults.setValue(xFinal);
+        newtonSolverResults.setNumberOfIterations(maxNumberOfIterations);
+        return newtonSolverResults;
+    }
+
+    public static void main(String[] args) {
+        NewtonSolverResults nr = new NewtonRaphson(x ->  x * x * x - x * x + 2, -20)
+            .derivative(x -> 3 * x * x - 2 * x)
+            .solve();
+
+        NewtonSolverResults<Double> nr2 = new NewtonRaphson(x ->  x * x * x - x * x + 2, -20)
+            .derivative(x -> 3 * x * x - 2 * x)
+            .secondDerivative(x -> 6 * x)
+            .solve();
+
+        NewtonSolverResults<Double> nr3 = new NewtonRaphson(x ->  x * x * x - x * x + 2, -20)
+                .solve();
+        System.out.println("s");
     }
 }

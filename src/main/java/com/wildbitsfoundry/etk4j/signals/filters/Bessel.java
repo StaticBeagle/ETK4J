@@ -6,7 +6,7 @@ import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
 import com.wildbitsfoundry.etk4j.math.optimize.solvers.NewtonRaphsonComplex;
 import com.wildbitsfoundry.etk4j.math.optimize.solvers.Secant;
-import com.wildbitsfoundry.etk4j.math.optimize.solvers.SolverResults;
+import com.wildbitsfoundry.etk4j.math.optimize.solvers.NewtonSolverResults;
 import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
 import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 import com.wildbitsfoundry.etk4j.util.NumArrays;
@@ -118,7 +118,7 @@ public class Bessel extends AnalogFilter {
         Complex[] x = aberth(fx, fp, x0, 1e-15, 50);
 
         for (int i = 0; i < n; ++i) {
-            SolverResults<Complex> sr = new NewtonRaphsonComplex(
+            NewtonSolverResults<Complex> sr = new NewtonRaphsonComplex(
                     z -> {
                         Complex[] result = new Complex[1];
                         com.wildbitsfoundry.etk4j.math.specialfunctions.
