@@ -29,7 +29,6 @@ public class CubicSpline extends Spline {
         for (int i = m - 2; i >= 0; --i) {
             b[i] = b[i] - upper[i] * b[i + 1];
         }
-        System.out.println(Arrays.toString(b));
     }
 
 //    private CubicSpline(double[] x, double[] y, double[] dydx) {
@@ -141,50 +140,37 @@ public class CubicSpline extends Spline {
         double[] diagonal = new double[n];
         double[] lower = new double[n - 1];
 
-        diagonal[0] = 2.0 * (x[1] - x[0]);
-        diagonal[n - 1] = 2.0 * (x[n - 1] - x[n - 2]);
-
-        for (int i = 0; i < n - 1; ++i) {
-            double hiMinus1 = x[i + 1] - x[i];
-            double hi = x[i + 2] - x[i + 1];
-            double deltaYMinus1 = y[i + 1] - y[i];
-            double deltaYi = y[i + 2] - y[i + 1];
-
-            upper[i] = hi;
-            diagonal[i] = 2 * (hiMinus1 + hi);
-            lower[i] = hi;
-            r[i] = 3 * deltaYi / hi - 3 * deltaYMinus1 / hiMinus1;
-        }
-        diagonal[n - 1] = 2 * (x[n + 1] - x[n - 1]);
         double h0 = x[1] - x[0];
-        double h1 = x[2] - x[1];
-        diagonal[0] += h0 + h0 * h0 / h1;
+        double hn = x[n - 1] - x[n - 2];
+        diagonal[0] = 2.0 * h0;
+        diagonal[n - 1] = 2.0 * hn;
 
-        upper[0] -= h0 * h0 / h1;
+        r[0] = 3.0 / h0 * (y[1] - y[0]) - 3.0 * d0;
+        r[n - 1] = 3.0 * dn - 3.0 / hn * (y[n - 1] - y[n - 2]);
+        for (int i = 0; i < n - 2; ++i) {
+            double hi = x[i + 1] - x[i];
+            double hiPlus1 = x[i + 2] - x[i + 1];
+            lower[i] = hi;
+            diagonal[i + 1] = 2.0 * (hi + hiPlus1);
+            upper[i] = hi;
+            // TODO maybe implement LDL solver?
+            r[i + 1] = 3.0 / hiPlus1 * (y[i + 2] - y[i + 1]) - 3.0 / hi * (y[i + 1] - y[i]);
+        }
+        lower[lower.length - 1] = hn;
+        upper[upper.length - 1] = hn;
 
-        double hn = x[n + 1] - x[n];
-        double hnMinus1 = x[n] - x[n - 1];
-        diagonal[n - 1] += hn + hn * hn / hnMinus1;
-
-        lower[n - 2] -= hn * hn / hnMinus1;
-
-        double deltaYn = y[n + 1] - y[n];
-        double deltaYnMinus1 = y[n] - y[n - 1];
-        r[n - 1] = 3.0 * deltaYn / hn - 3.0 * deltaYnMinus1 / hnMinus1;
         // result is in r
         solveTridiagonalSystem(lower, diagonal, upper, r);
 
-
-        double[] b = new double[r.length + 2];
-        System.arraycopy(r, 0, b, 1, r.length);
-        b[0] = (1 + h0 / h1) * b[1] - h0 / h1 * b[2];
-        b[b.length - 1] = (1 + hn / hnMinus1) * b[b.length - 2] - hn / hnMinus1 * b[b.length - 3];
-
+        double[] b = new double[n];
+        double[] d = new double[n];
         double[] coefficients = new double[(x.length - 1) * 4]; // 4 coefficients and n - 1 segments
-        for (int i = 0, j = 0; i < y.length - 1; ++i, ++j) {
-            coefficients[j] = (b[i + 1] - b[i]) / (3.0 * (x[i + 1] - x[i]));
-            coefficients[++j] = b[i];
-            coefficients[++j] = (y[i + 1] - y[i]) / (x[i + 1] - x[i]) - (x[i + 1] - x[i]) * (b[i + 1] + 2 * b[i]) / 3.0;
+        for(int i = 0, j = 0; i < n - 1; ++i, ++j) {
+            double hi = x[i + 1] - x[i];
+            double dy = y[i + 1] - y[i];
+            coefficients[j] = (r[i + 1] - r[i]) / (3.0 * hi);
+            coefficients[++j] = r[i];
+            coefficients[++j] = dy / hi - hi * (r[i + 1] + 2.0 * r[i]) / 3.0;
             coefficients[++j] = y[i];
         }
         return new CubicSpline(x, y, coefficients);
@@ -231,7 +217,6 @@ public class CubicSpline extends Spline {
         }
         return new CubicSpline(x, y, d);
     }
-
 
 
     public static CubicSpline newNotAKnotSplineInPlace(double[] x, double[] y) {
@@ -335,24 +320,24 @@ public class CubicSpline extends Spline {
         double[] x = {0, 1, 2, 3, 4, 5, 6, 7, 8};
         double[] y = {0, 1, 4, 9, 16, 25, 36, 49, 64};
 
-        x = new double[]{1, 3, 5, 14, 15, 20, 26, 36, 45, 62, 95};
+        x = new double[]{1, 3, 8, 14, 15, 20, 26, 36, 45, 62, 95};
         y = new double[]{10, 10, 10, 10, 10, 10, 10.5, 15, 50, 60, 85};
 
-        CubicSpline cs = CubicSpline.newNotAKnotSpline(x, y);
-        System.out.println(cs.differentiate(2.0));
-        System.out.println(cs.evaluateAntiDerivativeAt(0, 3.0));
-        System.out.println(cs.integrate(3.0));
-        System.out.println(cs.integrate(1.0, 3.0));
-        System.out.println(cs.evaluateAt(7.5));
-        System.out.println(cs);
+//        CubicSpline cs = CubicSpline.newNotAKnotSpline(x, y);
+//        System.out.println(cs.differentiate(2.0));
+//        System.out.println(cs.evaluateAntiDerivativeAt(0, 3.0));
+//        System.out.println(cs.integrate(3.0));
+//        System.out.println(cs.integrate(1.0, 3.0));
+//        System.out.println(cs.evaluateAt(7.5));
+//        System.out.println(cs);
 
         CubicSpline csc = CubicSpline.newClampedSpline(x, y, 1, 1);
-        System.out.println(cs.differentiate(2.0));
-        System.out.println(cs.evaluateAntiDerivativeAt(0, 3.0));
-        System.out.println(cs.integrate(3.0));
-        System.out.println(cs.integrate(1.0, 3.0));
-        System.out.println(cs.evaluateAt(7.5));
-        System.out.println(cs);
+        System.out.println(csc.differentiate(2.0));
+        System.out.println(csc.evaluateAntiDerivativeAt(0, 3.0));
+        System.out.println(csc.integrate(3.0));
+        System.out.println(csc.integrate(1.0, 3.0));
+        System.out.println(csc.evaluateAt(7.5));
+        System.out.println(csc);
 
 
     }
