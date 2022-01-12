@@ -9,104 +9,41 @@ import org.junit.rules.ExpectedException;
 import static org.junit.Assert.*;
 
 public class QuadraticSplineTest {
-//    static double[] x;
-//    static double[] y;
-//    static double[] xi;
-//    static double left;
-//    static double right;
-//
-//    // TODO test derivatives and definite/indefinite integrals
-//    // add tests for quadratic spline
-//
-//    @Rule
-//    public final ExpectedException exception = ExpectedException.none();
-//
-//    @BeforeClass
-//    public static void setArrays() {
-//        x = new double[]{0.9, 1.3, 1.9, 2.1};
-//        y = new double[]{1.3, 1.5, 1.85, 2.1};
-//        xi = new double[]{1.15, 1.8, 2.0};
-//        left = -0.5;
-//        right = 3.0;
-//    }
-//
-//    @Test
-//    public void testNaturalSplineInterpolation() {
-//        double[] expected = {0.0, 2.2704, 9.0816, 20.4336, 36.3264, 56.760000000000005, 81.7344, 111.2496, 145.3056,
-//                183.9024, 227.04, 268.796, 303.248, 330.39599999999996, 350.24, 362.78, 376.0732, 398.17679999999996,
-//                429.09079999999994, 468.8152, 517.35, 562.8132, 593.3228, 611.5570222222223, 633.5852,
-//                662.0855555555555, 697.0580888888888, 738.5028, 786.4196888888889, 840.8087555555555, 901.67};
-//        double[] x = new double[]{0.0, 10.0, 15.0, 20.0, 22.5, 30.0};
-//        double[] y = new double[]{0.0, 227.04, 362.78, 517.35, 602.97, 901.67};
-//        QuadraticSpline qs = QuadraticSpline.newNaturalSpline(x, y);
-//
-//        double[] xi = NumArrays.linSpace(0.0, 30.0, 31);
-//        double[] yi = new double[xi.length];
-//        // TODO maybe add evaluate at array?
-//        for (int i = 0; i < xi.length; ++i) {
-//            yi[i] = qs.evaluateAt(xi[i]);
-//        }
-//        assertArrayEquals(expected, yi, 1e-12);
-//    }
-//
-//    @Test
-//    public void testParabolicallyTerminatedSplineInterpolation() {
-//        CubicSpline cspline = CubicSpline.newParabolicallyTerminatedSpline(x, y);
-//
-//        double yi = cspline.evaluateAt(xi[0]);
-//        assertEquals(1.4321022727272725, yi, 1e-12);
-//
-//        yi = cspline.evaluateAt(xi[1]);
-//        assertEquals(1.7594696969696972, yi, 1e-12);
-//
-//        yi = cspline.evaluateAt(xi[2]);
-//        assertEquals(1.9632575757575759, yi, 1e-12);
-//    }
-//
-//    @Test
-//    public void testClampedSplineInterpolation() {
-//        CubicSpline cspline = CubicSpline.newClampedSpline(x, y, 2, 1);
-//
-//        double yi = cspline.evaluateAt(xi[0]);
-//        assertEquals(1.5100360576923078, yi, 1e-12);
-//
-//        yi = cspline.evaluateAt(xi[1]);
-//        assertEquals(1.7361111111111118, yi, 1e-12);
-//
-//        yi = cspline.evaluateAt(xi[2]);
-//        assertEquals(1.9814102564102565, yi, 1e-12);
-//    }
-//
-//    @Test
-//    public void testNotAKnotSplineInterpolation() {
-//        CubicSpline cspline = CubicSpline.newNotAKnotSpline(x, y);
-//
-//        double yi = cspline.evaluateAt(xi[0]);
-//        assertEquals(1.4394531249999998, yi, 1e-12);
-//
-//        yi = cspline.evaluateAt(xi[1]);
-//        assertEquals(1.7593750000000004, yi, 1e-12);
-//
-//        yi = cspline.evaluateAt(xi[2]);
-//        assertEquals(1.9622916666666668, yi, 1e-12);
-//    }
-//
-//    @Test
-//    public void testAkimaSplineInterpolation() {
-//        double[] x = {0.5, 0.9, 1.3, 1.9, 2.1, 2.2};
-//        double[] y = {1.0, 1.3, 1.5, 1.85, 2.1, 2.4};
-//        CubicSpline cspline = CubicSpline.newAkimaSpline(x, y);
-//
-//        double yi = cspline.evaluateAt(xi[0]);
-//        assertEquals(1.4258655894886363, yi, 1e-12);
-//
-//        yi = cspline.evaluateAt(xi[1]);
-//        assertEquals(1.7887205387205394, yi, 1e-12);
-//
-//        yi = cspline.evaluateAt(xi[2]);
-//        assertEquals(1.9470219435736678, yi, 1e-12);
-//    }
-//
+
+    @Test
+    public void testNaturalSplineInterpolation() {
+        double[] x = new double[]{0.0, 10.0, 15.0, 20.0, 22.5, 30.0};
+        double[] y = new double[]{0.0, 227.04, 362.78, 517.35, 602.97, 901.67};
+        QuadraticSpline qs = QuadraticSpline.newNaturalSpline(x, y);
+
+        double[] expected = {0.0, 2.2704, 9.0816, 20.4336, 36.3264, 56.760000000000005, 81.7344, 111.2496, 145.3056,
+                183.9024, 227.04, 268.796, 303.248, 330.39599999999996, 350.24, 362.78, 376.0732, 398.17679999999996,
+                429.09079999999994, 468.8152, 517.35, 562.8132, 593.3228, 611.5570222222223, 633.5852,
+                662.0855555555555, 697.0580888888888, 738.5028, 786.4196888888889, 840.8087555555555, 901.67};
+        assertArrayEquals(expected, qs.evaluateAt(NumArrays.linSteps(0, 30)), 1e-12);
+
+        assertEquals(17.6984, qs.differentiate(16), 1e-12);
+
+        assertEquals(1670.7990666666667, qs.integrate(11, 16), 1e-12);
+    }
+
+    @Test
+    public void testClampedSplineInterpolation() {
+        double[] x = new double[]{0.0, 10.0, 15.0, 20.0, 22.5, 30.0};
+        double[] y = new double[]{0.0, 227.04, 362.78, 517.35, 602.97, 901.67};
+        QuadraticSpline qs = QuadraticSpline.newClampedSpline(x, y, 1);
+
+        double[] expected = {0.0, 13.704, 29.408, 47.112, 66.816, 88.52000000000001, 112.224, 137.928, 165.632, 195.336,
+                227.04, 258.6328, 288.0032, 315.1512, 340.0768, 362.78, 386.23639999999995, 413.42159999999996,
+                444.3356, 478.97839999999997, 517.35, 555.1908000000001, 588.2412, 617.4855555555556, 648.83,
+                683.2588888888889, 720.7722222222222, 761.37, 805.0522222222222, 851.8188888888889, 901.67};
+        assertArrayEquals(expected, qs.evaluateAt(NumArrays.linSteps(0, 30)), 1e-12);
+
+        assertEquals(25.3208, qs.differentiate(16), 1e-12);
+
+        assertEquals(1628.8758666666663, qs.integrate(11, 16), 1e-12);
+    }
+    // TODO is this below needed. If we test in the cubic spline do we have to test here as well?
 //    @Test
 //    public void testNaturalSplineExtrapolateLeft() {
 //        CubicSpline cspline = CubicSpline.newNaturalSpline(x, y);

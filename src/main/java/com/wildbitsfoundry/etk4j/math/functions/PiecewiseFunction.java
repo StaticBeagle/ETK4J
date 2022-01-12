@@ -47,6 +47,15 @@ public abstract class PiecewiseFunction implements UnivariateFunction {
 		return this.extrapolate(x);
 	}
 
+	public final double[] evaluateAt(double[] x) {
+		final int n = x.length;
+		double[] yi = new double[n];
+		for(int i = 0; i < n; ++i) {
+			yi[i] = this.evaluateAt(x[i]);
+		}
+		return yi;
+	}
+
 	public abstract double evaluateSegmentAt(int index, double x);
 
 	public abstract UnivariateFunction getSegment(int index);

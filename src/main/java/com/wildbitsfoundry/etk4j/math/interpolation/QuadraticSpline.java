@@ -10,35 +10,6 @@ public class QuadraticSpline extends Spline {
 
     private static final double P5 = 0.5, P33 = 1.0 / 3.0;
 
-    private static class TridiagonalSystem {
-        public double[] L; // Sub-diagonal
-        public double[] D; // Diagonal
-        public double[] U; // Super-diagonal
-        public double[] b; // Solution vector
-
-        public TridiagonalSystem(int n) {
-            L = new double[n - 1];
-            D = new double[n];
-            U = new double[n - 1];
-            b = new double[n];
-        }
-
-        public double[] solve() {
-            int n = b.length;
-            for (int i = 0; i < n - 1; ++i) {
-                L[i] /= D[i];
-                D[i + 1] -= U[i] * L[i];
-                b[i + 1] -= L[i] * b[i];
-            }
-
-            b[n - 1] /= D[n - 1];
-            for (int i = n - 2; i >= 0; --i) {
-                b[i] = (b[i] - U[i] * b[i + 1]) / D[i];
-            }
-            return b;
-        }
-    }
-
     protected QuadraticSpline(double[] x, double[] y, double[] dydx) {
         super(x, 3);
 
@@ -64,13 +35,15 @@ public class QuadraticSpline extends Spline {
     }
 
     public static QuadraticSpline newNaturalSplineInPlace(double[] x, double[] y) {
-
-        TridiagonalSystem T = setupSpline(x, y);
+        final int n = x.length;
+        double[] b = new double[n];
         // Natural conditions
-        T.b[0] = 0.0;
-        T.D[0] = 1.0;
-
-        return new QuadraticSpline(x, y, T.solve());
+        b[0] = 0.0;
+        for (int i = 1; i < n; ++i) {
+            double hx = x[i] - x[i - 1];
+            b[i] = 2 * (y[i] - y[i - 1]) / hx - b[i - 1];
+        }
+        return new QuadraticSpline(x, y, b);
     }
 
     public static QuadraticSpline newClampedSpline(double[] x, double[] y, double d0) {
@@ -78,29 +51,15 @@ public class QuadraticSpline extends Spline {
     }
 
     public static QuadraticSpline newClampedSplineInPlace(double[] x, double[] y, double d0) {
-
-        TridiagonalSystem T = setupSpline(x, y);
-        // Natural conditions
-        T.b[0] = d0;
-        T.D[0] = 1.0;
-
-        return new QuadraticSpline(x, y, T.solve());
-    }
-
-    private static TridiagonalSystem setupSpline(double[] x, double[] y) {
         final int n = x.length;
-        TridiagonalSystem T = new TridiagonalSystem(n);
-
-        // U is always zero
-        // L and D are always one
-        Arrays.fill(T.L, 1.0);
-        Arrays.fill(T.D, 1.0);
-
+        double[] b = new double[n];
+        // Clamped conditions
+        b[0] = (y[1] - y[0]) / (x[1] - x[0]) - (x[1] - x[0]) * d0;
         for (int i = 1; i < n; ++i) {
             double hx = x[i] - x[i - 1];
-            T.b[i] = 2 * (y[i] - y[i - 1]) / hx;
+            b[i] = 2 * (y[i] - y[i - 1]) / hx - b[i - 1];
         }
-        return T;
+        return new QuadraticSpline(x, y, b);
     }
 
     @Override
@@ -146,37 +105,10 @@ public class QuadraticSpline extends Spline {
     public static void main(String[] args) {
         double[] x = {0, 1, 2, 3, 4, 5};
         double[] y = {0, 1, 4, 9, 16, 25};
-//
-//        LinearSpline ls = LinearSpline.newLinearSpline(x, y);
-//        System.out.println(ls.evaluateAt(2.5));
-//        System.out.println(ls.differentiate(2.5));
-//        System.out.println(ls.integrate(3));
-//        System.out.println(ls.integrate(1, 3));
-//        System.out.println(ls);
-//
-//        QuadraticSpline qs2 = newQuadraticSpline(x, y);
-//        System.out.println(qs2.evaluateAt(2.5));
-//        System.out.println(qs2.differentiate(2.5));
-//        System.out.println(qs2.integrate(3));
-//        System.out.println(qs2.integrate(1, 3));
-//        System.out.println(qs2);
-//
-//        CubicSpline cs = CubicSpline.newNotAKnotSpline(x, y);
-//        System.out.println(cs.evaluateAt(2.5));
-//        System.out.println(cs.differentiate(2.5));
-//        System.out.println(cs.integrate(3));
-//        System.out.println(cs.integrate(1, 3));
-//        System.out.println(cs);
+
 
         x = new double[]{0.0, 10.0, 15.0, 20.0, 22.5, 30.0};
         y = new double[]{0.0, 227.04, 362.78, 517.35, 602.97, 901.67};
-
-        //
-        LinearSpline ls = LinearSpline.newLinearSpline(x, y);
-        System.out.println(ls.evaluateAt(16));
-        System.out.println(ls.differentiate(16));
-        System.out.println(ls.integrate(11, 16));
-        System.out.println(ls);
 
         QuadraticSpline qs2 = newNaturalSpline(x, y);
         System.out.println(qs2.evaluateAt(16));
@@ -184,11 +116,11 @@ public class QuadraticSpline extends Spline {
         System.out.println(qs2.integrate(11, 16));
         System.out.println(qs2);
 
-        CubicSpline cs = CubicSpline.newNotAKnotSpline(x, y);
-        System.out.println(cs.evaluateAt(16));
-        System.out.println(cs.differentiate(16));
-        System.out.println(cs.integrate(11, 16));
-        System.out.println(cs);
+        QuadraticSpline qs3 = newClampedSpline(x, y, 1.0);
+        System.out.println(qs3.evaluateAt(16));
+        System.out.println(qs3.differentiate(16));
+        System.out.println(qs3.integrate(11, 16));
+        System.out.println(qs3);
 
         double[] yi = new double[31];
         for(int i = 0; i <= 30; ++i) {
