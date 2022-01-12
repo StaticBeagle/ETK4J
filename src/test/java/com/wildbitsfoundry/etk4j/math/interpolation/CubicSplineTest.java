@@ -18,9 +18,9 @@ public class CubicSplineTest {
 //	// TODO test derivatives and definite/indefinite integrals
 //	// add tests for quadratic spline
 //
-//	@Rule
-//	public final ExpectedException exception = ExpectedException.none();
-//
+	@Rule
+	public final ExpectedException exception = ExpectedException.none();
+
 	@BeforeClass
 	public static void setArrays() {
 		x = new double[] { 0.9, 1.3, 1.9, 2.1 };
@@ -29,20 +29,20 @@ public class CubicSplineTest {
 		left = -0.5;
 		right = 3.0;
 	}
-//
-//	@Test
-//	public void testNaturalSplineInterpolation() {
-//		CubicSpline cspline = CubicSpline.newNaturalSpline(x, y);
-//
-//		double yi = cspline.evaluateAt(xi[0]);
-//		assertEquals(1.4307218309859153, yi, 1e-12);
-//
-//		yi = cspline.evaluateAt(xi[1]);
-//		assertEquals(1.755721830985916, yi, 1e-12);
-//
-//		yi = cspline.evaluateAt(xi[2]);
-//		assertEquals(1.9682218309859156, yi, 1e-12);
-//	}
+
+	@Test
+	public void testNaturalSplineInterpolation() {
+		CubicSpline cspline = CubicSpline.newNaturalSpline(x, y);
+
+		double yi = cspline.evaluateAt(xi[0]);
+		assertEquals(1.4307218309859153, yi, 1e-12);
+
+		yi = cspline.evaluateAt(xi[1]);
+		assertEquals(1.755721830985916, yi, 1e-12);
+
+		yi = cspline.evaluateAt(xi[2]);
+		assertEquals(1.9682218309859156, yi, 1e-12);
+	}
 //
 //	@Test
 //	public void testParabolicallyTerminatedSplineInterpolation() {
@@ -102,69 +102,69 @@ public class CubicSplineTest {
 //		assertEquals(1.9470219435736678, yi, 1e-12);
 //	}
 //
-//	@Test
-//	public void testNaturalSplineExtrapolateLeft() {
-//		CubicSpline cspline = CubicSpline.newNaturalSpline(x, y);
-//
-//		cspline.setExtrapolationMethod(ExtrapolationMethod.CLAMP_TO_END_POINT);
-//		double yi = cspline.evaluateAt(left);
-//		assertEquals("Natural Spline ClampToEndPoint lower bound extrapolation", 1.3, yi, 0.0);
-//
-//		cspline.setExtrapolationMethod(ExtrapolationMethod.CLAMP_TO_NAN);
-//		yi = cspline.evaluateAt(left);
-//		assertTrue("Natural Spline ClampToEndNaN lower bound extrapolation", Double.isNaN(yi));
-//
-//		cspline.setExtrapolationMethod(ExtrapolationMethod.CLAMP_TO_ZERO);
-//		yi = cspline.evaluateAt(left);
-//		assertEquals("Natural Spline ClampToZero lower bound extrapolation", 0.0, yi, 0.0);
-//
-//		cspline.setExtrapolationMethod(ExtrapolationMethod.LINEAR);
-//		yi = cspline.evaluateAt(left);
-//		assertEquals("Natural Spline Linear lower bound extrapolation", 0.5474178403755874, yi, 1e-12);
-//
-//		cspline.setExtrapolationMethod(ExtrapolationMethod.NATURAL);
-//		yi = cspline.evaluateAt(left);
-//		assertEquals("Natural Spline Natural lower bound extrapolation", 1.1915492957746414, yi, 1e-12);
-//
-//		cspline.setExtrapolationMethod(ExtrapolationMethod.PERIODIC);
-//		yi = cspline.evaluateAt(left);
-//		assertEquals("Natural Spline Periodic lower bound extrapolation", 1.8500000000000005, yi, 1e-12);
-//
-//		cspline.setExtrapolationMethod(ExtrapolationMethod.THROW);
-//		exception.expect(IndexOutOfBoundsException.class);
-//		yi = cspline.evaluateAt(left);
-//	}
-//
-//	@Test
-//	public void testNaturalSplineExtrapolateRight() {
-//		CubicSpline cspline = CubicSpline.newNaturalSpline(x, y);
-//
-//		cspline.setExtrapolationMethod(ExtrapolationMethod.CLAMP_TO_END_POINT);
-//		double yi = cspline.evaluateAt(right);
-//		assertEquals("Natural Spline ClampToEndPoint upper bound extrapolation", 2.1, yi, 0.0);
-//
-//		cspline.setExtrapolationMethod(ExtrapolationMethod.CLAMP_TO_NAN);
-//		yi = cspline.evaluateAt(right);
-//		assertTrue("Natural Spline ClampToEndNaN upper bound extrapolation", Double.isNaN(yi));
-//
-//		cspline.setExtrapolationMethod(ExtrapolationMethod.CLAMP_TO_ZERO);
-//		yi = cspline.evaluateAt(right);
-//		assertEquals("Natural Spline ClampToZero upper bound extrapolation", 0.0, yi, 0.0);
-//
-//		cspline.setExtrapolationMethod(ExtrapolationMethod.LINEAR);
-//		yi = cspline.evaluateAt(right);
-//		assertEquals("Natural Spline Linear upper bound extrapolation", 3.306338028169013, yi, 1e-12);
-//
-//		cspline.setExtrapolationMethod(ExtrapolationMethod.NATURAL);
-//		yi = cspline.evaluateAt(right);
-//		assertEquals("Natural Spline Natural upper bound extrapolation", 1.6592429577464949, yi, 1e-12);
-//
-//		cspline.setExtrapolationMethod(ExtrapolationMethod.PERIODIC);
-//		yi = cspline.evaluateAt(right);
-//		assertEquals("Natural Spline Periodic upper bound extrapolation", 1.7557218309859157, yi, 1e-12);
-//
-//		cspline.setExtrapolationMethod(ExtrapolationMethod.THROW);
-//		exception.expect(IndexOutOfBoundsException.class);
-//		yi = cspline.evaluateAt(right);
-//	}
+	@Test
+	public void testNaturalSplineExtrapolateLeft() {
+		CubicSpline cspline = CubicSpline.newNaturalSpline(x, y);
+
+		cspline.setExtrapolationMethod(ExtrapolationMethod.CLAMP_TO_END_POINT);
+		double yi = cspline.evaluateAt(left);
+		assertEquals("Natural Spline ClampToEndPoint lower bound extrapolation", 1.3, yi, 0.0);
+
+		cspline.setExtrapolationMethod(ExtrapolationMethod.CLAMP_TO_NAN);
+		yi = cspline.evaluateAt(left);
+		assertTrue("Natural Spline ClampToEndNaN lower bound extrapolation", Double.isNaN(yi));
+
+		cspline.setExtrapolationMethod(ExtrapolationMethod.CLAMP_TO_ZERO);
+		yi = cspline.evaluateAt(left);
+		assertEquals("Natural Spline ClampToZero lower bound extrapolation", 0.0, yi, 0.0);
+
+		cspline.setExtrapolationMethod(ExtrapolationMethod.LINEAR);
+		yi = cspline.evaluateAt(left);
+		assertEquals("Natural Spline Linear lower bound extrapolation", 0.5474178403755874, yi, 1e-12);
+
+		cspline.setExtrapolationMethod(ExtrapolationMethod.NATURAL);
+		yi = cspline.evaluateAt(left);
+		assertEquals("Natural Spline Natural lower bound extrapolation", 1.1915492957746414, yi, 1e-12);
+
+		cspline.setExtrapolationMethod(ExtrapolationMethod.PERIODIC);
+		yi = cspline.evaluateAt(left);
+		assertEquals("Natural Spline Periodic lower bound extrapolation", 1.8500000000000005, yi, 1e-12);
+
+		cspline.setExtrapolationMethod(ExtrapolationMethod.THROW);
+		exception.expect(IndexOutOfBoundsException.class);
+		cspline.evaluateAt(left);
+	}
+
+	@Test
+	public void testNaturalSplineExtrapolateRight() {
+		CubicSpline cspline = CubicSpline.newNaturalSpline(x, y);
+
+		cspline.setExtrapolationMethod(ExtrapolationMethod.CLAMP_TO_END_POINT);
+		double yi = cspline.evaluateAt(right);
+		assertEquals("Natural Spline ClampToEndPoint upper bound extrapolation", 2.1, yi, 0.0);
+
+		cspline.setExtrapolationMethod(ExtrapolationMethod.CLAMP_TO_NAN);
+		yi = cspline.evaluateAt(right);
+		assertTrue("Natural Spline ClampToEndNaN upper bound extrapolation", Double.isNaN(yi));
+
+		cspline.setExtrapolationMethod(ExtrapolationMethod.CLAMP_TO_ZERO);
+		yi = cspline.evaluateAt(right);
+		assertEquals("Natural Spline ClampToZero upper bound extrapolation", 0.0, yi, 0.0);
+
+		cspline.setExtrapolationMethod(ExtrapolationMethod.LINEAR);
+		yi = cspline.evaluateAt(right);
+		assertEquals("Natural Spline Linear upper bound extrapolation", 3.306338028169013, yi, 1e-12);
+
+		cspline.setExtrapolationMethod(ExtrapolationMethod.NATURAL);
+		yi = cspline.evaluateAt(right);
+		assertEquals("Natural Spline Natural upper bound extrapolation", 1.6592429577464949, yi, 1e-12);
+
+		cspline.setExtrapolationMethod(ExtrapolationMethod.PERIODIC);
+		yi = cspline.evaluateAt(right);
+		assertEquals("Natural Spline Periodic upper bound extrapolation", 1.7557218309859157, yi, 1e-12);
+
+		cspline.setExtrapolationMethod(ExtrapolationMethod.THROW);
+		exception.expect(IndexOutOfBoundsException.class);
+		cspline.evaluateAt(right);
+	}
 }

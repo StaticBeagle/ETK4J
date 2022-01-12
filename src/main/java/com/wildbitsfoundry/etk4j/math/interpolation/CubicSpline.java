@@ -1,5 +1,6 @@
 package com.wildbitsfoundry.etk4j.math.interpolation;
 
+import java.lang.reflect.Array;
 import java.util.Arrays;
 
 import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
@@ -31,30 +32,23 @@ public class CubicSpline extends Spline {
         }
     }
 
-//    private CubicSpline(double[] x, double[] y, double[] dydx) {
-//        super(x, 4);
-//        final int n = _x.length;
-//        // compute coefficients
-//        _coefs = new double[(n - 1) * 4]; // 4 coefficients and n - 1 segments
-//        for (int i = 0, j = 0; i < n - 1; ++i, ++j) {
-//            double hx = _x[i + 1] - _x[i];
-//            if (hx <= 0.0) {
-//                // TODO create nonMonotonic exception
-//                throw new IllegalArgumentException("x must be monotonically increasing");
-//            }
-//            double m0 = dydx[i] * hx;
-//            double m1 = dydx[i + 1] * hx;
-//            double a = (2 * y[i] + m0 - 2 * y[i + 1] + m1) / (hx * hx * hx);
-//            double b = (-3 * y[i] - 2 * m0 + 3 * y[i + 1] - m1) / (hx * hx);
-//            double c = dydx[i];
-//            double d = y[i];
-//            _coefs[j] = a;
-//            _coefs[++j] = b;
-//            _coefs[++j] = c;
-//            _coefs[++j] = d;
-//        }
-//    }
+    private static double[] solveLDLTSystem(double[] lower, double[] diagonal, double[] b) {
+        final int length = diagonal.length;
+        for (int i = 0; i < length - 1; ++i) {
+            double ui = lower[i];
+            lower[i] /= diagonal[i];
+            diagonal[i + 1] -= ui * lower[i];
+            b[i + 1] -= lower[i] * b[i];
+        }
 
+        b[length - 1] /= diagonal[length - 1];
+        for (int i = length - 2; i >= 0; --i) {
+            b[i] = b[i] / diagonal[i] - lower[i] * b[i + 1];
+        }
+        return b;
+    }
+
+    // TODO check monotonicity
     private CubicSpline(double[] x, double[] y, double[] coefs) {
         super(x, 4);
         _coefs = coefs;
@@ -68,28 +62,54 @@ public class CubicSpline extends Spline {
         return newNotAKnotSplineInPlace(x, y);
     }
 
-//    public static CubicSpline newNaturalSpline(double[] x, double[] y) {
-//        return newNaturalSplineInPlace(Arrays.copyOf(x, x.length), y);
-//    }
+    public static CubicSpline newNaturalSpline(double[] x, double[] y) {
+        return newNaturalSplineInPlace(Arrays.copyOf(x, x.length), y);
+    }
 
-    //TODO
-//    public static double[] computeNaturalSplineDerivatives(double[] x, double[] y) {
-//        checkMinXLength(x, 2);
-//        TridiagonalLDLTSystem T = setupLDLT(x, y);
-//        final int n = x.length;
-//        T.D[0] = 2.0 * T.L[0];
-//        double r0 = (y[1] - y[0]) * T.L[0] * T.L[0];
-//        T.b[0] = 3.0 * r0;
-//        T.D[n - 1] = 2.0 * T.L[n - 2];
-//        r0 = (y[n - 1] - y[n - 2]) * T.L[n - 2] * T.L[n - 2];
-//        T.b[n - 1] = 3.0 * r0;
-//        return T.solve();
-//    }
+    public static CubicSpline newNaturalSplineInPlace(double[] x, double[] y) {
+        final int n = x.length - 2;
+        double[] diagonal = new double[n];
+        double[] lower = new double[n - 1];
+        double[] r = new double[n];
+        for(int i = 0; i < n - 1; ++i) {
+            double hi = x[i + 1] - x[i];
+            double hiPlus1 = x[i + 2] - x[i + 1];
+            double si = (y[i + 1] - y[i]) / hi;
+            double siPlus1 = (y[i + 2] - y[i + 1]) / hiPlus1;
 
-//    public static CubicSpline newNaturalSplineInPlace(double[] x, double[] y) {
-//        double[] dydx = computeNaturalSplineDerivatives(x, y);
-//        return new CubicSpline(x, y, dydx);
-//    }
+            diagonal[i] = 2.0 * (hi + hiPlus1);
+            lower[i] = hiPlus1;
+            r[i] = 6.0 * (siPlus1 - si);
+        }
+        double hn = x[n] - x[n - 1];
+        double hiPlus1 = x[n + 1] - x[n];
+        double sn = (y[n] - y[n - 1]) / hn;
+        double snPlus1 = (y[n + 1] - y[n]) / hiPlus1;
+
+        diagonal[n - 1] = 2.0 * (hn + hiPlus1);
+        r[n - 1] = 6.0 * (snPlus1 - sn);
+        solveLDLTSystem(lower, diagonal, r);
+
+        double[] coefficients = new double[(x.length - 1) * 4];
+        coefficients[0] = r[0] / (6.0 * (x[1] - x[0]));
+        coefficients[1] = 0;
+        coefficients[2] = (y[1] - y[0]) / (x[1] - x[0]) - (x[1] - x[0]) * r[0] / 6.0;
+        coefficients[3] = y[0];
+        for(int i = 1, j = 4; i < x.length - 2; ++i, ++j) {
+            double hi = x[i + 1] - x[i];
+            double dy = y[i + 1] - y[i];
+            coefficients[j] = (r[i] - r[i - 1]) / (6.0 * hi);
+            coefficients[++j] = r[i - 1] / 2.0;
+            coefficients[++j] = dy / hi - hi * (2.0 * r[i - 1] + r[i]) / 6.0;
+            coefficients[++j] = y[i];
+        }
+        int m = coefficients.length - 4;
+        coefficients[m] = -r[n - 1] / (6.0 * (x[n + 1] - x[n]));
+        coefficients[++m] = r[n - 1] / 2.0;
+        coefficients[++m] = (y[n + 1] - y[n]) / (x[n + 1] - x[n]) - (x[n + 1] - x[n]) * (2.0 * r[n - 1]) / 6.0; ;
+        coefficients[++m] = y[n];
+        return new CubicSpline(x, y, coefficients);
+    }
 
     //TODO
 //    public static CubicSpline newParabolicallyTerminatedSpline(double[] x, double[] y) {
@@ -132,11 +152,8 @@ public class CubicSpline extends Spline {
 
     public static CubicSpline newClampedSplineInPlace(double[] x, double[] y, double d0, double dn) {
         final int n = x.length;
-        final int m = y.length;
-
         double[] r = new double[n];
 
-        double[] upper = new double[n - 1];
         double[] diagonal = new double[n];
         double[] lower = new double[n - 1];
 
@@ -152,18 +169,13 @@ public class CubicSpline extends Spline {
             double hiPlus1 = x[i + 2] - x[i + 1];
             lower[i] = hi;
             diagonal[i + 1] = 2.0 * (hi + hiPlus1);
-            upper[i] = hi;
-            // TODO maybe implement LDL solver?
             r[i + 1] = 3.0 / hiPlus1 * (y[i + 2] - y[i + 1]) - 3.0 / hi * (y[i + 1] - y[i]);
         }
         lower[lower.length - 1] = hn;
-        upper[upper.length - 1] = hn;
 
         // result is in r
-        solveTridiagonalSystem(lower, diagonal, upper, r);
+        solveLDLTSystem(lower, diagonal, r);
 
-        double[] b = new double[n];
-        double[] d = new double[n];
         double[] coefficients = new double[(x.length - 1) * 4]; // 4 coefficients and n - 1 segments
         for(int i = 0, j = 0; i < n - 1; ++i, ++j) {
             double hi = x[i + 1] - x[i];
@@ -321,7 +333,13 @@ public class CubicSpline extends Spline {
         double[] y = {0, 1, 4, 9, 16, 25, 36, 49, 64};
 
         x = new double[]{1, 3, 8, 14, 15, 20, 26, 36, 45, 62, 95};
-        y = new double[]{10, 10, 10, 10, 10, 10, 10.5, 15, 50, 60, 85};
+        y = new double[]{10, 12, 15, 24, 14, 10, 10.5, 15, 50, 60, 85};
+
+//        x = new double[]{1, 3, 8, 14, 15};
+//        y = new double[]{10, 12, 15, 24, 14};
+
+//        x = new double[]{0.9, 1.3, 1.9, 2.1};
+//        y = new double[]{1.3, 1.5, 1.85, 2.1};
 
 //        CubicSpline cs = CubicSpline.newNotAKnotSpline(x, y);
 //        System.out.println(cs.differentiate(2.0));
@@ -331,7 +349,7 @@ public class CubicSpline extends Spline {
 //        System.out.println(cs.evaluateAt(7.5));
 //        System.out.println(cs);
 
-        CubicSpline csc = CubicSpline.newClampedSpline(x, y, 1, 1);
+        CubicSpline csc = CubicSpline.newNaturalSplineInPlace(x, y);
         System.out.println(csc.differentiate(2.0));
         System.out.println(csc.evaluateAntiDerivativeAt(0, 3.0));
         System.out.println(csc.integrate(3.0));
