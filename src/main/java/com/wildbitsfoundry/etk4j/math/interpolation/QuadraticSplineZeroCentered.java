@@ -65,7 +65,7 @@ public class QuadraticSplineZeroCentered extends Spline {
 
     @Override
     public double integrate(double x) {
-        return integrate(0, x);
+        return integrate(_x[0], x);
     }
 
     @Override
@@ -75,8 +75,7 @@ public class QuadraticSplineZeroCentered extends Spline {
     }
 
     @Override
-    public double evaluateDerivativeAt(int i, double t) {
-        double x = t + _x[i];
+    public double evaluateDerivativeAt(int i, double x) {
         i *= 3;
         return _coefs[i + 1] + x * 2.0 * _coefs[i];
     }
@@ -110,50 +109,52 @@ public class QuadraticSplineZeroCentered extends Spline {
         double[] x = {0, 1, 2, 3, 4, 5};
         double[] y = {0, 1, 4, 9, 16, 25};
 
-        double a = 0;
-        double b = 4;
-        double xi = 3.5;
-
-        LinearSpline ls = LinearSpline.newLinearSpline(x, y);
-        System.out.println(ls.evaluateAt(1.5));
-        System.out.println(ls.differentiate(2.5));
-        System.out.println(ls.integrate(a, b));
-        System.out.println(ls.integrate(xi));
-        System.out.println(ls);
-
-        QuadraticSplineZeroCentered qs = newQuadraticSpline(x, y);
-        System.out.println(qs.evaluateAt(1.5));
-        System.out.println(qs.differentiate(2.5));
-        System.out.println(qs.integrate(a, b));
-        System.out.println(qs.integrate(xi));
-        System.out.println(qs);
-
-        CubicSpline cs = CubicSpline.newNotAKnotSpline(x, y);
-        System.out.println(cs.evaluateAt(1.5));
-        System.out.println(cs.differentiate(2.5));
-        System.out.println(cs.integrate(a, b));
-        System.out.println(cs.integrate(xi));
-        System.out.println(cs);
-
-//        x = new double[]{0.0, 10.0, 15.0, 20.0, 22.5, 30.0};
-//        y = new double[]{0.0, 227.04, 362.78, 517.35, 602.97, 901.67};
+//        double a = 0;
+//        double b = 4;
+//        double xi = 3.5;
 //
+//        LinearSpline ls = LinearSpline.newLinearSpline(x, y);
+//        System.out.println(ls.evaluateAt(1.5));
+//        System.out.println(ls.differentiate(2.5));
+//        System.out.println(ls.integrate(a, b));
+//        System.out.println(ls.integrate(xi));
+//        System.out.println(ls);
+//
+//        QuadraticSplineZeroCentered qs = newQuadraticSpline(x, y);
+//        System.out.println(qs.evaluateAt(1.5));
+//        System.out.println(qs.differentiate(2.5));
+//        System.out.println(qs.integrate(a, b));
+//        System.out.println(qs.integrate(xi));
+//        System.out.println(qs);
+//
+//        CubicSpline cs = CubicSpline.newNotAKnotSpline(x, y);
+//        System.out.println(cs.evaluateAt(1.5));
+//        System.out.println(cs.differentiate(2.5));
+//        System.out.println(cs.integrate(a, b));
+//        System.out.println(cs.integrate(xi));
+//        System.out.println(cs);
+
+        x = new double[]{0.0, 10.0, 15.0, 20.0, 22.5, 30.0};
+        y = new double[]{0.0, 227.04, 362.78, 517.35, 602.97, 901.67};
+
 //        LinearSpline ls = LinearSpline.newLinearSpline(x, y);
 //        System.out.println(ls.evaluateAt(16));
 //        System.out.println(ls.differentiate(16));
 //        System.out.println(ls.integrate(11, 16));
 //        System.out.println(ls);
-//
-//        QuadraticSplineZeroCentered qs = newQuadraticSpline(x, y);
-//        System.out.println(qs.evaluateAt(16));
-//        System.out.println(qs.differentiate(16));
-//        System.out.println(qs.integrate(11, 16));
-//        System.out.println(qs);
-//
-//        CubicSpline cs = CubicSpline.newNotAKnotSpline(x, y);
-//        System.out.println(cs.evaluateAt(16));
-//        System.out.println(cs.differentiate(16));
-//        System.out.println(cs.integrate(11, 16));
-//        System.out.println(cs);
+
+        QuadraticSplineZeroCentered qs = newQuadraticSpline(x, y);
+        System.out.println(qs.evaluateAt(16));
+        System.out.println(qs.differentiate(16));
+        System.out.println(qs.integrate(11, 16));
+        System.out.println(qs.integrate(16));
+        System.out.println(qs);
+
+        CubicSpline cs = CubicSpline.newNotAKnotSpline(x, y);
+        System.out.println(cs.evaluateAt(16));
+        System.out.println(cs.differentiate(16));
+        System.out.println(cs.integrate(11, 16));
+        System.out.println(cs.integrate(16));
+        System.out.println(cs);
     }
 }
