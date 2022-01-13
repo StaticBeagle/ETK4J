@@ -40,7 +40,6 @@ public class CubicSpline extends Spline {
             diagonal[i + 1] -= ui * lower[i];
             b[i + 1] -= lower[i] * b[i];
         }
-
         b[length - 1] /= diagonal[length - 1];
         for (int i = length - 2; i >= 0; --i) {
             b[i] = b[i] / diagonal[i] - lower[i] * b[i + 1];
@@ -48,7 +47,7 @@ public class CubicSpline extends Spline {
         return b;
     }
 
-    // TODO check monotonicity
+    // TODO check monotonicity do we want to check this or let the user feel the wrath of "undefined behavior"?
     private CubicSpline(double[] x, double[] y, double[] coefs) {
         super(x, 4);
         _coefs = coefs;
@@ -103,11 +102,11 @@ public class CubicSpline extends Spline {
             coefficients[++j] = dy / hi - hi * (2.0 * r[i - 1] + r[i]) / 6.0;
             coefficients[++j] = y[i];
         }
-        int m = coefficients.length - 4;
-        coefficients[m] = -r[n - 1] / (6.0 * (x[n + 1] - x[n]));
-        coefficients[++m] = r[n - 1] / 2.0;
-        coefficients[++m] = (y[n + 1] - y[n]) / (x[n + 1] - x[n]) - (x[n + 1] - x[n]) * (2.0 * r[n - 1]) / 6.0; ;
-        coefficients[++m] = y[n];
+        int j = coefficients.length - 4;
+        coefficients[j] = -r[n - 1] / (6.0 * (x[n + 1] - x[n]));
+        coefficients[++j] = r[n - 1] / 2.0;
+        coefficients[++j] = (y[n + 1] - y[n]) / (x[n + 1] - x[n]) - (x[n + 1] - x[n]) * (2.0 * r[n - 1]) / 6.0; ;
+        coefficients[++j] = y[n];
         return new CubicSpline(x, y, coefficients);
     }
 
@@ -134,18 +133,6 @@ public class CubicSpline extends Spline {
 //        return new CubicSpline(x, y, dydx);
 //    }
 
-    // TODO
-//    public static double[] computeClampedSplineDerivatives(double[] x, double[] y, double d0, double dn) {
-//        checkMinXLength(x, 2);
-//        TridiagonalLDLTSystem T = setupLDLT(x, y);
-//        final int n = x.length;
-//        T.b[0] = d0;
-//        T.b[T.b.length - 1] = dn;
-//        T.b[1] = T.b[1] - T.b[0] * T.L[0];
-//        T.b[n - 2] = T.b[n - 2] - T.b[n - 1] * T.L[n - 2];
-//        return T.solve(T.b.length - 1, 1);
-//    }
-//
     public static CubicSpline newClampedSpline(double[] x, double[] y, double d0, double dn) {
         return newClampedSplineInPlace(Arrays.copyOf(x, x.length), y, d0, dn);
     }
@@ -269,19 +256,30 @@ public class CubicSpline extends Spline {
         // result is in r
         solveTridiagonalSystem(lower, diagonal, upper, r);
 
-
-        double[] b = new double[r.length + 2];
-        System.arraycopy(r, 0, b, 1, r.length);
-        b[0] = (1 + h0 / h1) * b[1] - h0 / h1 * b[2];
-        b[b.length - 1] = (1 + hn / hnMinus1) * b[b.length - 2] - hn / hnMinus1 * b[b.length - 3];
-
+        double b0 = (1 + h0 / h1) * r[0] - h0 / h1 * r[1];
         double[] coefficients = new double[(x.length - 1) * 4]; // 4 coefficients and n - 1 segments
-        for (int i = 0, j = 0; i < y.length - 1; ++i, ++j) {
-            coefficients[j] = (b[i + 1] - b[i]) / (3.0 * (x[i + 1] - x[i]));
-            coefficients[++j] = b[i];
-            coefficients[++j] = (y[i + 1] - y[i]) / (x[i + 1] - x[i]) - (x[i + 1] - x[i]) * (b[i + 1] + 2 * b[i]) / 3.0;
-            coefficients[++j] = y[i];
+        coefficients[0] = (r[0] - b0) / (3.0 * (x[1] - x[0]));
+        coefficients[1] = b0;
+        coefficients[2] = (y[1] - y[0]) / (x[1] - x[0]) - (x[1] - x[0]) * (r[0] + 2 * b0) / 3.0;
+        coefficients[3] = y[0];
+
+        final int noPoints = y.length;;
+        for (int i = 0, j = 4; i < noPoints - 3; ++i, ++j) {
+            coefficients[j] = (r[i + 1] - r[i]) / (3.0 * (x[i + 2] - x[i + 1]));
+            coefficients[++j] = r[i];
+            coefficients[++j] = (y[i + 2] - y[i + 1]) / (x[i + 2] - x[i + 1]) - (x[i + 2] - x[i + 1])
+                    * (r[i + 1] + 2 * r[i]) / 3.0;
+            coefficients[++j] = y[i + 1];
         }
+
+        double bn = (1 + hn / hnMinus1) * r[r.length - 1] - hn / hnMinus1 * r[r.length - 2];
+        int j = coefficients.length - 4;
+        int m = r.length;
+        coefficients[j] = (bn - r[m - 1]) / (3.0 * (x[noPoints - 1] - x[noPoints - 2]));
+        coefficients[++j] = r[m - 1];
+        coefficients[++j] = (y[noPoints - 1] - y[noPoints - 2]) / (x[noPoints - 1] - x[noPoints - 2]) -
+                (x[noPoints - 1] - x[noPoints - 2]) * (bn + 2 * r[m - 1]) / 3.0;
+        coefficients[++j] = y[noPoints - 2];
         return new CubicSpline(x, y, coefficients);
     }
 
@@ -297,13 +295,15 @@ public class CubicSpline extends Spline {
     }
 
     @Override
-    public double evaluateDerivativeAt(int i, double t) {
+    public double evaluateDerivativeAt(int i, double x) {
+        double t = x - _x[i];
         i <<= 2;
         return _coefs[i + 2] + t * (2 * _coefs[i + 1] + t * 3 * _coefs[i]);
     }
 
     @Override
-    public double evaluateAntiDerivativeAt(int i, double t) {
+    public double evaluateAntiDerivativeAt(int i, double x) {
+        double t = x - _x[i];
         i <<= 2;
         return t * (_coefs[i + 3] + t * (_coefs[i + 2] * P5 + t * (_coefs[i + 1] * P33 + t * _coefs[i] * P25)));
     }
@@ -349,7 +349,7 @@ public class CubicSpline extends Spline {
 //        System.out.println(cs.evaluateAt(7.5));
 //        System.out.println(cs);
 
-        CubicSpline csc = CubicSpline.newNaturalSplineInPlace(x, y);
+        CubicSpline csc = CubicSpline.newNotAKnotSpline(x, y);
         System.out.println(csc.differentiate(2.0));
         System.out.println(csc.evaluateAntiDerivativeAt(0, 3.0));
         System.out.println(csc.integrate(3.0));

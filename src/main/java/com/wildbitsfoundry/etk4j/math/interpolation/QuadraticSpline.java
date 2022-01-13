@@ -69,16 +69,16 @@ public class QuadraticSpline extends Spline {
         return _coefs[i + 2] + t * (_coefs[i + 1] + t * _coefs[i]);
     }
 
-    // TODO change t to x
     @Override
-    public double evaluateDerivativeAt(int i, double t) {
+    public double evaluateDerivativeAt(int i, double x) {
+        double t = x - _x[i];
         i *= 3;
         return _coefs[i + 1] + t * 2.0 * _coefs[i];
     }
 
-    // TODO change t to x
     @Override
-    public double evaluateAntiDerivativeAt(int i, double t) {
+    public double evaluateAntiDerivativeAt(int i, double x) {
+        double t = x - _x[i];
         i *= 3;
         return t * (_coefs[i + 2] + t * (_coefs[i + 1] * P5 + t * _coefs[i] * P33));
     }
@@ -121,12 +121,14 @@ public class QuadraticSpline extends Spline {
         System.out.println(qs3.differentiate(16));
         System.out.println(qs3.integrate(11, 16));
         System.out.println(qs3);
+//
+//        double[] yi = new double[31];
+//        for(int i = 0; i <= 30; ++i) {
+//            yi[i] = qs2.evaluateAt(i);
+//        }
 
-        double[] yi = new double[31];
-        for(int i = 0; i <= 30; ++i) {
-            yi[i] = qs2.evaluateAt(i);
-        }
+        CubicSpline cs = CubicSpline.newNotAKnotSpline(x, y);
 
-        System.out.println(Arrays.toString(yi));
+        System.out.println(Arrays.toString(cs.evaluateAt(NumArrays.linSteps(0, 30))));
     }
 }

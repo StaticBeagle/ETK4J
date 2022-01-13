@@ -42,14 +42,15 @@ public class LinearSpline extends Spline {
 	}
 
 	@Override
-	protected double evaluateDerivativeAt(int i, double t) {
-		i = i << 1;
+	protected double evaluateDerivativeAt(int i, double x) {
+		i <<= 1;
 		return _coefs[i];
 	}
 
 	@Override
-	public double evaluateAntiDerivativeAt(int i, double t) {
-		i = i << 1;
+	public double evaluateAntiDerivativeAt(int i, double x) {
+		double t = x - _x[i];
+		i <<= 1;
 		return t * (_coefs[i + 1] + t * _coefs[i] * 0.5);
 	}
 

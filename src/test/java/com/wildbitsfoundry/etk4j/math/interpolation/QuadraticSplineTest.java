@@ -22,9 +22,13 @@ public class QuadraticSplineTest {
                 662.0855555555555, 697.0580888888888, 738.5028, 786.4196888888889, 840.8087555555555, 901.67};
         assertArrayEquals(expected, qs.evaluateAt(NumArrays.linSteps(0, 30)), 1e-12);
 
-        assertEquals(17.6984, qs.differentiate(16), 1e-12);
-
-        assertEquals(1670.7990666666667, qs.integrate(11, 16), 1e-12);
+        assertEquals(376.0732, qs.evaluateAt(16.0), 1e-12);
+        assertEquals(17.6984, qs.differentiate(16.0), 1e-12);
+        assertEquals(17.6984, qs.evaluateDerivativeAt(2, 16), 1e-12);
+        assertEquals(368.69239999999996, qs.evaluateAntiDerivativeAt(2, 16), 1e-12);
+        assertEquals(2676.1257333333333, qs.integrate(16), 1e-12);
+        assertEquals(2676.1257333333333, qs.integrate(0.0, 16), 1e-12);
+        assertEquals(1670.7990666666667, qs.integrate(11.,16.0), 1e-12);
     }
 
     @Test
@@ -39,9 +43,13 @@ public class QuadraticSplineTest {
                 683.2588888888889, 720.7722222222222, 761.37, 805.0522222222222, 851.8188888888889, 901.67};
         assertArrayEquals(expected, qs.evaluateAt(NumArrays.linSteps(0, 30)), 1e-12);
 
-        assertEquals(25.3208, qs.differentiate(16), 1e-12);
-
-        assertEquals(1628.8758666666663, qs.integrate(11, 16), 1e-12);
+        assertEquals(386.23639999999995, qs.evaluateAt(16.0), 1e-12);
+        assertEquals(25.3208, qs.differentiate(16.0), 1e-12);
+        assertEquals(25.3208, qs.evaluateDerivativeAt(2, 16), 1e-12);
+        assertEquals(374.1974666666666, qs.evaluateAntiDerivativeAt(2, 16), 1e-12);
+        assertEquals(2840.4307999999996, qs.integrate(16), 1e-12);
+        assertEquals(2840.4307999999996, qs.integrate(0.0, 16), 1e-12);
+        assertEquals(1628.8758666666663, qs.integrate(11.,16.0), 1e-12);
     }
     // TODO is this below needed. If we test in the cubic spline do we have to test here as well?
 //    @Test

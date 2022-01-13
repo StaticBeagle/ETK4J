@@ -65,7 +65,8 @@ public abstract class Spline extends PiecewiseFunction implements Differentiable
 	}
 
 	// TODO this t and x is confusing, the interface should expose x not t
-	protected double evaluateDerivativeAt(int index, double t) {
+	protected double evaluateDerivativeAt(int index, double x) {
+		double t = x - _x[index];
 		index *= _order;
 		final int length = _order - 1;
 		double result = 0.0;
@@ -77,7 +78,8 @@ public abstract class Spline extends PiecewiseFunction implements Differentiable
 	}
 
 	// TODO this t and x is confusing, the interface should expose x not t
-	public double evaluateAntiDerivativeAt(int index, double t) {
+	public double evaluateAntiDerivativeAt(int index, double x) {
+		double t = x - _x[index];
 		index *= _order;
 		double result = 0.0;
 		for (int j = 0; j < _order; ++j) {
@@ -89,7 +91,6 @@ public abstract class Spline extends PiecewiseFunction implements Differentiable
 	
 	@Override
 	public double evaluateSegmentAt(int index, double x) {
-
 		double t = x - _x[index];
 		index *= _order;
 		double result = 0;
@@ -104,8 +105,7 @@ public abstract class Spline extends PiecewiseFunction implements Differentiable
 	@Override
 	public double differentiate(double x) {
 		int i = this.findSegmentIndex(x);
-		double t = x - _x[i];
-		return this.evaluateDerivativeAt(i, t);
+		return this.evaluateDerivativeAt(i, x);
 	}
 
 	@Override
@@ -124,8 +124,7 @@ public abstract class Spline extends PiecewiseFunction implements Differentiable
 		}
 
 		int i = this.findSegmentIndex(x);
-		double t = x - _x[i];
-		return _indefiniteIntegral[i] + this.evaluateAntiDerivativeAt(i, t);
+		return _indefiniteIntegral[i] + this.evaluateAntiDerivativeAt(i, x);
 	}
 
 	private void calculateIntegral() {
@@ -137,8 +136,7 @@ public abstract class Spline extends PiecewiseFunction implements Differentiable
 		final int size = _coefs.length / _order;
 		_indefiniteIntegral = new double[size];
 		for (int i = 0; i < size - 1; ++i) {
-			double t = _x[i + 1] - _x[i];
-			_indefiniteIntegral[i + 1] = _indefiniteIntegral[i] + this.evaluateAntiDerivativeAt(i, t);
+			_indefiniteIntegral[i + 1] = _indefiniteIntegral[i] + this.evaluateAntiDerivativeAt(i, _x[i + 1]);
 		}
 	}
 }
