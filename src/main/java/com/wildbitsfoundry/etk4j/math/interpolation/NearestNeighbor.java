@@ -89,14 +89,14 @@ public class NearestNeighbor extends PiecewiseFunction {
 
 
 	@Override
-	public double evaluateSegmentAt(int index, double x) {
+	public double evaluateAt(int index, double x) {
 		double t = (x - _x[index]) / (_x[index + 1] - _x[index]);
 		return _y[index + neighborCalculator.calculateNeighborIndex(t)];
 	}
 
 	@Override
 	public UnivariateFunction getSegment(int index) {
-		final double yi = this.evaluateSegmentAt(index, _x[index]);
+		final double yi = this.evaluateAt(index, _x[index]);
 		UnivariateFunction fn = new UnivariateFunction() {
 			
 			@Override

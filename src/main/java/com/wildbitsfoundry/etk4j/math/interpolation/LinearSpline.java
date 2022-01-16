@@ -11,7 +11,7 @@ public class LinearSpline extends Spline {
 
 		final int n = _x.length;
 		// compute coefficients
-		_coefs = new double[(n - 1) * 2]; // 2 coefficients and n - 1 segments
+		coefficients = new double[(n - 1) * 2]; // 2 coefficients and n - 1 segments
 		for (int i = 0, j = 0; i < n - 1; ++i, ++j) {
 			double hx = _x[i + 1] - _x[i];
 			if (hx <= 0.0) {
@@ -19,8 +19,8 @@ public class LinearSpline extends Spline {
 			}
 			double a = (y[i + 1] - y[i]) / hx;
 			double b = y[i];
-			_coefs[j] = a;
-			_coefs[++j] = b;
+			coefficients[j] = a;
+			coefficients[++j] = b;
 		}
 	}
 
@@ -35,31 +35,31 @@ public class LinearSpline extends Spline {
 	}
 
 	@Override
-	public double evaluateSegmentAt(int i, double x) {
+	public double evaluateAt(int i, double x) {
 		double t = x - _x[i];
 		i <<= 1;
-		return _coefs[i + 1] + t * _coefs[i];
+		return coefficients[i + 1] + t * coefficients[i];
 	}
 
 	@Override
 	protected double evaluateDerivativeAt(int i, double x) {
 		i <<= 1;
-		return _coefs[i];
+		return coefficients[i];
 	}
 
 	@Override
 	public double evaluateAntiDerivativeAt(int i, double x) {
 		double t = x - _x[i];
 		i <<= 1;
-		return t * (_coefs[i + 1] + t * _coefs[i] * 0.5);
+		return t * (coefficients[i + 1] + t * coefficients[i] * 0.5);
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0, j = 0; i < _x.length - 1; ++i, ++j) {
-			double a = _coefs[j];
-			double b = _coefs[++j];
+			double a = coefficients[j];
+			double b = coefficients[++j];
 
 			sb.append("S").append(i + 1).append("(x) = ")
 					.append(a != 0d ? String.format("%.4g * (x - %.4f)", a, _x[i]) : "")

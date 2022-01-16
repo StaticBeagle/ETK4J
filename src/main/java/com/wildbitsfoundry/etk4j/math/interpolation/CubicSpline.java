@@ -1,13 +1,8 @@
 package com.wildbitsfoundry.etk4j.math.interpolation;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 
 import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
-import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
-import com.wildbitsfoundry.etk4j.util.NumArrays;
-
-import javax.naming.PartialResultException;
 
 import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkMinXLength;
 import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkXYDimensions;
@@ -17,7 +12,7 @@ public class CubicSpline extends Spline {
     private static final double P5 = 0.5, P33 = 1.0 / 3.0, P25 = 0.25;
 
     // TODO move this to matrix?
-    private static void solveTridiagonalSystem(double[] lower, double[] diagonal, double[] upper, double[] b) {
+    private static void solveLDUTridiagonalSystem(double[] lower, double[] diagonal, double[] upper, double[] b) {
         final int m = b.length;
         b[0] = b[0] / diagonal[0];
         // Forward Substitution
@@ -32,7 +27,7 @@ public class CubicSpline extends Spline {
         }
     }
 
-    private static double[] solveLDLTSystem(double[] lower, double[] diagonal, double[] b) {
+    private static double[] solveLDLTridiagonalSystem(double[] lower, double[] diagonal, double[] b) {
         final int length = diagonal.length;
         for (int i = 0; i < length - 1; ++i) {
             double ui = lower[i];
@@ -47,10 +42,9 @@ public class CubicSpline extends Spline {
         return b;
     }
 
-    // TODO check monotonicity do we want to check this or let the user feel the wrath of "undefined behavior"?
-    private CubicSpline(double[] x, double[] y, double[] coefs) {
+    private CubicSpline(double[] x, double[] y, double[] coefficients) {
         super(x, 4);
-        _coefs = coefs;
+        this.coefficients = coefficients;
     }
 
     public static CubicSpline newCubicSpline(double[] x, double[] y) {
@@ -66,6 +60,8 @@ public class CubicSpline extends Spline {
     }
 
     public static CubicSpline newNaturalSplineInPlace(double[] x, double[] y) {
+        checkXYDimensions(x, y);
+        checkMinXLength(x, 2);
         final int n = x.length - 2;
         double[] diagonal = new double[n];
         double[] lower = new double[n - 1];
@@ -87,7 +83,7 @@ public class CubicSpline extends Spline {
 
         diagonal[n - 1] = 2.0 * (hn + hiPlus1);
         r[n - 1] = 6.0 * (snPlus1 - sn);
-        solveLDLTSystem(lower, diagonal, r);
+        solveLDLTridiagonalSystem(lower, diagonal, r);
 
         double[] coefficients = new double[(x.length - 1) * 4];
         coefficients[0] = r[0] / (6.0 * (x[1] - x[0]));
@@ -110,34 +106,57 @@ public class CubicSpline extends Spline {
         return new CubicSpline(x, y, coefficients);
     }
 
-    //TODO
-//    public static CubicSpline newParabolicallyTerminatedSpline(double[] x, double[] y) {
-//        return newParabolicallyTerminatedSplineInPlace(Arrays.copyOf(x, x.length), y);
-//    }
-//
-//    public static double[] computeParabolicallyTerminatedSplineDerivatives(double[] x, double[] y) {
-//        checkMinXLength(x, 2);
-//        TridiagonalLDLTSystem T = setupLDLT(x, y);
-//        final int n = x.length;
-//        T.D[0] = T.L[0];
-//        double r0 = (y[1] - y[0]) * T.L[0] * T.L[0];
-//        T.b[0] = 2.0 * r0;
-//        T.D[n - 1] = T.L[n - 2];
-//        r0 = (y[n - 1] - y[n - 2]) * T.L[n - 2] * T.L[n - 2];
-//        T.b[n - 1] = 2.0 * r0;
-//        return T.solve();
-//    }
+    public static CubicSpline newParabolicallyTerminatedSpline(double[] x, double[] y) {
+        return newParabolicallyTerminatedSplineInPlace(Arrays.copyOf(x, x.length), y);
+    }
 
-//    public static CubicSpline newParabolicallyTerminatedSplineInPlace(double[] x, double[] y) {
-//        double[] dydx = computeParabolicallyTerminatedSplineDerivatives(x, y);
-//        return new CubicSpline(x, y, dydx);
-//    }
+    public static CubicSpline newParabolicallyTerminatedSplineInPlace(double[] x, double[] y) {
+        checkXYDimensions(x, y);
+        checkMinXLength(x, 2);
+        final int n = x.length;
+        double[] r = new double[n];
+
+        double[] diagonal = new double[n];
+        double[] lower = new double[n - 1];
+        double[] upper = new double[n - 1];
+
+        double hn = x[n - 1] - x[n - 2];
+        diagonal[0] = 1.0;
+        diagonal[n - 1] = -1.0;
+
+        upper[0] = -1.0;
+        for (int i = 0; i < n - 2; ++i) {
+            double hi = x[i + 1] - x[i];
+            double hiPlus1 = x[i + 2] - x[i + 1];
+            lower[i] = hi;
+            upper[i + 1] = hiPlus1;
+            diagonal[i + 1] = 2.0 * (hi + hiPlus1);
+            r[i + 1] = 3.0 / hiPlus1 * (y[i + 2] - y[i + 1]) - 3.0 / hi * (y[i + 1] - y[i]);
+        }
+        lower[lower.length - 1] = 1.0;
+
+        // result is in r
+        solveLDUTridiagonalSystem(lower, diagonal, upper, r);
+
+        double[] coefficients = new double[(x.length - 1) * 4]; // 4 coefficients and n - 1 segments
+        for(int i = 0, j = 0; i < n - 1; ++i, ++j) {
+            double hi = x[i + 1] - x[i];
+            double dy = y[i + 1] - y[i];
+            coefficients[j] = (r[i + 1] - r[i]) / (3.0 * hi);
+            coefficients[++j] = r[i];
+            coefficients[++j] = dy / hi - hi * (r[i + 1] + 2.0 * r[i]) / 3.0;
+            coefficients[++j] = y[i];
+        }
+        return new CubicSpline(x, y, coefficients);
+    }
 
     public static CubicSpline newClampedSpline(double[] x, double[] y, double d0, double dn) {
         return newClampedSplineInPlace(Arrays.copyOf(x, x.length), y, d0, dn);
     }
 
     public static CubicSpline newClampedSplineInPlace(double[] x, double[] y, double d0, double dn) {
+        checkXYDimensions(x, y);
+        checkMinXLength(x, 2);
         final int n = x.length;
         double[] r = new double[n];
 
@@ -156,12 +175,12 @@ public class CubicSpline extends Spline {
             double hiPlus1 = x[i + 2] - x[i + 1];
             lower[i] = hi;
             diagonal[i + 1] = 2.0 * (hi + hiPlus1);
-            r[i + 1] = 3.0 / hiPlus1 * (y[i + 2] - y[i + 1]) - 3.0 / hi * (y[i + 1] - y[i]);
+            r[i + 1] = 3.0 * ((y[i + 2] - y[i + 1]) / hiPlus1  - (y[i + 1] - y[i]) / hi);
         }
         lower[lower.length - 1] = hn;
 
         // result is in r
-        solveLDLTSystem(lower, diagonal, r);
+        solveLDLTridiagonalSystem(lower, diagonal, r);
 
         double[] coefficients = new double[(x.length - 1) * 4]; // 4 coefficients and n - 1 segments
         for(int i = 0, j = 0; i < n - 1; ++i, ++j) {
@@ -214,11 +233,23 @@ public class CubicSpline extends Spline {
                 d[i] = 0.5 * (t[i + 2] + t[i + 1]);
             }
         }
-        return new CubicSpline(x, y, d);
+        // compute coefficients
+        double[] coefficients = new double[(n - 1) * 4]; // 4 coefficients and n - 1 segments
+        for (int i = 0, j = 0; i < n - 1; ++i, ++j) {
+            double hx = x[i + 1] - x[i];
+            double m0 = d[i] * hx;
+            double m1 = d[i + 1] * hx;
+            coefficients[j] = (2 * y[i] + m0 - 2 * y[i + 1] + m1) / (hx * hx * hx);;
+            coefficients[++j] = (-3 * y[i] - 2 * m0 + 3 * y[i + 1] - m1) / (hx * hx);;
+            coefficients[++j] = d[i];
+            coefficients[++j] = y[i];;
+        }
+        return new CubicSpline(x, y, coefficients);
     }
 
-
     public static CubicSpline newNotAKnotSplineInPlace(double[] x, double[] y) {
+        checkXYDimensions(x, y);
+        checkMinXLength(x, 4);
         final int n = x.length - 2;
         double[] r = new double[n];
 
@@ -254,7 +285,7 @@ public class CubicSpline extends Spline {
         double deltaYnMinus1 = y[n] - y[n - 1];
         r[n - 1] = 3.0 * deltaYn / hn - 3.0 * deltaYnMinus1 / hnMinus1;
         // result is in r
-        solveTridiagonalSystem(lower, diagonal, upper, r);
+        solveLDUTridiagonalSystem(lower, diagonal, upper, r);
 
         double b0 = (1 + h0 / h1) * r[0] - h0 / h1 * r[1];
         double[] coefficients = new double[(x.length - 1) * 4]; // 4 coefficients and n - 1 segments
@@ -288,34 +319,34 @@ public class CubicSpline extends Spline {
     }
 
     @Override
-    public double evaluateSegmentAt(int i, double x) {
+    public double evaluateAt(int i, double x) {
         double t = x - _x[i];
         i <<= 2;
-        return _coefs[i + 3] + t * (_coefs[i + 2] + t * (_coefs[i + 1] + t * _coefs[i]));
+        return coefficients[i + 3] + t * (coefficients[i + 2] + t * (coefficients[i + 1] + t * coefficients[i]));
     }
 
     @Override
     public double evaluateDerivativeAt(int i, double x) {
         double t = x - _x[i];
         i <<= 2;
-        return _coefs[i + 2] + t * (2 * _coefs[i + 1] + t * 3 * _coefs[i]);
+        return coefficients[i + 2] + t * (2 * coefficients[i + 1] + t * 3 * coefficients[i]);
     }
 
     @Override
     public double evaluateAntiDerivativeAt(int i, double x) {
         double t = x - _x[i];
         i <<= 2;
-        return t * (_coefs[i + 3] + t * (_coefs[i + 2] * P5 + t * (_coefs[i + 1] * P33 + t * _coefs[i] * P25)));
+        return t * (coefficients[i + 3] + t * (coefficients[i + 2] * P5 + t * (coefficients[i + 1] * P33 + t * coefficients[i] * P25)));
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         for (int i = 0, j = 0; i < _x.length - 1; ++i, ++j) {
-            double a = _coefs[j];
-            double b = _coefs[++j];
-            double c = _coefs[++j];
-            double d = _coefs[++j];
+            double a = coefficients[j];
+            double b = coefficients[++j];
+            double c = coefficients[++j];
+            double d = coefficients[++j];
 
             sb.append("S").append(i + 1).append("(x) = ")
                     .append(a != 0d ? String.format("%.4g * (x - %.4f)^3", a, _x[i]) : "")
@@ -326,37 +357,5 @@ public class CubicSpline extends Spline {
         sb.setLength(Math.max(sb.length() - System.lineSeparator().length(), 0));
         return sb.toString().replace("+ -", "- ").replace("- -", "+ ")
                 .replace("=  + ", "= ").replace("=  - ", "= -");
-    }
-
-    public static void main(String[] args) {
-        double[] x = {0, 1, 2, 3, 4, 5, 6, 7, 8};
-        double[] y = {0, 1, 4, 9, 16, 25, 36, 49, 64};
-
-        x = new double[]{1, 3, 8, 14, 15, 20, 26, 36, 45, 62, 95};
-        y = new double[]{10, 12, 15, 24, 14, 10, 10.5, 15, 50, 60, 85};
-
-//        x = new double[]{1, 3, 8, 14, 15};
-//        y = new double[]{10, 12, 15, 24, 14};
-
-//        x = new double[]{0.9, 1.3, 1.9, 2.1};
-//        y = new double[]{1.3, 1.5, 1.85, 2.1};
-
-//        CubicSpline cs = CubicSpline.newNotAKnotSpline(x, y);
-//        System.out.println(cs.differentiate(2.0));
-//        System.out.println(cs.evaluateAntiDerivativeAt(0, 3.0));
-//        System.out.println(cs.integrate(3.0));
-//        System.out.println(cs.integrate(1.0, 3.0));
-//        System.out.println(cs.evaluateAt(7.5));
-//        System.out.println(cs);
-
-        CubicSpline csc = CubicSpline.newNotAKnotSpline(x, y);
-        System.out.println(csc.differentiate(2.0));
-        System.out.println(csc.evaluateAntiDerivativeAt(0, 3.0));
-        System.out.println(csc.integrate(3.0));
-        System.out.println(csc.integrate(1.0, 3.0));
-        System.out.println(csc.evaluateAt(7.5));
-        System.out.println(csc);
-
-
     }
 }

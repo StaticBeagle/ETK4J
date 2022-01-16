@@ -27,7 +27,6 @@ public class QuadraticSplineZeroCenteredTest {
         assertEquals(394.2363999999999, qs.evaluateAt(16.0), 1e-12);
         assertEquals(31.3208, qs.differentiate(16.0), 1e-12);
         assertEquals(31.3208, qs.evaluateDerivativeAt(2, 16), 1e-12);
-        System.out.println(qs);
         assertEquals(2113.5808000000075, qs.evaluateAntiDerivativeAt(2, 16), 1e-12);
         assertEquals(2969.7641333333327, qs.integrate(16), 1e-12);
         assertEquals(2969.7641333333327, qs.integrate(0.0, 16), 1e-12);

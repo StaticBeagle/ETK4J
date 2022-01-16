@@ -23,7 +23,7 @@ public abstract class Spline extends PiecewiseFunction implements Differentiable
 	@Override
 	public UnivariateFunction getSegment(int index) {
 		int offset = index * _order;
-		final double[] coefs = Arrays.copyOfRange(_coefs, offset, offset + _order);
+		final double[] coefs = Arrays.copyOfRange(coefficients, offset, offset + _order);
 		final double x0 = _x[index];
 		UnivariateFunction fn = x -> NumArrays.horner(coefs, x - x0);
 		return fn;
@@ -72,7 +72,7 @@ public abstract class Spline extends PiecewiseFunction implements Differentiable
 		double result = 0.0;
 		for (int j = 0; j < length; ++j) {
 			result *= t;
-			result += _coefs[index++] * (length - j);
+			result += coefficients[index++] * (length - j);
 		}
 		return result;
 	}
@@ -83,20 +83,20 @@ public abstract class Spline extends PiecewiseFunction implements Differentiable
 		index *= _order;
 		double result = 0.0;
 		for (int j = 0; j < _order; ++j) {
-			result += _coefs[index++] / (_order - j);
+			result += coefficients[index++] / (_order - j);
 			result *= t;
 		}
 		return result;
 	}
 	
 	@Override
-	public double evaluateSegmentAt(int index, double x) {
+	public double evaluateAt(int index, double x) {
 		double t = x - _x[index];
 		index *= _order;
 		double result = 0;
 		for (int j = 0; j < _order; ++j) {
 			result *= t;
-			result += _coefs[index++];
+			result += coefficients[index++];
 		}
 		return result;
 	}
@@ -133,7 +133,7 @@ public abstract class Spline extends PiecewiseFunction implements Differentiable
 			return;
 		}
 
-		final int size = _coefs.length / _order;
+		final int size = coefficients.length / _order;
 		_indefiniteIntegral = new double[size];
 		for (int i = 0; i < size - 1; ++i) {
 			_indefiniteIntegral[i + 1] = _indefiniteIntegral[i] + this.evaluateAntiDerivativeAt(i, _x[i + 1]);

@@ -7,7 +7,7 @@ import com.wildbitsfoundry.etk4j.math.extrapolation.Extrapolator;
 public abstract class PiecewiseFunction implements UnivariateFunction {
 	private int _numberOfSegments;
 	protected double[] _x = null;
-	protected double[] _coefs = null;
+	protected double[] coefficients = null;
 	// TODO _coefs name doesn't make sense
 	Extrapolator _extrapolator;
 
@@ -42,7 +42,7 @@ public abstract class PiecewiseFunction implements UnivariateFunction {
 		x += 0.0;	// convert -0.0 to 0.0
 		if (x >= _x0 && x <= _xn) {
 			int index = this.findSegmentIndex(x);
-			return this.evaluateSegmentAt(index, x);
+			return this.evaluateAt(index, x);
 		}
 		return this.extrapolate(x);
 	}
@@ -56,7 +56,7 @@ public abstract class PiecewiseFunction implements UnivariateFunction {
 		return yi;
 	}
 
-	public abstract double evaluateSegmentAt(int index, double x);
+	public abstract double evaluateAt(int index, double x);
 
 	public abstract UnivariateFunction getSegment(int index);
 

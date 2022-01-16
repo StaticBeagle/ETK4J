@@ -1,9 +1,7 @@
 package com.wildbitsfoundry.etk4j.math.interpolation;
 
-import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
 import com.wildbitsfoundry.etk4j.util.NumArrays;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 
 public class QuadraticSpline extends Spline {
@@ -15,7 +13,7 @@ public class QuadraticSpline extends Spline {
 
         final int n = _x.length;
         // compute coefficients
-        _coefs = new double[(n - 1) * 3]; // 3 coefficients and n - 1 segments
+        coefficients = new double[(n - 1) * 3]; // 3 coefficients and n - 1 segments
         for (int i = 0, j = 0; i < n - 1; ++i, ++j) {
             double hx = _x[i + 1] - _x[i];
             if (hx <= 0.0) {
@@ -24,9 +22,9 @@ public class QuadraticSpline extends Spline {
             double a = 0.5 * (dydx[i + 1] - dydx[i]) / hx;
             double b = dydx[i];
             double c = y[i];
-            _coefs[j] = a;
-            _coefs[++j] = b;
-            _coefs[++j] = c;
+            coefficients[j] = a;
+            coefficients[++j] = b;
+            coefficients[++j] = c;
         }
     }
 
@@ -63,33 +61,33 @@ public class QuadraticSpline extends Spline {
     }
 
     @Override
-    public double evaluateSegmentAt(int i, double x) {
+    public double evaluateAt(int i, double x) {
         double t = x - _x[i];
         i *= 3;
-        return _coefs[i + 2] + t * (_coefs[i + 1] + t * _coefs[i]);
+        return coefficients[i + 2] + t * (coefficients[i + 1] + t * coefficients[i]);
     }
 
     @Override
     public double evaluateDerivativeAt(int i, double x) {
         double t = x - _x[i];
         i *= 3;
-        return _coefs[i + 1] + t * 2.0 * _coefs[i];
+        return coefficients[i + 1] + t * 2.0 * coefficients[i];
     }
 
     @Override
     public double evaluateAntiDerivativeAt(int i, double x) {
         double t = x - _x[i];
         i *= 3;
-        return t * (_coefs[i + 2] + t * (_coefs[i + 1] * P5 + t * _coefs[i] * P33));
+        return t * (coefficients[i + 2] + t * (coefficients[i + 1] * P5 + t * coefficients[i] * P33));
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         for (int i = 0, j = 0; i < _x.length - 1; ++i, ++j) {
-            double a = _coefs[j];
-            double b = _coefs[++j];
-            double c = _coefs[++j];
+            double a = coefficients[j];
+            double b = coefficients[++j];
+            double c = coefficients[++j];
 
             sb.append("S").append(i + 1).append("(x) = ")
                     .append(a != 0d ? String.format("%.4g * (x - %.4f)^2", a, _x[i]) : "")
