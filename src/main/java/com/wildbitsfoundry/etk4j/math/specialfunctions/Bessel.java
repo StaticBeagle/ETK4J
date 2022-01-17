@@ -10,33 +10,97 @@ public final class Bessel {
     /*
     TODO translate
         public static int start(double x, int n, int t)
+
+        Ordinary Bessel function of the first kind of order zero
+        // input x
         public static double bessj0(double x)
+
+        Ordinary Bessel function of the first kind of order one
+        // input x
         public static double bessj1(double x)
+
+        Ordinary Bessel function of the first kind of order k (up to n)
+        // Input x
+        // Input n The upper bound of the indices of array j
+        // Output the ordinary Bessel function of the first kind of order k
         public static void bessj(double x, int n, double j[])
+
+        Ordinary Bessel function of the second kind of orders zero and one
+        // Input x
+        // Output
+        // yO value of the ordinary Bessel function of the second kind of order zero
+        // y1 value of the ordinary Bessel function of the second kind of order one
         public static void bessy01(double x, double y0[], double y1[])
+
+        Ordinary Bessel function of the second kind of order k
+        // Input n the upper bound o the indices of array y
+        // Output
+        // Output of the ordinary Bessel function of the second kind of order k
         public static void bessy(double x, int n, double y[])
-        public static void besspq0(double x, double p0[], double q0[])
-        public static void besspq1(double x, double p1[], double q1[])
+
+        // Helper method to calculate the Bessel function of order zero for large values of x
+        static void besspq0(double x, double p0[], double q0[])
+
+        // Helper method to calculate the Bessel function of order one for large values of x
+        static void besspq1(double x, double p1[], double q1[])
+
+        // Modified Bessel function of the first kind of order zero
+        public static double bessi0(double x)
+
+        // Modified Bessel function of the first kind of order one
+        public static double bessi1(double x)
+
+        Modified Bessel function of the first kind of order k
+        // Input n the upper bound of the indices of array i
+        // Output
+        // Output of the modified Bessel function of the first kind of order k
         public static void bessi(double x, int n, double i[])
+
+        Modified Bessel function of the third kind of order j
+        // Input n the upper bound o the indices of array k
+        // Output
+        // Output of the modified Bessel function of the first kind of order j
         public static void bessk(double x, int n, double k[])
+
+        Exponentially scaled modified Bessel function of the first kind of order zero
+        public static double nonexpbessi0(double x)
+
+        Exponentially scaled modified Bessel function of the first kind of order one
+        public static double nonexpbessi1(double x)
+
+        Exponentially scaled modified Bessel function of the first kind of order one
+        // Input n the upper bound o the indices of array i
+        // Output
+        // Output of the modified Bessel function of the first kind of order one
         public static void nonexpbessi(double x, int n, double i[])
+
+
+        Exponentially scaled modified Bessel function of the third kind of order j
+        // Input n the upper bound o the indices of array k
+        // Output
+        // Output of the modified Bessel function of the first kind of order j
         public static void nonexpbessk(double x, int n, double k[])
-        public static void spherbessj(double x, int n, double j[])
+
+
         public static double loggamma(double x)
         public static double gamma(double x)
         public static void bessjaplusn(double a, double x, int n, double ja[])
         public static void besspqa01(double a, double x, double pa[], double qa[], double pa1[], double qa1[])
         public static void bessya01(double a, double x, double ya[], double ya1[])
-        public static double bessi1(double x)
-        public static double nonexpbessi1(double x)
-        public static double bessi0(double x)
-        public static double nonexpbessi0(double x)
+
+
      */
 
     private Bessel() {
     }
 
     // TODO test
+    /***
+     * Modified Bessel function of the third kind of order zero and one
+     * @param x Argument at which to evaluate the Bessel function
+     * @param k0 Output: has the value of the modified Bessel function of the third kind of order zero
+     * @param k1 Output: has the value of the modified Bessel function of the third kind of order one
+     */
     public static void bessk01(double x, double k0[], double k1[]) {
         if (x <= 1.5) {
             int k;
@@ -70,6 +134,12 @@ public final class Bessel {
     }
 
     // TODO test
+    /***
+     * Modified Bessel function of the third kind of order zero and one
+     * @param x Argument at which to evaluate the Bessel function
+     * @param k0 Output: has the value of the Bessel function of order zero
+     * @param k1 Output: has the value of the Bessel function of order one
+     */
     public static void bessk01(Complex x, Complex[] k0, Complex[] k1) {
         if (x.abs() <= 1.5) {
             int k;
@@ -114,6 +184,12 @@ public final class Bessel {
     }
 
     // TODO test
+    /***
+     * Exponentially scaled modified Bessel function of the third kind of order zero and one
+     * @param x Argument at which to evaluate the Bessel function
+     * @param k0 Output: has the value of the Bessel function of order zero
+     * @param k1 Output: has the value of the Bessel function of order one
+     */
     public static void nonexpbessk01(double x, double k0[], double k1[]) {
         if (x <= 1.5) {
             double expx;
@@ -189,6 +265,12 @@ public final class Bessel {
     }
 
     // TODO test
+    /***
+     * Exponentially scaled modified Bessel function of the third kind of order zero and one
+     * @param x Argument at which to evaluate the Bessel function
+     * @param k0 Output: has the value of the Bessel function of order zero
+     * @param k1 Output: has the value of the Bessel function of order one
+     */
     public static void nonexpbessk01(Complex x, Complex[] k0, Complex[] k1) {
         if (x.abs() <= 1.5) {
             Complex expx;
@@ -279,6 +361,13 @@ public final class Bessel {
     }
 
     // TODO test
+    /***
+     * Reciprocal of the gamma function
+     * @param x Argument at which to evaluate the function x must be [0.5, 1.5]
+     * @param odd Output: the odd part
+     * @param even Output: the even part
+     * @return the value of the reciprocal gamma function evaluated at x
+     */
     public static double recipgamma(double x, double odd[], double even[]) {
         int i;
         double alfa, beta, x2;
@@ -313,7 +402,14 @@ public final class Bessel {
         return odd[0] * x + even[0];
     }
 
-    // TODO add docs. test
+    // TODO test
+    /***
+     * Modified Bessel function of the third kind of order a and a + 1
+     * @param a order of the function
+     * @param x Argument at which to evaluate the Bessel function
+     * @param ka Output: has the value of the Bessel function of order a
+     * @param ka1 Output: has the value of the Bessel function of order a + 1
+     */
     public static void besska01(double a, double x, double ka[], double ka1[]) {
         if (a == 0.0) {
             bessk01(x, ka, ka1);
@@ -391,7 +487,14 @@ public final class Bessel {
         }
     }
 
-    // TODO this is translated. Test
+    // TODO test
+    /***
+     * Modified Bessel function of the third kind of order a and a + 1
+     * @param a order of the function
+     * @param x Argument at which to evaluate the Bessel function
+     * @param ka Output: has the value of the Bessel function of order a
+     * @param ka1 Output: has the value of the Bessel function of order a + 1
+     */
     public static void besska01(double a, Complex x, Complex[] ka, Complex[] ka1) {
         if (a == 0.0) {
             bessk01(x, ka, ka1);
@@ -481,8 +584,14 @@ public final class Bessel {
             }
         }
     }
-
-    // TODO add docs. This was translated. Test
+    // TODO test
+    /***
+     * Exponentially scaled modified Bessel function of the third kind of order a and a + 1
+     * @param a order of the function
+     * @param x Argument at which to evaluate the Bessel function
+     * @param ka Output: has the value of the Bessel function of order a
+     * @param ka1 Output: has the value of the Bessel function of order a + 1
+     */
     public static void nonexpbesska01(double a, double x, double ka[], double ka1[]) {
         if (a == 0.0) {
             nonexpbessk01(x, ka, ka1);
@@ -547,13 +656,14 @@ public final class Bessel {
         }
     }
 
-    // TODO this was translated. Test
-    public static void nonexpbesska01(double a, Complex x, Complex[] ka) {
-        Complex[] ka1 = new Complex[1];
-        nonexpbesska01(a, x, ka, ka1);
-    }
-
-    // TODO this was translated. Test
+    // TODO test
+    /***
+     * Exponentially scaled modified Bessel function of the third kind of order a and a + 1
+     * @param a order of the function
+     * @param x Argument at which to evaluate the Bessel function
+     * @param ka Output: has the value of the Bessel function of order a
+     * @param ka1 Output: has the value of the Bessel function of order a + 1
+     */
     public static void nonexpbesska01(double a, Complex x, Complex[] ka, Complex[] ka1) {
         if (a == 0.0) {
             nonexpbessk01(x, ka, ka1);

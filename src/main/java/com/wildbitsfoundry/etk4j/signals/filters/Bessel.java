@@ -122,23 +122,23 @@ public class Bessel extends AnalogFilter {
                     z -> {
                         Complex[] result = new Complex[1];
                         com.wildbitsfoundry.etk4j.math.specialfunctions.
-                                Bessel.nonexpbesska01(n + 0.5, z.invert(), result);
+                                Bessel.nonexpbesska01(n + 0.5, z.invert(), result, new Complex[1]);
                         return result[0];
                     },
                     z -> {
                         Complex[] a0 = new Complex[1];
                         com.wildbitsfoundry.etk4j.math.specialfunctions.
-                                Bessel.nonexpbesska01(n - 0.5, z.invert(), a0);
+                                Bessel.nonexpbesska01(n - 0.5, z.invert(), a0, new Complex[1]);
                         a0[0] = a0[0].divide(z.pow(2).multiply(2));
 
                         Complex[] a1 = new Complex[1];
                         com.wildbitsfoundry.etk4j.math.specialfunctions.
-                                Bessel.nonexpbesska01(n + 0.5, z.invert(), a1);
+                                Bessel.nonexpbesska01(n + 0.5, z.invert(), a1, new Complex[1]);
                         a1[0] = a1[0].divide(z.pow(2));
 
                         Complex[] a2 = new Complex[1];
                         com.wildbitsfoundry.etk4j.math.specialfunctions.
-                                Bessel.nonexpbesska01(n + 1.5, z.invert(), a2);
+                                Bessel.nonexpbesska01(n + 1.5, z.invert(), a2, new Complex[1]);
                         a2[0] = a2[0].divide(z.pow(2).multiply(2));
 
                         return a0[0].subtract(a1[0]).add(a2[0]);
@@ -176,7 +176,7 @@ public class Bessel extends AnalogFilter {
         Complex[][] result = new Complex[length][1];
         for (int i = 0; i < length; ++i) {
             com.wildbitsfoundry.etk4j.math.specialfunctions.
-                    Bessel.nonexpbesska01(length + 0.5, x[i].invert(), result[i]);
+                    Bessel.nonexpbesska01(length + 0.5, x[i].invert(), result[i], new Complex[1]);
         }
         return ComplexArrays.flatten(result);
     };
@@ -187,17 +187,17 @@ public class Bessel extends AnalogFilter {
         for (int i = 0; i < length; ++i) {
             Complex[] a0 = new Complex[1];
             com.wildbitsfoundry.etk4j.math.specialfunctions.
-                    Bessel.nonexpbesska01(length - 0.5, x[i].invert(), a0);
+                    Bessel.nonexpbesska01(length - 0.5, x[i].invert(), a0, new Complex[1]);
             a0[0] = a0[0].divide(x[i].pow(2).multiply(2));
 
             Complex[] a1 = new Complex[1];
             com.wildbitsfoundry.etk4j.math.specialfunctions.
-                    Bessel.nonexpbesska01(length + 0.5, x[i].invert(), a1);
+                    Bessel.nonexpbesska01(length + 0.5, x[i].invert(), a1, new Complex[1]);
             a1[0] = a1[0].divide(x[i].pow(2));
 
             Complex[] a2 = new Complex[1];
             com.wildbitsfoundry.etk4j.math.specialfunctions.
-                    Bessel.nonexpbesska01(length + 1.5, x[i].invert(), a2);
+                    Bessel.nonexpbesska01(length + 1.5, x[i].invert(), a2, new Complex[1]);
             a2[0] = a2[0].divide(x[i].pow(2).multiply(2));
 
             result[i] = new Complex[]{a0[0].subtract(a1[0]).add(a2[0])};
