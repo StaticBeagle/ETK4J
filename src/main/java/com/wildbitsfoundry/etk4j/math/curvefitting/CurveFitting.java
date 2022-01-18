@@ -7,7 +7,7 @@ public final class CurveFitting {
 	private CurveFitting() {
 	}
 
-	/***
+	/**
 	 * Constructs a line <code>f(x) = m * x + b</code> defined by two points (x0, y0) and (x1, y1)
 	 * @param x0 starting coordinate for x
 	 * @param x1 end coordinate for x
@@ -20,7 +20,7 @@ public final class CurveFitting {
 		return new double[] { m, y0 - m * x0 };
 	}
 	
-	/***
+	/**
 	 * <strong>Linear least squares fit</strong> <br />
 	 * Fits x and y to a function <code>f(x) = m * x + b</code> in a least square sense
 	 * @param x independent variable
@@ -53,7 +53,7 @@ public final class CurveFitting {
 	}
 	
 
-	/***
+	/**
 	 * Constructs a parabola <code>f(x) = a * x^2 + b * x + c</code> defined by points (x0, y0), (x1, y1), (x2, y2)
 	 * @param x0 starting coordinate for x
 	 * @param x1 middle coordinate for x
@@ -76,7 +76,7 @@ public final class CurveFitting {
 		return Polynomial.polyFit(x, y, n).getCoefficients();
 	}
 
-	/***
+	/**
 	 * Exponential least squares fit <br />
 	 * Fits x and y to a function a * e^(b * x) in a least square sense
 	 * @param x independent variable
@@ -103,8 +103,8 @@ public final class CurveFitting {
 		return new double[] { a, b };
 	}
 
-	/***
-	 * Logarithmic least squares fit
+	/**
+	 * Logarithmic least squares fit.
 	 * Fits x and y to a function a + b * ln(x) in a least square sense
 	 * @param x independent variable
 	 * @param y dependent variable
@@ -127,7 +127,7 @@ public final class CurveFitting {
 		return new double[] { a, b };
 	}
 	
-	/***
+	/**
 	 * Power Law least squares fit
 	 * Fits x and y to a function a * x^(b) in a least square sense
 	 * @param x independent variable

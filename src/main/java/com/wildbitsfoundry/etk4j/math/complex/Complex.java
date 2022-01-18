@@ -17,8 +17,6 @@ public class Complex implements Comparable<Complex> {
 		_imag = imag;
 	}
 
-	// TODO create actual copy constructor
-
 	public Complex(Complex c) {
 		_real = c._real;
 		_imag = c._imag;
@@ -347,7 +345,7 @@ public class Complex implements Comparable<Complex> {
 
 	@Override
 	public String toString() {
-		return new String(String.format("(%.4f, %.4f)", _real, _imag));
+		return String.format("(%.4f %s %.4fj)", _real, _imag >= 0.0 ? "+" : "-", Math.abs(_imag));
 	}
 
 	private static final void invertOp(Complex c) {

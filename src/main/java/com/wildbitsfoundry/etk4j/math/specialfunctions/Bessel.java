@@ -2,7 +2,9 @@ package com.wildbitsfoundry.etk4j.math.specialfunctions;
 
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 
-/***
+import static com.wildbitsfoundry.etk4j.math.specialfunctions.Gamma.recipgamma;
+
+/**
  * Docs https://github.com/JeffBezanson/numal/tree/master/CHAPTER6
  */
 
@@ -81,12 +83,15 @@ public final class Bessel {
         // Output of the modified Bessel function of the first kind of order j
         public static void nonexpbessk(double x, int n, double k[])
 
-
-        public static double loggamma(double x)
-        public static double gamma(double x)
         public static void bessjaplusn(double a, double x, int n, double ja[])
-        public static void besspqa01(double a, double x, double pa[], double qa[], double pa1[], double qa1[])
         public static void bessya01(double a, double x, double ya[], double ya1[])
+
+         public static void bessyaplusn(double a, double x, int n, double ya[])
+         public static void besspqa01(double a, double x, double pa[], double qa[], double pa1[], double qa1[])
+
+         public static void besszeros(double a, int n, double[] z, int d)
+
+         public static void bessiaplusn(double a, double x, int n, double[] ia)
 
 
      */
@@ -95,13 +100,13 @@ public final class Bessel {
     }
 
     // TODO test
-    /***
-     * Modified Bessel function of the third kind of order zero and one
-     * @param x Argument at which to evaluate the Bessel function
-     * @param k0 Output: has the value of the modified Bessel function of the third kind of order zero
-     * @param k1 Output: has the value of the modified Bessel function of the third kind of order one
+    /**
+     * Modified Bessel function of the third kind of order zero and one.
+     * @param x Argument at which to evaluate the Bessel function.
+     * @param k0 Output: has the value of the modified Bessel function of the third kind of order zero.
+     * @param k1 Output: has the value of the modified Bessel function of the third kind of order one.
      */
-    public static void bessk01(double x, double k0[], double k1[]) {
+    public static void bessk01(double x, double[] k0, double[] k1) {
         if (x <= 1.5) {
             int k;
             double c, d, r, sum0, sum1, t, term, t0, t1;
@@ -134,11 +139,11 @@ public final class Bessel {
     }
 
     // TODO test
-    /***
-     * Modified Bessel function of the third kind of order zero and one
-     * @param x Argument at which to evaluate the Bessel function
-     * @param k0 Output: has the value of the Bessel function of order zero
-     * @param k1 Output: has the value of the Bessel function of order one
+    /**
+     * Modified Bessel function of the third kind of order zero and one.
+     * @param x Argument at which to evaluate the Bessel function.
+     * @param k0 Output: has the value of the Bessel function of order zero.
+     * @param k1 Output: has the value of the Bessel function of order one.
      */
     public static void bessk01(Complex x, Complex[] k0, Complex[] k1) {
         if (x.abs() <= 1.5) {
@@ -184,13 +189,13 @@ public final class Bessel {
     }
 
     // TODO test
-    /***
-     * Exponentially scaled modified Bessel function of the third kind of order zero and one
-     * @param x Argument at which to evaluate the Bessel function
-     * @param k0 Output: has the value of the Bessel function of order zero
-     * @param k1 Output: has the value of the Bessel function of order one
+    /**
+     * Exponentially scaled modified Bessel function of the third kind of order zero and one.
+     * @param x Argument at which to evaluate the Bessel function.
+     * @param k0 Output: has the value of the Bessel function of order zero.
+     * @param k1 Output: has the value of the Bessel function of order one.
      */
-    public static void nonexpbessk01(double x, double k0[], double k1[]) {
+    public static void nonexpbessk01(double x, double[] k0, double[] k1) {
         if (x <= 1.5) {
             double expx;
             expx = Math.exp(x);
@@ -265,11 +270,11 @@ public final class Bessel {
     }
 
     // TODO test
-    /***
-     * Exponentially scaled modified Bessel function of the third kind of order zero and one
-     * @param x Argument at which to evaluate the Bessel function
-     * @param k0 Output: has the value of the Bessel function of order zero
-     * @param k1 Output: has the value of the Bessel function of order one
+    /**
+     * Exponentially scaled modified Bessel function of the third kind of order zero and one.
+     * @param x Argument at which to evaluate the Bessel function.
+     * @param k0 Output: has the value of the Bessel function of order zero.
+     * @param k1 Output: has the value of the Bessel function of order one.
      */
     public static void nonexpbessk01(Complex x, Complex[] k0, Complex[] k1) {
         if (x.abs() <= 1.5) {
@@ -361,56 +366,14 @@ public final class Bessel {
     }
 
     // TODO test
-    /***
-     * Reciprocal of the gamma function
-     * @param x Argument at which to evaluate the function x must be [0.5, 1.5]
-     * @param odd Output: the odd part
-     * @param even Output: the even part
-     * @return the value of the reciprocal gamma function evaluated at x
+    /**
+     * Modified Bessel function of the third kind of order a and a + 1.
+     * @param a order of the function.
+     * @param x Argument at which to evaluate the Bessel function.
+     * @param ka Output: has the value of the Bessel function of order a.
+     * @param ka1 Output: has the value of the Bessel function of order a + 1.
      */
-    public static double recipgamma(double x, double odd[], double even[]) {
-        int i;
-        double alfa, beta, x2;
-        double[] b = new double[13];
-        b[1] = -0.283876542276024;
-        b[2] = -0.076852840844786;
-        b[3] = 0.001706305071096;
-        b[4] = 0.001271927136655;
-        b[5] = 0.000076309597586;
-        b[6] = -0.000004971736704;
-        b[7] = -0.000000865920800;
-        b[8] = -0.000000033126120;
-        b[9] = 0.000000001745136;
-        b[10] = 0.000000000242310;
-        b[11] = 0.000000000009161;
-        b[12] = -0.000000000000170;
-        x2 = x * x * 8.0;
-        alfa = -0.000000000000001;
-        beta = 0.0;
-        for (i = 12; i >= 2; i -= 2) {
-            beta = -(alfa * 2.0 + beta);
-            alfa = -beta * x2 - alfa + b[i];
-        }
-        even[0] = (beta / 2.0 + alfa) * x2 - alfa + 0.921870293650453;
-        alfa = -0.000000000000034;
-        beta = 0.0;
-        for (i = 11; i >= 1; i -= 2) {
-            beta = -(alfa * 2.0 + beta);
-            alfa = -beta * x2 - alfa + b[i];
-        }
-        odd[0] = (alfa + beta) * 2.0;
-        return odd[0] * x + even[0];
-    }
-
-    // TODO test
-    /***
-     * Modified Bessel function of the third kind of order a and a + 1
-     * @param a order of the function
-     * @param x Argument at which to evaluate the Bessel function
-     * @param ka Output: has the value of the Bessel function of order a
-     * @param ka1 Output: has the value of the Bessel function of order a + 1
-     */
-    public static void besska01(double a, double x, double ka[], double ka1[]) {
+    public static void besska01(double a, double x, double[] ka, double[] ka1) {
         if (a == 0.0) {
             bessk01(x, ka, ka1);
         } else {
@@ -488,12 +451,12 @@ public final class Bessel {
     }
 
     // TODO test
-    /***
-     * Modified Bessel function of the third kind of order a and a + 1
-     * @param a order of the function
-     * @param x Argument at which to evaluate the Bessel function
-     * @param ka Output: has the value of the Bessel function of order a
-     * @param ka1 Output: has the value of the Bessel function of order a + 1
+    /**
+     * Modified Bessel function of the third kind of order a and a + 1.
+     * @param a order of the function.
+     * @param x Argument at which to evaluate the Bessel function.
+     * @param ka Output: has the value of the Bessel function of order a.
+     * @param ka1 Output: has the value of the Bessel function of order a + 1.
      */
     public static void besska01(double a, Complex x, Complex[] ka, Complex[] ka1) {
         if (a == 0.0) {
@@ -585,14 +548,14 @@ public final class Bessel {
         }
     }
     // TODO test
-    /***
-     * Exponentially scaled modified Bessel function of the third kind of order a and a + 1
-     * @param a order of the function
-     * @param x Argument at which to evaluate the Bessel function
-     * @param ka Output: has the value of the Bessel function of order a
-     * @param ka1 Output: has the value of the Bessel function of order a + 1
+    /**
+     * Exponentially scaled modified Bessel function of the third kind of order a and a + 1.
+     * @param a order of the function.
+     * @param x Argument at which to evaluate the Bessel function.
+     * @param ka Output: has the value of the Bessel function of order a.
+     * @param ka1 Output: has the value of the Bessel function of order a + 1.
      */
-    public static void nonexpbesska01(double a, double x, double ka[], double ka1[]) {
+    public static void nonexpbesska01(double a, double x, double[] ka, double[] ka1) {
         if (a == 0.0) {
             nonexpbessk01(x, ka, ka1);
         } else {
@@ -657,12 +620,12 @@ public final class Bessel {
     }
 
     // TODO test
-    /***
-     * Exponentially scaled modified Bessel function of the third kind of order a and a + 1
-     * @param a order of the function
-     * @param x Argument at which to evaluate the Bessel function
-     * @param ka Output: has the value of the Bessel function of order a
-     * @param ka1 Output: has the value of the Bessel function of order a + 1
+    /**
+     * Exponentially scaled modified Bessel function of the third kind of order a and a + 1.
+     * @param a order of the function.
+     * @param x Argument at which to evaluate the Bessel function.
+     * @param ka Output: has the value of the Bessel function of order a.
+     * @param ka1 Output: has the value of the Bessel function of order a + 1.
      */
     public static void nonexpbesska01(double a, Complex x, Complex[] ka, Complex[] ka1) {
         if (a == 0.0) {

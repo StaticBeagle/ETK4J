@@ -14,13 +14,6 @@ public final class Interpolants {
 		return (y1 - y0) * t + y0;
 	}
 
-	public static double cosine(double x0, double x1, double y0, double y1, double x) {
-		double hx = x1 - x0;
-		double t = (x - x0) / hx;
-		double t2 = (1 - Math.cos(t * Math.PI)) * 0.5;
-		return (y1 - y0) * t2 + y0;
-	}
-
 	public static double neville(double[] x, double[] y, double xi) {
 		checkXYDimensions(x, y);
 		int length = x.length;

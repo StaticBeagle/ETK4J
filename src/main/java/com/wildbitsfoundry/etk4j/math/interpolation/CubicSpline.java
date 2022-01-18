@@ -27,7 +27,7 @@ public class CubicSpline extends Spline {
         }
     }
 
-    private static double[] solveLDLTridiagonalSystem(double[] lower, double[] diagonal, double[] b) {
+    private static double[] solveLDLtTridiagonalSystem(double[] lower, double[] diagonal, double[] b) {
         final int length = diagonal.length;
         for (int i = 0; i < length - 1; ++i) {
             double ui = lower[i];
@@ -61,7 +61,7 @@ public class CubicSpline extends Spline {
 
     public static CubicSpline newNaturalSplineInPlace(double[] x, double[] y) {
         checkXYDimensions(x, y);
-        checkMinXLength(x, 2);
+        checkMinXLength(x, 3);
         final int n = x.length - 2;
         double[] diagonal = new double[n];
         double[] lower = new double[n - 1];
@@ -83,7 +83,7 @@ public class CubicSpline extends Spline {
 
         diagonal[n - 1] = 2.0 * (hn + hiPlus1);
         r[n - 1] = 6.0 * (snPlus1 - sn);
-        solveLDLTridiagonalSystem(lower, diagonal, r);
+        solveLDLtTridiagonalSystem(lower, diagonal, r);
 
         double[] coefficients = new double[(x.length - 1) * 4];
         coefficients[0] = r[0] / (6.0 * (x[1] - x[0]));
@@ -112,7 +112,7 @@ public class CubicSpline extends Spline {
 
     public static CubicSpline newParabolicallyTerminatedSplineInPlace(double[] x, double[] y) {
         checkXYDimensions(x, y);
-        checkMinXLength(x, 2);
+        checkMinXLength(x, 3);
         final int n = x.length;
         double[] r = new double[n];
 
@@ -180,7 +180,7 @@ public class CubicSpline extends Spline {
         lower[lower.length - 1] = hn;
 
         // result is in r
-        solveLDLTridiagonalSystem(lower, diagonal, r);
+        solveLDLtTridiagonalSystem(lower, diagonal, r);
 
         double[] coefficients = new double[(x.length - 1) * 4]; // 4 coefficients and n - 1 segments
         for(int i = 0, j = 0; i < n - 1; ++i, ++j) {

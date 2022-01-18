@@ -1,13 +1,9 @@
 package com.wildbitsfoundry.etk4j.math.interpolation;
 
-import static com.wildbitsfoundry.etk4j.math.interpolation.Interpolants.cosine;
-import static com.wildbitsfoundry.etk4j.math.interpolation.Interpolants.linear;
-import static com.wildbitsfoundry.etk4j.math.interpolation.Interpolants.neville;
-import static com.wildbitsfoundry.etk4j.math.interpolation.Interpolants.quadratic;
-import static com.wildbitsfoundry.etk4j.math.interpolation.Interpolants.spline;
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Test;
+
+import static com.wildbitsfoundry.etk4j.math.interpolation.Interpolants.*;
+import static org.junit.Assert.assertEquals;
 
 public class InterpolantsTest {
 
@@ -16,13 +12,6 @@ public class InterpolantsTest {
 	@Test
 	public void testLinear() {
 		double x = linear(1, 2, 1, 2, 1.5);
-		assertEquals(1.5, x, 1e-12);
-	}
-
-	// TODO Maybe remove cosine
-	@Test
-	public void testCosine() {
-		double x = cosine(1, 2, 1, 2, 1.5);
 		assertEquals(1.5, x, 1e-12);
 	}
 	
