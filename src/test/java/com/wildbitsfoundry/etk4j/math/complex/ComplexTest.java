@@ -25,7 +25,7 @@ public class ComplexTest {
 		Complex c = new Complex(a.real(), a.imag());
 		assertEquals(a, c);
 		
-		Complex d = Complex.newComplex(a);
+		Complex d = new Complex(a);
 		assertEquals(a, d);
 		
 		c = a;
@@ -381,6 +381,6 @@ public class ComplexTest {
 	@Test
 	public void testToString() {
 		Complex a = new Complex(-2.0, 3.0);
-		assertEquals("(-2.0000, 3.0000)", a.toString());
+		assertEquals("(-2.0000 + 3.0000j)", a.toString());
 	}
 }

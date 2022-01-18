@@ -21,7 +21,7 @@ public final class ComplexArrays {
 		final int length = a.length;
 		Complex[] result = new Complex[length];
 		for (int i = 0; i < length; ++i) {
-			result[i] = Complex.newComplex(a[i]);
+			result[i] = new Complex(a[i]);
 		}
 		return result;
 	}

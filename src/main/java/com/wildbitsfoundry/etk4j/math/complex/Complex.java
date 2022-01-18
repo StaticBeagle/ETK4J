@@ -22,10 +22,6 @@ public class Complex implements Comparable<Complex> {
 		_imag = c._imag;
 	}
 
-	public static Complex newComplex(Complex c) {
-		return new Complex(c._real, c._imag);
-	}
-
 	public static Complex fromReal(double d) {
 		return new Complex(d, 0.0);
 	}
@@ -89,11 +85,21 @@ public class Complex implements Comparable<Complex> {
 		return _imag == 0;
 	}
 
-	public boolean isClose(Complex other, double tol) {
-		if(!MathETK.isClose(Double.doubleToLongBits(_imag), Double.doubleToLongBits(other._imag), tol)) {
+	public boolean isClose(Complex other, double absTol, double relTol) {
+		if(!MathETK.isClose(_imag, other._imag, absTol, relTol)) {
 			return false;
 		}
-		if(!MathETK.isClose(Double.doubleToLongBits(_real), Double.doubleToLongBits(other._real), tol)) {
+		if(!MathETK.isClose(_real, other._real, absTol, relTol)) {
+			return false;
+		}
+		return true;
+	}
+
+	public boolean isClose(Complex other, double absTol) {
+		if(!MathETK.isClose(_imag, other._imag, absTol)) {
+			return false;
+		}
+		if(!MathETK.isClose(_real, other._real, absTol)) {
 			return false;
 		}
 		return true;

@@ -100,9 +100,11 @@ public final class Bessel {
     }
 
     // TODO test
+
     /**
      * Modified Bessel function of the third kind of order zero and one.
-     * @param x Argument at which to evaluate the Bessel function.
+     *
+     * @param x  Argument at which to evaluate the Bessel function.
      * @param k0 Output: has the value of the modified Bessel function of the third kind of order zero.
      * @param k1 Output: has the value of the modified Bessel function of the third kind of order one.
      */
@@ -139,9 +141,11 @@ public final class Bessel {
     }
 
     // TODO test
+
     /**
      * Modified Bessel function of the third kind of order zero and one.
-     * @param x Argument at which to evaluate the Bessel function.
+     *
+     * @param x  Argument at which to evaluate the Bessel function.
      * @param k0 Output: has the value of the Bessel function of order zero.
      * @param k1 Output: has the value of the Bessel function of order one.
      */
@@ -158,9 +162,9 @@ public final class Bessel {
             Complex t0;
             Complex t1;
             sum0 = x.invert().multiply(2.0).log().subtract(0.5772156649015328606);
-            d = Complex.newComplex(sum0);
+            d = new Complex(sum0);
             sum1 = d.multiply(-2.0).subtract(1.0);
-            c = Complex.newComplex(sum1);
+            c = new Complex(sum1);
             term = Complex.fromReal(1.0);
             r = Complex.fromReal(1.0);
             t = x.multiply(x).multiply(0.25);
@@ -189,9 +193,11 @@ public final class Bessel {
     }
 
     // TODO test
+
     /**
      * Exponentially scaled modified Bessel function of the third kind of order zero and one.
-     * @param x Argument at which to evaluate the Bessel function.
+     *
+     * @param x  Argument at which to evaluate the Bessel function.
      * @param k0 Output: has the value of the Bessel function of order zero.
      * @param k1 Output: has the value of the Bessel function of order one.
      */
@@ -270,9 +276,11 @@ public final class Bessel {
     }
 
     // TODO test
+
     /**
      * Exponentially scaled modified Bessel function of the third kind of order zero and one.
-     * @param x Argument at which to evaluate the Bessel function.
+     *
+     * @param x  Argument at which to evaluate the Bessel function.
      * @param k0 Output: has the value of the Bessel function of order zero.
      * @param k1 Output: has the value of the Bessel function of order one.
      */
@@ -341,19 +349,18 @@ public final class Bessel {
             cr1 = new Complex();
             cr2 = new Complex();
             erplus1 = new Complex();
-            ;
             er = new Complex();
             for (i = 0; i <= 13; i++) {
                 r -= 2;
                 br = y2.multiply(br1).subtract(br2).add(dr[i]);
                 cr = y2.multiply(cr1).subtract(cr2).add(er);
                 ermin1 = erplus1.add(r * dr[i]);
-                erplus1 = er;
-                er = ermin1;
-                br2 = br1;
-                br1 = br;
-                cr2 = cr1;
-                cr1 = cr;
+                erplus1 = new Complex(er);
+                er = new Complex(ermin1);
+                br2 = new Complex(br1);
+                br1 = new Complex(br);
+                cr2 = new Complex(cr1);
+                cr1 = new Complex(cr);
             }
             f0 = y.multiply(br1).subtract(br2).add(0.9884081742308258);
             f1 = y.multiply(cr1).subtract(cr2).add(er.multiply(0.5));
@@ -366,11 +373,13 @@ public final class Bessel {
     }
 
     // TODO test
+
     /**
      * Modified Bessel function of the third kind of order a and a + 1.
-     * @param a Order of the function.
-     * @param x Argument at which to evaluate the Bessel function.
-     * @param ka Output: has the value of the Bessel function of order a.
+     *
+     * @param a   Order of the function.
+     * @param x   Argument at which to evaluate the Bessel function.
+     * @param ka  Output: has the value of the Bessel function of order a.
      * @param ka1 Output: has the value of the Bessel function of order a + 1.
      */
     public static void besska01(double a, double x, double[] ka, double[] ka1) {
@@ -391,6 +400,8 @@ public final class Bessel {
                 f = g = Math.sqrt(Math.PI / x / 2.0) * Math.exp(-x);
             else if (x < 1.0) {
                 double a1, b, c, d, e, p, q, s;
+                double[] tmp1 = new double[1];
+                double[] tmp2 = new double[1];
                 b = x / 2.0;
                 d = -Math.log(b);
                 e = a * d;
@@ -399,8 +410,6 @@ public final class Bessel {
                 s = (Math.abs(e) < 1.0e-15) ? 1.0 : Math.sinh(e) / e;
                 e = Math.exp(e);
                 a1 = (e + 1.0 / e) / 2.0;
-                double[] tmp1 = new double[1];
-                double[] tmp2 = new double[1];
                 g = recipgamma(a, tmp1, tmp2) * e;
                 p = tmp1[0];
                 q = tmp2[0];
@@ -451,11 +460,13 @@ public final class Bessel {
     }
 
     // TODO test
+
     /**
      * Modified Bessel function of the third kind of order a and a + 1.
-     * @param a order of the function.
-     * @param x Argument at which to evaluate the Bessel function.
-     * @param ka Output: has the value of the Bessel function of order a.
+     *
+     * @param a   order of the function.
+     * @param x   Argument at which to evaluate the Bessel function.
+     * @param ka  Output: has the value of the Bessel function of order a.
      * @param ka1 Output: has the value of the Bessel function of order a + 1.
      */
     public static void besska01(double a, Complex x, Complex[] ka, Complex[] ka1) {
@@ -478,7 +489,7 @@ public final class Bessel {
             }
             if (a == 0.5) {
                 f = Complex.fromReal(Math.PI).divide(x).multiply(0.5).multiply(x.uminus().exp());
-                g = Complex.newComplex(f);
+                g = new Complex(f);
             } else if (x.abs() < 1.0) {
                 Complex a1;
                 Complex b;
@@ -502,13 +513,13 @@ public final class Bessel {
                 p = Complex.fromReal(tmp1[0]);
                 q = Complex.fromReal(tmp2[0]);
                 ka[0] = d.multiply(s).multiply(q).add(a1.multiply(p)).multiply(c);
-                f = Complex.newComplex(ka[0]);
+                f = new Complex(ka[0]);
                 e = Complex.fromReal(a * a);
                 p = g.multiply(c).multiply(0.5);
                 q = g.invert().multiply(0.5);
                 c = Complex.fromReal(1.0);
                 d = b.multiply(b);
-                ka1[0] = p;
+                ka1[0] = new Complex(p);
                 n = 1;
                 do {
                     f = f.multiply(n).add(p).add(q).divide(e.uminus().add(n * n));
@@ -521,7 +532,7 @@ public final class Bessel {
                     ka1[0].addEquals(g);
                     n++;
                 } while (h.divide(ka[0]).add(ka1[0].invert().multiply(g.abs())).abs() > 1.0e-15);
-                f = ka[0];
+                f = new Complex(ka[0]);
                 g = ka1[0].divide(b);
             } else {
                 Complex expon;
@@ -534,8 +545,8 @@ public final class Bessel {
                 x = x.invert().multiply(2.0);
                 for (n = 1; n <= na; n++) {
                     h = g.multiply(x).multiply(a + n).add(f);
-                    f = g;
-                    g = h;
+                    f = new Complex(g);
+                    g = new Complex(h);
                 }
             }
             if (rev) {
@@ -548,11 +559,13 @@ public final class Bessel {
         }
     }
     // TODO test
+
     /**
      * Exponentially scaled modified Bessel function of the third kind of order a and a + 1.
-     * @param a order of the function.
-     * @param x Argument at which to evaluate the Bessel function.
-     * @param ka Output: has the value of the Bessel function of order a.
+     *
+     * @param a   order of the function.
+     * @param x   Argument at which to evaluate the Bessel function.
+     * @param ka  Output: has the value of the Bessel function of order a.
      * @param ka1 Output: has the value of the Bessel function of order a + 1.
      */
     public static void nonexpbesska01(double a, double x, double[] ka, double[] ka1) {
@@ -620,11 +633,13 @@ public final class Bessel {
     }
 
     // TODO test
+
     /**
      * Exponentially scaled modified Bessel function of the third kind of order a and a + 1.
-     * @param a order of the function.
-     * @param x Argument at which to evaluate the Bessel function.
-     * @param ka Output: has the value of the Bessel function of order a.
+     *
+     * @param a   order of the function.
+     * @param x   Argument at which to evaluate the Bessel function.
+     * @param ka  Output: has the value of the Bessel function of order a.
      * @param ka1 Output: has the value of the Bessel function of order a + 1.
      */
     public static void nonexpbesska01(double a, Complex x, Complex[] ka, Complex[] ka1) {
@@ -647,7 +662,7 @@ public final class Bessel {
             }
             if (a == -0.5) {
                 f = Complex.fromReal(Math.PI).divide(x).multiply(0.5).sqrt();
-                g = Complex.newComplex(f);
+                g = new Complex(f);
             } else if (x.abs() < 1.0) {
                 Complex expon;
                 expon = x.exp();
@@ -668,12 +683,12 @@ public final class Bessel {
                 n = 1;
                 do {
                     h = x.add(n).multiply(2.0).multiply(g).subtract(f.multiply(n - 1 + c / n)).divide(n + 1);
-                    f = g;
-                    g = h;
+                    f = new Complex(g);
+                    g = new Complex(h);
                     n++;
                 } while (h.abs() * n < e.abs());
                 p = f.divide(g);
-                q = Complex.newComplex(p);
+                q = new Complex(p);
                 e = b.subtract(2.0);
                 do {
                     p = Complex.fromReal(n - 1 + c / n).divide(p.uminus().add(2.0).multiply(n + 1).add(e));
@@ -687,8 +702,8 @@ public final class Bessel {
                 x = x.invert().multiply(2.0);
                 for (n = 1; n <= na; n++) {
                     h = x.multiply(g).multiply(a + n).add(f);
-                    f = g;
-                    g = h;
+                    f = new Complex(g);
+                    g = new Complex(h);
                 }
             }
             if (rev) {

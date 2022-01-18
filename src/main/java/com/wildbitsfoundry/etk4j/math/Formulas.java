@@ -11,7 +11,7 @@ public class Formulas {
 
 		if(b == 0 && c == 0) {
 			r1 = new Complex();
-			r2 = Complex.newComplex(r1);
+			r2 = new Complex(r1);
 			return new Complex[] { r1, r2 };
 		}
 		
