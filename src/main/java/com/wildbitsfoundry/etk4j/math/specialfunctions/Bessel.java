@@ -368,7 +368,7 @@ public final class Bessel {
     // TODO test
     /**
      * Modified Bessel function of the third kind of order a and a + 1.
-     * @param a order of the function.
+     * @param a Order of the function.
      * @param x Argument at which to evaluate the Bessel function.
      * @param ka Output: has the value of the Bessel function of order a.
      * @param ka1 Output: has the value of the Bessel function of order a + 1.

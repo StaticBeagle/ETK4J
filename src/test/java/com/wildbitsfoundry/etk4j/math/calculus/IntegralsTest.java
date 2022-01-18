@@ -13,7 +13,7 @@ public final class IntegralsTest {
 	@Test
 	public void testCummulativeTrapz() {
 		double[] a = {1, 2, 3, 4 ,5 ,6};
-		double[] trapz = Integrals.cummulativeTrapz(a);
+		double[] trapz = Integrals.cumulativeTrapz(a);
 		assertArrayEquals(new double[] {0.0, 1.5, 4.0, 7.5, 12.0, 17.5}, trapz, 1e-12);
 	}
 	
