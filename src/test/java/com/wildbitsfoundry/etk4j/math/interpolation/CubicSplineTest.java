@@ -222,11 +222,6 @@ public class CubicSplineTest {
         assertEquals("Natural Spline Natural lower bound extrapolation", 1.1915492957746414, yi,
                 1e-12);
 
-        cs.setExtrapolationMethod(ExtrapolationMethod.PERIODIC);
-        yi = cs.evaluateAt(left);
-        assertEquals("Natural Spline Periodic lower bound extrapolation", 1.8500000000000005, yi,
-                1e-12);
-
         cs.setExtrapolationMethod(ExtrapolationMethod.THROW);
         IndexOutOfBoundsException exception = assertThrows(IndexOutOfBoundsException.class, () -> {
             cs.evaluateAt(left);
@@ -261,11 +256,6 @@ public class CubicSplineTest {
         cs.setExtrapolationMethod(ExtrapolationMethod.NATURAL);
         yi = cs.evaluateAt(right);
         assertEquals("Natural Spline Natural upper bound extrapolation", 1.6592429577464949, yi,
-                1e-12);
-
-        cs.setExtrapolationMethod(ExtrapolationMethod.PERIODIC);
-        yi = cs.evaluateAt(right);
-        assertEquals("Natural Spline Periodic upper bound extrapolation", 1.7557218309859157, yi,
                 1e-12);
 
         cs.setExtrapolationMethod(ExtrapolationMethod.THROW);

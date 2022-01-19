@@ -87,11 +87,7 @@ public class LinearSplineTest {
 		lspline.setExtrapolationMethod(ExtrapolationMethod.NATURAL);
 		yi = lspline.evaluateAt(left);
 		assertEquals("Linear Spline Natural lower bound extrapolation", 0.6000000000000002, yi, 1e-12);
-		
-		lspline.setExtrapolationMethod(ExtrapolationMethod.PERIODIC);
-		yi = lspline.evaluateAt(left);
-		assertEquals("Linear Spline Periodic lower bound extrapolation", 1.8500000000000005, yi, 1e-12);
-		
+
 		lspline.setExtrapolationMethod(ExtrapolationMethod.THROW);
 		exception.expect(IndexOutOfBoundsException.class);
 		yi = lspline.evaluateAt(left);
@@ -120,10 +116,6 @@ public class LinearSplineTest {
 		lspline.setExtrapolationMethod(ExtrapolationMethod.NATURAL);
 		yi = lspline.evaluateAt(right);
 		assertEquals("Linear Spline Natural upper bound extrapolation", 3.2249999999999988, yi, 1e-12);
-		
-		lspline.setExtrapolationMethod(ExtrapolationMethod.PERIODIC);
-		yi = lspline.evaluateAt(right);
-		assertEquals("Linear Spline Periodic upper bound extrapolation", 1.7916666666666667, yi, 1e-12);
 		
 		lspline.setExtrapolationMethod(ExtrapolationMethod.THROW);
 		exception.expect(IndexOutOfBoundsException.class);
