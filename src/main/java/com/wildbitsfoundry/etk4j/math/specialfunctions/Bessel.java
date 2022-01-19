@@ -356,11 +356,11 @@ public final class Bessel {
                 cr = y2.multiply(cr1).subtract(cr2).add(er);
                 ermin1 = erplus1.add(r * dr[i]);
                 erplus1 = new Complex(er);
-                er = new Complex(ermin1);
-                br2 = new Complex(br1);
-                br1 = new Complex(br);
-                cr2 = new Complex(cr1);
-                cr1 = new Complex(cr);
+                er = ermin1;
+                br2 = br1;
+                br1 = br;
+                cr2 = cr1;
+                cr1 = cr;
             }
             f0 = y.multiply(br1).subtract(br2).add(0.9884081742308258);
             f1 = y.multiply(cr1).subtract(cr2).add(er.multiply(0.5));
@@ -545,8 +545,8 @@ public final class Bessel {
                 x = x.invert().multiply(2.0);
                 for (n = 1; n <= na; n++) {
                     h = g.multiply(x).multiply(a + n).add(f);
-                    f = new Complex(g);
-                    g = new Complex(h);
+                    f = g;
+                    g = h;
                 }
             }
             if (rev) {
@@ -683,8 +683,8 @@ public final class Bessel {
                 n = 1;
                 do {
                     h = x.add(n).multiply(2.0).multiply(g).subtract(f.multiply(n - 1 + c / n)).divide(n + 1);
-                    f = new Complex(g);
-                    g = new Complex(h);
+                    f = g;
+                    g = h;
                     n++;
                 } while (h.abs() * n < e.abs());
                 p = f.divide(g);
@@ -702,8 +702,8 @@ public final class Bessel {
                 x = x.invert().multiply(2.0);
                 for (n = 1; n <= na; n++) {
                     h = x.multiply(g).multiply(a + n).add(f);
-                    f = new Complex(g);
-                    g = new Complex(h);
+                    f = g;
+                    g = h;
                 }
             }
             if (rev) {

@@ -320,21 +320,21 @@ public class CubicSpline extends Spline {
 
     @Override
     public double evaluateAt(int i, double x) {
-        double t = x - _x[i];
+        double t = x - this.x[i];
         i <<= 2;
         return coefficients[i + 3] + t * (coefficients[i + 2] + t * (coefficients[i + 1] + t * coefficients[i]));
     }
 
     @Override
     public double evaluateDerivativeAt(int i, double x) {
-        double t = x - _x[i];
+        double t = x - this.x[i];
         i <<= 2;
         return coefficients[i + 2] + t * (2 * coefficients[i + 1] + t * 3 * coefficients[i]);
     }
 
     @Override
     public double evaluateAntiDerivativeAt(int i, double x) {
-        double t = x - _x[i];
+        double t = x - this.x[i];
         i <<= 2;
         return t * (coefficients[i + 3] + t * (coefficients[i + 2] * P5 + t * (coefficients[i + 1] * P33 + t * coefficients[i] * P25)));
     }
@@ -342,17 +342,17 @@ public class CubicSpline extends Spline {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0, j = 0; i < _x.length - 1; ++i, ++j) {
+        for (int i = 0, j = 0; i < x.length - 1; ++i, ++j) {
             double a = coefficients[j];
             double b = coefficients[++j];
             double c = coefficients[++j];
             double d = coefficients[++j];
 
             sb.append("S").append(i + 1).append("(x) = ")
-                    .append(a != 0d ? String.format("%.4g * (x - %.4f)^3", a, _x[i]) : "")
-                    .append(b != 0d ? String.format(" + %.4g * (x - %.4f)^2", b, _x[i]) : "")
-                    .append(c != 0d ? String.format(" + %.4g * (x - %.4f)", c, _x[i]) : "")
-                    .append(d != 0d ? String.format(" + %.4g", d, _x[i]) : "").append(System.lineSeparator());
+                    .append(a != 0d ? String.format("%.4g * (x - %.4f)^3", a, x[i]) : "")
+                    .append(b != 0d ? String.format(" + %.4g * (x - %.4f)^2", b, x[i]) : "")
+                    .append(c != 0d ? String.format(" + %.4g * (x - %.4f)", c, x[i]) : "")
+                    .append(d != 0d ? String.format(" + %.4g", d, x[i]) : "").append(System.lineSeparator());
         }
         sb.setLength(Math.max(sb.length() - System.lineSeparator().length(), 0));
         return sb.toString().replace("+ -", "- ").replace("- -", "+ ")

@@ -4,17 +4,45 @@ import com.wildbitsfoundry.etk4j.math.curvefitting.CurveFitting;
 import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkXYDimensions;
 import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkMinXLength;
 
+/**
+ * The {@code Interpolants} class contains methods to perform interpolation at a given argument.
+ */
 public final class Interpolants {
+
 	private Interpolants() {
 	}
 
-	public static double linear(double x0, double x1, double y0, double y1, double x) {
+	/**
+	 * Linear interpolation. Creates a line and evaluates that line at the value specified by {@code xi}.
+	 * @param x0 Lower abscissa.
+	 * @param x1 Upper abscissa.
+	 * @param y0 Lower ordinate.
+	 * @param y1 Upper ordinate.
+	 * @param xi Argument at which to evaluate the function.
+	 * @return {@code y(xi) = m * xi + b}.
+	 */
+	public static double linear(double x0, double x1, double y0, double y1, double xi) {
+		if(xi < x0 || xi > x1) {
+			throw new IllegalArgumentException("xi must be within [x0, x1].");
+		}
 		double hx = x1 - x0;
-		double t = (x - x0) / hx;
+		double t = (xi - x0) / hx;
 		return (y1 - y0) * t + y0;
 	}
 
+	/**
+	 * Neville's interpolation algorithm. This array must be monotonically increasing.
+	 * @param x Array of abscissas.
+	 * @param y Array of ordinates.
+	 * @param xi Argument at which to evaluate the function.
+	 * @return The result of Neville's algorithm evaluated at {@code xi}.
+	 * @see <a href="https://mathworld.wolfram.com/NevillesAlgorithm.html">Neville's algorithm</a>.
+	 */
 	public static double neville(double[] x, double[] y, double xi) {
+		if(xi < x[0] || xi > x[x.length - 1]) {
+			throw new IllegalArgumentException(String.format("xi must lie within the bounds of x [%.4f, %.4f].",
+					x[0], x[x.length - 1]));
+		}
 		checkXYDimensions(x, y);
 		int length = x.length;
 		double[][] N = new double[length][length];
@@ -32,11 +60,35 @@ public final class Interpolants {
 		return N[length - 1][length - 1];
 	}
 
+	/**
+	 * Quadratic (Parabola) interpolation.
+	 * @param x0 Left abscissa.
+	 * @param x1 Middle abscissa.
+	 * @param x2 Right abscissa.
+	 * @param y0 Left ordinate.
+	 * @param y1 Middle ordinate.
+	 * @param y2 Right ordinate.
+	 * @param xi Argument at which to evaluate the function.
+	 * @return Performs a parabolic fit and evaluates the function at the value specified by {@code xi}.
+	 */
 	public static double quadratic(double x0, double x1, double x2, double y0, double y1, double y2, double xi) {
+		if(xi < x0 || xi > x2) {
+			throw new IllegalArgumentException("xi must be within [x0, x2].");
+		}
 		double[] parabola = CurveFitting.parabola(x0, x1, x2, y0, y1, y2);
 		return parabola[2] + xi * (parabola[1] + xi * parabola[0]);
 	}
 
+	/**
+	 * Spline interpolation.
+	 * @param x Array of abscissas. This array must be monotonically increasing.
+	 * @param y Array of ordinates.
+	 * @param xi Argument at which to evaluate the spline.
+	 * @return If the number of points in x ie equal to 2 it performs linear interpolation. If the number of points
+	 * in x is equal to 3 it performs quadratic interpolation. If the number of points is greater than 3 it creates
+	 * a cubic spline with {@link CubicSpline#newNotAKnotSpline(double[], double[])} with not-a-knot conditions and
+	 * evaluates given spline at {@xi}.
+	 */
 	public static double spline(double[] x, double[] y, double xi) {
 		checkXYDimensions(x, y);
 		checkMinXLength(x, 2);

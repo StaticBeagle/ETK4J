@@ -2,10 +2,10 @@ package com.wildbitsfoundry.etk4j.math.interpolation;
 
 import java.util.Arrays;
 
+import com.wildbitsfoundry.etk4j.math.extrapolation.Extrapolators;
 import com.wildbitsfoundry.etk4j.math.functions.PiecewiseFunction;
 import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
 import com.wildbitsfoundry.etk4j.util.NumArrays;
-import static com.wildbitsfoundry.etk4j.math.interpolation.Extrapolators.ClampToEndPointExtrapolator;
 import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkMinXLength;
 import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkXYDimensions;
 
@@ -41,11 +41,11 @@ public class NearestNeighbor extends PiecewiseFunction {
 		if(!NumArrays.isAscending(x)) {
 			throw new IllegalArgumentException("x must be monotonically increasing");
 		}
-		double x0 = _x[0];
-		double xn = _x[_x.length - 1];
+		double x0 = this.x[0];
+		double xn = this.x[this.x.length - 1];
 		double y0 = this.evaluateAt(x0);
 		double yn = this.evaluateAt(xn);
-		this.setExtrapolator(new ClampToEndPointExtrapolator(x0, xn, y0, yn));
+		this.setExtrapolator(new Extrapolators.ClampToEndPointExtrapolator(x0, xn, y0, yn));
 	}
 	
 	public static NearestNeighbor newNearestNeighbor(double[] x, double[] y) {
@@ -90,13 +90,13 @@ public class NearestNeighbor extends PiecewiseFunction {
 
 	@Override
 	public double evaluateAt(int index, double x) {
-		double t = (x - _x[index]) / (_x[index + 1] - _x[index]);
+		double t = (x - this.x[index]) / (this.x[index + 1] - this.x[index]);
 		return _y[index + neighborCalculator.calculateNeighborIndex(t)];
 	}
 
 	@Override
 	public UnivariateFunction getSegment(int index) {
-		final double yi = this.evaluateAt(index, _x[index]);
+		final double yi = this.evaluateAt(index, x[index]);
 		UnivariateFunction fn = new UnivariateFunction() {
 			
 			@Override

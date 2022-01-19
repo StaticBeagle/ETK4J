@@ -98,21 +98,37 @@ public final class MathETK {
 	}
 
 	/***
-	 *
-	 * @param a
-	 * @param b
-	 * @param absTol
-	 * @param relTol
+	 * Determines whether a number is close to another number within a certain tolerance.
+	 * @param a Argument in which to evaluate the function at.
+	 * @param b Argument in which to evaluate the function at.
+	 * @param absTol The absolute tolerance.
+	 * @param relTol The relative tolerance.
 	 * @return {@code Math.abs(a - b) <= absTol + relTol * Math.abs(b)}
 	 */
 	public static boolean isClose(double a, double b, double absTol, double relTol) {
 		return Math.abs(a - b) <= absTol + relTol * Math.abs(b);
 	}
 
+	/***
+	 * Determines whether a number is close to another number within a certain tolerance. <br>
+	 * This calls {@link #isClose(double, double, double, double) with relative tolerance of 1e-5}.
+	 * @param a Argument in which to evaluate the function at.
+	 * @param b Argument in which to evaluate the function at.
+	 * @param absTol The absolute tolerance.
+	 * @return {@code Math.abs(a - b) <= absTol + 1e-5 * Math.abs(b)}
+	 */
 	public static boolean isClose(double a, double b, double absTol) {
 		return isClose(a, b, absTol, 1e-5);
 	}
 
+	/***
+	 * Determines whether a number is close to another number within a certain tolerance. <br>
+	 * This calls {@link #isClose(double, double, double, double) with absolute tolerance of 1e-8 and <br>
+	 * relative tolerance of 1e-5}.
+	 * @param a Argument in which to evaluate the function at.
+	 * @param b Argument in which to evaluate the function at.
+	 * @return {@code Math.abs(a - b) <= 1e-8 + 1e-5 * Math.abs(b)}
+	 */
 	public static boolean isClose(double a, double b) {
 		return isClose(a, b, 1e-8, 1e-5);
 	}

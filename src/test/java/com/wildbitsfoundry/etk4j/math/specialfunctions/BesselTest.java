@@ -223,10 +223,6 @@ public class BesselTest {
         assertEquals(-0.6043692159144972, ka1Complex[0].imag(), 1e-12);
 
         nonexpbesska01(0.0, new Complex(1.0, Math.sqrt(1.25) - 0.5), kaComplex, ka1Complex);
-        System.out.println(kaComplex[0].real());
-        System.out.println(kaComplex[0].imag());
-        System.out.println(ka1Complex[0].real());
-        System.out.println(ka1Complex[0].imag());
         assertEquals(1.0424992536107143, kaComplex[0].real(), 1e-12);
         assertEquals(-0.2574424664855407, kaComplex[0].imag(), 1e-12);
         assertEquals(1.338125723984699, ka1Complex[0].real(), 1e-12);

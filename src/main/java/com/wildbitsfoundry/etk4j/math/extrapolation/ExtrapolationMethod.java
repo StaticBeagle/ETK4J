@@ -1,6 +1,5 @@
-package com.wildbitsfoundry.etk4j.math.interpolation;
+package com.wildbitsfoundry.etk4j.math.extrapolation;
 
-// TODO this all should be all capitalized
 public enum ExtrapolationMethod {
 	THROW,
 	LINEAR,

@@ -11,11 +11,11 @@ public class QuadraticSpline extends Spline {
     protected QuadraticSpline(double[] x, double[] y, double[] dydx) {
         super(x, 3);
 
-        final int n = _x.length;
+        final int n = this.x.length;
         // compute coefficients
         coefficients = new double[(n - 1) * 3]; // 3 coefficients and n - 1 segments
         for (int i = 0, j = 0; i < n - 1; ++i, ++j) {
-            double hx = _x[i + 1] - _x[i];
+            double hx = this.x[i + 1] - this.x[i];
             if (hx <= 0.0) {
                 throw new IllegalArgumentException("x must be monotonically increasing");
             }
@@ -62,21 +62,21 @@ public class QuadraticSpline extends Spline {
 
     @Override
     public double evaluateAt(int i, double x) {
-        double t = x - _x[i];
+        double t = x - this.x[i];
         i *= 3;
         return coefficients[i + 2] + t * (coefficients[i + 1] + t * coefficients[i]);
     }
 
     @Override
     public double evaluateDerivativeAt(int i, double x) {
-        double t = x - _x[i];
+        double t = x - this.x[i];
         i *= 3;
         return coefficients[i + 1] + t * 2.0 * coefficients[i];
     }
 
     @Override
     public double evaluateAntiDerivativeAt(int i, double x) {
-        double t = x - _x[i];
+        double t = x - this.x[i];
         i *= 3;
         return t * (coefficients[i + 2] + t * (coefficients[i + 1] * P5 + t * coefficients[i] * P33));
     }
@@ -84,14 +84,14 @@ public class QuadraticSpline extends Spline {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0, j = 0; i < _x.length - 1; ++i, ++j) {
+        for (int i = 0, j = 0; i < x.length - 1; ++i, ++j) {
             double a = coefficients[j];
             double b = coefficients[++j];
             double c = coefficients[++j];
 
             sb.append("S").append(i + 1).append("(x) = ")
-                    .append(a != 0d ? String.format("%.4g * (x - %.4f)^2", a, _x[i]) : "")
-                    .append(b != 0d ? String.format(" + %.4g * (x - %.4f)", b, _x[i]) : "")
+                    .append(a != 0d ? String.format("%.4g * (x - %.4f)^2", a, x[i]) : "")
+                    .append(b != 0d ? String.format(" + %.4g * (x - %.4f)", b, x[i]) : "")
                     .append(c != 0d ? String.format(" + %.4g", c) : "")
                     .append(System.lineSeparator());
         }

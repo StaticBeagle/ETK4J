@@ -1,12 +1,11 @@
 package com.wildbitsfoundry.etk4j.math.interpolation;
 
+import com.wildbitsfoundry.etk4j.math.extrapolation.ExtrapolationMethod;
 import com.wildbitsfoundry.etk4j.util.NumArrays;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
-import java.util.Arrays;
 
 import static org.junit.Assert.*;
 

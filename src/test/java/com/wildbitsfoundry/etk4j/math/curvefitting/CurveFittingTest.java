@@ -25,36 +25,45 @@ public final class CurveFittingTest {
 	public void testParabola() {
 		double[] x = { -4.62, -1.96, 1.89 };
 		double[] y = { 2.99, 2.12, 4.02 };
-		double[] coefs = { 0.12604825847610224, 0.5023298715998206, 2.6203395585738543 };
+		double[] coefficients = { 0.12604825847610224, 0.5023298715998206, 2.6203395585738543 };
 		double[] parabola = CurveFitting.parabola(x[0], x[1], x[2],y[0], y[1], y[2]);
-		assertArrayEquals(coefs, parabola, 1e-12);
+		assertArrayEquals(coefficients, parabola, 1e-12);
+	}
+
+	@Test
+	public void testPolynomial() {
+		double[] x = { -4.62, -1.96, 1.89 };
+		double[] y = { 2.99, 2.12, 4.02 };
+		double[] coefficients = { 0.12604825847610227, 0.5023298715998206, 2.6203395585738543 };
+		double[] quadratic = CurveFitting.polynomial(x, y, 2);
+		assertArrayEquals(coefficients, quadratic, 1e-12);
 	}
 	
 	@Test
 	public void testExponential() {
 		double[] x = { 1, 5, 8 };
 		double[] y = { 2, 6, 10 };
-		double[] coefs = { 1.8380687899821915, 0.21612342866514117 };
+		double[] coefficients = { 1.8380687899821915, 0.21612342866514117 };
 		double[] exponential = CurveFitting.exponential(x, y);
-		assertArrayEquals(coefs, exponential, 1e-12);
+		assertArrayEquals(coefficients, exponential, 1e-12);
 	}
 	
 	@Test
 	public void testLogarithmic() {
 		double[] x = { 1, 5, 8 };
 		double[] y = { 2, 6, 10 };
-		double[] coefs = { 1.6997797260492338, 3.4971760347075427 };
+		double[] coefficients = { 1.6997797260492338, 3.4971760347075427 };
 		double[] log = CurveFitting.logarithmic(x, y);
-		assertArrayEquals(coefs, log, 1e-12);
+		assertArrayEquals(coefficients, log, 1e-12);
 	}
 	
 	@Test
 	public void testPowerLaw() {
 		double[] x = { 1, 5, 8 };
 		double[] y = { 2, 6, 10 };
-		double[] coefs = { 1.960117903982167, 0.7504929064884995 };
+		double[] coefficients = { 1.960117903982167, 0.7504929064884995 };
 		double[] pow = CurveFitting.power(x, y);
-		assertArrayEquals(coefs, pow, 1e-12);
+		assertArrayEquals(coefficients, pow, 1e-12);
 	}
 	
 }

@@ -1,5 +1,6 @@
 package com.wildbitsfoundry.etk4j.math.interpolation;
 
+import com.wildbitsfoundry.etk4j.math.extrapolation.ExtrapolationMethod;
 import com.wildbitsfoundry.etk4j.util.NumArrays;
 import org.junit.Test;
 

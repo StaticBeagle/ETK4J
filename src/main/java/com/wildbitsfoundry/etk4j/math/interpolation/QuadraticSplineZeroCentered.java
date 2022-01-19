@@ -48,24 +48,24 @@ public class QuadraticSplineZeroCentered extends Spline {
 
     @Override
     public double integrate(double a, double b) {
-        if (a < _x[0] || b > _x[_x.length - 1]) {
+        if (a < x[0] || b > x[x.length - 1]) {
             throw new IllegalArgumentException(
-                    String.format("The spline is not defined outside of [%.4g, %.4g]", _x[0], _x[_x.length - 1]));
+                    String.format("The spline is not defined outside of [%.4g, %.4g]", x[0], x[x.length - 1]));
         }
         // TODO check that b > a; for all cases look at spline
         int ia = this.findSegmentIndex(a);
         int ib = this.findSegmentIndex(b);
 
-        double integral = evaluateAntiDerivativeAt(ia, _x[ia + 1]) - evaluateAntiDerivativeAt(ia, a);
+        double integral = evaluateAntiDerivativeAt(ia, x[ia + 1]) - evaluateAntiDerivativeAt(ia, a);
         for(int i = ia + 1; i < ib; ++i) {
-            integral += evaluateAntiDerivativeAt(i, _x[i + 1]) - evaluateAntiDerivativeAt(i, _x[i]);
+            integral += evaluateAntiDerivativeAt(i, x[i + 1]) - evaluateAntiDerivativeAt(i, x[i]);
         }
-        return evaluateAntiDerivativeAt(ib, b) - evaluateAntiDerivativeAt(ib, _x[ib]) + integral;
+        return evaluateAntiDerivativeAt(ib, b) - evaluateAntiDerivativeAt(ib, x[ib]) + integral;
     }
 
     @Override
     public double integrate(double x) {
-        return integrate(_x[0], x);
+        return integrate(this.x[0], x);
     }
 
     @Override
@@ -89,14 +89,14 @@ public class QuadraticSplineZeroCentered extends Spline {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0, j = 0; i < _x.length - 1; ++i, ++j) {
+        for (int i = 0, j = 0; i < x.length - 1; ++i, ++j) {
             double a = coefficients[j];
             double b = coefficients[++j];
             double c = coefficients[++j];
 
             sb.append("S").append(i + 1).append("(x) = ")
-                    .append(a != 0d ? String.format("%.4g * x^2", a, _x[i]) : "")
-                    .append(b != 0d ? String.format(" + %.4g * x", b, _x[i]) : "")
+                    .append(a != 0d ? String.format("%.4g * x^2", a, x[i]) : "")
+                    .append(b != 0d ? String.format(" + %.4g * x", b, x[i]) : "")
                     .append(c != 0d ? String.format(" + %.4g", c) : "")
                     .append(System.lineSeparator());
         }

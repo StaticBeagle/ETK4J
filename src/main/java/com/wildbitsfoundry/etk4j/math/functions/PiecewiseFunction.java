@@ -3,44 +3,46 @@ package com.wildbitsfoundry.etk4j.math.functions;
 import java.util.Arrays;
 
 import com.wildbitsfoundry.etk4j.math.extrapolation.Extrapolator;
+import com.wildbitsfoundry.etk4j.math.extrapolation.Extrapolators;
 
+/**
+ * The {@code PiecewiseFunction} class describes the mathematical equivalent of a mathematical piecewise function. In
+ * other words, a function comprised of segments which are functions themselves.
+ */
 public abstract class PiecewiseFunction implements UnivariateFunction {
-	private int _numberOfSegments;
-	protected double[] _x = null;
+	private int numberOfSegments;
+	protected double[] x;
 	protected double[] coefficients = null;
-	// TODO _coefs name doesn't make sense
-	Extrapolator _extrapolator;
+	Extrapolator extrapolators;
 
-	private double _x0, _xn;
+	private double x0, xn;
 
 	protected PiecewiseFunction(double[] x) {
-		_x = x;
-		_x0 = x[0];
-		_numberOfSegments = _x.length - 1;
-		_xn = x[_numberOfSegments];
+		this.x = x;
+		x0 = x[0];
+		numberOfSegments = this.x.length - 1;
+		xn = x[numberOfSegments];
 		// TODO check Default extrapolator is throw
-		_extrapolator = xi -> {
-			throw new IndexOutOfBoundsException(String.format("x is outside of [%.4f, %.4f]", _x0, _xn));
-		};
+		extrapolators = new Extrapolators.ThrowExtrapolator(x0, xn);
 	}
 
 	protected void setExtrapolator(Extrapolator extrapolator) {
-		_extrapolator = extrapolator;
+		extrapolators = extrapolator;
 	}
 
 	public int findSegmentIndex(double x) {
-		int index = Arrays.binarySearch(_x, x);
-		return index < 0.0 ? -(index + 2) : Math.min(index, _x.length - 2);
+		int index = Arrays.binarySearch(this.x, x);
+		return index < 0.0 ? -(index + 2) : Math.min(index, this.x.length - 2);
 	}
 
 	public int getNumberOfSegments() {
-		return _numberOfSegments;
+		return numberOfSegments;
 	}
 
 	@Override
 	public final double evaluateAt(double x) {
 		x += 0.0;	// convert -0.0 to 0.0
-		if (x >= _x0 && x <= _xn) {
+		if (x >= x0 && x <= xn) {
 			int index = this.findSegmentIndex(x);
 			return this.evaluateAt(index, x);
 		}
@@ -65,14 +67,14 @@ public abstract class PiecewiseFunction implements UnivariateFunction {
 	}
 
 	public UnivariateFunction getLastSegment() {
-		return this.getSegment(_x.length - 2);
+		return this.getSegment(x.length - 2);
 	}
 
 	protected double extrapolate(double x) {
-		return _extrapolator.extrapolate(x);
+		return extrapolators.extrapolate(x);
 	}
 
 	public double[] getBreaks() {
-		return Arrays.copyOf(_x, _x.length);
+		return Arrays.copyOf(x, x.length);
 	}
 }
