@@ -1,6 +1,7 @@
 package com.wildbitsfoundry.etk4j.control;
 
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
+import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
 import com.wildbitsfoundry.etk4j.util.NumArrays;
 import org.junit.Test;
 
@@ -90,7 +91,7 @@ public class TransferFunctionTest {
     public void testGettersAndEvaluation() {
         Complex[] poles = new Complex[] { Complex.fromReal(-1.0), Complex.fromReal(-1.0), Complex.fromReal(-1.0) };
 
-        TransferFunction tf = new TransferFunction(10.0, poles);
+        TransferFunction tf = new TransferFunction(new Polynomial(10.0), new Polynomial(poles));
 
         double phase = tf.getPhaseInDegreesAt(100.0);
         assertEquals(-268.2811839069496, phase, 1e-12);

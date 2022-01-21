@@ -12,9 +12,9 @@ public abstract class LinearTimeInvariantSystem {
         INTERPOLATION
     }
 
-    protected abstract StateSpace toStateSpace();
-    protected abstract TransferFunction toTransferFunction();
-    protected abstract ZeroPoleGain toZeroPoleGain();
+    public abstract StateSpace toStateSpace();
+    public abstract TransferFunction toTransferFunction();
+    public abstract ZeroPoleGain toZeroPoleGain();
 
     protected TimeResponse lsim(double[][] input, double[] time, double[] initialConditions,
                                 StateSpace ss) {

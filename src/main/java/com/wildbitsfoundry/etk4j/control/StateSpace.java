@@ -1,7 +1,15 @@
 package com.wildbitsfoundry.etk4j.control;
 
+import com.wildbitsfoundry.etk4j.math.complex.Complex;
+import com.wildbitsfoundry.etk4j.math.linearalgebra.EigenvalueDecomposition;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrices;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
+import com.wildbitsfoundry.etk4j.math.linearalgebra.NonSquareMatrixException;
+import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
+import com.wildbitsfoundry.etk4j.util.ComplexArrays;
+import com.wildbitsfoundry.etk4j.util.NumArrays;
+
+import java.util.Arrays;
 
 public class StateSpace extends LinearTimeInvariantSystem {
 
@@ -53,19 +61,79 @@ public class StateSpace extends LinearTimeInvariantSystem {
     }
 
     @Override
-    protected StateSpace toStateSpace() {
+    public StateSpace toStateSpace() {
         return this;
     }
 
-    // TODO implement this and make them public
-    @Override
-    protected TransferFunction toTransferFunction() {
-        throw null;
+    /**
+     * https://github.com/scipy/scipy/blob/47bb6febaa10658c72962b9615d5d5aa2513fa3a/scipy/signal/lti_conversion.py#L196
+     * @return
+     */
+    public TransferFunction[] toTransferFunction(int input) {
+        int nin = D.getColumnCount();
+        int nout = D.getRowCount();
+        if(input >= nin) {
+            throw new IllegalArgumentException("System does not have the input specified.");
+        }
+        // make SIMO from possibly MIMO system.
+        B = B.subMatrix(0, B.getRowCount() - 1, input, input);
+        D = D.subMatrix(0, D.getRowCount() - 1, input, input);
+
+        double[][] num;
+        double[] den;
+
+        if(!A.isSquared()) {
+            throw new NonSquareMatrixException("Matrix A must be a square Matrix.");
+        }
+        den = poly(A);
+
+        if(B.getRowCount() * B.getColumnCount() == 0 && C.getRowCount() * C.getColumnCount() == 0) {
+            if(D.getRowCount() * D.getColumnCount() == 0 && A.getRowCount() * A.getColumnCount() == 0) {
+                den = new double[0];
+            }
+            return new TransferFunction[] { new TransferFunction(D.getArray(), den)};
+        }
+
+        int numStates = A.getRowCount();
+        num = new double[nout][numStates + 1];
+        TransferFunction[] tfs = new TransferFunction[nout];
+        for(int k = 0; k < nout; ++k) {
+            double[] Ck = C.getRow(k);
+            double[] Dk = D.getRow(k);
+            num[k] = poly(A.subtract(new Matrix(dot(B.getArray(), Ck))));
+            NumArrays.addElementWiseInPlace(num[k], NumArrays.multiplyElementWise(den, Dk[0] - 1));
+            tfs[k] = new TransferFunction(num[k], den);
+        }
+        return tfs;
+    }
+
+    private static double[][] dot(double[] a, double[] b) {
+        double[][] result = new double[a.length][b.length];
+        for(int i = 0; i < a.length; ++i) {
+            result[i] = NumArrays.multiplyElementWise(b, a[i]);
+        }
+        return result;
+    }
+
+    /**
+     * Characteristic polynomial of matrix.
+     * @param m Argument to get the characteristic polynomial.
+     * @return The Characteristic polynomial of Matrix {@code m}.
+     */
+    private static double[] poly(Matrix m) {
+        EigenvalueDecomposition eig = m.eig();
+        Complex[] roots = ComplexArrays.zip(eig.getRealEigenvalues(), eig.getImagEigenvalues());
+        return new Polynomial(roots).getCoefficients();
     }
 
     @Override
-    protected ZeroPoleGain toZeroPoleGain() {
-        throw null;
+    public TransferFunction toTransferFunction() {
+        return this.toTransferFunction(0)[0];
+    }
+
+    @Override
+    public ZeroPoleGain toZeroPoleGain() {
+        return this.toTransferFunction().toZeroPoleGain();
     }
 
     public TimeResponse simulateTimeResponse(double[][] input, double[] time) {
@@ -83,5 +151,34 @@ public class StateSpace extends LinearTimeInvariantSystem {
     public TimeResponse simulateTimeResponse(double[][] input, double[] time, double[] initialConditions,
                                              IntegrationMethod integrationMethod) {
         return lsim(input, time, initialConditions, this, integrationMethod);
+    }
+
+    public static void main(String[] args) {
+        double[][] A = {{-2, -1}, {1, 0}};
+        double[][] B = {{1}, {0}};
+        double[][] C = {{1, 2}};
+        double[][] D = {{1}};
+
+        StateSpace ss = new StateSpace(A, B, C, D);
+        TransferFunction tf = ss.toTransferFunction();
+        System.out.println(tf);
+
+        A = new double[][]{{-1}};
+        B = new double[][]{{1}};
+        C = new double[][]{{1}};
+        D = new double[][]{{0}};
+
+        ss = new StateSpace(A, B, C, D);
+        tf = ss.toTransferFunction();
+        System.out.println(tf);
+
+        A = new double[][] {{-2, -1, 3}, {1, 0, 5}, {4, 5, 10}};
+        B = new double[][]{{1, 2, 4}, {0, 6, 7}, {9, 10, 22}};
+        C = new double[][]{{1, 2, 0}, {0, 1, 0}, {0, 0, 1}};
+        D = new double[][]{{0, 0, 1}, {2, 3, 4}, {5, 6, 7}};
+
+        ss = new StateSpace(A, B, C, D);
+        TransferFunction[] tfs = ss.toTransferFunction(0);
+        Arrays.stream(tfs).forEach(System.out::println);
     }
 }

@@ -4,193 +4,185 @@ import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.functions.ComplexUnivariateFunction;
 import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
 import com.wildbitsfoundry.etk4j.util.ComplexArrays;
+import com.wildbitsfoundry.etk4j.util.NumArrays;
 
 public class RationalFunction implements UnivariateFunction, ComplexUnivariateFunction {
-	private Polynomial _numerator;
-	private Polynomial _denominator;
+    private Polynomial numerator;
+    private Polynomial denominator;
 
-	public RationalFunction(Complex[] zeros, Complex[] poles) {
-		this(zeros, poles, calculateZeroPoleGain(zeros, poles));
-	}
+    public RationalFunction(Complex[] zeros, Complex[] poles) {
+        this(zeros, poles, calculateZeroPoleGain(zeros, poles));
+    }
 
-	public RationalFunction(Complex[] zeros, Complex[] poles, double gain) {
-		_numerator = new Polynomial(zeros);
-		_denominator = new Polynomial(poles);
+    public RationalFunction(Complex[] zeros, Complex[] poles, double gain) {
+        numerator = new Polynomial(zeros);
+        denominator = new Polynomial(poles);
 
-		_numerator.multiplyEquals(gain);
-	}
+        numerator.multiplyEquals(gain);
+    }
 
-	public RationalFunction(double num, Complex[] poles) {
-		_numerator = new Polynomial(num);
-		_denominator = new Polynomial(poles);
+    public RationalFunction(RationalFunction rf) {
+        numerator = new Polynomial(rf.numerator);
+        denominator = new Polynomial(rf.denominator);
+    }
 
-		_numerator.multiplyEquals(calculateZeroPoleGain(new Complex[] { Complex.fromReal(-1.0) }, poles));
-	}
+    public RationalFunction(Polynomial num, Polynomial den) {
+        numerator = new Polynomial(num);
+        denominator = new Polynomial(den);
+    }
 
-	public RationalFunction(RationalFunction rf) {
-		_numerator = new Polynomial(rf._numerator);
-		_denominator = new Polynomial(rf._denominator);
-	}
+    public RationalFunction(double[] num, double[] den) {
+        double factor = 1.0 / den[0];
+        num = NumArrays.multiplyElementWise(num, factor);
+        den = NumArrays.multiplyElementWise(den, factor);
+        numerator = new Polynomial(num);
+        denominator = new Polynomial(den);
+    }
 
-	public RationalFunction(Polynomial num, Polynomial den) {
-		_numerator = new Polynomial(num);
-		_denominator = new Polynomial(den);
-	}
+    public Complex[] getZeros() {
+        return numerator.getRoots();
+    }
 
-	public RationalFunction(double num, Polynomial den) {
-		_numerator = new Polynomial(num);
-		_denominator = new Polynomial(den);
-	}
+    public Complex[] getPoles() {
+        return denominator.getRoots();
+    }
 
-	public RationalFunction(double[] num, double[] den) {
-		_numerator = new Polynomial(num);
-		_denominator = new Polynomial(den);
-	}
+    public Polynomial getNumerator() {
+        return new Polynomial(numerator);
+    }
 
-	public Complex[] getZeros() {
-		return _numerator.getRoots();
-	}
+    public Polynomial getDenominator() {
+        return new Polynomial(denominator);
+    }
 
-	public Complex[] getPoles() {
-		return _denominator.getRoots();
-	}
+    public RationalFunction add(final RationalFunction rf) {
+        Polynomial numeratorLeftSide = numerator.multiply(rf.denominator);
+        Polynomial numeratorRightSide = denominator.multiply(rf.numerator);
+        Polynomial denominator = this.denominator.multiply(rf.denominator);
 
-	public Polynomial getNumerator() {
-		return new Polynomial(_numerator);
-	}
+        return new RationalFunction(numeratorLeftSide.add(numeratorRightSide), denominator);
+    }
 
-	public Polynomial getDenominator() {
-		return new Polynomial(_denominator);
-	}
+    public RationalFunction add(double scalar) {
+        return new RationalFunction(numerator.add(denominator.multiply(scalar)), denominator);
+    }
 
-	public RationalFunction add(final RationalFunction rf) {
-		Polynomial numeratorLeftSide = _numerator.multiply(rf._denominator);
-		Polynomial numeratorRightSide = _denominator.multiply(rf._numerator);
-		Polynomial denominator = _denominator.multiply(rf._denominator);
+    public RationalFunction subtract(RationalFunction rf) {
+        Polynomial numeratorLeftSide = numerator.multiply(rf.denominator);
+        Polynomial numeratorRightSide = denominator.multiply(rf.numerator);
+        Polynomial denominator = this.denominator.multiply(rf.denominator);
 
-		return new RationalFunction(numeratorLeftSide.add(numeratorRightSide), denominator);
-	}
+        return new RationalFunction(numeratorLeftSide.subtract(numeratorRightSide), denominator);
+    }
 
-	public RationalFunction add(double scalar) {
-		return new RationalFunction(_numerator.add(_denominator.multiply(scalar)), _denominator);
-	}
+    public RationalFunction multiply(final Polynomial p) {
+        Polynomial numerator = this.numerator.multiply(p);
+        Polynomial denominator = new Polynomial(this.denominator);
+        return new RationalFunction(numerator, denominator);
+    }
 
-	public RationalFunction subtract(RationalFunction rf) {
-		Polynomial numeratorLeftSide = _numerator.multiply(rf._denominator);
-		Polynomial numeratorRightSide = _denominator.multiply(rf._numerator);
-		Polynomial denominator = _denominator.multiply(rf._denominator);
+    private void multiplyEquals(Polynomial p) {
+        numerator.multiplyEquals(p);
+    }
 
-		return new RationalFunction(numeratorLeftSide.subtract(numeratorRightSide), denominator);
-	}
+    public RationalFunction multiply(RationalFunction rf) {
+        Polynomial numerator = this.numerator.multiply(rf.numerator);
+        Polynomial denominator = this.denominator.multiply(rf.denominator);
+        return new RationalFunction(numerator, denominator);
+    }
 
-	public RationalFunction multiply(final Polynomial p) {
-		Polynomial numerator = _numerator.multiply(p);
-		Polynomial denominator = new Polynomial(_denominator);
-		return new RationalFunction(numerator, denominator);
-	}
+    public RationalFunction multiply(double scalar) {
+        Polynomial numerator = this.numerator.multiply(scalar);
+        Polynomial denominator = new Polynomial(this.denominator);
+        return new RationalFunction(numerator, denominator);
+    }
 
-	private void multiplyEquals(Polynomial p) {
-		_numerator.multiplyEquals(p);
-	}
+    public RationalFunction substitute(double d) {
+        Polynomial num = numerator.substitute(d);
+        Polynomial den = denominator.substitute(d);
 
-	public RationalFunction multiply(RationalFunction rf) {
-		Polynomial numerator = _numerator.multiply(rf._numerator);
-		Polynomial denominator = _denominator.multiply(rf._denominator);
-		return new RationalFunction(numerator, denominator);
-	}
+        return new RationalFunction(num, den);
+    }
 
-	public RationalFunction multiply(double scalar) {
-		Polynomial numerator = _numerator.multiply(scalar);
-		Polynomial denominator = new Polynomial(_denominator);
-		return new RationalFunction(numerator, denominator);
-	}
+    public void substituteInPlace(double d) {
+        numerator.substituteInPlace(d);
+        denominator.substituteInPlace(d);
+    }
 
-	public RationalFunction substitute(double d) {
-		Polynomial num = _numerator.substitute(d);
-		Polynomial den = _denominator.substitute(d);
+    public RationalFunction substitute(Polynomial p) {
+        Polynomial num = numerator.substitute(p);
+        Polynomial den = denominator.substitute(p);
 
-		return new RationalFunction(num, den);
-	}
+        return new RationalFunction(num, den);
+    }
 
-	public void substituteInPlace(double d) {
-		_numerator.substituteInPlace(d);
-		_denominator.substituteInPlace(d);
-	}
+    public void substituteInPlace(Polynomial p) {
+        numerator.substituteInPlace(p);
+        denominator.substituteInPlace(p);
+    }
 
-	public RationalFunction substitute(Polynomial p) {
-		Polynomial num = _numerator.substitute(p);
-		Polynomial den = _denominator.substitute(p);
+    public RationalFunction substitute(RationalFunction rf) {
+        RationalFunction result = new RationalFunction(this);
+        subsOp(result, rf.numerator, rf.denominator);
+        return result;
+    }
 
-		return new RationalFunction(num, den);
-	}
+    public void substituteInPlace(RationalFunction rf) {
+        subsOp(this, rf.numerator, rf.denominator);
+    }
 
-	public void substituteInPlace(Polynomial p) {
-		_numerator.substituteInPlace(p);
-		_denominator.substituteInPlace(p);
-	}
+    private static void subsOp(RationalFunction rf, Polynomial num, Polynomial den) {
+        RationalFunction nump = rf.numerator.substitute(num, den);
+        RationalFunction denp = rf.denominator.substitute(num, den);
 
-	public RationalFunction substitute(RationalFunction rf) {
-		RationalFunction result = new RationalFunction(this);
-		subsOp(result, rf._numerator, rf._denominator);
-		return result;
-	}
+        int numDegree = rf.numerator.degree();
+        int denDegree = rf.denominator.degree();
+        int diff = Math.abs(numDegree - denDegree);
+        if (denDegree > numDegree) {
+            nump.multiplyEquals(den.pow(diff));
+        } else if (numDegree > denDegree) {
+            denp.multiplyEquals(den.pow(diff));
+        }
+        rf.numerator = nump.numerator;
+        rf.denominator = denp.numerator;
+    }
 
-	public void substituteInPlace(RationalFunction rf) {
-		subsOp(this, rf._numerator, rf._denominator);
-	}
+    public double normalize() {
+        double norm = denominator.normalize();
+        numerator.multiplyEquals(norm);
+        return norm;
+    }
 
-	private static void subsOp(RationalFunction rf, Polynomial num, Polynomial den) {
-		RationalFunction nump = rf._numerator.substitute(num, den);
-		RationalFunction denp = rf._denominator.substitute(num, den);
+    @Override
+    public double evaluateAt(double x) {
+        return numerator.evaluateAt(x) / denominator.evaluateAt(x);
+    }
 
-		int numDegree = rf._numerator.degree();
-		int denDegree = rf._denominator.degree();
-		int diff = Math.abs(numDegree - denDegree);
-		if (denDegree > numDegree) {
-			nump.multiplyEquals(den.pow(diff));
-		} else if (numDegree > denDegree) {
-			denp.multiplyEquals(den.pow(diff));
-		}
-		rf._numerator = nump._numerator;
-		rf._denominator = denp._numerator;
-	}
+    @Override
+    public Complex evaluateAt(Complex c) {
+        return numerator.evaluateAt(c).divide(denominator.evaluateAt(c));
+    }
 
-	public double normalize() {
-		double norm = _denominator.normalize();
-		_numerator.multiplyEquals(1 / norm);
-		return norm;
-	}
+    public Complex evaluateAt(double real, double imag) {
+        Complex resultNum = numerator.evaluateAt(real, imag);
+        Complex resultDen = denominator.evaluateAt(real, imag);
+        resultNum.divideEquals(resultDen);
+        return resultNum;
+    }
 
-	@Override
-	public double evaluateAt(double x) {
-		return _numerator.evaluateAt(x) / _denominator.evaluateAt(x);
-	}
+    private static double calculateZeroPoleGain(Complex[] zeros, Complex[] poles) {
+        // Compute gain k
+        Complex num = ComplexArrays.product(zeros).multiply(Math.pow(-1, zeros.length));
+        Complex den = ComplexArrays.product(poles).multiply(Math.pow(-1, poles.length));
+        den.divideEquals(num);
+        return den.real();
+    }
 
-	@Override
-	public Complex evaluateAt(Complex c) {
-		return _numerator.evaluateAt(c).divide(_denominator.evaluateAt(c));
-	}
+    public boolean isProper() {
+        return numerator.degree() <= denominator.degree();
+    }
 
-	public Complex evaluateAt(double real, double imag) {
-		Complex resultNum = _numerator.evaluateAt(real, imag);
-		Complex resultDen = _denominator.evaluateAt(real, imag);
-		resultNum.divideEquals(resultDen);
-		return resultNum;
-	}
-
-	private static double calculateZeroPoleGain(Complex[] zeros, Complex[] poles) {
-		// Compute gain k
-		Complex num = ComplexArrays.product(zeros).multiply(Math.pow(-1, zeros.length));
-		Complex den = ComplexArrays.product(poles).multiply(Math.pow(-1, poles.length));
-		den.divideEquals(num);
-		return den.real();
-	}
-
-	public boolean isProper() {
-		return _numerator.degree() <= _denominator.degree();
-	}
-
-	public boolean isStrictlyProper() {
-		return _numerator.degree() < _denominator.degree();
-	}
+    public boolean isStrictlyProper() {
+        return numerator.degree() < denominator.degree();
+    }
 }

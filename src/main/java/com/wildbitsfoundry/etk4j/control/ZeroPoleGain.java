@@ -48,127 +48,8 @@ public class ZeroPoleGain extends LinearTimeInvariantSystem {
     }
 
     @Override // TODO this should be public to comply with Liskov
-    protected ZeroPoleGain toZeroPoleGain() {
+    public ZeroPoleGain toZeroPoleGain() {
         return this;
-    }
-
-    // TODO this only works for digital filters
-    public double[][] toSecondOrderSections() {
-        if (zeros.length == 0 && poles.length == 0) {
-            return new double[][]{{gain, 0.0, 0.0, 1.0, 0.0, 0.0}};
-        }
-
-        Complex[] p = deepCopy(
-                ComplexArrays.concatenate(poles, ComplexArrays.zeros(Math.max(zeros.length - poles.length, 0))));
-        Complex[] z = deepCopy(
-                ComplexArrays.concatenate(zeros, ComplexArrays.zeros(Math.max(poles.length - zeros.length, 0))));
-        int nSections = (int) Math.floor((Math.max(p.length, z.length) + 1) / 2);
-
-        // pairing is nearest for now
-        if (p.length % 2 == 1) { // and pairing == nearest
-            p = ComplexArrays.concatenate(p, ComplexArrays.zeros(1));
-            z = ComplexArrays.concatenate(z, ComplexArrays.zeros(1));
-        }
-        // assert p.length == z.length
-
-//		Ensure we have complex conjugate pairs
-//    	(note that _cplxreal only gives us one element of each complex pair):
-        ComplexRealResults crz = complexReal(z);
-        z = ComplexArrays.concatenate(crz.getComplex(), ComplexArrays.fromReal(crz.getReal()));
-        crz = complexReal(p);
-        p = ComplexArrays.concatenate(crz.getComplex(), ComplexArrays.fromReal(crz.getReal()));
-
-        Complex[][] pSos = new Complex[nSections][2];
-        Complex[][] zSos = new Complex[nSections][2];
-
-        for (int i = 0; i < nSections; ++i) {
-            // Select the new "worst" pole
-            int p1Index = NumArrays.argMin(NumArrays.abs(NumArrays.subtract(1, ComplexArrays.abs(p))));
-            int p2Index = 0;
-            Complex p1 = p[p1Index];
-            p = ComplexArrays.remove(p, p1Index);
-
-            // Pair that pole with a zero
-
-            int z1Index = 0;
-            int z2Index = 0;
-            Complex z1 = null;
-            Complex p2 = null;
-            Complex z2 = null;
-            if (p1.isReal() && Arrays.stream(p).filter(c -> c.isReal()).count() == 0) {
-                // Special case to set a first-order section
-                z1Index = nearestRealComplexIndex(z, p1, "real");
-                z1 = z[z1Index];
-                z = ComplexArrays.remove(z, z1Index);
-                p2 = new Complex();
-                z2 = new Complex();
-            } else {
-                if (!p1.isReal() && Arrays.stream(p).filter(c -> c.isReal()).count() == 1) {
-//              Special case to ensure we choose a complex zero to pair
-//              with so later (setting up a first-order section)
-                    z1Index = nearestRealComplexIndex(z, p1, "complex");
-                    /// TODO assert !z[z1Index].isReal()
-                } else {
-//                  Pair the pole with the closest zero (real or complex)
-                    z1Index = NumArrays.argMin(ComplexArrays.abs(ComplexArrays.subtract(p1, z)));
-                }
-                z1 = z[z1Index];
-                z = ComplexArrays.remove(z, z1Index);
-
-//              Now that we have p1 and z1, figure out what p2 and z2 need to be
-                if (!p1.isReal()) {
-                    if (!z1.isReal()) { // complex pole, complex zero
-                        p2 = p1.conj();
-                        z2 = z1.conj();
-                    } else {    // complex pole, real zero
-                        p2 = p1.conj();
-                        z2Index = nearestRealComplexIndex(z, p1, "real");
-                        z2 = z[z2Index];
-                        // TODO assert z2.isReal()
-                        z = ComplexArrays.remove(z, z2Index);
-                    }
-                } else {
-                    if (!z1.isReal()) {  // Real pole, complex zero
-                        z2 = z1.conj();
-                        p2Index = nearestRealComplexIndex(p, z1, "real");
-                        p2 = p[p2Index];
-                        // TODO assert p2.isReal()
-                    } else {    // Real pole, real zero
-                        // pick the next "worst" pole to use
-                        List<Integer> index = new ArrayList<>();
-                        int[] isReal = Arrays.stream(p).mapToInt(c -> c.isReal() ? 1 : 0).toArray();
-                        for (int j = 0; j < isReal.length; ++j) {
-                            if(isReal[j] == 1) {
-                                index.add(j);
-                            }
-                        }
-                        Complex[] pIndex = new Complex[index.size()];
-                        for (int j = 0; j < pIndex.length; ++j) {
-                            pIndex[j] = p[index.get(j)];
-                        }
-                        p2Index = index.get(NumArrays.argMin(
-                           NumArrays.abs(
-                                   NumArrays.subtract(ComplexArrays.abs(pIndex), 1)
-                           )
-                        ));
-                        p2 = p[p2Index];
-
-                        // TODO assert p2.isReal()
-//                      find a real zero to match the added pole
-                        z2Index = nearestRealComplexIndex(z, p2, "real");
-                        z2 = z[z2Index];
-                        // TODO assert z2.isReal()
-                        z = ComplexArrays.remove(z, z2Index);
-                    }
-                    p = ComplexArrays.remove(p, p2Index);
-                }
-            }
-            pSos[i] = new Complex[]{p1, p2};
-            zSos[i] = new Complex[]{z1, z2};
-        }
-        // TODO assert p.length == z.length == 0 // we've consumed all poles and zeros
-
-        return null;
     }
 
     private static class ComplexRealResults {
@@ -376,6 +257,5 @@ public class ZeroPoleGain extends LinearTimeInvariantSystem {
         Complex[] p1 = {Complex.fromReal(-1)};
 
         ZeroPoleGain zpk = new ZeroPoleGain(z1, p1, 1.0);
-        double[][] sos = zpk.toSecondOrderSections();
     }
 }

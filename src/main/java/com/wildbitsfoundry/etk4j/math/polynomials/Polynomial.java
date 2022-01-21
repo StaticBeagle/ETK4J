@@ -25,25 +25,25 @@ import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkX
 public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction, DifferentiableFunction,
         IntegrableFunction {
 
-    protected double[] _coefs = null;
-    protected Complex[] _roots = null;
+    protected double[] coefficients = null;
+    protected Complex[] roots = null;
 
     /***
      * Constructs a polynomial with a constant value of 1.
      */
     public Polynomial() {
-        _coefs = new double[]{1.0};
+        coefficients = new double[]{1.0};
     }
 
     /***
      * Copy constructor
      */
     public Polynomial(Polynomial polynomial) {
-        int length = polynomial._coefs.length;
-        this._coefs = new double[length];
-        System.arraycopy(polynomial._coefs, 0, this._coefs, 0, length);
-        if (polynomial._roots != null) {
-            this._roots = ComplexArrays.deepCopy(polynomial._roots);
+        int length = polynomial.coefficients.length;
+        this.coefficients = new double[length];
+        System.arraycopy(polynomial.coefficients, 0, this.coefficients, 0, length);
+        if (polynomial.roots != null) {
+            this.roots = ComplexArrays.deepCopy(polynomial.roots);
         }
     }
 
@@ -64,7 +64,7 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
                 break;
             }
         }
-        this._coefs = i == length ? new double[]{0.0} : Arrays.copyOfRange(coefficients, i, length);
+        this.coefficients = i == length ? new double[]{0.0} : Arrays.copyOfRange(coefficients, 0, length);
 
     }
 
@@ -103,11 +103,11 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
                 result[j + 1].subtractEquals(tmp[j]);
             }
         }
-        _coefs = new double[size + 1];
+        coefficients = new double[size + 1];
         for (int i = 0; i <= size; i++) {
-            _coefs[i] = result[i].real();
+            coefficients[i] = result[i].real();
         }
-        _roots = ComplexArrays.deepCopy(roots);
+        this.roots = ComplexArrays.deepCopy(roots);
     }
 
     /***
@@ -115,7 +115,7 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
      * @return Returns the order of the polynomial
      */
     public int degree() {
-        return _coefs.length - 1;
+        return coefficients.length - 1;
     }
 
     /***
@@ -126,13 +126,13 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
     public void denormalize() {
         int i;
         // Find the normalizing gain
-        i = _coefs.length - 1;
-        while (this._coefs[i] == 0.0) {
+        i = coefficients.length - 1;
+        while (this.coefficients[i] == 0.0) {
             if (--i == 0)
                 break;
         }
-        for (int j = 0; j < this._coefs.length; j++) {
-            this._coefs[j] = this._coefs[j] / this._coefs[i];
+        for (int j = 0; j < this.coefficients.length; j++) {
+            this.coefficients[j] = this.coefficients[j] / this.coefficients[i];
         }
     }
 
@@ -144,11 +144,10 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
      * @return normalizing factor
      */
     public double normalize() {
-        double cn = this._coefs[0];
-        for (int j = 1; j < this._coefs.length; j++) {
-            this._coefs[j] = this._coefs[j] / cn;
+        double cn =  1.0 / this.coefficients[0];
+        for (int j = 0; j < this.coefficients.length; j++) {
+            this.coefficients[j] = this.coefficients[j] * cn;
         }
-        this._coefs[0] = 1;
         return cn;
     }
 
@@ -160,11 +159,11 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
      * @return Pnew(x) = P(x) * poly
      */
     public Polynomial multiply(final Polynomial p) {
-        return new Polynomial(NumArrays.convolution(_coefs, p._coefs));
+        return new Polynomial(NumArrays.convolution(coefficients, p.coefficients));
     }
 
     public Polynomial multiply(double... coefs) {
-        return new Polynomial(NumArrays.convolution(_coefs, coefs));
+        return new Polynomial(NumArrays.convolution(coefficients, coefs));
     }
 
     /***
@@ -174,8 +173,8 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
      *            Another polynomial
      */
     public void multiplyEquals(final Polynomial p) {
-        _coefs = NumArrays.convolution(_coefs, p._coefs);
-        _roots = null;
+        coefficients = NumArrays.convolution(coefficients, p.coefficients);
+        roots = null;
     }
 
     /***
@@ -185,17 +184,17 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
      *            Another polynomial
      */
     public void multiplyEquals(double... coefs) {
-        _coefs = NumArrays.convolution(_coefs, coefs);
-        _roots = null;
+        coefficients = NumArrays.convolution(coefficients, coefs);
+        roots = null;
     }
 
     public Polynomial multiply(double d) {
-        return new Polynomial(NumArrays.multiply(_coefs, d));
+        return new Polynomial(NumArrays.multiplyElementWise(coefficients, d));
     }
 
     public void multiplyEquals(double d) {
-        for (int i = 0; i < this._coefs.length; i++) {
-            this._coefs[i] = this._coefs[i] * d;
+        for (int i = 0; i < this.coefficients.length; i++) {
+            this.coefficients[i] = this.coefficients[i] * d;
         }
     }
 
@@ -205,16 +204,16 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
     }
 
     public void addEquals(final Polynomial p) {
-        _coefs = addOp(this, p);
-        _roots = null;
+        coefficients = addOp(this, p);
+        roots = null;
     }
 
     private static final double[] addOp(Polynomial p1, Polynomial p2) {
-        final int p1Length = p1._coefs.length;
-        final int p2Length = p2._coefs.length;
-        double[] result = p1Length > p2Length ? Arrays.copyOf(p1._coefs, p1Length) : Arrays.copyOf(p2._coefs, p2Length);
+        final int p1Length = p1.coefficients.length;
+        final int p2Length = p2.coefficients.length;
+        double[] result = p1Length > p2Length ? Arrays.copyOf(p1.coefficients, p1Length) : Arrays.copyOf(p2.coefficients, p2Length);
         for (int i = p1Length - 1, j = p2Length - 1, k = result.length - 1; i >= 0 && j >= 0; --i, --j, --k) {
-            result[k] = p1._coefs[i] + p2._coefs[j];
+            result[k] = p1.coefficients[i] + p2.coefficients[j];
         }
         return result;
     }
@@ -225,27 +224,27 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
     }
 
     public void subtractEquals(final Polynomial p) {
-        _coefs = subtractOp(this, p);
-        _roots = null;
+        coefficients = subtractOp(this, p);
+        roots = null;
     }
 
     private static final double[] subtractOp(Polynomial p1, Polynomial p2) {
-        final int p1Length = p1._coefs.length;
-        final int p2Length = p2._coefs.length;
+        final int p1Length = p1.coefficients.length;
+        final int p2Length = p2.coefficients.length;
         double[] result = null;
         if (p1Length > p2Length) {
             int diff = p1Length - p2Length;
             result = new double[p1Length];
-            System.arraycopy(p2._coefs, 0, result, diff, p2Length);
+            System.arraycopy(p2.coefficients, 0, result, diff, p2Length);
             for (int i = 0; i < p1Length; ++i) {
-                result[i] = p1._coefs[i] - result[i];
+                result[i] = p1.coefficients[i] - result[i];
             }
         } else {
             int diff = p2Length - p1Length;
             result = new double[p2Length];
-            System.arraycopy(p1._coefs, 0, result, diff, p1Length);
+            System.arraycopy(p1.coefficients, 0, result, diff, p1Length);
             for (int i = 0; i < p2Length; ++i) {
-                result[i] = result[i] - p2._coefs[i];
+                result[i] = result[i] - p2.coefficients[i];
             }
         }
         return result;
@@ -254,18 +253,18 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
     @Override
     public String toString() {
         final int length = this.degree();
-        if (length == 0 && _coefs[0] == 0.0) {
+        if (length == 0 && coefficients[0] == 0.0) {
             return "0.000";
         }
 
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i <= length; ++i) {
-            if (_coefs[i] == 0) {
+            if (coefficients[i] == 0) {
                 continue;
             }
-            sb.append(_coefs[i] < 0 ? " - " : " + ");
+            sb.append(coefficients[i] < 0 ? " - " : " + ");
             int power = length - i;
-            double coef = Math.abs(this._coefs[i]);
+            double coef = Math.abs(this.coefficients[i]);
             if (i == length) {
                 sb.append(String.format("%.4g", coef));
             } else if (!MathETK.isClose(coef, 1.0, 1e-12)) {
@@ -276,15 +275,15 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
                 sb.append(x);
             }
         }
-        sb.replace(0, 3, _coefs[0] < 0 ? "-" : "");
+        sb.replace(0, 3, coefficients[0] < 0 ? "-" : "");
         return sb.toString();
     }
 
     public Polynomial derivative() {
-        int length = _coefs.length - 1;
+        int length = coefficients.length - 1;
         double[] coefficients = new double[length];
         for (int i = 0; i < length; ++i) {
-            coefficients[i] = _coefs[i] * (length - i);
+            coefficients[i] = this.coefficients[i] * (length - i);
         }
         return new Polynomial(coefficients);
     }
@@ -295,7 +294,7 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
      * @return Array containing the coefficients in descending order
      */
     public double[] getCoefficients() {
-        return Arrays.copyOf(_coefs, _coefs.length);
+        return Arrays.copyOf(coefficients, coefficients.length);
     }
 
     /***
@@ -308,15 +307,15 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
     public double evaluateAt(double x) {
         // Horner's method
         double result = 0;
-        for (double coefficient : this._coefs) {
+        for (double coefficient : this.coefficients) {
             result = result * x + coefficient;
         }
         return result;
     }
 
     public void reverseInPlace() {
-        _coefs = NumArrays.reverse(_coefs);
-        _roots = null;
+        coefficients = NumArrays.reverse(coefficients);
+        roots = null;
     }
 
     /***
@@ -331,7 +330,7 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
     public Complex evaluateAt(double real, double imag) {
         // Horner's method
         Complex result = new Complex();
-        for (double coef : _coefs) {
+        for (double coef : coefficients) {
             result.multiplyEquals(real, imag);
             result.addEquals(coef);
         }
@@ -342,7 +341,7 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
     public Complex evaluateAt(Complex c) {
         // Horner's method
         Complex result = new Complex();
-        for (double coef : _coefs) {
+        for (double coef : coefficients) {
             result.multiplyEquals(c);
             result.addEquals(coef);
         }
@@ -351,30 +350,30 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
 
     public Complex[] getRoots() {
         // lazy creation of roots
-        if (_roots == null) {
+        if (roots == null) {
             int N = this.degree();
             switch (N) {
                 case 0:
-                    _roots = new Complex[0];
+                    roots = new Complex[0];
                     break;
                 case 1:
-                    _roots = new Complex[]{new Complex(-_coefs[1] / _coefs[0], 0)};
+                    roots = new Complex[]{new Complex(-coefficients[1] / coefficients[0], 0)};
                     break;
                 case 2:
-                    _roots = Formulas.quadraticFormula(_coefs[0], _coefs[1], _coefs[2]);
+                    roots = Formulas.quadraticFormula(coefficients[0], coefficients[1], coefficients[2]);
                     break;
                 default:
                     // Use generalized eigenvalue decomposition to find the roots
-                    _roots = new Complex[N];
-                    Matrix c = Matrices.Companion(_coefs, N);
+                    roots = new Complex[N];
+                    Matrix c = Matrices.Companion(coefficients, N);
                     EigenvalueDecomposition evd = c.eig();
                     double[] realEig = evd.getRealEigenvalues();
                     double[] imagEig = evd.getImagEigenvalues();
-                    _roots = ComplexArrays.zip(realEig, imagEig);
+                    roots = ComplexArrays.zip(realEig, imagEig);
             }
         }
         // Defensive copy
-        return ComplexArrays.deepCopy(_roots);
+        return ComplexArrays.deepCopy(roots);
     }
 
     /***
@@ -385,16 +384,16 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
      * @param d
      */
     public void substituteInPlace(double d) {
-        _roots = null;
+        roots = null;
         if (d == 0) {
-            _coefs = new double[]{_coefs[this.degree()]};
+            coefficients = new double[]{coefficients[this.degree()]};
             return;
         }
 
         final int deg = this.degree();
         for (int i = 0; i < deg; ++i) {
             for (int j = i; j < deg; ++j) {
-                _coefs[i] *= d;
+                coefficients[i] *= d;
             }
         }
     }
@@ -408,7 +407,7 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
      */
     public Polynomial substitute(double d) {
         final int deg = this.degree();
-        double[] result = Arrays.copyOf(_coefs, _coefs.length);
+        double[] result = Arrays.copyOf(coefficients, coefficients.length);
         for (int i = 0; i < deg; ++i) {
             result[i] *= Math.pow(d, deg - i);
         }
@@ -424,8 +423,8 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
      */
     public void substituteInPlace(Polynomial p) {
         Polynomial result = substituteOp(this, p);
-        _coefs = result._coefs;
-        _roots = null;
+        coefficients = result.coefficients;
+        roots = null;
     }
 
     /***
@@ -443,7 +442,7 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
     public RationalFunction substitute(final Polynomial num, final Polynomial den) {
         final int deg = this.degree();
         Polynomial nump = num.pow(deg);
-        nump.multiplyEquals(_coefs[0]);
+        nump.multiplyEquals(coefficients[0]);
 
         // Pre-calculate powers
         List<Polynomial> pows = new ArrayList<>(deg);
@@ -459,7 +458,7 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
             tmp = pows.get(i);
             denp.multiplyEquals(den);
             tmp.multiplyEquals(denp);
-            tmp.multiplyEquals(_coefs[j]);
+            tmp.multiplyEquals(coefficients[j]);
             nump.addEquals(tmp);
         }
         return new RationalFunction(nump, denp);
@@ -468,11 +467,11 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
     private static Polynomial substituteOp(Polynomial src, Polynomial sub) {
         final int deg = src.degree();
         Polynomial result = sub.pow(deg);
-        result.multiplyEquals(src._coefs[0]);
+        result.multiplyEquals(src.coefficients[0]);
         Polynomial tmp = null;
         for (int i = deg - 1, j = 1; i >= 0; --i, ++j) {
             tmp = sub.pow(i);
-            tmp.multiplyEquals(src._coefs[j]);
+            tmp.multiplyEquals(src.coefficients[j]);
             result.addEquals(tmp);
         }
         return result;
@@ -485,15 +484,15 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
         if (n == 0) {
             return new Polynomial(new double[]{1.0});
         }
-        double[] tmp = Arrays.copyOf(_coefs, _coefs.length);
+        double[] tmp = Arrays.copyOf(coefficients, coefficients.length);
         while (--n > 0) {
-            tmp = NumArrays.convolution(tmp, _coefs);
+            tmp = NumArrays.convolution(tmp, coefficients);
         }
         return new Polynomial(tmp);
     }
 
     public double getCoefficientAt(int index) {
-        return _coefs[index];
+        return coefficients[index];
     }
 
     /***
@@ -532,10 +531,10 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
     }
 
     public Polynomial integral(double constant) {
-        final int length = _coefs.length;
+        final int length = coefficients.length;
         double[] integral = new double[length + 1];
         for (int i = 0, j = length; i < length; ++i, --j) {
-            integral[i] = (_coefs[i] / j);
+            integral[i] = (coefficients[i] / j);
         }
         integral[length] = constant;
         return new Polynomial(integral);
@@ -549,11 +548,11 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
 
     @Override
     public double differentiate(double x) {
-        final int length = _coefs.length - 1;
+        final int length = coefficients.length - 1;
         double result = 0.0;
         for (int i = 0, j = 0; j < length; ++i, ++j) {
             result *= x;
-            result += _coefs[i] * (length - j);
+            result += coefficients[i] * (length - j);
         }
         return result;
     }

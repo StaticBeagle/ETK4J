@@ -19,7 +19,7 @@ public class RationalFunctionTest {
 		assertArrayEquals(new double[] { 1, 1 }, rf.getNumerator().getCoefficients(), 1e-12);
 		assertArrayEquals(new double[] { 1, 2, 1 }, rf.getDenominator().getCoefficients(), 1e-12);
 		
-		rf = new RationalFunction(1, poles);
+		rf = new RationalFunction(new Polynomial(1), new Polynomial(poles));
 		assertArrayEquals(new double[] { 1 }, rf.getNumerator().getCoefficients(), 1e-12);
 		
 		RationalFunction rf2 = new RationalFunction(rf);
@@ -32,7 +32,7 @@ public class RationalFunctionTest {
 		assertArrayEquals(new double[] { 1, 1 }, rf.getNumerator().getCoefficients(), 1e-12);
 		assertArrayEquals(new double[] { 1, 2, 1 }, rf.getDenominator().getCoefficients(), 1e-12);
 		
-		rf = new RationalFunction(1, new Polynomial(1, 2, 1));
+		rf = new RationalFunction(new Polynomial(1), new Polynomial(1, 2, 1));
 		
 		assertArrayEquals(new double[] { 1 }, rf.getNumerator().getCoefficients(), 1e-12);
 		
@@ -156,7 +156,7 @@ public class RationalFunctionTest {
 		RationalFunction rf = new RationalFunction(new double[] {2, 2}, new double[] {2, 4, 2});
 		double norm = rf.normalize();
 		
-		assertEquals(2.0, norm, 1e-12);
+		assertEquals(1.0, norm, 1e-12);
 		assertArrayEquals(new double[] { 1, 1 }, rf.getNumerator().getCoefficients(), 1e-12);
 		assertArrayEquals(new double[] { 1, 2, 1 }, rf.getDenominator().getCoefficients(), 1e-12);
 	}

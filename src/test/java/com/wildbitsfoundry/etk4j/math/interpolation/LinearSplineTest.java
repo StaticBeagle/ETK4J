@@ -16,7 +16,7 @@ public class LinearSplineTest {
 	double left;
 	double right;
 
-	// TODO test derivatives and definite/indefinite integrals
+	// TODO test throw extrapolator
 	
 	@Rule
 	public final ExpectedException exception = ExpectedException.none();

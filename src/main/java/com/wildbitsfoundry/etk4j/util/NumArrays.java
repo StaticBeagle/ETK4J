@@ -1,10 +1,7 @@
 package com.wildbitsfoundry.etk4j.util;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.List;
 import java.util.stream.IntStream;
 
 import com.wildbitsfoundry.etk4j.math.MathETK;
@@ -161,19 +158,6 @@ public final class NumArrays {
         return result;
     }
 
-    public static double[] multiply(double[] a, double d) {
-        double[] result = Arrays.copyOf(a, a.length);
-        multiplyInPlace(result, d);
-        return result;
-    }
-
-    public static void multiplyInPlace(double[] a, double d) {
-        final int length = a.length;
-        for (int i = 0; i < length; ++i) {
-            a[i] *= d;
-        }
-    }
-
     // TODO these element-wise functions can be rewritten without the elementWise
     // I think the add function overlaps
     // Maybe intead of add in place, add equals?
@@ -195,13 +179,25 @@ public final class NumArrays {
         }
     }
 
-    // TODO remove the ElementWise
     public static void addElementWiseInPlace(double[] a, double[] b) {
         if (a.length != b.length) {
             throw new IllegalArgumentException("a and b dimensions must match");
         }
         for (int i = 0; i < a.length; ++i) {
             a[i] += b[i];
+        }
+    }
+
+    public static double[] multiplyElementWise(double[] a, double d) {
+        double[] result = Arrays.copyOf(a, a.length);
+        multiplyElementWiseInPlace(result, d);
+        return result;
+    }
+
+    public static void multiplyElementWiseInPlace(double[] a, double d) {
+        final int length = a.length;
+        for (int i = 0; i < length; ++i) {
+            a[i] *= d;
         }
     }
 
@@ -219,7 +215,6 @@ public final class NumArrays {
         if (a.length != b.length) {
             throw new IllegalArgumentException("a and b dimensions must match");
         }
-
         final int length = a.length;
         for (int i = 0; i < length; ++i) {
             a[i] *= b[i];
@@ -360,10 +355,10 @@ public final class NumArrays {
         int bLength = b.length;
         double[] c = new double[aLength * bLength];
         if (a.length == 1) {
-            return NumArrays.multiply(b, a[0]);
+            return NumArrays.multiplyElementWise(b, a[0]);
         }
         if (b.length == 1) {
-            return NumArrays.multiply(a, b[0]);
+            return NumArrays.multiplyElementWise(a, b[0]);
         }
         for (int i = 0; i < aLength; i++) {
             for (int j = 0; j < bLength; j++) {
@@ -659,7 +654,7 @@ public final class NumArrays {
 
     public static double[] dot(double[] a, double[][] b) {
         if(a.length != b.length) {
-            throw new IllegalArgumentException("The number of elements in a must match the number of rows in b");
+            throw new IllegalArgumentException("The number of elements in a must match the number of rows in b.");
         }
         Matrix A = new Matrix(a, 1);
         A.multiplyEquals(new Matrix(b));
@@ -667,7 +662,7 @@ public final class NumArrays {
     }
 
     public static double[] dot(double[] a, double b) {
-        return multiply(a, b);
+        return multiplyElementWise(a, b);
     }
 
     public static double product(double[] a) {
@@ -754,5 +749,8 @@ public final class NumArrays {
 
         double[] aaaa = {0, 1, 1, 0, 2, 3, 5, 0, 8, 13, 21};
         System.out.println(argMin(aaaa));
+
+        System.out.println(Arrays.toString(add(a, b)));
+        System.out.println(Arrays.toString(addElementWise(a, b)));
     }
 }

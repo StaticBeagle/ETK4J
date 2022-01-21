@@ -72,7 +72,7 @@ public class TransferFunction extends LinearTimeInvariantSystem {
         }
     }
 
-    private RationalFunction _rf;
+    private RationalFunction rf;
 
     /***
      * Constructs a transfer function from poles and zeros
@@ -80,30 +80,23 @@ public class TransferFunction extends LinearTimeInvariantSystem {
      * @param poles - poles of the transfer function
      */
     public TransferFunction(Complex[] zeros, Complex[] poles) {
-        _rf = new RationalFunction(zeros, poles);
-    }
-
-    public TransferFunction(double gain, Complex[] poles) {
-        Polynomial num = new Polynomial(gain);
-        Polynomial den = new Polynomial(poles);
-
-        _rf = new RationalFunction(num, den);
+        rf = new RationalFunction(zeros, poles);
     }
 
     public TransferFunction(TransferFunction tf) {
-        _rf = new RationalFunction(tf._rf);
+        rf = new RationalFunction(tf.rf);
     }
 
     public TransferFunction(Polynomial numerator, Polynomial denominator) {
-        _rf = new RationalFunction(numerator, denominator);
+        rf = new RationalFunction(numerator, denominator);
     }
 
     public TransferFunction(double[] numerator, double[] denominator) {
-        _rf = new RationalFunction(numerator, denominator);
+        rf = new RationalFunction(numerator, denominator);
     }
 
     public TransferFunction(RationalFunction rf) {
-        _rf = rf;
+        this.rf = new RationalFunction(rf);
     }
 
     public TransferFunction(ZeroPoleGain zpk) {
@@ -111,35 +104,35 @@ public class TransferFunction extends LinearTimeInvariantSystem {
     }
 
     public TransferFunction(Complex[] zeros, Complex[] poles, double gain) {
-        _rf = new RationalFunction(zeros, poles, gain);
+        rf = new RationalFunction(zeros, poles, gain);
     }
 
     @Override
     public ZeroPoleGain toZeroPoleGain() {
-        Complex[] zeros = _rf.getZeros();
-        Complex[] poles = _rf.getPoles();
-        double k = _rf.getNumerator().getCoefficientAt(0);
+        Complex[] zeros = rf.getZeros();
+        Complex[] poles = rf.getPoles();
+        double k = rf.getNumerator().getCoefficientAt(0) / rf.getDenominator().getCoefficientAt(0);
         return new ZeroPoleGain(zeros, poles, k);
     }
 
     public Complex[] getZeros() {
-        return _rf.getZeros();
+        return rf.getZeros();
     }
 
     public Complex[] getPoles() {
-        return _rf.getPoles();
+        return rf.getPoles();
     }
 
     public Polynomial getNumerator() {
-        return _rf.getNumerator();
+        return rf.getNumerator();
     }
 
     public Polynomial getDenominator() {
-        return _rf.getDenominator();
+        return rf.getDenominator();
     }
 
     public Complex evaluateAt(double f) {
-        return _rf.evaluateAt(0.0, f);
+        return rf.evaluateAt(0.0, f);
     }
 
     public double[] getMagnitudeAt(double[] frequencies) {
@@ -300,29 +293,29 @@ public class TransferFunction extends LinearTimeInvariantSystem {
     }
 
     public TransferFunction add(final TransferFunction tf) {
-        return new TransferFunction(_rf.add(tf._rf));
+        return new TransferFunction(rf.add(tf.rf));
     }
 
     public TransferFunction add(double d) {
-        return new TransferFunction(_rf.add(d));
+        return new TransferFunction(rf.add(d));
     }
 
     public TransferFunction subtract(TransferFunction tf) {
-        return new TransferFunction(_rf.subtract(tf._rf));
+        return new TransferFunction(rf.subtract(tf.rf));
     }
 
     public TransferFunction multiply(TransferFunction tf) {
-        return new TransferFunction(_rf.multiply(tf._rf));
+        return new TransferFunction(rf.multiply(tf.rf));
     }
 
     public TransferFunction multiply(double d) {
-        return new TransferFunction(_rf.multiply(d));
+        return new TransferFunction(rf.multiply(d));
     }
 
     @Override
     public String toString() {
-        String num = _rf.getNumerator().toString();
-        String den = _rf.getDenominator().toString();
+        String num = rf.getNumerator().toString();
+        String den = rf.getDenominator().toString();
 
         int numLength = num.length();
         int denLength = den.length();
@@ -398,8 +391,8 @@ public class TransferFunction extends LinearTimeInvariantSystem {
 
     public double[] getAllGainCrossoverFrequencies() {
 
-        Polynomial magPolyNum = getPolynomialMagnitude(_rf.getNumerator());
-        Polynomial magPolyDen = getPolynomialMagnitude(_rf.getDenominator());
+        Polynomial magPolyNum = getPolynomialMagnitude(rf.getNumerator());
+        Polynomial magPolyDen = getPolynomialMagnitude(rf.getDenominator());
 
         Complex[] solution = magPolyNum.subtract(magPolyDen).getRoots();
         double[] wgc = new double[solution.length];
@@ -460,8 +453,8 @@ public class TransferFunction extends LinearTimeInvariantSystem {
      *         frequencies
      */
     public double[] getAllPhaseCrossoverFrequencies() {
-        Complex[] num = evalAtjw(_rf.getNumerator().getCoefficients());
-        Complex[] conjDen = ComplexArrays.conj(evalAtjw(_rf.getDenominator().getCoefficients()));
+        Complex[] num = evalAtjw(rf.getNumerator().getCoefficients());
+        Complex[] conjDen = ComplexArrays.conj(evalAtjw(rf.getDenominator().getCoefficients()));
 
         Complex[] conv = ComplexArrays.convolution(num, conjDen);
         double[] imag = new double[conv.length];
@@ -521,7 +514,7 @@ public class TransferFunction extends LinearTimeInvariantSystem {
     }
 
     public void substituteInPlace(double d) {
-        _rf.substituteInPlace(d);
+        rf.substituteInPlace(d);
     }
 
     /***
@@ -577,11 +570,11 @@ public class TransferFunction extends LinearTimeInvariantSystem {
     }
 
     public boolean isProper() {
-        return _rf.isProper();
+        return rf.isProper();
     }
 
     public boolean isStrictlyProper() {
-        return _rf.isStrictlyProper();
+        return rf.isStrictlyProper();
     }
 
     /***
@@ -597,8 +590,8 @@ public class TransferFunction extends LinearTimeInvariantSystem {
         if (!tf.isProper()) {
             throw new ImproperTransferFunctionException();
         }
-        double[] num = tf._rf.getNumerator().getCoefficients();
-        double[] den = tf._rf.getDenominator().getCoefficients();
+        double[] num = tf.rf.getNumerator().getCoefficients();
+        double[] den = tf.rf.getDenominator().getCoefficients();
 
         if (num.length == 0.0 || den.length == 0.0) {
             // Null system
@@ -626,7 +619,7 @@ public class TransferFunction extends LinearTimeInvariantSystem {
         }
         double[] fRow = new double[k - 1];
         System.arraycopy(den, 1, fRow, 0, fRow.length);
-        NumArrays.multiplyInPlace(fRow, -1.0);
+        NumArrays.multiplyElementWiseInPlace(fRow, -1.0);
 
         double[][] eye = Matrices.Identity(k - 2, k - 1).getAs2DArray();
         double[][] A = new double[eye.length + 1][];
@@ -642,13 +635,12 @@ public class TransferFunction extends LinearTimeInvariantSystem {
     }
 
     public void normalize() {
-        this._rf.normalize();
+        this.rf.normalize();
     }
     // TODO add getOrder
 
-    // TODO this should be public to comply with Liskov
     @Override
-    protected TransferFunction toTransferFunction() {
+    public TransferFunction toTransferFunction() {
         return this;
     }
 
