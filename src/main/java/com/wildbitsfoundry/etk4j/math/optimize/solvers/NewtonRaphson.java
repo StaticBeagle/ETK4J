@@ -3,12 +3,9 @@ package com.wildbitsfoundry.etk4j.math.optimize.solvers;
 import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
 
-import static com.wildbitsfoundry.etk4j.math.optimize.solvers.NewtonSolverResults.NewtonSolverStatus;
-
 
 public final class NewtonRaphson {
 
-    // TODO remove solver results?
     private int maxNumberOfIterations = 100;
     private double absTol = 1e-9;
     private double relTol = 0;
@@ -55,7 +52,7 @@ public final class NewtonRaphson {
         return this;
     }
 
-    public NewtonSolverResults<Double> solve() {
+    public SolverResults<Double> solve() {
         int maxNumberOfIterations = this.maxNumberOfIterations;
         UnivariateFunction func = this.func;
 
@@ -66,8 +63,9 @@ public final class NewtonRaphson {
                 double funcValue = func.evaluateAt(xCurrent);
                 if (funcValue == 0) {
                     double error = Math.abs(xFinal - xCurrent);
-                    NewtonSolverResults<Double> solverResults = new NewtonSolverResults<>();
-                    solverResults.setSolverStatus(NewtonSolverStatus.CONVERGED);
+                    SolverResults<Double> solverResults = new SolverResults<>();
+                    solverResults.setSolverStatus("Converged");
+                    solverResults.setHasConverged(true);
                     solverResults.setError(error);
                     solverResults.setValue(xFinal);
                     solverResults.setNumberOfIterations(maxNumberOfIterations);
@@ -76,8 +74,9 @@ public final class NewtonRaphson {
                 double funcDerivativeValue = derivative.evaluateAt(xCurrent);
                 if (funcDerivativeValue == 0) {
                     double error = Math.abs(xFinal - xCurrent);
-                    NewtonSolverResults<Double> solverResults = new NewtonSolverResults<>();
-                    solverResults.setSolverStatus(NewtonSolverStatus.DERIVATIVE_WAS_ZERO);
+                    SolverResults<Double> solverResults = new SolverResults<>();
+                    solverResults.setSolverStatus("Derivative was zero");
+                    solverResults.setHasConverged(false);
                     solverResults.setError(error);
                     solverResults.setValue(xFinal);
                     solverResults.setNumberOfIterations(maxNumberOfIterations);
@@ -96,9 +95,9 @@ public final class NewtonRaphson {
                 xFinal = xCurrent - newtonStep;
                 if (MathETK.isClose(xFinal, xCurrent, absTol, relTol)) {
                     double error = Math.abs(xFinal - xCurrent);
-                    NewtonSolverResults<Double> solverResults = new NewtonSolverResults<>();
-                    // TODO Make a boolean field converged and return the solver status as a string
-                    solverResults.setSolverStatus(NewtonSolverStatus.CONVERGED);
+                    SolverResults<Double> solverResults = new SolverResults<>();
+                    solverResults.setSolverStatus("Converged");
+                    solverResults.setHasConverged(true);
                     solverResults.setError(error);
                     solverResults.setValue(xFinal);
                     solverResults.setNumberOfIterations(maxNumberOfIterations);
@@ -111,9 +110,9 @@ public final class NewtonRaphson {
             if (x1 != null) {
                 if (x1 == x0) {
                     double error = Math.abs(xFinal - xCurrent);
-                    NewtonSolverResults<Double> solverResults = new NewtonSolverResults<>();
-                    solverResults.setSolverStatus(NewtonSolverStatus
-                            .SECOND_INITIAL_GUESS_EQUAL_TO_FIRST_INITIAL_GUESS);
+                    SolverResults<Double> solverResults = new SolverResults<>();
+                    solverResults.setSolverStatus("Second initial guess was equal to first initial guess");
+                    solverResults.setHasConverged(false);
                     solverResults.setError(error);
                     solverResults.setValue(xFinal);
                     solverResults.setNumberOfIterations(maxNumberOfIterations);
@@ -139,17 +138,19 @@ public final class NewtonRaphson {
                 if(q1 == q0) {
                     if(xFinal != xCurrent) {
                         double error = Math.abs(xFinal - xCurrent);
-                        NewtonSolverResults<Double> newtonSolverResults = new NewtonSolverResults<>();
-                        newtonSolverResults.setSolverStatus(NewtonSolverStatus.TOLERANCE_WAS_REACHED);
-                        newtonSolverResults.setError(error);
-                        newtonSolverResults.setValue(xFinal);
-                        newtonSolverResults.setNumberOfIterations(maxNumberOfIterations);
-                        return newtonSolverResults;
+                        SolverResults<Double> solverResults = new SolverResults<>();
+                        solverResults.setSolverStatus("Tolerance was reached");
+                        solverResults.setHasConverged(false);
+                        solverResults.setError(error);
+                        solverResults.setValue(xFinal);
+                        solverResults.setNumberOfIterations(maxNumberOfIterations);
+                        return solverResults;
                     }
                     x = (xFinal + xCurrent) / 2.0;
                     double error = Math.abs(xFinal - xCurrent);
-                    NewtonSolverResults<Double> solverResults = new NewtonSolverResults<>();
-                    solverResults.setSolverStatus(NewtonSolverStatus.CONVERGED);
+                    SolverResults<Double> solverResults = new SolverResults<>();
+                    solverResults.setSolverStatus("Converged");
+                    solverResults.setHasConverged(true);
                     solverResults.setError(error);
                     solverResults.setValue(x);
                     solverResults.setNumberOfIterations(maxNumberOfIterations);
@@ -163,8 +164,9 @@ public final class NewtonRaphson {
                 }
                 if(MathETK.isClose(x, xFinal, absTol, relTol)) {
                     double error = Math.abs(xFinal - xCurrent);
-                    NewtonSolverResults<Double> solverResults = new NewtonSolverResults<>();
-                    solverResults.setSolverStatus(NewtonSolverStatus.CONVERGED);
+                    SolverResults<Double> solverResults = new SolverResults<>();
+                    solverResults.setSolverStatus("Converged");
+                    solverResults.setHasConverged(true);
                     solverResults.setError(error);
                     solverResults.setValue(x);
                     solverResults.setNumberOfIterations(maxNumberOfIterations);
@@ -177,26 +179,12 @@ public final class NewtonRaphson {
             }
         }
         double error = Math.abs(xFinal - xCurrent);
-        NewtonSolverResults<Double> newtonSolverResults = new NewtonSolverResults<>();
-        newtonSolverResults.setSolverStatus(NewtonSolverStatus.MAX_NUMBER_OF_ITERATIONS_EXCEEDED);
-        newtonSolverResults.setError(error);
-        newtonSolverResults.setValue(xFinal);
-        newtonSolverResults.setNumberOfIterations(maxNumberOfIterations);
-        return newtonSolverResults;
-    }
-
-    public static void main(String[] args) {
-        NewtonSolverResults nr = new NewtonRaphson(x ->  x * x * x - x * x + 2, -20)
-            .derivative(x -> 3 * x * x - 2 * x)
-            .solve();
-
-        NewtonSolverResults<Double> nr2 = new NewtonRaphson(x ->  x * x * x - x * x + 2, -20)
-            .derivative(x -> 3 * x * x - 2 * x)
-            .secondDerivative(x -> 6 * x)
-            .solve();
-
-        NewtonSolverResults<Double> nr3 = new NewtonRaphson(x ->  x * x * x - x * x + 2, -20)
-                .solve();
-        System.out.println("s");
+        SolverResults<Double> solverResults = new SolverResults<>();
+        solverResults.setSolverStatus("Maximum number of iterations exceeded");
+        solverResults.setHasConverged(false);
+        solverResults.setError(error);
+        solverResults.setValue(xFinal);
+        solverResults.setNumberOfIterations(maxNumberOfIterations);
+        return solverResults;
     }
 }

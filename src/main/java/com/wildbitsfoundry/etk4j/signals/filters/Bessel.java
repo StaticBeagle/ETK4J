@@ -6,7 +6,7 @@ import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
 import com.wildbitsfoundry.etk4j.math.optimize.solvers.NewtonRaphsonComplex;
 import com.wildbitsfoundry.etk4j.math.optimize.solvers.Secant;
-import com.wildbitsfoundry.etk4j.math.optimize.solvers.NewtonSolverResults;
+import com.wildbitsfoundry.etk4j.math.optimize.solvers.SolverResults;
 import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
 import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 import com.wildbitsfoundry.etk4j.util.NumArrays;
@@ -125,13 +125,14 @@ public class Bessel extends AnalogFilter {
         Complex[] x = aberth(fx, fp, x0, 1e-15, 50);
 
         for (int i = 0; i < n; ++i) {
-            NewtonSolverResults<Complex> sr = new NewtonRaphsonComplex(
+            SolverResults<Complex> sr = new NewtonRaphsonComplex(
                     z -> {
                         Complex[] result = new Complex[1];
                         com.wildbitsfoundry.etk4j.math.specialfunctions.
                                 Bessel.nonexpbesska01(n + 0.5, z.invert(), result, new Complex[1]);
                         return result[0];
-                    },
+                    }, x[i])
+                    .derivative(
                     z -> {
                         Complex[] a0 = new Complex[1];
                         com.wildbitsfoundry.etk4j.math.specialfunctions.
@@ -149,7 +150,7 @@ public class Bessel extends AnalogFilter {
                         a2[0] = a2[0].divide(z.pow(2).multiply(2));
 
                         return a0[0].subtract(a1[0]).add(a2[0]);
-                    }, x[i])
+                    })
                     .absTolerance(1e-15)
                     .relTolerance(0.0)
                     .iterationLimit(50)

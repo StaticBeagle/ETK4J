@@ -110,6 +110,18 @@ public final class MathETK {
 	}
 
 	/***
+	 * Determines whether a number is close to another number within a certain tolerance.
+	 * @param a Argument in which to evaluate the function at.
+	 * @param b Argument in which to evaluate the function at.
+	 * @param absTol The absolute tolerance.
+	 * @param relTol The relative tolerance.
+	 * @return {@code Math.abs(a - b) <= absTol + relTol * Math.abs(b)}
+	 */
+	public static boolean isClose(Complex a, Complex b, double absTol, double relTol) {
+		return a.subtract(b).abs() <= absTol + relTol * b.abs();
+	}
+
+	/***
 	 * Determines whether a number is close to another number within a certain tolerance. <br>
 	 * This calls {@link #isClose(double, double, double, double) with relative tolerance of 1e-5}.
 	 * @param a Argument in which to evaluate the function at.
@@ -146,7 +158,6 @@ public final class MathETK {
 		return Math.round(d / 2) * 2;
 	}
 
-	// TODO move this to MathETK or Formulas
 	public static class FRexpResult {
 		public int exponent = 0;
 		public double mantissa = 0.0;

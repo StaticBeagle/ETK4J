@@ -4,108 +4,187 @@ import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.functions.ComplexUnivariateFunction;
 
-import static com.wildbitsfoundry.etk4j.math.optimize.solvers.NewtonSolverResults.NewtonSolverStatus;
-
 
 public final class NewtonRaphsonComplex {
+    private int maxNumberOfIterations = 100;
+    private double absTol = 1e-9;
+    private double relTol = 0;
+    private Complex x0 = null;
+    private Complex x1 = null;
 
-    protected int _maxIter = 100;
-    protected double _absTol = 1e-9;
-    protected double _relTol = 1e-6;
-    protected double _maxVal = Double.POSITIVE_INFINITY;
-    private double _minVal = Double.NEGATIVE_INFINITY;
-    protected double _step = 0.001;
-    protected Complex _x0;
+    private ComplexUnivariateFunction func;
+    private ComplexUnivariateFunction derivative;
+    private ComplexUnivariateFunction secondDerivative;
 
-    protected ComplexUnivariateFunction _func;
-    protected ComplexUnivariateFunction _derivative;
 
-    // create constructor that takes in derivative type
+    public NewtonRaphsonComplex(ComplexUnivariateFunction func, Complex initialGuess) {
+        this.func = func;
+        x0 = initialGuess;
+    }
 
-    public NewtonRaphsonComplex(ComplexUnivariateFunction func, ComplexUnivariateFunction derivative, Complex initialGuess) {
-        _func = func;
-        _derivative = derivative;
-        _x0 = initialGuess;
+    public NewtonRaphsonComplex secondInitialGuess(Complex secondInitialGuess) {
+        this.x1 = secondInitialGuess;
+        return this;
+    }
+
+    public NewtonRaphsonComplex derivative(ComplexUnivariateFunction derivative) {
+        this.derivative = derivative;
+        return this;
+    }
+
+    public NewtonRaphsonComplex secondDerivative(ComplexUnivariateFunction secondDerivative) {
+        this.secondDerivative = secondDerivative;
+        return this;
     }
 
     public NewtonRaphsonComplex iterationLimit(int limit) {
-        _maxIter = limit;
+        maxNumberOfIterations = limit;
         return this;
     }
 
     public NewtonRaphsonComplex absTolerance(double tol) {
-        _absTol = tol;
+        absTol = tol;
         return this;
     }
 
     public NewtonRaphsonComplex relTolerance(double tol) {
-        _relTol = tol;
+        relTol = tol;
         return this;
     }
 
-    // TODO remove this?
-    public NewtonRaphsonComplex maxAllowedValue(double max) {
-        _maxVal = max;
-        return this;
-    }
+    public SolverResults<Complex> solve() {
+        int maxNumberOfIterations = this.maxNumberOfIterations;
+        ComplexUnivariateFunction func = this.func;
 
-    // TODO remove this?
-    public NewtonRaphsonComplex minAllowedValue(double min) {
-        _minVal = min;
-        return this;
-    }
-    // TODO remove this
-    public NewtonRaphsonComplex differentiationStepSize(double step) {
-        _step = step;
-        return this;
-    }
-
-    protected static NewtonSolverResults<Complex> buildResults(Complex xfinal, NewtonSolverStatus status, int iterCount, double error) {
-        NewtonSolverResults<Complex> sr = new NewtonSolverResults<>();
-        sr.setValue(xfinal);
-        sr.setSolverStatus(status);
-        sr.setNumberOfIterations(iterCount);
-        sr.setError(error);
-        return sr;
-    }
-
-    public NewtonSolverResults<Complex> solve() {
-        return this.solve(_derivative);
-    }
-
-    protected NewtonSolverResults<Complex> solve(ComplexUnivariateFunction derivative) {
-        int maxiter = _maxIter;
-        double maxval = _maxVal;
-        ComplexUnivariateFunction func = _func;
-
-        Complex xcurrent = _x0;
-        Complex xfinal = new Complex();
-        double error = 0.0;
-        while (maxiter-- > 0) {
-
-            xfinal = xcurrent.subtract(func.evaluateAt(xcurrent).divide(derivative.evaluateAt(xcurrent)));
-
-            error = xfinal.subtract(xcurrent).abs();
-            if (error < _absTol + _relTol * xcurrent.abs()) {
-                return buildResults(xfinal, NewtonSolverStatus.CONVERGED, _maxIter - maxiter, error);
+        Complex xCurrent = x0;
+        Complex xFinal = new Complex();
+        if (derivative != null) {
+            while (maxNumberOfIterations-- > 0) {
+                Complex funcValue = func.evaluateAt(xCurrent);
+                if (funcValue == new Complex()) {
+                    double error = xFinal.subtract(xCurrent).abs();
+                    SolverResults<Complex> solverResults = new SolverResults<>();
+                    solverResults.setSolverStatus("Converged");
+                    solverResults.setHasConverged(true);
+                    solverResults.setError(error);
+                    solverResults.setValue(xFinal);
+                    solverResults.setNumberOfIterations(maxNumberOfIterations);
+                    return solverResults;
+                }
+                Complex funcDerivativeValue = derivative.evaluateAt(xCurrent);
+                if (funcDerivativeValue == new Complex()) {
+                    double error = xFinal.subtract(xCurrent).abs();
+                    SolverResults<Complex> solverResults = new SolverResults<>();
+                    solverResults.setSolverStatus("Derivative was zero");
+                    solverResults.setHasConverged(false);
+                    solverResults.setError(error);
+                    solverResults.setValue(xFinal);
+                    solverResults.setNumberOfIterations(maxNumberOfIterations);
+                    return solverResults;
+                }
+                // Newton Step
+                Complex newtonStep = funcValue.divide(funcDerivativeValue);
+                if (secondDerivative != null) {
+                    // Use Halley's method
+                    Complex funcSecondDerivativeValue = secondDerivative.evaluateAt(xCurrent);
+                    Complex adj = newtonStep.multiply(funcSecondDerivativeValue).divide(funcDerivativeValue).divide(2);
+                    if (adj.abs() < 1) {
+                        newtonStep.divideEquals(adj.uminus().add(1.0));
+                    }
+                }
+                xFinal = xCurrent.subtract(newtonStep);
+                if (MathETK.isClose(xFinal, xCurrent, absTol, relTol)) {
+                    double error = xFinal.subtract(xCurrent).abs();
+                    SolverResults<Complex> solverResults = new SolverResults<>();
+                    solverResults.setSolverStatus("Converged");
+                    solverResults.setHasConverged(true);
+                    solverResults.setError(error);
+                    solverResults.setValue(xFinal);
+                    solverResults.setNumberOfIterations(maxNumberOfIterations);
+                    return solverResults;
+                }
+                xCurrent = xFinal;
             }
-
-            xcurrent = xfinal;
+        } else {
+            // Secant method
+            if (x1 != null) {
+                if (x1 == x0) {
+                    double error = xFinal.subtract(xCurrent).abs();
+                    SolverResults<Complex> solverResults = new SolverResults<>();
+                    solverResults.setSolverStatus("Second initial guess was equal to first initial guess");
+                    solverResults.setHasConverged(false);
+                    solverResults.setError(error);
+                    solverResults.setValue(xFinal);
+                    solverResults.setNumberOfIterations(maxNumberOfIterations);
+                    return solverResults;
+                }
+            } else {
+                double eps = 1e-4;
+                xFinal = xCurrent.multiply(1 + eps);
+                xFinal.addEquals(xFinal.compareTo(new Complex()) >= 0 ? eps : -eps);
+            }
+            Complex q0 = func.evaluateAt(xCurrent);
+            Complex q1 = func.evaluateAt(xFinal);
+            if (q1.abs() < q0.abs()) {
+                Complex swap = xCurrent;
+                xCurrent = xFinal;
+                xFinal = swap;
+                swap = q0;
+                q0 = q1;
+                q1 = swap;
+            }
+            while (maxNumberOfIterations-- > 0) {
+                Complex x = new Complex();
+                if (q1 == q0) {
+                    if (xFinal != xCurrent) {
+                        double error = xFinal.subtract(xCurrent).abs();
+                        SolverResults<Complex> solverResults = new SolverResults<>();
+                        solverResults.setSolverStatus("Tolerance was reached");
+                        solverResults.setHasConverged(false);
+                        solverResults.setError(error);
+                        solverResults.setValue(xFinal);
+                        solverResults.setNumberOfIterations(maxNumberOfIterations);
+                        return solverResults;
+                    }
+                    x = xFinal.add(xCurrent).divide(2.0);
+                    double error = xFinal.subtract(xCurrent).abs();
+                    SolverResults<Complex> solverResults = new SolverResults<>();
+                    solverResults.setSolverStatus("Converged");
+                    solverResults.setHasConverged(true);
+                    solverResults.setError(error);
+                    solverResults.setValue(x);
+                    solverResults.setNumberOfIterations(maxNumberOfIterations);
+                    return solverResults;
+                } else {
+                    if (q1.abs() > q0.abs()) {
+                        x = q0.uminus().divide(q1.multiply(xFinal).add(xCurrent)).divide(q0.divide(q1).uminus().add(1));
+                    } else {
+                        x = q1.uminus().divide(q0.multiply(xFinal).add(xCurrent)).divide(q1.divide(q0).uminus().add(1));
+                    }
+                }
+                if (MathETK.isClose(x, xFinal, absTol, relTol)) {
+                    double error = xFinal.subtract(xCurrent).abs();
+                    SolverResults<Complex> solverResults = new SolverResults<>();
+                    solverResults.setSolverStatus("Converged");
+                    solverResults.setHasConverged(true);
+                    solverResults.setError(error);
+                    solverResults.setValue(x);
+                    solverResults.setNumberOfIterations(maxNumberOfIterations);
+                    return solverResults;
+                }
+                xCurrent = xFinal;
+                q0 = q1;
+                xFinal = x;
+                q1 = func.evaluateAt(xFinal);
+            }
         }
-        return buildResults(xfinal, NewtonSolverStatus.MAX_NUMBER_OF_ITERATIONS_EXCEEDED, Math.abs(_maxIter - maxiter), error);
-    }
-
-    public static void main(String[] args) {
-        ComplexUnivariateFunction fx = z -> z.pow(2).add(1.0);
-        ComplexUnivariateFunction fp = z -> z.multiply(2.0);
-        NewtonSolverResults<Complex> results = new NewtonRaphsonComplex(fx, fp, new Complex(5, -2))
-                .absTolerance(1e-9)
-                .relTolerance(0.0)
-                .iterationLimit(50)
-                .solve();
-
-        System.out.println(results);
-
-        System.out.println(MathETK.rem(0.6, 0.2));
+        double error = xFinal.subtract(xCurrent).abs();
+        SolverResults<Complex> solverResults = new SolverResults<>();
+        solverResults.setSolverStatus("Maximum number of iterations exceeded");
+        solverResults.setHasConverged(false);
+        solverResults.setError(error);
+        solverResults.setValue(xFinal);
+        solverResults.setNumberOfIterations(maxNumberOfIterations);
+        return solverResults;
     }
 }

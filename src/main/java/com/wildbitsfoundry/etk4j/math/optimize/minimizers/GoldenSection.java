@@ -6,6 +6,7 @@ public final class GoldenSection {
 
     private GoldenSection() {}
 
+    // TODO
     // Maybe improve it and roll out our own implementation
     // https://www.mathworks.com/matlabcentral/fileexchange/25919-golden-section-method-algorithm
     public static double goldenSectionMinimizer(BiFunction<Double, Object[], Double> func,

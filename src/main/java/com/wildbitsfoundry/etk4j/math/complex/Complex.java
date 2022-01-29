@@ -107,58 +107,15 @@ public class Complex implements Comparable<Complex> {
     }
 
     /**
-     * Is the complex number close to another complex number. <br>
-     * Internally this calls {@link MathETK#isClose(double, double, double, double)}
-     *
-     * @param other  The other complex number to compare it to.
-     * @param absTol The absolute tolerance.
-     * @param relTol The relative tolerance.
-     * @return True if the Complex number is close within a tolerance, false otherwise.
+     * Compare magnitudes of complex numbers.
+     * @see java.lang.Comparable(java.lang.Object)
      */
-    public boolean isClose(Complex other, double absTol, double relTol) {
-        if (!MathETK.isClose(imag, other.imag, absTol, relTol)) {
-            return false;
-        }
-        if (!MathETK.isClose(real, other.real, absTol, relTol)) {
-            return false;
-        }
-        return true;
-    }
-
-
-    /**
-     * Is the complex number close to another complex number. <br>
-     * Internally this calls {@link MathETK#isClose(double, double, double, double)}
-     *
-     * @param other  The other complex number to compare it to.
-     * @param absTol The absolute tolerance.
-     * @return True if the Complex number is close within a tolerance, false otherwise.
-     */
-    public boolean isClose(Complex other, double absTol) {
-        if (!MathETK.isClose(imag, other.imag, absTol)) {
-            return false;
-        }
-        if (!MathETK.isClose(real, other.real, absTol)) {
-            return false;
-        }
-        return true;
-    }
-
     @Override
     public int compareTo(Complex obj) {
-        final int SMALLER = -1;
-        final int EQUAL = 0;
-        final int GREATER = 1;
         if (this == obj) {
-            return EQUAL;
+            return 0;
         }
-        if (this.real > obj.real) {
-            return GREATER;
-        }
-        if (this.real < obj.real) {
-            return SMALLER;
-        }
-        return Double.compare(this.imag, obj.imag);
+        return Double.compare(this.abs(), obj.abs());
     }
 
     /**

@@ -1,4 +1,4 @@
-package com.wildbitsfoundry.etk4j.math.solvers.univariate;
+package com.wildbitsfoundry.etk4j.math.optimize.solvers;
 
 import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
 

@@ -4,6 +4,7 @@ import com.wildbitsfoundry.etk4j.math.functions.MultivariateFunction;
 import com.wildbitsfoundry.etk4j.math.solvers.multivariate.NewtonRaphson;
 import com.wildbitsfoundry.etk4j.math.solvers.multivariate.SolverResults;
 
+// TODO refactor multivariate Newton
 public class MultivariateSolverExample {
 
 	public static void main(String[] args) {

@@ -1,32 +1,33 @@
 package examples;
 
-import com.wildbitsfoundry.etk4j.math.solvers.univariate.NewtonRaphson;
-import com.wildbitsfoundry.etk4j.math.solvers.univariate.SolverResults;
+import com.wildbitsfoundry.etk4j.math.optimize.solvers.NewtonRaphson;
+import com.wildbitsfoundry.etk4j.math.optimize.solvers.SolverResults;
 
 public class UnivariateSolverExample {
 	public static void main(String[] args) {
-		/*
-		 * Find the square root of 2
-		 * Solve: 
-		 *  f(x) = 2 - x^2 = 0;
-		 */
 
-		/* @formatter:off */
-		System.out.printf("Solution with pre-computed Jacobian%n------------------------------------%n");
-		SolverResults sr1 = new NewtonRaphson(x -> 2 - x * x, x -> -2 * x, 1)
+		System.out.println("Solve 3 * x^3 - x^2 + 2");
+		System.out.println("------------------------------------");
+		System.out.printf("Solution with first derivative: ");
+		SolverResults<Double> nr = new NewtonRaphson(x ->  x * x * x - x * x + 2, -20)
+				.derivative(x -> 3 * x * x - 2 * x)
 				.absTolerance(1e-9)
-				.relTolerance(1e-6)
+				.relTolerance(0.0)
 				.iterationLimit(100)
 				.solve();
-		System.out.println(sr1);
-
-		System.out.printf("%nSolution with auto-computed Jacobian%n------------------------------------%n");
-		SolverResults sr2 = new NewtonRaphson(x -> 2 - x * x, 1)
-				.absTolerance(1e-9)
-				.relTolerance(1e-6)
-				.iterationLimit(100)
-				.differentiationStepSize(1e-7)
+		System.out.println(nr);
+		System.out.println("------------------------------------");
+		System.out.printf("Solution with first and second derivative (Halley's method): ");
+		SolverResults<Double> nr2 = new NewtonRaphson(x ->  x * x * x - x * x + 2, -20)
+				.derivative(x -> 3 * x * x - 2 * x)
+				.secondDerivative(x -> 6 * x)
 				.solve();
-		System.out.println(sr2);
+		System.out.println(nr2);
+		System.out.println("------------------------------------");
+		System.out.printf("Solution with no derivatives (Secant method): ");
+		SolverResults<Double> nr3 = new NewtonRaphson(x ->  x * x * x - x * x + 2, -20)
+				.solve();
+		System.out.println(nr3);
+
 	}
 }

@@ -46,13 +46,12 @@ public class ComplexTest {
 	@Test
 	public void testCompareTo() {
 		Complex a = new Complex(-2.0, 3.0);
-		new Complex(5.0, -6.0);
-		Complex c = new Complex(a.real(), a.imag());
+		Complex c = new Complex(a);
 		
 		assertEquals(0.0, a.compareTo(c), 1e-12);
 		assertEquals(0.0, a.compareTo(a), 1e-12);
-		assertEquals(1.0, a.compareTo(c.subtract(1.0)), 1e-12);
-		assertEquals(-1.0, a.compareTo(c.add(1.0)), 1e-12);
+		assertEquals(-1.0, a.compareTo(c.subtract(1.0)), 1e-12);
+		assertEquals(1.0, a.compareTo(c.add(1.0)), 1e-12);
 	}
 	
 	@Test
