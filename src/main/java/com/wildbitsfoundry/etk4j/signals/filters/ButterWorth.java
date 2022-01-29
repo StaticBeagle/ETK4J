@@ -87,11 +87,34 @@ public final class ButterWorth extends AnalogFilter {
         return lpTobp(zpk, w0, bw);
     }
 
+    public static ZeroPoleGain newBandPassZPK(int n, double wp1, double wp2) {
+        if(n <= 0) {
+            // throw
+        }
+        if(wp1 <= 0 || wp2 <= 0) {
+            // throw
+        }
+        if(wp1 <= wp2) {
+            // throw
+        }
+        ZeroPoleGain zpk = buttAp(n);
+        double w0 = Math.sqrt(wp1 * wp2);
+        double bw = wp2 - wp1;
+        return lpTobpZPK(zpk, w0, bw);
+    }
+
     public static TransferFunction newBandStop(int n, double wp1, double wp2) {
         ZeroPoleGain zpk = buttAp(n);
         double w0 = Math.sqrt(wp1 * wp2);
         double bw = wp2 - wp1;
         return lpTobs(zpk, w0, bw);
+    }
+
+    public static ZeroPoleGain newBandStopZPK(int n, double wp1, double wp2) {
+        ZeroPoleGain zpk = buttAp(n);
+        double w0 = Math.sqrt(wp1 * wp2);
+        double bw = wp2 - wp1;
+        return lpTobsZPK(zpk, w0, bw);
     }
 
 //    private static void checkInputsLowPassHighPass(int n, double wn) {

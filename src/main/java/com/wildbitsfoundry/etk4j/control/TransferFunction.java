@@ -131,8 +131,8 @@ public class TransferFunction extends LinearTimeInvariantSystem {
         return rf.getDenominator();
     }
 
-    public Complex evaluateAt(double f) {
-        return rf.evaluateAt(0.0, f);
+    public Complex evaluateAt(double w) {
+        return rf.evaluateAt(0.0, w);
     }
 
     public double[] getMagnitudeAt(double[] frequencies) {
@@ -580,15 +580,16 @@ public class TransferFunction extends LinearTimeInvariantSystem {
     /***
      * Transform SISO only single input single output TFs
      * @return
+     * @throws ImproperTransferFunctionException If the order of the numerator is greater than the order of the
+     * denominator.
      */
     @Override
     public StateSpace toStateSpace() {
-
         TransferFunction tf = new TransferFunction(this);
 
         tf.normalize();
         if (!tf.isProper()) {
-            throw new ImproperTransferFunctionException();
+            throw new ImproperTransferFunctionException("Transfer function must be proper");
         }
         double[] num = tf.rf.getNumerator().getCoefficients();
         double[] den = tf.rf.getDenominator().getCoefficients();

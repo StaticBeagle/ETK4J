@@ -70,6 +70,7 @@ public class StateSpace extends LinearTimeInvariantSystem {
      * @return
      */
     public TransferFunction[] toTransferFunction(int input) {
+        //TODO normalizeABCD
         int nin = D.getColumnCount();
         int nout = D.getRowCount();
         if(input >= nin) {
@@ -85,7 +86,7 @@ public class StateSpace extends LinearTimeInvariantSystem {
         if(!A.isSquared()) {
             throw new NonSquareMatrixException("Matrix A must be a square Matrix.");
         }
-        den = poly(A);
+        den = A.poly();
 
         if(B.getRowCount() * B.getColumnCount() == 0 && C.getRowCount() * C.getColumnCount() == 0) {
             if(D.getRowCount() * D.getColumnCount() == 0 && A.getRowCount() * A.getColumnCount() == 0) {
@@ -99,9 +100,9 @@ public class StateSpace extends LinearTimeInvariantSystem {
         TransferFunction[] tfs = new TransferFunction[nout];
         for(int k = 0; k < nout; ++k) {
             double[] Ck = C.getRow(k);
-            double[] Dk = D.getRow(k);
-            num[k] = poly(A.subtract(new Matrix(dot(B.getArray(), Ck))));
-            NumArrays.addElementWiseInPlace(num[k], NumArrays.multiplyElementWise(den, Dk[0] - 1));
+            double Dk = D.get(k, 0);
+            num[k] = A.subtract(new Matrix(dot(B.getArray(), Ck))).poly();
+            NumArrays.addElementWiseInPlace(num[k], NumArrays.multiplyElementWise(den, Dk - 1));
             tfs[k] = new TransferFunction(num[k], den);
         }
         return tfs;
@@ -113,17 +114,6 @@ public class StateSpace extends LinearTimeInvariantSystem {
             result[i] = NumArrays.multiplyElementWise(b, a[i]);
         }
         return result;
-    }
-
-    /**
-     * Characteristic polynomial of matrix.
-     * @param m Argument to get the characteristic polynomial.
-     * @return The Characteristic polynomial of Matrix {@code m}.
-     */
-    private static double[] poly(Matrix m) {
-        EigenvalueDecomposition eig = m.eig();
-        Complex[] roots = ComplexArrays.zip(eig.getRealEigenvalues(), eig.getImagEigenvalues());
-        return new Polynomial(roots).getCoefficients();
     }
 
     @Override

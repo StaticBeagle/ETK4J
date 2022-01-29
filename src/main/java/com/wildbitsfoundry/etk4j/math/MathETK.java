@@ -7,7 +7,7 @@ public final class MathETK {
 	}
 
 	/***
-	 * Hypotenuse without under/overflow
+	 * Hypotenuse without under/overflow.
 	 * @param a
 	 * @param b
 	 * @return sqrt(a^2 + b^2)
@@ -27,7 +27,7 @@ public final class MathETK {
 	}
 
 	/***
-	 * Inverse hyperbolic sine
+	 * Inverse hyperbolic sine.
 	 * @param x
 	 * @return
 	 */
@@ -52,7 +52,7 @@ public final class MathETK {
 	}
 	
 	/***
-	 * Round towards zero
+	 * Round towards zero.
 	 * @param x
 	 * @return the value of x rounded to the nearest integer toward zero
 	 */
@@ -61,7 +61,7 @@ public final class MathETK {
 	}
 	
 	/***
-	 * Remainder after division
+	 * Remainder after division.
 	 * @param a
 	 * @param b
 	 * @return
@@ -144,5 +144,74 @@ public final class MathETK {
 	 */
 	public static long roundEven(double d) {
 		return Math.round(d / 2) * 2;
+	}
+
+	// TODO move this to MathETK or Formulas
+	public static class FRexpResult {
+		public int exponent = 0;
+		public double mantissa = 0.0;
+	}
+
+	/**
+	 * Find the mantissa and exponent of a number.
+	 *
+	 * @param value Breaks the floating point number value into its binary significand and an integral exponent for 2.
+	 * @return The mantissa and exponent of a number such that number = m * 2^e.
+	 * @see <a href="https://stackoverflow.com/a/3946294/6383857">https://stackoverflow.com/a/3946294/6383857</a>
+	 */
+	public static FRexpResult frexp(double value) {
+		FRexpResult result = new FRexpResult();
+
+		result.exponent = 0;
+		result.mantissa = 0;
+
+		if (value == 0.0) {
+			return result;
+		}
+		if (Double.isNaN(value)) {
+			result.mantissa = Double.NaN;
+			result.exponent = -1;
+			return result;
+		}
+		if (Double.isInfinite(value)) {
+			result.mantissa = value;
+			result.exponent = -1;
+			return result;
+		}
+
+		long bits = Double.doubleToLongBits(value);
+		double realMantissa = 1.0;
+
+		boolean neg = (bits < 0);
+		int exponent = (int) ((bits >> 52) & 0x7ffL);
+		long mantissa = bits & 0xfffffffffffffL;
+
+		if (exponent == 0) {
+			exponent++;
+		} else {
+			mantissa = mantissa | (1L << 52);
+		}
+
+		// bias the exponent - actually biased by 1023.
+		// we are treating the mantissa as m.0 instead of 0.m
+		//  so subtract another 52.
+		exponent -= 1075;
+		realMantissa = mantissa;
+
+		// normalize
+		while (realMantissa > 1.0) {
+			mantissa >>= 1;
+			realMantissa /= 2.0;
+			exponent++;
+		}
+
+		if (neg) {
+			realMantissa = realMantissa * -1;
+		}
+
+		result.exponent = exponent;
+		result.mantissa = realMantissa;
+
+		return result;
 	}
 }

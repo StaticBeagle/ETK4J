@@ -8,10 +8,11 @@ import java.util.function.BiFunction;
 public class Brent {
 
     // TODO test
+    // https://github.com/scipy/scipy/blob/v1.7.1/scipy/optimize/optimize.py#L1904-L1979
     public static double brentsMinimizer(BiFunction<Double, Object[], Double> func,
                                           double a, double b, double tol, int maxIter, Object... params) {
 
-        double sqrtEPS = Math.sqrt(ConstantsETK.DOUBLE_EPS);
+        double sqrtEPS = Math.sqrt(2.2e-16);
         double goldenMean = 0.5 * (3.0 - Math.sqrt(5.0));
         double fulc = a + goldenMean * (b - a);
         double nfc = fulc;
@@ -52,7 +53,7 @@ public class Brent {
                     x = xf + rat;
 
 
-                    if (x - a < tol2 || b - x < tol2) {
+                    if ((x - a) < tol2 || (b - x) < tol2) {
                         double si = Math.signum(xm - xf) + ((xm - xf) == 0 ? 1 : 0);
                         rat = tol1 * si;
                     }

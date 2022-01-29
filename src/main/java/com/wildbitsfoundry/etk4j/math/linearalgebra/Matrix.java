@@ -11,6 +11,8 @@ import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
 import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 import com.wildbitsfoundry.etk4j.util.NumArrays;
 
+import static com.wildbitsfoundry.etk4j.math.MathETK.frexp;
+
 public class Matrix {
     private double[] data;
     private int rows;
@@ -179,16 +181,25 @@ public class Matrix {
     }
 
     public double get(int i, int j) {
-        // TODO check bounds
+        if (i >= rows) {
+            throw new ArrayIndexOutOfBoundsException(String.format("Index i = %d is greater than the number of rows = %d",
+                    i, rows));
+        }
+        if (j >= cols) {
+            throw new ArrayIndexOutOfBoundsException(String.format("Index j = %d is greater than the number of columns = %d",
+                    j, cols));
+        }
         return data[i * cols + j];
     }
 
     public void set(int i, int j, double val) {
-        if (i > rows) {
-            // TODO throw
+        if (i >= rows) {
+            throw new ArrayIndexOutOfBoundsException(String.format("Index i = %d is greater than the number of rows = %d",
+                    i, rows));
         }
-        if (j > cols) {
-            // throw
+        if (j >= cols) {
+            throw new ArrayIndexOutOfBoundsException(String.format("Index j = %d is greater than the number of columns = %d",
+                    j, cols));
         }
         data[i * cols + j] = val;
     }
@@ -1002,6 +1013,7 @@ public class Matrix {
         }
     }
 
+    // TODO
     public void setRow(int i, double[] row) {
         if (i < 0 || i >= rows) {
             throw new IndexOutOfBoundsException("f");
@@ -1012,9 +1024,14 @@ public class Matrix {
         System.arraycopy(row, 0, data, i * cols, cols);
     }
 
+    /**
+     * Power of Matrix.
+     * @param n The power to raise the matrix to.
+     * @return A^n
+     */
     public Matrix pow(int n) {
         if (!this.isSquared()) {
-            throw new IllegalArgumentException("Matrix must be squared");
+            throw new IllegalArgumentException("Matrix must be a square matrix.");
         }
         n = Math.abs(n);
         if (n == 0) {
@@ -1051,8 +1068,12 @@ public class Matrix {
         return result;
     }
 
+    /**
+     * Exponential of Matrix.
+     * @return e^A
+     */
     public Matrix expm() {
-        FRexpResult result = frexp(this.normInf());
+        MathETK.FRexpResult result = frexp(this.normInf());
         double s = Math.max(0.0, result.exponent + 1);
         Matrix A = this.multiply(1 / Math.pow(2.0, s));
 
@@ -1083,6 +1104,7 @@ public class Matrix {
 
     }
 
+    // Power using Eigen values
 //    public Matrix pow(double n) {
 //        if (!this.isSquared()) {
 //            throw new IllegalArgumentException("Matrix must be squared");
@@ -1104,131 +1126,147 @@ public class Matrix {
 
     // TODO add more matrix multiplication tests?
     public static void main(String[] args) {
-        Matrix a = Matrices.Magic(3);
-        double[] rowPacked = a.getRowPackedCopy();
-        double[] colPacked = a.getColumnPackedCopy();
+//        Matrix a = Matrices.Magic(3);
+//        double[] rowPacked = a.getRowPackedCopy();
+//        double[] colPacked = a.getColumnPackedCopy();
+//
+//        System.out.println(a);
+//        System.out.println(Arrays.toString(rowPacked));
+//        System.out.println(Arrays.toString(colPacked));
+//
+//        System.out.println(Arrays.toString(a.getRow(1)));
+//        System.out.println(Arrays.toString(a.getCol(2)));
+//
+//        Matrix b = Matrices.Magic(3);
+//        Matrix c = new Matrix(b);
+//
+//        b = b.balance();
+//
+//        System.out.println();
+//        System.out.println(b);
+//        System.out.println();
+//        System.out.println(c);
+//
+//        double[] data = {1, 0.01, 0.0001, 100, 1, 0.01, 10000, 100, 1};
+//        Matrix d = new Matrix(data, 3);
+//        System.out.println();
+//        System.out.println(d);
+//
+//        d = d.balance();
+//        System.out.println();
+//        System.out.println(d);
+//
+//        Matrix mul = Matrices.Magic(3);
+//        System.out.println();
+//        System.out.println(mul);
+//        System.out.println();
+//        System.out.println(mul.pow(0));
+//        System.out.println();
+//        System.out.println(mul.pow(1));
+//        System.out.println();
+//        System.out.println(mul.pow(2));
+//        System.out.println();
+//        System.out.println(mul.pow(3));
+//        System.out.println();
+//        System.out.println(mul.pow(4));
+//        System.out.println();
+//        System.out.println(mul.pow(5));
+//
+//        double[][] ddata = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+//
+//        Matrix E = new Matrix(ddata);
+//        System.out.println();
+//        System.out.println(E.expm());
+//
+//        double[][] Aa = {{-2, -1}, {1, 0}};
+//        EigenvalueDecomposition eigenvalueDecomposition = new EigenvalueDecomposition(new Matrix(Aa));
+//        Complex[] roots = ComplexArrays.zip(eigenvalueDecomposition.getRealEigenvalues(), eigenvalueDecomposition.getImagEigenvalues());
+//        double[] coefficients = new Polynomial(roots).getCoefficients();
+//        System.out.println(Arrays.toString(coefficients));
+//
+//        Aa = new double[][]{{-1}};
+//        eigenvalueDecomposition = new EigenvalueDecomposition(new Matrix(Aa));
+//        roots = ComplexArrays.zip(eigenvalueDecomposition.getRealEigenvalues(), eigenvalueDecomposition.getImagEigenvalues());
+//        coefficients = new Polynomial(roots).getCoefficients();
+//        System.out.println(Arrays.toString(coefficients));
+//
+//        System.out.println(Arrays.toString(new Polynomial(new Complex[]{Complex.fromReal(-1)}).getCoefficients()));
+//
+//        TransferFunction tf = new TransferFunction(new double[]{1}, new double[]{1});
+//        System.out.println(tf);
+//
+//        StateSpace ss = tf.toStateSpace();
+//        System.out.println(ss);
 
-        System.out.println(a);
-        System.out.println(Arrays.toString(rowPacked));
-        System.out.println(Arrays.toString(colPacked));
-
-        System.out.println(Arrays.toString(a.getRow(1)));
-        System.out.println(Arrays.toString(a.getCol(2)));
-
-        Matrix b = Matrices.Magic(3);
-        Matrix c = new Matrix(b);
-
-        b = b.balance();
-
-        System.out.println();
-        System.out.println(b);
-        System.out.println();
-        System.out.println(c);
-
-        double[] data = {1, 0.01, 0.0001, 100, 1, 0.01, 10000, 100, 1};
-        Matrix d = new Matrix(data, 3);
-        System.out.println();
-        System.out.println(d);
-
-        d = d.balance();
-        System.out.println();
-        System.out.println(d);
-
-        Matrix mul = Matrices.Magic(3);
-        System.out.println();
-        System.out.println(mul);
-        System.out.println();
-        System.out.println(mul.pow(0));
-        System.out.println();
-        System.out.println(mul.pow(1));
-        System.out.println();
-        System.out.println(mul.pow(2));
-        System.out.println();
-        System.out.println(mul.pow(3));
-        System.out.println();
-        System.out.println(mul.pow(4));
-        System.out.println();
-        System.out.println(mul.pow(5));
-
-        double[][] ddata = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
-
-        Matrix E = new Matrix(ddata);
-        System.out.println();
-        System.out.println(E.expm());
-
-        double[][] Aa = {{-2, -1}, {1, 0}};
-        EigenvalueDecomposition eigenvalueDecomposition = new EigenvalueDecomposition(new Matrix(Aa));
-        Complex[] roots = ComplexArrays.zip(eigenvalueDecomposition.getRealEigenvalues(), eigenvalueDecomposition.getImagEigenvalues());
-        double[] coefficients = new Polynomial(roots).getCoefficients();
-        System.out.println(Arrays.toString(coefficients));
-
-        Aa = new double[][]{{-1}};
-        eigenvalueDecomposition = new EigenvalueDecomposition(new Matrix(Aa));
-        roots = ComplexArrays.zip(eigenvalueDecomposition.getRealEigenvalues(), eigenvalueDecomposition.getImagEigenvalues());
-        coefficients = new Polynomial(roots).getCoefficients();
-        System.out.println(Arrays.toString(coefficients));
-
-        System.out.println(Arrays.toString(new Polynomial(new Complex[]{Complex.fromReal(-1)}).getCoefficients()));
-
-        TransferFunction tf = new TransferFunction(new double[]{1}, new double[]{1});
-        System.out.println(tf);
-
-        StateSpace ss = tf.toStateSpace();
-        System.out.println(ss);
-
-        Aa = new double[][]{{-2, -1}, {1, 0}};
-        System.out.println(new Matrix(Aa).subMatrix(0, 1, 0, 0));
+        Test2();
     }
 
-    // TODO move this to MathETK or Formulas
-    public static class FRexpResult {
-        public int exponent = 0;
-        public double mantissa = 0.;
+    public static void Test2() {
+        double value = -5.35;
+        double value1 = 0.0;
+        double value2 = -0.0;
+        double value3 = Double.NaN;
+        double value4 = Double.NEGATIVE_INFINITY;
+        double value5 = Double.POSITIVE_INFINITY;
+
+        MathETK.FRexpResult frexp = frexp(value);
+        System.out.println("Mantissa: " + frexp.mantissa);
+        System.out.println("Exponent: " + frexp.exponent);
+        System.out.println("Original value was: " + value);
+        System.out.println(frexp.mantissa + " * 2^" + frexp.exponent + " = ");
+        System.out.println(frexp.mantissa * (1 << frexp.exponent));
+        System.out.println();
+
+        frexp = frexp(value1);
+        System.out.println("Mantissa: " + frexp.mantissa);
+        System.out.println("Exponent: " + frexp.exponent);
+        System.out.println("Original value was: " + value1);
+        System.out.println(frexp.mantissa + " * 2^" + frexp.exponent + " = ");
+        System.out.println(frexp.mantissa * (1 << frexp.exponent));
+        System.out.println();
+
+        frexp = frexp(value2);
+        System.out.println("Mantissa: " + frexp.mantissa);
+        System.out.println("Exponent: " + frexp.exponent);
+        System.out.println("Original value was: " + value2);
+        System.out.println(frexp.mantissa + " * 2^" + frexp.exponent + " = ");
+        System.out.println(frexp.mantissa * (1 << frexp.exponent));
+        System.out.println();
+
+
+        frexp = frexp(value3);
+        System.out.println("Mantissa: " + frexp.mantissa);
+        System.out.println("Exponent: " + frexp.exponent);
+        System.out.println("Original value was: " + value3);
+        System.out.println(frexp.mantissa + " * 2^" + frexp.exponent + " = ");
+        System.out.println(frexp.mantissa * (1 << frexp.exponent));
+        System.out.println();
+
+        frexp = frexp(value4);
+        System.out.println("Mantissa: " + frexp.mantissa);
+        System.out.println("Exponent: " + frexp.exponent);
+        System.out.println("Original value was: " + value4);
+        System.out.println(frexp.mantissa + " * 2^" + frexp.exponent + " = ");
+        System.out.println(frexp.mantissa * (1 << frexp.exponent));
+        System.out.println();
+
+        frexp = frexp(value5);
+        System.out.println("Mantissa: " + frexp.mantissa);
+        System.out.println("Exponent: " + frexp.exponent);
+        System.out.println("Original value was: " + value5);
+        System.out.println(frexp.mantissa + " * 2^" + frexp.exponent + " = ");
+        System.out.println(frexp.mantissa * (1 << frexp.exponent));
     }
 
-    public static FRexpResult frexp(double value) {
-        final FRexpResult result = new FRexpResult();
-        long bits = Double.doubleToLongBits(value);
-        double realMant = 1.;
-
-        // Test for NaN, infinity, and zero.
-        if (Double.isNaN(value) ||
-                value + value == value ||
-                Double.isInfinite(value)) {
-            result.exponent = 0;
-            result.mantissa = value;
-        } else {
-
-            boolean neg = (bits < 0);
-            int exponent = (int) ((bits >> 52) & 0x7ffL);
-            long mantissa = bits & 0xfffffffffffffL;
-
-            if (exponent == 0) {
-                exponent++;
-            } else {
-                mantissa = mantissa | (1L << 52);
-            }
-
-            // bias the exponent - actually biased by 1023.
-            // we are treating the mantissa as m.0 instead of 0.m
-            //  so subtract another 52.
-            exponent -= 1075;
-            realMant = mantissa;
-
-            // normalize
-            while (realMant >= 1.0) {
-                mantissa >>= 1;
-                realMant /= 2.;
-                exponent++;
-            }
-
-            if (neg) {
-                realMant = realMant * -1;
-            }
-
-            result.exponent = exponent;
-            result.mantissa = realMant;
-        }
-        return result;
+    /**
+     * Characteristic polynomial of matrix.
+     *
+     * @return The Characteristic polynomial of the Matrix.
+     */
+    public double[] poly() {
+        EigenvalueDecomposition eig = this.eig();
+        Complex[] roots = ComplexArrays.zip(eig.getRealEigenvalues(), eig.getImagEigenvalues());
+        return new Polynomial(roots).getCoefficients();
     }
+
 }

@@ -1,5 +1,6 @@
 package com.wildbitsfoundry.etk4j.signals.filters;
 
+import com.wildbitsfoundry.etk4j.math.optimize.minimizers.Brent;
 import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.BandStopSpecs;
 import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.HighPassSpecs;
 import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.LowPassSpecs;
@@ -77,10 +78,11 @@ public class AnalogFilter {
         double[] wp = new double[2];
         // maximize the pass band
         // https://github.com/scipy/scipy/blob/master/scipy/signal/filter_design.py
-        wp[0] = goldenSectionMinimizer(AnalogFilter::bandStopObjMinimize, wp1, ws1 - 1e-12,
+        wp[0] = Brent.brentsMinimizer(AnalogFilter::bandStopObjMinimize, wp1, ws1 - 1e-12,
                 1e-5, 500, specs, strategy, 0);
 
-        wp[1] = goldenSectionMinimizer(AnalogFilter::bandStopObjMinimize, ws2 + 1e-12, wp2,
+        specs.setLowerPassBandFrequency(wp[0]);
+        wp[1] = Brent.brentsMinimizer(AnalogFilter::bandStopObjMinimize, ws2 + 1e-12, wp2,
                 1e-5, 500, specs, strategy, 1);
 
         wp1 = wp[0];

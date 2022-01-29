@@ -715,5 +715,22 @@ public final class Bessel {
             }
         }
     }
+
+    public static void main(String[] args) {
+        double[] ka = new double[1];
+        double[] ka1 = new double[1];
+
+        besska01(1.0, -1, ka, ka1);
+
+        Complex[] kaComplex = new Complex[1];
+        Complex[] ka1Complex = new Complex[1];
+
+        besska01(1.0, -1, ka, ka1);
+
+        besska01(1e-16, new Complex(-0.1, 0.1), kaComplex, ka1Complex);
+
+        System.out.println(ka[0]);
+        System.out.println(kaComplex[0]);
+    }
 }
 

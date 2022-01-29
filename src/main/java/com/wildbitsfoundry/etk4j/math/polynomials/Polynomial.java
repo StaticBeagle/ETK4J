@@ -1,5 +1,6 @@
 package com.wildbitsfoundry.etk4j.math.polynomials;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -64,17 +65,16 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
                 break;
             }
         }
-        this.coefficients = i == length ? new double[]{0.0} : Arrays.copyOfRange(coefficients, 0, length);
+        this.coefficients = i == length ? new double[]{0.0} : Arrays.copyOfRange(coefficients, i, length);
 
     }
 
     /***
      * Creates a polynomial P(x) from an array of its roots. Say we have the
      * following set of roots r = [ -1, -2 ] then: P(x) = (x + 1)*(x + 2) which
-     * is the solution to the polynomial: P(x) = x^2 + 3x + 2
+     * is the solution to the polynomial: P(x) = x^2 + 3x + 2.
      *
-     * @param roots
-     *            Array of roots
+     * @param roots Array of roots.
      */
     public Polynomial(Complex... roots) {
         List<Complex> finiteRoots = new ArrayList<>(roots.length);

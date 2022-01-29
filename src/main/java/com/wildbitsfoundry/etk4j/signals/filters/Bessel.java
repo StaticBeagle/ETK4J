@@ -110,6 +110,13 @@ public class Bessel extends AnalogFilter {
         return lpTobs(zpk, w0, bw);
     }
 
+    public static ZeroPoleGain newBandStopZPK(int n, double wp1, double wp2) {
+        ZeroPoleGain zpk = besselap(n);
+        double w0 = Math.sqrt(wp1 * wp2);
+        double bw = wp2 - wp1;
+        return lpTobsZPK(zpk, w0, bw);
+    }
+
     private static Complex[] besselZeros(int n) {
         if (n == 0) {
             return new Complex[0];
