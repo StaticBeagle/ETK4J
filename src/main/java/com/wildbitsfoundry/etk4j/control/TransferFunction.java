@@ -1,112 +1,170 @@
 package com.wildbitsfoundry.etk4j.control;
 
+import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
 import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrices;
 import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
 import com.wildbitsfoundry.etk4j.math.polynomials.RationalFunction;
-import com.wildbitsfoundry.etk4j.signals.filters.Elliptic;
-import com.wildbitsfoundry.etk4j.signals.filters.FilterOrderResults;
-import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs;
 import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 import com.wildbitsfoundry.etk4j.util.NumArrays;
 
 import java.util.Arrays;
 
-/***
- *
- * @author StaticBeagle
- *
+/**
+ * The {@code Transfer Function} class represents a continuous time system in the frequency domain. <br>
+ * The internal structure of the class is a {@link RationalFunction}.
  */
 public class TransferFunction extends LinearTimeInvariantSystem {
 
+    /**
+     * The {@code Frequency Response} holds the {@link Complex }results of the evaluation of the
+     * {@link TransferFunction} at a given set of frequencies.
+     */
     public static class FrequencyResponse {
         private Complex[] response;
-        private double[] frequencies;
+        private double[] w;
 
-        // TODO rename all frequencies to wn?
-        FrequencyResponse(Complex[] response, double[] frequencies) {
+        FrequencyResponse(Complex[] response, double[] w) {
             this.response = response;
-            this.frequencies = frequencies;
+            this.w = w;
         }
 
-        /***
-         * Returns the complex magnitude of a system
-         * @return
+        /**
+         * Complex response of the system.
+         * @return The {@link Complex} response of the system.
          */
         public Complex[] getResponse() {
             return response;
         }
-        // TODO document this
+
+        /**
+         * Frequencies at which the system was evaluated.
+         * @return An array of frequencies at which the system was evaluated.
+         */
         public double[] getFrequencies() {
-            return frequencies;
+            return w;
         }
     }
 
+    /**
+     * The {@code BodeResponse} class holds the magnitude and frequency response after evaluating the given
+     * {@link TransferFunction} at an array of frequencies.
+     */
     public static class BodeResponse {
         private double[] magnitudeIndB;
         private double[] phase;
-        private double[] frequencies;
+        private double[] w;
 
-        // TODO rename all frequencies to wn?
-        BodeResponse(double[] magnitudeIndB, double[] phase, double[] frequencies) {
+        BodeResponse(double[] magnitudeIndB, double[] phase, double[] w) {
             this.magnitudeIndB = magnitudeIndB;
             this.phase = phase;
-            this.frequencies = frequencies;
+            this.w = w;
         }
 
-        /***
-         * Returns the complex magnitude of a system
-         * @return
+        /**
+         * Magnitude response of the system.
+         * @return The magnitude response of the system. <br>
+         * {@code Mag<sub>dB</sub> = 20 * log10(abs(response))}.
          */
         public double[] getMagnitudeIndB() {
             return magnitudeIndB;
         }
 
+        /**
+         * Phase response of the system.
+         * @return The wrapped phase response of the system is degrees. The wrapped phase only goes from -180° to 180°. <br>
+         * To unwrap the phase the {@link TransferFunction#unwrapPhase(double[])} can be used.
+         */
         public double[] getPhaseInDegrees() {
             return phase;
         }
-        // TODO document this
+
+        /**
+         * Frequencies at which the system was evaluated.
+         * @return An array of frequencies at which the system was evaluated.
+         */
         public double[] getFrequencies() {
-            return frequencies;
+            return w;
         }
     }
 
     private RationalFunction rf;
 
     /***
-     * Constructs a transfer function from poles and zeros
-     * @param zeros - zeros of the transfer function
-     * @param poles - poles of the transfer function
+     * Constructs a {@code TransferFunction} from the given zeros and poles.The gain of the system is calculated from
+     * the given zeros and poles.
+     * @param zeros The zeros of the transfer function.
+     * @param poles The poles of the transfer function.
      */
     public TransferFunction(Complex[] zeros, Complex[] poles) {
         rf = new RationalFunction(zeros, poles);
     }
 
-    public TransferFunction(TransferFunction tf) {
-        rf = new RationalFunction(tf.rf);
-    }
-
-    public TransferFunction(Polynomial numerator, Polynomial denominator) {
-        rf = new RationalFunction(numerator, denominator);
-    }
-
-    public TransferFunction(double[] numerator, double[] denominator) {
-        rf = new RationalFunction(numerator, denominator);
-    }
-
-    public TransferFunction(RationalFunction rf) {
-        this.rf = new RationalFunction(rf);
-    }
-
-    public TransferFunction(ZeroPoleGain zpk) {
-        this(zpk.getZeros(), zpk.getPoles(), zpk.getGain());
-    }
-
+    /***
+     * Constructs a {@code TransferFunction} from the given zeros, poles, and gain.
+     * @param zeros The zeros of the transfer function.
+     * @param poles The poles of the transfer function.
+     * @param gain The gain of the transfer function.
+     */
     public TransferFunction(Complex[] zeros, Complex[] poles, double gain) {
         rf = new RationalFunction(zeros, poles, gain);
     }
 
+    /**
+     * Copy constructor.
+     * @param tf The {@link TransferFunction} to be copied.
+     */
+    public TransferFunction(TransferFunction tf) {
+        rf = new RationalFunction(tf.rf);
+    }
+
+    /**
+     * Constructs a {@code TransferFunction} from the given numerator {@link Polynomial} and denominator
+     * {@link Polynomial}. This constructor does not normalize the resulting {@link TransferFunction} in other words,
+     * it doesn't force the leading coefficient of the denominator {@link Polynomial} to be one.
+     * @param numerator Numerator polynomial.
+     * @param denominator Denominator polynomial
+     */
+    public TransferFunction(Polynomial numerator, Polynomial denominator) {
+        rf = new RationalFunction(numerator, denominator);
+    }
+
+    /**
+     * Constructs a {@code TransferFunction} from the given numerator and denominator. The numerator and denominator
+     * values represent the coefficients of the numerator and denominator polynomials respectively. The coefficients are
+     * assumed to be in descending order i.e. {@code [1, 2, 3]} represents {@code x<sup>2</sup> + 2x + 3}.
+     * This constructor normalizes resulting {@link TransferFunction} to force the leading coefficient of the
+     * denominator {@link Polynomial} to be one.
+     * @param numerator The coefficients of the numerator polynomial in descending order.
+     * @param denominator The coefficients of the denominator polynomial in descending order.
+     */
+    public TransferFunction(double[] numerator, double[] denominator) {
+        rf = new RationalFunction(numerator, denominator);
+    }
+
+    /**
+     * Constructs a {@code Transfer Function} from the given {@link RationalFunction}. This constructor does not
+     * normalize the input {@link RationalFunction} to force the leading coefficient of the denominator to be one and
+     * the function is taken as is.
+     * @param rf The rational function to be used internally by the transfer function.
+     */
+    public TransferFunction(RationalFunction rf) {
+        this.rf = new RationalFunction(rf);
+    }
+
+    /**
+     * Constructs a {@code Transfer Function} from the given {@link ZeroPoleGain} representation.
+     * @param zpk The zero, pole, gain representation of the system.
+     */
+    public TransferFunction(ZeroPoleGain zpk) {
+        this(zpk.getZeros(), zpk.getPoles(), zpk.getGain());
+    }
+
+    /**
+     * {@link ZeroPoleGain} representation of the system.
+     * @return The transfer function object broken into its zeros, poles, and gain.
+     */
     @Override
     public ZeroPoleGain toZeroPoleGain() {
         Complex[] zeros = rf.getZeros();
@@ -135,10 +193,10 @@ public class TransferFunction extends LinearTimeInvariantSystem {
         return rf.evaluateAt(0.0, w);
     }
 
-    public double[] getMagnitudeAt(double[] frequencies) {
-        double[] magnitude = new double[frequencies.length];
-        for (int i = 0; i < frequencies.length; ++i) {
-            magnitude[i] = this.evaluateAt(frequencies[i]).abs();
+    public double[] getMagnitudeAt(double[] w) {
+        double[] magnitude = new double[w.length];
+        for (int i = 0; i < w.length; ++i) {
+            magnitude[i] = this.evaluateAt(w[i]).abs();
         }
         return magnitude;
     }
@@ -169,7 +227,6 @@ public class TransferFunction extends LinearTimeInvariantSystem {
         return phase;
     }
 
-    // TODO implement getFrequencyResponse(void)?
     public FrequencyResponse getFrequencyResponse() {
         double[] frequencies = findFrequencies(200);
         return this.getFrequencyResponse(frequencies);
@@ -180,13 +237,12 @@ public class TransferFunction extends LinearTimeInvariantSystem {
         return this.getFrequencyResponse(frequencies);
     }
 
-    // TODO rename frequencies to wn?
-    public FrequencyResponse getFrequencyResponse(double[] frequencies) {
-        Complex[] response = new Complex[frequencies.length];
-        for (int i = 0; i < frequencies.length; ++i) {
-            response[i] = this.evaluateAt(frequencies[i]);
+    public FrequencyResponse getFrequencyResponse(double[] w) {
+        Complex[] response = new Complex[w.length];
+        for (int i = 0; i < w.length; ++i) {
+            response[i] = this.evaluateAt(w[i]);
         }
-        return new FrequencyResponse(response, frequencies);
+        return new FrequencyResponse(response, w);
     }
 
     public BodeResponse getBode() {
@@ -199,18 +255,16 @@ public class TransferFunction extends LinearTimeInvariantSystem {
         return this.getBode(frequencies);
     }
 
-    // TODO rename frequencies to wn?
-    public BodeResponse getBode(double[] frequencies) {
-        double[] magnitudeIndB = new double[frequencies.length];
-        double[] phaseInDegrees = new double[frequencies.length];
-        for (int i = 0; i < frequencies.length; ++i) {
-            magnitudeIndB[i] = 20 * Math.log10(this.getMagnitudeAt(frequencies[i]));
-            phaseInDegrees[i] = this.evaluateAt(frequencies[i]).arg() * (180 / Math.PI);
+    public BodeResponse getBode(double[] w) {
+        double[] magnitudeIndB = new double[w.length];
+        double[] phaseInDegrees = new double[w.length];
+        for (int i = 0; i < w.length; ++i) {
+            magnitudeIndB[i] = 20 * Math.log10(this.getMagnitudeAt(w[i]));
+            phaseInDegrees[i] = this.evaluateAt(w[i]).arg() * (180 / Math.PI);
         }
-        return new BodeResponse(magnitudeIndB, phaseInDegrees, frequencies);
+        return new BodeResponse(magnitudeIndB, phaseInDegrees, w);
     }
 
-    // TODO rename to numberOfPoints?
     private double[] findFrequencies(int numberOfPoints) {
         Complex[] ep = this.getPoles();
         Complex[] tz = this.getZeros();
@@ -244,8 +298,6 @@ public class TransferFunction extends LinearTimeInvariantSystem {
             return (int) Math.round(d);
         }
     }
-
-
 
     public static void unwrapPhase(double[] phase) {
         int length = phase.length;
@@ -342,7 +394,7 @@ public class TransferFunction extends LinearTimeInvariantSystem {
 
     private static Polynomial getPolynomialMagnitude(Polynomial polynomial) {
         double[] num = polynomial.getCoefficients();
-        Complex[] numjw = evalAtjw(num);
+        Complex[] numjw = evaluateAtjw(num);
         return new Polynomial(norm(numjw));
     }
 
@@ -353,14 +405,14 @@ public class TransferFunction extends LinearTimeInvariantSystem {
      */
     private static double[] norm(Complex[] a) {
         Complex[] mag = ComplexArrays.convolution(a, ComplexArrays.conj(a));
-        double[] coefs = new double[mag.length];
+        double[] coefficients = new double[mag.length];
         for (int i = 0; i < mag.length; ++i) {
-            coefs[i] = mag[i].real();
+            coefficients[i] = mag[i].real();
         }
-        return coefs;
+        return coefficients;
     }
 
-    private static Complex[] evalAtjw(double[] poly) {
+    private static Complex[] evaluateAtjw(double[] poly) {
         final int length = poly.length;
         Complex[] result = new Complex[length];
 
@@ -380,6 +432,10 @@ public class TransferFunction extends LinearTimeInvariantSystem {
         return result == 2 || result == 3 ? -1 : 1;
     }
 
+    public double[] getAllGainCrossoverFrequencies() {
+        return this.getAllGainCrossoverFrequencies(Math.sqrt(ConstantsETK.DOUBLE_EPS));
+    }
+
 
     // 		  |Num(s)|
     // H(s) = -------- = 1
@@ -389,7 +445,7 @@ public class TransferFunction extends LinearTimeInvariantSystem {
     //
     // Find roots of the resultant polynomial
 
-    public double[] getAllGainCrossoverFrequencies() {
+    public double[] getAllGainCrossoverFrequencies(double tol) {
 
         Polynomial magPolyNum = getPolynomialMagnitude(rf.getNumerator());
         Polynomial magPolyDen = getPolynomialMagnitude(rf.getDenominator());
@@ -399,7 +455,7 @@ public class TransferFunction extends LinearTimeInvariantSystem {
         int j = 0;
         for (int i = 0; i < solution.length; i++) {
             double real = solution[i].real();
-            if (solution[i].imag() == 0 && real > 0) {
+            if (solution[i].imag() == 0 && real >= tol) {
                 wgc[j] = real;
                 j++;
             }
@@ -418,19 +474,55 @@ public class TransferFunction extends LinearTimeInvariantSystem {
                 return f;
             }
         }
-        return Double.POSITIVE_INFINITY;
+        return Double.NaN;
     }
 
+    /**
+     * Phase crossover frequency.
+     * @return The first frequency at which the phase crosses -180°.
+     */
+    public double getPhaseCrossoverFrequency() {
+        return this.getPhaseCrossoverFrequency(Math.sqrt(ConstantsETK.DOUBLE_EPS));
+    }
 
-    /***
-     * Finds all the phase cross over frequencies by solving H(s) = H(-s)
+    /**
+     * Phase crossover frequency.
+     * @return The first frequency at which the phase crosses -180°.
+     */
+    public double getPhaseCrossoverFrequency(double tol) {
+        double[] frequencies = this.getAllPhaseCrossoverFrequencies(tol);
+        // Get the first one where the magnitude was decreasing
+        for (double freq : frequencies) {
+            double slope = this.getMagnitudeAt(freq) - this.getMagnitudeAt(freq + 1e-12);
+            if (slope > 0.0) {
+                return freq;
+            }
+        }
+        return Double.NaN;
+    }
+
+    public double[] getAllPhaseCrossoverFrequencies() {
+        return this.getAllPhaseCrossoverFrequencies(Math.sqrt(ConstantsETK.DOUBLE_EPS));
+    }
+
+    /**
+     * Finds all the phase crossover frequencies by solving H(s) = H(-s). The phase crossover frequencies are defined
+     * as the frequencies at which the phase of the system crosses -180°. Typically, the first frequency at which
+     * the phase crosses -180° is the frequency of interest and in that case
+     * {@link TransferFunction#getPhaseCrossoverFrequency()} can be used. <br>
      *
      * <pre>
-     * This is equivalent to:
+     * Let's define our system as:
      *
-     *         Num(jw) * Den'(jw) - Num'(jw) * Den'(jw)
-     * H(jw) = ----------------------------------------
-     *                    Den(jw) * Den'(jw)
+     *         Num(jw)
+     * H(jw) = -------
+     *         Den(jw)
+     *
+     * The goal is to solve
+     *
+     *         Num(jw) * Den'(jw)
+     * H(jw) = ------------------
+     *         Den(jw) * Den'(jw)
      *
      * Where H'(jw) = Conjugate of H(jw).
      *
@@ -449,26 +541,25 @@ public class TransferFunction extends LinearTimeInvariantSystem {
      * The roots of Imag(Nump(jw)) are the solution vector containing the gain
      * crossover frequencies.
      * </pre>
-     * @return Returns an array of values that are the phase crossover
-     *         frequencies
+     * @return An array of the phase crossover frequencies in ascending order.
      */
-    public double[] getAllPhaseCrossoverFrequencies() {
-        Complex[] num = evalAtjw(rf.getNumerator().getCoefficients());
-        Complex[] conjDen = ComplexArrays.conj(evalAtjw(rf.getDenominator().getCoefficients()));
+    public double[] getAllPhaseCrossoverFrequencies(double tol) {
+        Complex[] num = evaluateAtjw(rf.getNumerator().getCoefficients());
+        Complex[] den = evaluateAtjw(rf.getDenominator().getCoefficients());
 
-        Complex[] conv = ComplexArrays.convolution(num, conjDen);
-        double[] imag = new double[conv.length];
-        for (int i = 0; i < conv.length; ++i) {
-            imag[i] = conv[i].imag();
-        }
+        double[] convLHS = NumArrays.convolution(ComplexArrays.imag(num), ComplexArrays.real(den));
+        double[] convRHS = NumArrays.convolution(ComplexArrays.real(num), ComplexArrays.imag(den));
 
-        Complex[] solution = new Polynomial(imag).getRoots();
+        Polynomial a = new Polynomial(convLHS);
+        Polynomial b = new Polynomial(convRHS);
+        a.subtractEquals(b);
 
-        double[] wpc = new double[solution.length];
+        Complex[] roots = a.getRoots();
+        double[] wpc = new double[roots.length];
         int j = 0;
-        for (int i = 0; i < solution.length; i++) {
-            double real = solution[i].real();
-            if (solution[i].imag() == 0 && real > 0) {
+        for (int i = 0; i < roots.length; i++) {
+            double real = roots[i].real();
+            if (roots[i].imag() == 0 && real >= tol) {
                 wpc[j] = real;
                 j++;
             }
@@ -482,34 +573,22 @@ public class TransferFunction extends LinearTimeInvariantSystem {
         return this.evaluateAt(f).abs();
     }
 
-    public double getPhaseCrossoverFrequency() {
-        double[] freqs = this.getAllPhaseCrossoverFrequencies();
-        // Get the first one were the magnitude was decreasing
-        for (double f : freqs) {
-            double slope = this.getMagnitudeAt(f) - this.getMagnitudeAt(f + 1e-12);
-            if (slope > 0.0) {
-                return f;
-            }
-        }
-        return Double.POSITIVE_INFINITY;
-    }
-
     public Margins getMargins() {
         double wcg = this.getGainCrossoverFrequency();
         double wcp = this.getPhaseCrossoverFrequency();
 
-        double pm = wcg;
-        if (wcg != Double.POSITIVE_INFINITY) {
+        double pm = Double.POSITIVE_INFINITY;
+        if (!Double.isNaN(wcg)) {
             double phase = this.getPhaseInDegreesAt(wcg);
             pm = 180.0 + phase;
         }
-        double gm = wcp;
-        if (wcp != Double.POSITIVE_INFINITY) {
+        double gm = Double.POSITIVE_INFINITY;
+        if (!Double.isNaN(wcp)) {
             double mag = this.getMagnitudeAt(wcp);
-            gm = 20 * Math.log10(1.0 / mag);
+            gm = 1.0 / mag;
         }
 
-        Margins m = new Margins(gm, pm, wcg, wcp);
+        Margins m = new Margins(gm, pm, wcp, wcg);
         return m;
     }
 
@@ -519,7 +598,7 @@ public class TransferFunction extends LinearTimeInvariantSystem {
 
     /***
      * Calculates the phase at of the system a given frequency. </br>
-     * This operation uses the zeros and poles of the system to calculate the phase as: </br>
+     * This operation uses the zeros and poles of the system to calculate the phase as:
      * <pre>
      * 	&Sigma; Phase(Zeros) - &Sigma; Phase(Poles)
      * </pre>
@@ -670,125 +749,127 @@ public class TransferFunction extends LinearTimeInvariantSystem {
     }
 
     public static void main(String[] args) {
-        System.out.println(roundFrequency(1.17));
-        System.out.println(roundFrequency(-0.23));
-        System.out.println(roundFrequency(-0.5));
-        System.out.println(roundFrequency(-0.57));
-        System.out.println(roundFrequency(-0.51));
-        System.out.println(roundFrequency(2.5));
-        System.out.println(roundFrequency(2.51));
-        System.out.println(roundFrequency(2.49));
-        System.out.println(roundFrequency(3.5));
-        System.out.println(roundFrequency(3.49));
-        TransferFunction tf1 = new TransferFunction(new double[]{1000, 0}, new double[]{1, 25, 100, 9, 4});
-        System.out.println(tf1);
-        System.out.println(tf1.getMargins());
+//        System.out.println(roundFrequency(1.17));
+//        System.out.println(roundFrequency(-0.23));
+//        System.out.println(roundFrequency(-0.5));
+//        System.out.println(roundFrequency(-0.57));
+//        System.out.println(roundFrequency(-0.51));
+//        System.out.println(roundFrequency(2.5));
+//        System.out.println(roundFrequency(2.51));
+//        System.out.println(roundFrequency(2.49));
+//        System.out.println(roundFrequency(3.5));
+//        System.out.println(roundFrequency(3.49));
+//        TransferFunction tf1 = new TransferFunction(new double[]{1000, 0}, new double[]{1, 25, 100, 9, 4});
+//        System.out.println(tf1);
+//        System.out.println(tf1.getMargins());
+//
+//        double phase = tf1.getPhaseInDegreesAt(70.4);
+//        System.out.println(phase);
+//
+//        TransferFunction tf2 = new TransferFunction(new double[]{1, 3, 3}, new double[]{1, 2, 1});
+//        System.out.println(tf2.toStateSpace());
+//
+//        TransferFunction tf3 = new TransferFunction(new double[]{5, 3, 4}, new double[]{8, 2, 9, 10});
+//        System.out.println(tf3.toStateSpace());
+//
+//        TransferFunction tf4 = new TransferFunction(new double[]{5}, new double[]{3});
+//        System.out.println(tf4.toStateSpace());
+//
+//        TransferFunction tf5 = new TransferFunction(new double[]{1.0, 3, 3}, new double[]{1.0, 2.0, 1});
+//        tf5.step();
+//
+//        double[] timePoints = {0.0, 0.0707070707070707, 0.1414141414141414, 0.2121212121212121, 0.2828282828282828,
+//                0.35353535353535354, 0.4242424242424242, 0.4949494949494949, 0.5656565656565656, 0.6363636363636364,
+//                0.7070707070707071, 0.7777777777777778, 0.8484848484848484, 0.9191919191919191, 0.9898989898989898,
+//                1.0606060606060606, 1.1313131313131313, 1.202020202020202, 1.2727272727272727, 1.3434343434343434,
+//                1.4141414141414141, 1.4848484848484849, 1.5555555555555556, 1.6262626262626263, 1.6969696969696968,
+//                1.7676767676767675, 1.8383838383838382, 1.909090909090909, 1.9797979797979797, 2.0505050505050506,
+//                2.121212121212121, 2.191919191919192, 2.2626262626262625, 2.333333333333333, 2.404040404040404,
+//                2.4747474747474745, 2.5454545454545454, 2.616161616161616, 2.686868686868687, 2.7575757575757573,
+//                2.8282828282828283, 2.898989898989899, 2.9696969696969697, 3.04040404040404, 3.111111111111111,
+//                3.1818181818181817, 3.2525252525252526, 3.323232323232323, 3.3939393939393936, 3.4646464646464645,
+//                3.535353535353535, 3.606060606060606, 3.6767676767676765, 3.7474747474747474, 3.818181818181818,
+//                3.888888888888889, 3.9595959595959593, 4.03030303030303, 4.101010101010101, 4.171717171717171,
+//                4.242424242424242, 4.313131313131313, 4.383838383838384, 4.454545454545454, 4.525252525252525,
+//                4.595959595959596, 4.666666666666666, 4.737373737373737, 4.808080808080808, 4.878787878787879,
+//                4.949494949494949, 5.02020202020202, 5.090909090909091, 5.161616161616162, 5.232323232323232,
+//                5.303030303030303, 5.373737373737374, 5.444444444444445, 5.515151515151515, 5.585858585858586,
+//                5.656565656565657, 5.727272727272727, 5.797979797979798, 5.8686868686868685, 5.9393939393939394,
+//                6.0101010101010095, 6.08080808080808, 6.151515151515151, 6.222222222222222, 6.292929292929292,
+//                6.363636363636363, 6.434343434343434, 6.505050505050505, 6.575757575757575, 6.646464646464646,
+//                6.717171717171717, 6.787878787878787, 6.858585858585858, 6.929292929292929, 7.0};
+//
+//        TransferFunction tf6 = new TransferFunction(new double[]{1.0, 3.0, 3.0}, new double[]{1.0, 2.0, 1.0});
+//        double[] yOut = tf6.step(timePoints, new double[]{1.0, 0.0}).getResponse();
+//
+//        System.out.println(Arrays.toString(yOut));
+//
+//        TransferFunction tf7 = new TransferFunction(new double[]{1.0, 3.0, 3.0}, new double[]{1.0, 2.0, 1.0});
+//        double[] yOut2 = tf7.step(new double[]{0.0}).getResponse();
+//
+//        System.out.println(Arrays.toString(yOut2));
+//
+//        TransferFunction tf8 = new TransferFunction(new double[] {1, 1, 0}, new double[] {1, 8, 25, 12, 1, 9 , 8, 10});
+//        double[] wn = tf8.findFrequencies(9);
+//
+//        System.out.println(Arrays.toString(wn));
+//
+//        TransferFunction tf9 = new TransferFunction(new double[] {1, 0.1, 7.5}, new double[] {1, 0.12, 9, 0, 0});
+//
+//        System.out.println(Arrays.toString(tf9.findFrequencies(9)));
+//
+//        // Specs for band pass filter
+//        FilterSpecs.BandPassSpecs bpSpecs = new FilterSpecs.BandPassSpecs();
+//        // The bandwidth of the filter starts at the LowerPassBandFrequency and
+//        // ends at the UpperPassBandFrequency. The filter has lower stop band
+//        // which is set LowerStopBandFrequency and the upper stop band can be set
+//        // with UpperStopBandFrequency. The attenuation at the stop bands can be
+//        // set with the LowerStopBandAttenuation and UpperStopBandAttenuation
+//        // respectively. In a frequency spectrum, the order of the frequencies will be:
+//        // LowerStopBandFrequency < LowerPassBandFrequency < UpperPassBandFrequency <
+//        // UpperStopBandFrequency
+//        bpSpecs.setLowerPassBandFrequency(190.0); // 190 Hz lower pass band frequency
+//        bpSpecs.setUpperPassBandFrequency(210.0); // 210 Hz upper pass band frequency
+//        bpSpecs.setLowerStopBandFrequency(180.0); // 180 Hz lower stop band frequency
+//        bpSpecs.setUpperStopBandFrequency(220.0); // 220 Hz upper stop band frequency
+//        bpSpecs.setPassBandRipple(0.2); // 0.2 dB gain/ripple refer to note
+//        bpSpecs.setStopBandAttenuation(20.0); // 20 dB attenuation in the stop band
+//
+//        FilterOrderResults.OrderAndCutoffFrequencies nW0W1 = Elliptic.ellipord(bpSpecs);
+//        TransferFunction el = Elliptic.newBandPass(nW0W1.getOrder(), bpSpecs.getPassBandRipple(),
+//                bpSpecs.getStopBandAttenuation(), nW0W1.getLowerCutoffFrequency(), nW0W1.getUpperCutoffFrequency());
+//
+//        System.out.println(Arrays.toString(el.findFrequencies(9)));
+//
+//        FilterSpecs.BandStopSpecs bsSpecs = new FilterSpecs.BandStopSpecs();
+//        // The notch of the filter starts at the LowerStopBandFrequency and
+//        // ends at the UpperStopBandFrequency. The filter has lower pass band
+//        // which is set LowerPassBandFrequency and the upper pass band can be set
+//        // with UpperPassBandFrequency. The attenuation at the notch can be
+//        // set with the StopBandAttenuation parameter and the attenuation/ripple
+//        // in the pass band can be set with the PassBandRipple parameter.
+//        // In a frequency spectrum, the order of the frequencies will be:
+//        // LowerPassBandFrequency < LowerStopBandFrequency < UpperStopBandFrequency <
+//        // UpperPassBandFrequency
+//        bsSpecs.setLowerPassBandFrequency(3.6e3); // 3600 Hz lower pass band frequency
+//        bsSpecs.setUpperPassBandFrequency(9.1e3); // 9100 Hz lower pass band frequency
+//        bsSpecs.setLowerStopBandFrequency(5.45e3); // 5450 Hz lower stop band frequency
+//        bsSpecs.setUpperStopBandFrequency(5.90e3); // 5900 Hz upper stop band frequency
+//        bsSpecs.setPassBandRipple(0.5); // 1.5 dB gain/ripple refer to note
+//        bsSpecs.setStopBandAttenuation(38.0); // 38 db attenuation at the notch
+//
+//        nW0W1 = Elliptic.ellipord(bsSpecs);
+//        el = Elliptic.newBandStop(nW0W1.getOrder(), bsSpecs.getPassBandRipple(),
+//                bsSpecs.getStopBandAttenuation(), nW0W1.getLowerCutoffFrequency(), nW0W1.getUpperCutoffFrequency());
+//
+//        System.out.println(Arrays.toString(el.findFrequencies(9)));
+//
+//        TransferFunction tf10 = new TransferFunction(new double[] {1, 0.1, 7.5, 0, 1, 0, 0 ,-10},
+//                new double[] {1, 0, -20, 1e13, 0, 8, 1, 0.12, 9, 0, 0});
+//
+//        System.out.println(Arrays.toString(tf10.findFrequencies(9)));
 
-        double phase = tf1.getPhaseInDegreesAt(70.4);
-        System.out.println(phase);
-
-        TransferFunction tf2 = new TransferFunction(new double[]{1, 3, 3}, new double[]{1, 2, 1});
-        System.out.println(tf2.toStateSpace());
-
-        TransferFunction tf3 = new TransferFunction(new double[]{5, 3, 4}, new double[]{8, 2, 9, 10});
-        System.out.println(tf3.toStateSpace());
-
-        TransferFunction tf4 = new TransferFunction(new double[]{5}, new double[]{3});
-        System.out.println(tf4.toStateSpace());
-
-        TransferFunction tf5 = new TransferFunction(new double[]{1.0, 3, 3}, new double[]{1.0, 2.0, 1});
-        tf5.step();
-
-        double[] timePoints = {0.0, 0.0707070707070707, 0.1414141414141414, 0.2121212121212121, 0.2828282828282828,
-                0.35353535353535354, 0.4242424242424242, 0.4949494949494949, 0.5656565656565656, 0.6363636363636364,
-                0.7070707070707071, 0.7777777777777778, 0.8484848484848484, 0.9191919191919191, 0.9898989898989898,
-                1.0606060606060606, 1.1313131313131313, 1.202020202020202, 1.2727272727272727, 1.3434343434343434,
-                1.4141414141414141, 1.4848484848484849, 1.5555555555555556, 1.6262626262626263, 1.6969696969696968,
-                1.7676767676767675, 1.8383838383838382, 1.909090909090909, 1.9797979797979797, 2.0505050505050506,
-                2.121212121212121, 2.191919191919192, 2.2626262626262625, 2.333333333333333, 2.404040404040404,
-                2.4747474747474745, 2.5454545454545454, 2.616161616161616, 2.686868686868687, 2.7575757575757573,
-                2.8282828282828283, 2.898989898989899, 2.9696969696969697, 3.04040404040404, 3.111111111111111,
-                3.1818181818181817, 3.2525252525252526, 3.323232323232323, 3.3939393939393936, 3.4646464646464645,
-                3.535353535353535, 3.606060606060606, 3.6767676767676765, 3.7474747474747474, 3.818181818181818,
-                3.888888888888889, 3.9595959595959593, 4.03030303030303, 4.101010101010101, 4.171717171717171,
-                4.242424242424242, 4.313131313131313, 4.383838383838384, 4.454545454545454, 4.525252525252525,
-                4.595959595959596, 4.666666666666666, 4.737373737373737, 4.808080808080808, 4.878787878787879,
-                4.949494949494949, 5.02020202020202, 5.090909090909091, 5.161616161616162, 5.232323232323232,
-                5.303030303030303, 5.373737373737374, 5.444444444444445, 5.515151515151515, 5.585858585858586,
-                5.656565656565657, 5.727272727272727, 5.797979797979798, 5.8686868686868685, 5.9393939393939394,
-                6.0101010101010095, 6.08080808080808, 6.151515151515151, 6.222222222222222, 6.292929292929292,
-                6.363636363636363, 6.434343434343434, 6.505050505050505, 6.575757575757575, 6.646464646464646,
-                6.717171717171717, 6.787878787878787, 6.858585858585858, 6.929292929292929, 7.0};
-
-        TransferFunction tf6 = new TransferFunction(new double[]{1.0, 3.0, 3.0}, new double[]{1.0, 2.0, 1.0});
-        double[] yOut = tf6.step(timePoints, new double[]{1.0, 0.0}).getResponse();
-
-        System.out.println(Arrays.toString(yOut));
-
-        TransferFunction tf7 = new TransferFunction(new double[]{1.0, 3.0, 3.0}, new double[]{1.0, 2.0, 1.0});
-        double[] yOut2 = tf7.step(new double[]{0.0}).getResponse();
-
-        System.out.println(Arrays.toString(yOut2));
-
-        TransferFunction tf8 = new TransferFunction(new double[] {1, 1, 0}, new double[] {1, 8, 25, 12, 1, 9 , 8, 10});
-        double[] wn = tf8.findFrequencies(9);
-
-        System.out.println(Arrays.toString(wn));
-
-        TransferFunction tf9 = new TransferFunction(new double[] {1, 0.1, 7.5}, new double[] {1, 0.12, 9, 0, 0});
-
-        System.out.println(Arrays.toString(tf9.findFrequencies(9)));
-
-        // Specs for band pass filter
-        FilterSpecs.BandPassSpecs bpSpecs = new FilterSpecs.BandPassSpecs();
-        // The bandwidth of the filter starts at the LowerPassBandFrequency and
-        // ends at the UpperPassBandFrequency. The filter has lower stop band
-        // which is set LowerStopBandFrequency and the upper stop band can be set
-        // with UpperStopBandFrequency. The attenuation at the stop bands can be
-        // set with the LowerStopBandAttenuation and UpperStopBandAttenuation
-        // respectively. In a frequency spectrum, the order of the frequencies will be:
-        // LowerStopBandFrequency < LowerPassBandFrequency < UpperPassBandFrequency <
-        // UpperStopBandFrequency
-        bpSpecs.setLowerPassBandFrequency(190.0); // 190 Hz lower pass band frequency
-        bpSpecs.setUpperPassBandFrequency(210.0); // 210 Hz upper pass band frequency
-        bpSpecs.setLowerStopBandFrequency(180.0); // 180 Hz lower stop band frequency
-        bpSpecs.setUpperStopBandFrequency(220.0); // 220 Hz upper stop band frequency
-        bpSpecs.setPassBandRipple(0.2); // 0.2 dB gain/ripple refer to note
-        bpSpecs.setStopBandAttenuation(20.0); // 20 dB attenuation in the stop band
-
-        FilterOrderResults.OrderAndCutoffFrequencies nW0W1 = Elliptic.ellipord(bpSpecs);
-        TransferFunction el = Elliptic.newBandPass(nW0W1.getOrder(), bpSpecs.getPassBandRipple(),
-                bpSpecs.getStopBandAttenuation(), nW0W1.getLowerCutoffFrequency(), nW0W1.getUpperCutoffFrequency());
-
-        System.out.println(Arrays.toString(el.findFrequencies(9)));
-
-        FilterSpecs.BandStopSpecs bsSpecs = new FilterSpecs.BandStopSpecs();
-        // The notch of the filter starts at the LowerStopBandFrequency and
-        // ends at the UpperStopBandFrequency. The filter has lower pass band
-        // which is set LowerPassBandFrequency and the upper pass band can be set
-        // with UpperPassBandFrequency. The attenuation at the notch can be
-        // set with the StopBandAttenuation parameter and the attenuation/ripple
-        // in the pass band can be set with the PassBandRipple parameter.
-        // In a frequency spectrum, the order of the frequencies will be:
-        // LowerPassBandFrequency < LowerStopBandFrequency < UpperStopBandFrequency <
-        // UpperPassBandFrequency
-        bsSpecs.setLowerPassBandFrequency(3.6e3); // 3600 Hz lower pass band frequency
-        bsSpecs.setUpperPassBandFrequency(9.1e3); // 9100 Hz lower pass band frequency
-        bsSpecs.setLowerStopBandFrequency(5.45e3); // 5450 Hz lower stop band frequency
-        bsSpecs.setUpperStopBandFrequency(5.90e3); // 5900 Hz upper stop band frequency
-        bsSpecs.setPassBandRipple(0.5); // 1.5 dB gain/ripple refer to note
-        bsSpecs.setStopBandAttenuation(38.0); // 38 db attenuation at the notch
-
-        nW0W1 = Elliptic.ellipord(bsSpecs);
-        el = Elliptic.newBandStop(nW0W1.getOrder(), bsSpecs.getPassBandRipple(),
-                bsSpecs.getStopBandAttenuation(), nW0W1.getLowerCutoffFrequency(), nW0W1.getUpperCutoffFrequency());
-
-        System.out.println(Arrays.toString(el.findFrequencies(9)));
-
-        TransferFunction tf10 = new TransferFunction(new double[] {1, 0.1, 7.5, 0, 1, 0, 0 ,-10},
-                new double[] {1, 0, -20, 1e13, 0, 8, 1, 0.12, 9, 0, 0});
-
-        System.out.println(Arrays.toString(tf10.findFrequencies(9)));
+        System.out.println(getComplexSign(2));
 //		double[] phase = tf1.getPhaseAt(logspace);
 //		System.out.println(Arrays.toString(phase));
 //		for(int i = 0; i < phase.length; ++i) {

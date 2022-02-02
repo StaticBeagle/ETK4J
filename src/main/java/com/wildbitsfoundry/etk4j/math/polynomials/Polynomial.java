@@ -20,6 +20,7 @@ import java.util.List;
 import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkXYDimensions;
 
 /**
+ * //TODO
  * @author Marcos L. Lopez-Rivera
  */
 public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction, DifferentiableFunction,
@@ -340,9 +341,9 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
     public Complex evaluateAt(Complex c) {
         // Horner's method
         Complex result = new Complex();
-        for (double coef : coefficients) {
+        for (double coefficient : coefficients) {
             result.multiplyEquals(c);
-            result.addEquals(coef);
+            result.addEquals(coefficient);
         }
         return result;
     }

@@ -11,13 +11,16 @@ public class Complex implements Comparable<Complex> {
     private double real;
     private double imag;
 
+    /**
+     * Constructs a {@code Complex} number with real and imaginary part equal to zero.
+     */
     public Complex() {
         real = 0.0;
         imag = 0.0;
     }
 
     /**
-     * Creates a complex number from the real and imaginary parts.
+     * Constructs a {@code Complex} number from the real and imaginary parts.
      *
      * @param real The real part of the complex number.
      * @param imag The imaginary part of the complex number.
@@ -27,13 +30,17 @@ public class Complex implements Comparable<Complex> {
         this.imag = imag;
     }
 
+    /**
+     * Copy Constructor
+     * @param c The Complex number to be copied.
+     */
     public Complex(Complex c) {
         real = c.real;
         imag = c.imag;
     }
 
     /**
-     * Creates a complex number with only real part and zero imaginary port.
+     * Constructs a complex number with only real part and zero imaginary port.
      *
      * @param d The real part of the complex number.
      * @return A complex number with real part equal to {@code d} nd imaginary part equal to zero.
@@ -43,7 +50,7 @@ public class Complex implements Comparable<Complex> {
     }
 
     /**
-     * Creates a complex number with real part equal to zero and only imaginary port.
+     * Constructs a complex number with real part equal to zero and only imaginary port.
      *
      * @param d The imaginary part of the complex number.
      * @return A complex number with real part equal to zero and imaginary part equal to {@code d}.
@@ -52,7 +59,7 @@ public class Complex implements Comparable<Complex> {
         return new Complex(0.0, d);
     }
 
-    /***
+    /**
      * Constructs a complex number from magnitude and phase angle
      *
      * @param r The magnitude of the complex number.

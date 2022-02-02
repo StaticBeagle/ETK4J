@@ -16,9 +16,6 @@ public class QuadraticSpline extends Spline {
         coefficients = new double[(n - 1) * 3]; // 3 coefficients and n - 1 segments
         for (int i = 0, j = 0; i < n - 1; ++i, ++j) {
             double hx = this.x[i + 1] - this.x[i];
-            if (hx <= 0.0) {
-                throw new IllegalArgumentException("x must be monotonically increasing");
-            }
             double a = 0.5 * (dydx[i + 1] - dydx[i]) / hx;
             double b = dydx[i];
             double c = y[i];

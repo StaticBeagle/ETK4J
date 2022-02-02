@@ -38,9 +38,6 @@ public class NearestNeighbor extends PiecewiseFunction {
 				}
 			};
 		}
-		if(!NumArrays.isAscending(x)) {
-			throw new IllegalArgumentException("x must be monotonically increasing");
-		}
 		double x0 = this.x[0];
 		double xn = this.x[this.x.length - 1];
 		double y0 = this.evaluateAt(x0);

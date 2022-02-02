@@ -10,7 +10,6 @@ public class QuadraticSplineZeroCentered extends Spline {
 
     protected QuadraticSplineZeroCentered(double[] x, double[] y) {
         super(x, 3);
-        //TODO check if x is monotonic
         int dim = x.length - 1;
         Matrix X = new Matrix(3 * dim, 3 * dim);
         for (int i = 0; i < dim; ++i) {

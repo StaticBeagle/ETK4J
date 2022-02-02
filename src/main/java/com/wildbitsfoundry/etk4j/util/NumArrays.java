@@ -8,13 +8,16 @@ import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.interpolation.CubicSpline;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
 
+/**
+ * The {@code NumArrays} class provides methods to manipulate arrays of native {@code double} values.
+ */
 public final class NumArrays {
 
     private NumArrays() {
     }
 
     /***
-     * Creates n linearly spaced samples between x0 and x1
+     * Creates n linearly spaced samples between x0 and x1.
      *
      * @param x0
      *            starting point
@@ -109,14 +112,8 @@ public final class NumArrays {
     }
 
     public static double[] subtract(double[] a, double[] b) {
-        if (a.length != b.length) {
-            throw new IllegalArgumentException("a and b dimensions must match");
-        }
-        final int length = a.length;
-        double[] result = new double[length];
-        for (int i = 0; i < length; ++i) {
-            result[i] = a[i] - b[i];
-        }
+        double[] result = Arrays.copyOf(a, a.length);
+        subtractElementWiseInPlace(result, b);
         return result;
     }
 
@@ -138,6 +135,15 @@ public final class NumArrays {
         return result;
     }
 
+    public static void subtractElementWiseInPlace(double[] a, double[] b) {
+        if (a.length != b.length) {
+            throw new IllegalArgumentException("a and b dimensions must match.");
+        }
+        for (int i = 0; i < a.length; ++i) {
+            a[i] = a[i] - b[i];
+        }
+    }
+
     public static double[] abs(double[] a) {
         double[] result = new double[a.length];
         for(int i = 0; i < a.length; ++i) {
@@ -156,6 +162,7 @@ public final class NumArrays {
             }
         }
         return result;
+        // TODO maybe remove leading zeros?
     }
 
     // TODO these element-wise functions can be rewritten without the elementWise

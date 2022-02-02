@@ -17,8 +17,12 @@ public final class Derivatives {
 	 * @param x Argument at which to evaluate the derivative.
 	 * @param h Step size of the differentiation.
 	 * @return The derivative evaluated at <code>x</code> with step size <code>h</code>.
+	 * @throws IllegalArgumentException If the step size is less than or equal to zero.
 	 */
 	public static double forwardDifference(UnivariateFunction func, double x, double h) {
+		if(h <= 0) {
+			throw new IllegalArgumentException("The step size h must be greater than zero");
+		}
 		return (func.evaluateAt(x + h) - func.evaluateAt(x)) / h;
 	}
 
@@ -28,8 +32,12 @@ public final class Derivatives {
 	 * @param x Argument at which to evaluate the derivative.
 	 * @param h Step size of the differentiation.
 	 * @return The derivative evaluated at <code>x</code> with step size <code>h</code>.
+	 * @throws IllegalArgumentException If the step size is less than or equal to zero.
 	 */
 	public static double forwardDifference3Points(UnivariateFunction func, double x, double h) {
+		if(h <= 0) {
+			throw new IllegalArgumentException("The step size h must be greater than zero");
+		}
 		double num = -func.evaluateAt(x + 2 * h) + 4 * func.evaluateAt(x + h) - 3 * func.evaluateAt(x);
 		return num / (2 * h);
 	}
@@ -40,8 +48,12 @@ public final class Derivatives {
 	 * @param x Argument at which to evaluate the derivative.
 	 * @param h Step size of the differentiation.
 	 * @return The derivative evaluated at <code>x</code> with step size <code>h</code>.
+	 * @throws IllegalArgumentException If the step size is less than or equal to zero.
 	 */
 	public static double forwardDifference5Points(UnivariateFunction func, double x, double h) {
+		if(h <= 0) {
+			throw new IllegalArgumentException("The step size h must be greater than zero");
+		}
 		double num = -25 * func.evaluateAt(x) + 48 * func.evaluateAt(x + h) - 36 * func.evaluateAt(x + 2 * h)
 				+ 16 * func.evaluateAt(x + 3 * h) - 3 * func.evaluateAt(x + 4 * h);
 		return num / (12 * h);
@@ -53,8 +65,12 @@ public final class Derivatives {
 	 * @param x Argument at which to evaluate the derivative.
 	 * @param h Step size of the differentiation.
 	 * @return The derivative evaluated at <code>x</code> with step size <code>h</code>.
+	 * @throws IllegalArgumentException If the step size is less than or equal to zero.
 	 */
 	public static double backwardDifference(UnivariateFunction func, double x, double h) {
+		if(h <= 0) {
+			throw new IllegalArgumentException("The step size h must be greater than zero");
+		}
 		return (func.evaluateAt(x) - func.evaluateAt(x - h)) / h;
 	}
 
@@ -64,8 +80,12 @@ public final class Derivatives {
 	 * @param x Argument at which to evaluate the derivative.
 	 * @param h Step size of the differentiation.
 	 * @return The derivative evaluated at <code>x</code> with step size <code>h</code>.
+	 * @throws IllegalArgumentException If the step size is less than or equal to zero.
 	 */
 	public static double backwardDifference3Points(UnivariateFunction func, double x, double h) {
+		if(h <= 0) {
+			throw new IllegalArgumentException("The step size h must be greater than zero");
+		}
 		double num = func.evaluateAt(x - 2 * h) - 4 * func.evaluateAt(x - h) + 3 * func.evaluateAt(x);
 		return num / (2 * h);
 	}
@@ -76,8 +96,12 @@ public final class Derivatives {
 	 * @param x Argument at which to evaluate the derivative.
 	 * @param h Step size of the differentiation.
 	 * @return The derivative evaluated at <code>x</code> with step size <code>h</code>.
+	 * @throws IllegalArgumentException if the step size is less than or equal to zero.
 	 */
 	public static double backwardDifference5Points(UnivariateFunction func, double x, double h) {
+		if(h <= 0) {
+			throw new IllegalArgumentException("The step size h must be greater than zero");
+		}
 		double num = 25 * func.evaluateAt(x) - 48 * func.evaluateAt(x - h) + 36 * func.evaluateAt(x - 2 * h)
 				- 16 * func.evaluateAt(x - 3 * h) + 3 * func.evaluateAt(x - 4 * h);
 		return num / (12 * h);
@@ -89,8 +113,12 @@ public final class Derivatives {
 	 * @param x Argument at which to evaluate the derivative.
 	 * @param h Step size of the differentiation.
 	 * @return The derivative evaluated at <code>x</code> with step size <code>h</code>.
+	 * @throws IllegalArgumentException If the step size is less than or equal to zero.
 	 */
 	public static double centeredDifference(UnivariateFunction func, double x, double h) {
+		if(h <= 0) {
+			throw new IllegalArgumentException("The step size h must be greater than zero");
+		}
 		return (func.evaluateAt(x + h) - func.evaluateAt(x - h)) / (2 * h);
 	}
 
@@ -100,8 +128,12 @@ public final class Derivatives {
 	 * @param x Argument at which to evaluate the derivative.
 	 * @param h Step size of the differentiation.
 	 * @return The derivative evaluated at <code>x</code> with step size <code>h</code>.
+	 * @throws IllegalArgumentException If the step size is less than or equal to zero.
 	 */
 	public static double centeredDifference5Points(UnivariateFunction func, double x, double h) {
+		if(h <= 0) {
+			throw new IllegalArgumentException("The step size h must be greater than zero");
+		}
 		double num = 8 * (func.evaluateAt(x + h) - func.evaluateAt(x - h)) - func.evaluateAt(x + 2 * h)
 				+ func.evaluateAt(x - 2 * h);
 		return num / (12 * h);
@@ -113,8 +145,12 @@ public final class Derivatives {
 	 * @param x Argument at which to evaluate the derivative.
 	 * @param h Step size of the differentiation.
 	 * @return The derivative evaluated at <code>x</code> with step size <code>h</code>.
+	 * @throws IllegalArgumentException If the step size is less than or equal to zero.
 	 */
 	public static double centeredDifference7Points(UnivariateFunction func, double x, double h) {
+		if(h <= 0) {
+			throw new IllegalArgumentException("The step size h must be greater than zero");
+		}
 		double num = 45 * (func.evaluateAt(x + h) - func.evaluateAt(x - h))
 				+ 9 * (func.evaluateAt(x - 2 * h) - func.evaluateAt(x + 2 * h)) + func.evaluateAt(x + 3 * h)
 				- func.evaluateAt(x - 3 * h);
@@ -128,11 +164,11 @@ public final class Derivatives {
 	 * @param x Argument at which to evaluate the derivative.
 	 * @param h Step size of the differentiation.
 	 * @return The derivative evaluated at <code>x</code> with step size <code>h</code>.
-	 *
+	 * @throws IllegalArgumentException If the step size is less than or equal to zero.
 	 */
 	public static double ridders(UnivariateFunction func, double x, double h) {
-		if(h == 0) {
-			throw new IllegalArgumentException("h cannot be zero.");
+		if(h <= 0) {
+			throw new IllegalArgumentException("The step size h must be greater than zero");
 		}
 		double con = 1.4;
 		double con2 = con * con;

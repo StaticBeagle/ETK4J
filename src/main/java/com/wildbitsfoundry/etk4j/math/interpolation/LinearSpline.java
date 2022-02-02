@@ -14,9 +14,6 @@ public class LinearSpline extends Spline {
 		coefficients = new double[(n - 1) * 2]; // 2 coefficients and n - 1 segments
 		for (int i = 0, j = 0; i < n - 1; ++i, ++j) {
 			double hx = this.x[i + 1] - this.x[i];
-			if (hx <= 0.0) {
-				throw new IllegalArgumentException("x must be monotonically increasing");
-			}
 			double a = (y[i + 1] - y[i]) / hx;
 			double b = y[i];
 			coefficients[j] = a;

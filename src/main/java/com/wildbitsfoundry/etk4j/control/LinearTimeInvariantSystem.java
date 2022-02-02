@@ -5,6 +5,10 @@ import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrices;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
 import com.wildbitsfoundry.etk4j.util.NumArrays;
 
+/**
+ * The {@code LinearTimeInvariantSystem} represents and LTI system and provides methods to simulate the time response
+ * of the given system.
+ */
 public abstract class LinearTimeInvariantSystem {
 
     public enum IntegrationMethod {
@@ -16,11 +20,20 @@ public abstract class LinearTimeInvariantSystem {
     public abstract TransferFunction toTransferFunction();
     public abstract ZeroPoleGain toZeroPoleGain();
 
-    protected TimeResponse lsim(double[][] input, double[] time, double[] initialConditions,
-                                StateSpace ss) {
-        return lsim(input, time, initialConditions, ss, IntegrationMethod.INTERPOLATION);
-    }
-
+    /**
+     * Simulate time response of a continuous-time system.
+     * @param input Array describing the input at every time step.
+     * @param time The time at which to evaluate the system.
+     * @param initialConditions Initial conditions of the system.
+     * @param ss State Space representation of the system.
+     * @param integrationMethod Integration method.
+     * @return The {@link TimeResponse} of the system.
+     * @throws IllegalArgumentException if the length of the input array does not match the length of the time array.
+     * @throws IllegalArgumentException if the time array is empty.
+     * @throws IllegalArgumentException if the initial time is negative.
+     * @throws NonUniformTimeStepsException if the step of the time array ore not uniform.
+     * @see <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.lsim.html">lsim</a>
+     */
     protected TimeResponse lsim(double[][] input, double[] time, double[] initialConditions,
                               StateSpace ss, IntegrationMethod integrationMethod) {
         double[][] U = NumArrays.transpose(input);
@@ -60,7 +73,7 @@ public abstract class LinearTimeInvariantSystem {
                 delta[i - 1] = (time[i + 1] - time[i]) / dt;
             }
             if (!NumArrays.allClose(delta, 1.0)) {
-                throw new NonUniformTimeStepsException();
+                throw new NonUniformTimeStepsException("Only uniform time steps are supported.");
             }
 
             switch (integrationMethod) {
@@ -103,8 +116,7 @@ public abstract class LinearTimeInvariantSystem {
                     double[][] Bd1 = expMT.subMatrix(noStates + noInputs, expMT.getRowCount() - 1, 0, noStates - 1).getAs2DArray();
                     double[][] Bd0 = expMT.subMatrix(noStates, noStates + noInputs - 1, 0, noStates - 1).getAs2DArray();
                     for (int i = 0; i < Bd0.length; ++i) {
-                        // TODO make an in place for this
-                        Bd0[i] = NumArrays.subtract(Bd0[i], Bd1[i]);
+                        NumArrays.subtractElementWiseInPlace(Bd0[i], Bd1[i]);
                     }
                     for (int i = 1; i < noSteps; ++i) {
                         xOut[i] = NumArrays.add(NumArrays.dot(xOut[i - 1], Ad), NumArrays.dot(U[i - 1], Bd0));
@@ -126,27 +138,62 @@ public abstract class LinearTimeInvariantSystem {
         return new TimeResponse(time, NumArrays.transpose(yOut), xOut);
     }
 
+    /**
+     * Step response of the continuous-time system with zero initial conditions and 100 default (calculated) time points.
+     *
+     * @return The step response of the system.
+     * @see <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.step.html">step</a>
+     */
     public StepResponse step() {
         return step(100);
     }
 
+    /**
+     * Step response of the continuous-time system with zero initial conditions and the given {@code numberOfpoints}
+     * default (calculated) time points.
+     *
+     * @param numberOfPoints The number of points in which to evaluate the step response.
+     * @return The step response of the system.
+     * @see <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.step.html">step</a>
+     */
     public StepResponse step(int numberOfPoints) {
-        return stepResponse(null, null, numberOfPoints);
+        return step(null, null, numberOfPoints);
     }
 
+    /**
+     * Step response of the continuous-time system with the given initial conditions and the given {@code numberOfpoints}
+     * default (calculated) time points.
+     * @param initialConditions The initial conditions of the system.
+     * @param numberOfPoints The number of points in which to evaluate the step response.
+     * @return The step response of the system.
+     * @see <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.step.html">step</a>
+     */
     public StepResponse step(double[] initialConditions, int numberOfPoints) {
-        return stepResponse(null, initialConditions, numberOfPoints);
+        return step(null, initialConditions, numberOfPoints);
     }
 
+    /**
+     * Step response of the continuous-time system with zero initial conditions and the given time points.
+     * @param time The times at which to evaluate the step response.
+     * @return The step response of the system.
+     * @see <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.step.html">step</a>
+     */
     public StepResponse step(double[] time) {
-        return stepResponse(time, null, time.length);
+        return step(time, null, time.length);
     }
 
+    /**
+     * Step response of the continuous-time system with the given initial conditions and the given time points.
+     * @param time The times at which to evaluate the step response.
+     * @param initialConditions The initial conditions of the system.
+     * @return The step response of the system.
+     * @see <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.step.html">step</a>
+     */
     public StepResponse step(double[] time, double[] initialConditions) {
-        return stepResponse(time, initialConditions, time.length);
+        return step(time, initialConditions, time.length);
     }
 
-    protected StepResponse stepResponse(double[] time, double[] initialConditions, int numberOfPoints) {
+    protected StepResponse step(double[] time, double[] initialConditions, int numberOfPoints) {
         StateSpace ss = this.toStateSpace();
         time = time == null ? defaultResponseTimes(ss.getA(), numberOfPoints) : time;
         double[][] U = new double[1][];

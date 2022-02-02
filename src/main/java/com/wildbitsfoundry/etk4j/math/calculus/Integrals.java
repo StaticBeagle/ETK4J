@@ -6,7 +6,7 @@ import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
 import com.wildbitsfoundry.etk4j.util.RefValue.RefInteger;
 
 /**
- * The <code>Integrals</code> class contains various methods that can be used for
+ * The {@code Integrals} class contains various methods that can be used for
  * computing the integral of a function numerically.
  */
 public final class Integrals {
@@ -15,6 +15,7 @@ public final class Integrals {
 
     /**
      * Cumulative trapezoidal integration.
+     *
      * @param a Array of values of the function.
      * @return The approximate integral of {@code a} with unit spacing.
      */
@@ -29,6 +30,7 @@ public final class Integrals {
 
     /**
      * Unit spaced trapezoidal integration.
+     *
      * @param a Array of values of the function.
      * @return The approximate integral of {@code a} with unit spacing.
      */
@@ -40,56 +42,59 @@ public final class Integrals {
         }
         return result;
     }
-    
+
     /**
      * Computes the approximate definite integral from a to b using the trapezoidal rule.
-     * @param func The function to be integrated.
-     * @param a The lower limit of the integral.
-     * @param b The upper limit of the integral.
-     * @param n The number of partitions.
+     *
+     * @param func   The function to be integrated.
+     * @param a      The lower limit of the integral.
+     * @param b      The upper limit of the integral.
+     * @param n      The number of partitions.
      * @param params Optional parameters passed to {@code func}.
      * @return The approximate definite integral of {@code func} from a to b.
      */
-    public static double trapz(BiFunction<Double, Object[], Double> func, double a, double b, int n, Object ...params) {
-        if(b < a) {
-        	throw new IllegalArgumentException("b must be greater than a.");
+    public static double trapz(BiFunction<Double, Object[], Double> func, double a, double b, int n, Object... params) {
+        if (b < a) {
+            throw new IllegalArgumentException("b must be greater than a.");
         }
-        if(n <= 0) {
-        	throw new IllegalArgumentException("n has to be greater than zero.");
+        if (n <= 0) {
+            throw new IllegalArgumentException("n has to be greater than zero.");
         }
-    	double h = (b - a) / n;
-    	double sum = func.apply(a, params) + func.apply(b, params);
-    	for(int i = 1; i < n; ++i) {
-    		sum += 2.0 * func.apply(a + i * h, params);
-    	}
-    	return 0.5 * h * sum;
+        double h = (b - a) / n;
+        double sum = func.apply(a, params) + func.apply(b, params);
+        for (int i = 1; i < n; ++i) {
+            sum += 2.0 * func.apply(a + i * h, params);
+        }
+        return 0.5 * h * sum;
     }
-    
+
     /**
      * Computes the approximate definite integral from a to b using the trapezoidal rule.
+     *
      * @param func The function to be integrated.
-     * @param a The lower limit of the integral.
-     * @param b The upper limit of the integral.
-     * @param n tThe number of partitions.
+     * @param a    The lower limit of the integral.
+     * @param b    The upper limit of the integral.
+     * @param n    tThe number of partitions.
      * @return The approximate definite integral of {@code func} from a to b.
      */
     public static double trapz(UnivariateFunction func, double a, double b, int n) {
         return trapz((x, o) -> func.evaluateAt(x), a, b, n);
     }
-   
+
     /**
      * Computes the approximate definite integral from a to b using the Simpson's 1/3 rule.
-     * @param func The function to be integrated.
-     * @param a The lower limit of the integral.
-     * @param b The upper limit of the integral.
-     * @param n The number of partitions. Must be even.
+     *
+     * @param func   The function to be integrated.
+     * @param a      The lower limit of the integral.
+     * @param b      The upper limit of the integral.
+     * @param n      The number of partitions. Must be even.
      * @param params Optional parameters passed to {@code func}.
      * @return The approximate definite integral of {@code func} from a to b.
      */
-    public static double simpson(BiFunction<Double, Object[], Double> func, double a, double b, int n, Object ...params) {
-    	if(n % 2 != 0) {
-    		throw new IllegalArgumentException("The number of partitions (n) must be even");
-    	}
+    public static double simpson(BiFunction<Double, Object[], Double> func, double a, double b, int n, Object... params) {
+        if (n % 2 != 0) {
+            throw new IllegalArgumentException("The number of partitions (n) must be even");
+        }
         double even = 0, odd = 0;
         double h = (b - a) / n;
         for (int i = 1; i < n; i = i + 2) {
@@ -100,20 +105,21 @@ public final class Integrals {
         }
         return h / 3.0 * (func.apply(a, params) + 2.0 * even + 4.0 * odd + func.apply(b, params));
     }
-    
+
     /**
      * Computes the approximate definite integral from a to b using the Simpson's 1/3 rule.
+     *
      * @param func The function to be integrated.
-     * @param a The lower limit of the integral.
-     * @param b The upper limit of the integral.
-     * @param n The number of partitions. Must be even.
+     * @param a    The lower limit of the integral.
+     * @param b    The upper limit of the integral.
+     * @param n    The number of partitions. Must be even.
      * @return The approximate definite integral of {@code func} from a to b.
      */
     public static double simpson(UnivariateFunction func, double a, double b, int n) {
         return simpson((x, o) -> func.evaluateAt(x), a, b, n);
     }
-    
-    
+
+
     /***
      * Computes The approximate definite integral from a to b using 1d quadrature.
      * @param func The function to be integrated.
@@ -125,7 +131,7 @@ public final class Integrals {
      * @return The approximate definite integral of {@code func} from a to b.
      */
     public static double qadrat(BiFunction<Double, Object[], Double> func, double a, double b,
-                                 double absTol, double relTol, int maxEval, Object ...params) {
+                                double absTol, double relTol, int maxEval, Object... params) {
         double x, f0, f2, f3, f5, f6, f7, f9, f14, hmin, hmax, re, ae, result;
 
         RefInteger numEval = new RefInteger(0);
@@ -163,11 +169,11 @@ public final class Integrals {
      * @param b The upper limit of the integral.
      * @param absTol The absolute tolerance.
      * @param relTol The relative tolerance.
-     * @param 
+     * @param
      * @return The approximate definite integral of {@code func} from a to b.
      */
     public static double qadrat(UnivariateFunction func, double a, double b,
-                                 double absTol, double relTol, int maxEval) {
+                                double absTol, double relTol, int maxEval) {
         return qadrat((x, o) -> func.evaluateAt(x), a, b, absTol, relTol, maxEval);
     }
 
@@ -175,13 +181,13 @@ public final class Integrals {
     private static double lint(BiFunction<Double, Object[], Double> func,
                                double x0, double xn, double f0, double f2, double f3,
                                double f5, double f6, double f7, double f9, double f14,
-                               double hmin, double re, double ae, RefInteger numEval, int maxEval, Object ...params) {
+                               double hmin, double re, double ae, RefInteger numEval, int maxEval, Object... params) {
         /* this function is internally used by QADRAT */
 
         if (numEval.getValue() >= maxEval) {
-        	String error = String.format("Maximum number of evaluations reached in qadrat.%n"
-        			+ "If increasing the number of evaluations doesn't help, try loosening the%n"
-        			+ "relative and absolute tolerances.");
+            String error = String.format("Maximum number of evaluations reached in qadrat.%n"
+                    + "If increasing the number of evaluations doesn't help, try loosening the%n"
+                    + "relative and absolute tolerances.");
             throw new MaximumNumberOfEvaluationsReached(error);
         }
 

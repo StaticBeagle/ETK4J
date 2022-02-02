@@ -5,60 +5,94 @@ import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
 import com.wildbitsfoundry.etk4j.util.NumArrays;
 import org.junit.Test;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class TransferFunctionTest {
 
     @Test
     public void testConstructors() {
-        TransferFunction tf = new TransferFunction(new double[] { 10.0 }, new double[] { 1.0, 1.0 });
+        TransferFunction tf = new TransferFunction(new double[]{10.0}, new double[]{1.0, 1.0});
         assertEquals(10.0, tf.getMagnitudeAt(0.0), 1e-12);
 
     }
 
     @Test
     public void testMargins() {
-        double[] numerator = { 1.0 };
-        double[] denominator = { 1.0, 2.0, 1.0, 0.0 };
+        double[] numerator = {1.0};
+        double[] denominator = {1.0, 2.0, 1.0, 0.0};
 
         TransferFunction tf = new TransferFunction(numerator, denominator);
         Margins margins = tf.getMargins();
-
-        assertEquals(0.6823278038280193, margins.getGainCrossOverFrequency(), 1e-12);
+        assertEquals(1.9999999999999991, margins.getGainMargin(), 1e-12);
         assertEquals(21.386389751875015, margins.getPhaseMargin(), 1e-12);
-        assertEquals(0.9999999999999998, margins.getPhaseCrossOverFrequency(), 1e-12);
-        assertEquals(6.02059991327962, margins.getGainMargin(), 1e-12);
-        assertEquals(
-                "Margins [GainMargin=6.02059991327962, PhaseMargin=21.386389751875015,"
-                        + " GainCrossOverFrequency=0.6823278038280193, PhaseCrossOverFrequency=0.9999999999999998]",
-                margins.toString());
+        assertEquals(0.9999999999999998, margins.getPhaseCrossoverFrequency(), 1e-12);
+        assertEquals(0.6823278038280193, margins.getGainCrossoverFrequency(), 1e-12);
+
+        numerator = new double[]{1, 2, 1000.0};
+        denominator = new double[]{1.0, 25.0, 100.0, 0.0};
+
+        tf = new TransferFunction(numerator, denominator);
+        margins = tf.getMargins();
+        assertEquals(2.961817321997373, margins.getGainMargin(), 1e-12);
+        assertEquals(24.186930185460113, margins.getPhaseMargin(), 1e-12);
+        assertEquals(10.291920843263163, margins.getPhaseCrossoverFrequency(), 1e-12);
+        assertEquals(5.949128709414389, margins.getGainCrossoverFrequency(), 1e-12);
+
+        numerator = new double[]{1, 1, 2, 1000.0};
+        denominator = new double[]{1.0, 25.0, 100.0, 10};
+
+        tf = new TransferFunction(numerator, denominator);
+        margins = tf.getMargins();
+        assertEquals(1.2064017876262465, margins.getGainMargin(), 1e-12);
+        assertEquals(10.556579721873817, margins.getPhaseMargin(), 1e-12);
+        assertEquals(6.812944126351795, margins.getPhaseCrossoverFrequency(), 1e-12);
+        assertEquals(6.060989439604447, margins.getGainCrossoverFrequency(), 1e-12);
+
+        numerator = new double[]{1};
+        denominator = new double[]{1.0, 2.0, 1.0};
+
+        tf = new TransferFunction(numerator, denominator);
+        margins = tf.getMargins();
+        assertTrue(Double.isInfinite(margins.getGainMargin()));
+        assertTrue(Double.isInfinite(margins.getPhaseMargin()));
+        assertTrue(Double.isNaN(margins.getPhaseCrossoverFrequency()));
+        assertTrue(Double.isNaN(margins.getGainCrossoverFrequency()));
+
+        numerator = new double[]{7, 14};
+        denominator = new double[]{1, 10, 24};
+
+        tf = new TransferFunction(numerator, denominator);
+        tf.getMargins();
+        assertTrue(Double.isInfinite(margins.getGainMargin()));
+        assertTrue(Double.isInfinite(margins.getPhaseMargin()));
+        assertTrue(Double.isNaN(margins.getPhaseCrossoverFrequency()));
+        assertTrue(Double.isNaN(margins.getGainCrossoverFrequency()));
     }
 
     @Test
     public void testPolesAndZeros() {
-        double[] numerator = { 1.0 };
-        double[] denominator = { 1.0, 2.0, 1.0, 0.0 };
+        double[] numerator = {1.0};
+        double[] denominator = {1.0, 2.0, 1.0, 0.0};
 
         TransferFunction tf = new TransferFunction(numerator, denominator);
 
         Complex[] zeros = tf.getZeros();
         Complex[] poles = tf.getPoles();
 
-        assertArrayEquals(new Complex[] {}, zeros);
-        assertArrayEquals(new Complex[] { Complex.fromReal(-1.0000000209081399), Complex.fromReal(-0.9999999790918601),
-                Complex.fromReal(-4.1910912494273124E-17) }, poles);
+        assertArrayEquals(new Complex[]{}, zeros);
+        assertArrayEquals(new Complex[]{Complex.fromReal(-1.0000000209081399), Complex.fromReal(-0.9999999790918601),
+                Complex.fromReal(-4.1910912494273124E-17)}, poles);
 
-        zeros = new Complex[] { Complex.fromReal(-1.0) };
-        poles = new Complex[] { Complex.fromReal(-5.0), Complex.fromReal(-1.0), Complex.fromReal(-2.0) };
+        zeros = new Complex[]{Complex.fromReal(-1.0)};
+        poles = new Complex[]{Complex.fromReal(-5.0), Complex.fromReal(-1.0), Complex.fromReal(-2.0)};
 
         tf = new TransferFunction(zeros, poles);
 
         numerator = tf.getNumerator().getCoefficients();
         denominator = tf.getDenominator().getCoefficients();
 
-        assertArrayEquals(new double[] { 10.0, 10.0 }, numerator, 1e-12);
-        assertArrayEquals(new double[] { 1.0, 8.0, 17.0, 10.0 }, denominator, 1e-12);
+        assertArrayEquals(new double[]{10.0, 10.0}, numerator, 1e-12);
+        assertArrayEquals(new double[]{1.0, 8.0, 17.0, 10.0}, denominator, 1e-12);
 
         ZeroPoleGain zpk = new ZeroPoleGain(zeros, poles, 2.0);
         tf = new TransferFunction(zpk);
@@ -71,8 +105,8 @@ public class TransferFunctionTest {
 
     @Test
     public void testPolesZPKToTf() {
-        double[] numerator = { 1.0, 2.0 };
-        double[] denominator = { 4.0, 2.0, 1.0, 0.0 };
+        double[] numerator = {1.0, 2.0};
+        double[] denominator = {4.0, 2.0, 1.0, 0.0};
 
         TransferFunction tf = new TransferFunction(numerator, denominator);
 
@@ -89,7 +123,7 @@ public class TransferFunctionTest {
 
     @Test
     public void testGettersAndEvaluation() {
-        Complex[] poles = new Complex[] { Complex.fromReal(-1.0), Complex.fromReal(-1.0), Complex.fromReal(-1.0) };
+        Complex[] poles = new Complex[]{Complex.fromReal(-1.0), Complex.fromReal(-1.0), Complex.fromReal(-1.0)};
 
         TransferFunction tf = new TransferFunction(new Polynomial(10.0), new Polynomial(poles));
 
@@ -98,13 +132,13 @@ public class TransferFunctionTest {
 
         double[] frequencies = NumArrays.logSpace(-3, 3, 10);
 
-        double[] magnitudeResponse = { 9.999985000018752, 9.999676843499255, 9.993041654128266, 9.851853368415734,
+        double[] magnitudeResponse = {9.999985000018752, 9.999676843499255, 9.993041654128266, 9.851853368415734,
                 7.462732134984385, 0.7462732134984399, 0.009851853368415734, 9.993041654128302E-5, 9.999676843499274E-7,
-                9.999985000018753E-9 };
+                9.999985000018753E-9};
 
-        double[] phaseResponse = { -0.17188728124350178, -0.7978246216992994, -3.7026276509801344, -17.13177941249893,
+        double[] phaseResponse = {-0.17188728124350178, -0.7978246216992994, -3.7026276509801344, -17.13177941249893,
                 -74.69637093434646, -195.30362906565347, -252.86822058750107, -266.29737234901984, -269.2021753783007,
-                -269.8281127187565 };
+                -269.8281127187565};
 
         assertArrayEquals(magnitudeResponse, tf.getMagnitudeAt(frequencies), 1e-12);
         double[] systemPhaseResponse = tf.getPhaseInDegreesAt(frequencies);
@@ -178,7 +212,7 @@ public class TransferFunctionTest {
                 2.985588705785755, 2.9864589783431175, 2.987277590856656, 2.9880475409027722, 2.9887716575404877,
                 2.98945261035007, 2.9900929180229268, 2.9906949565219074, 2.9912609668306436, 2.99179306231};
 
-        TransferFunction tf = new TransferFunction(new double[] {1.0, 3.0, 3.0}, new double[] {1.0, 2.0, 1.0});
+        TransferFunction tf = new TransferFunction(new double[]{1.0, 3.0, 3.0}, new double[]{1.0, 2.0, 1.0});
         StepResponse sr = tf.step();
 
         assertArrayEquals(timePoints, sr.getTime(), 1e-12);
@@ -187,11 +221,11 @@ public class TransferFunctionTest {
         // Test single point
         sr = tf.step(1);
 
-        assertArrayEquals(new double[] {7.0}, sr.getTime(), 1e-12);
-        assertArrayEquals(new double[] {1.0}, sr.getResponse(), 1e-12);
+        assertArrayEquals(new double[]{7.0}, sr.getTime(), 1e-12);
+        assertArrayEquals(new double[]{1.0}, sr.getResponse(), 1e-12);
 
         // Test with initial conditions
-        yOut = new double[] {6.0, 5.926964828289961, 5.849920761127837, 5.769755488835639, 5.687254187005841,
+        yOut = new double[]{6.0, 5.926964828289961, 5.849920761127837, 5.769755488835639, 5.687254187005841,
                 5.6031093761207185, 5.517929912766562, 5.432249185059296, 5.346532579030544, 5.261184277318395,
                 5.176553446529198, 5.092939865052552, 5.010599038890671, 4.929746849177359, 4.85056377148471,
                 4.773198703723482, 4.697772436413435, 4.624380796312477, 4.553097491829138, 4.483976686284269,
@@ -212,7 +246,7 @@ public class TransferFunctionTest {
                 3.027099498902846, 3.025476580865796, 3.0239489530785955, 3.0225111685470485, 3.0211580798915536,
                 3.019884823824347, 3.01868680634983, 3.017559688661594, 3.016499373709989, 3.015501993414416};
 
-        sr = tf.step(timePoints, new double[] {1.0, 2.0});
+        sr = tf.step(timePoints, new double[]{1.0, 2.0});
         // We should get back the timePoints we passed in
         assertArrayEquals(timePoints, sr.getTime(), 1e-12);
         assertArrayEquals(yOut, sr.getResponse(), 1e-12);
@@ -319,7 +353,7 @@ public class TransferFunctionTest {
                 }
         };
 
-        TransferFunction tf = new TransferFunction(new double[] {1.0, 3.0, 3.0}, new double[] {1.0, 2.0, 1.0});
+        TransferFunction tf = new TransferFunction(new double[]{1.0, 3.0, 3.0}, new double[]{1.0, 2.0, 1.0});
         SingleInputSingleOutputTimeResponse SISOtr = tf.simulateTimeResponse(NumArrays.ones(timePoints.length),
                 timePoints);
 
