@@ -28,6 +28,5 @@ public class UnivariateSolverExample {
 		SolverResults<Double> nr3 = new NewtonRaphson(x ->  x * x * x - x * x + 2, -20)
 				.solve();
 		System.out.println(nr3);
-
 	}
 }

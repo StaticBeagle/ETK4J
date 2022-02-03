@@ -3,6 +3,7 @@ package com.wildbitsfoundry.etk4j.math.laplace;
 import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
 import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
 
+//https://www.codeproject.com/Articles/25189/Numerical-Laplace-Transforms-and-Inverse-Transform
 public class InverseLaplaceTransformStehfest {
     private final double[] V;       //  Stehfest coefficients
     final static double ln2 = Math.log(2.0);

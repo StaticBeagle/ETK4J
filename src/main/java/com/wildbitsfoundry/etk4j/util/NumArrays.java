@@ -153,16 +153,18 @@ public final class NumArrays {
     }
 
     public static double[] convolution(double[] a, double[] b) {
-        double[] result = new double[a.length + b.length - 1];
+        final int n = a.length;
+        final int m = b.length;
 
-        for (int i = 0; i < result.length; ++i) {
-            result[i] = 0.0;
-            for (int j = Math.max(0, i + 1 - b.length); j < Math.min(a.length, i + 1); ++j) {
-                result[i] += a[j] * b[i - j];
+        double[] result = new double[n + m - 1];
+        for(int i = 0; i < n; ++i)
+        {
+            for(int j = 0; j < m; ++j)
+            {
+                result[i + j] += a[i] * b[j];
             }
         }
         return result;
-        // TODO maybe remove leading zeros?
     }
 
     // TODO these element-wise functions can be rewritten without the elementWise
@@ -759,5 +761,9 @@ public final class NumArrays {
 
         System.out.println(Arrays.toString(add(a, b)));
         System.out.println(Arrays.toString(addElementWise(a, b)));
+
+        System.out.println(Arrays.toString(convolution(aaa, aaaa)));
+
+        System.out.println(Arrays.toString(convolution(aaa, bb)));
     }
 }

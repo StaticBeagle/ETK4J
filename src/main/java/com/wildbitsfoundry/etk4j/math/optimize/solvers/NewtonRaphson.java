@@ -53,13 +53,13 @@ public final class NewtonRaphson {
     }
 
     public SolverResults<Double> solve() {
-        int maxNumberOfIterations = this.maxNumberOfIterations;
+        int currentIteration = 0;
         UnivariateFunction func = this.func;
 
         double xCurrent = x0;
         double xFinal = 0.0;
         if (derivative != null) {
-            while (maxNumberOfIterations-- > 0) {
+            while (currentIteration++ < maxNumberOfIterations) {
                 double funcValue = func.evaluateAt(xCurrent);
                 if (funcValue == 0) {
                     double error = Math.abs(xFinal - xCurrent);
@@ -68,7 +68,7 @@ public final class NewtonRaphson {
                     solverResults.setHasConverged(true);
                     solverResults.setError(error);
                     solverResults.setValue(xFinal);
-                    solverResults.setNumberOfIterations(maxNumberOfIterations);
+                    solverResults.setNumberOfIterations(currentIteration);
                     return solverResults;
                 }
                 double funcDerivativeValue = derivative.evaluateAt(xCurrent);
@@ -79,7 +79,7 @@ public final class NewtonRaphson {
                     solverResults.setHasConverged(false);
                     solverResults.setError(error);
                     solverResults.setValue(xFinal);
-                    solverResults.setNumberOfIterations(maxNumberOfIterations);
+                    solverResults.setNumberOfIterations(currentIteration);
                     return solverResults;
                 }
                 // Newton Step
@@ -100,7 +100,7 @@ public final class NewtonRaphson {
                     solverResults.setHasConverged(true);
                     solverResults.setError(error);
                     solverResults.setValue(xFinal);
-                    solverResults.setNumberOfIterations(maxNumberOfIterations);
+                    solverResults.setNumberOfIterations(currentIteration);
                     return solverResults;
                 }
                 xCurrent = xFinal;
@@ -115,9 +115,10 @@ public final class NewtonRaphson {
                     solverResults.setHasConverged(false);
                     solverResults.setError(error);
                     solverResults.setValue(xFinal);
-                    solverResults.setNumberOfIterations(maxNumberOfIterations);
+                    solverResults.setNumberOfIterations(currentIteration);
                     return solverResults;
                 }
+                xFinal = x1;
             } else {
                 double eps = 1e-4;
                 xFinal = xCurrent * (1 + eps);
@@ -133,7 +134,7 @@ public final class NewtonRaphson {
                 q0 = q1;
                 q1 = swap;
             }
-            while (maxNumberOfIterations-- > 0) {
+            while (currentIteration++ < maxNumberOfIterations) {
                 double x = 0;
                 if(q1 == q0) {
                     if(xFinal != xCurrent) {
@@ -143,7 +144,7 @@ public final class NewtonRaphson {
                         solverResults.setHasConverged(false);
                         solverResults.setError(error);
                         solverResults.setValue(xFinal);
-                        solverResults.setNumberOfIterations(maxNumberOfIterations);
+                        solverResults.setNumberOfIterations(currentIteration);
                         return solverResults;
                     }
                     x = (xFinal + xCurrent) / 2.0;
@@ -153,7 +154,7 @@ public final class NewtonRaphson {
                     solverResults.setHasConverged(true);
                     solverResults.setError(error);
                     solverResults.setValue(x);
-                    solverResults.setNumberOfIterations(maxNumberOfIterations);
+                    solverResults.setNumberOfIterations(currentIteration);
                     return solverResults;
                 } else {
                     if(Math.abs(q1) > Math.abs(q0)) {
@@ -169,7 +170,7 @@ public final class NewtonRaphson {
                     solverResults.setHasConverged(true);
                     solverResults.setError(error);
                     solverResults.setValue(x);
-                    solverResults.setNumberOfIterations(maxNumberOfIterations);
+                    solverResults.setNumberOfIterations(currentIteration);
                     return solverResults;
                 }
                 xCurrent = xFinal;
@@ -184,7 +185,7 @@ public final class NewtonRaphson {
         solverResults.setHasConverged(false);
         solverResults.setError(error);
         solverResults.setValue(xFinal);
-        solverResults.setNumberOfIterations(maxNumberOfIterations);
+        solverResults.setNumberOfIterations(currentIteration);
         return solverResults;
     }
 }
