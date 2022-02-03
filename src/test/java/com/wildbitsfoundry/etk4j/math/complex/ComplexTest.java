@@ -50,8 +50,8 @@ public class ComplexTest {
 		
 		assertEquals(0.0, a.compareTo(c), 1e-12);
 		assertEquals(0.0, a.compareTo(a), 1e-12);
-		assertEquals(-1.0, a.compareTo(c.subtract(1.0)), 1e-12);
-		assertEquals(1.0, a.compareTo(c.add(1.0)), 1e-12);
+		assertEquals(-1.0, a.compareToAbs(c.subtract(1.0)), 1e-12);
+		assertEquals(1.0, a.compareToAbs(c.add(1.0)), 1e-12);
 	}
 	
 	@Test

@@ -114,11 +114,30 @@ public class Complex implements Comparable<Complex> {
     }
 
     /**
-     * Compare magnitudes of complex numbers.
+     * Compare complex numbers lexicographically.
+     * Real parts get compared first and if they are equal then the imaginary parts are compared.
      * @see java.lang.Comparable(java.lang.Object)
      */
     @Override
     public int compareTo(Complex obj) {
+        if (this == obj) {
+            return 0;
+        }
+        if (this.real > obj.real) {
+            return 1;
+        }
+        if (this.real < obj.real) {
+            return -1;
+        }
+        return Double.compare(this.imag, obj.imag);
+    }
+
+    /**
+     * Compare the absolute values of two complex numbers.
+     * @param obj Argument used for comparison.
+     * @return {@code this.abs().compareTo(obj.abs())}
+     */
+    public int compareToAbs(Complex obj) {
         if (this == obj) {
             return 0;
         }

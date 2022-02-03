@@ -122,7 +122,7 @@ public final class NewtonRaphsonComplex {
             } else {
                 double eps = 1e-4;
                 xFinal = xCurrent.multiply(1 + eps);
-                xFinal.addEquals(xFinal.abs() >= 0 ? eps : -eps);
+                xFinal.addEquals(xFinal.compareTo(new Complex()) >= 0 ? eps : -eps);
             }
             Complex q0 = func.evaluateAt(xCurrent);
             Complex q1 = func.evaluateAt(xFinal);
