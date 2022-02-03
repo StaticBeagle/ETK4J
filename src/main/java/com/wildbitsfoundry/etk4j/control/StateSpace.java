@@ -67,7 +67,7 @@ public class StateSpace extends LinearTimeInvariantSystem {
 
     /*
     Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
-    All rights reserved. See https://github.com/StaticBeagle/ETK4J/blob/master/COPYING.
+    All rights reserved. See https://github.com/StaticBeagle/ETK4J/blob/master/SciPy.
      */
     /**
      * https://github.com/scipy/scipy/blob/47bb6febaa10658c72962b9615d5d5aa2513fa3a/scipy/signal/lti_conversion.py#L196

@@ -658,7 +658,7 @@ public class TransferFunction extends LinearTimeInvariantSystem {
 
     /*
     Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
-    All rights reserved. See https://github.com/StaticBeagle/ETK4J/blob/master/COPYING.
+    All rights reserved. See https://github.com/StaticBeagle/ETK4J/blob/master/SciPy.
      */
     /***
      * Transform SISO only single input single output TFs

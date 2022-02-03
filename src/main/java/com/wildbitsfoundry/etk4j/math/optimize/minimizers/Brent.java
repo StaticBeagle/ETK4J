@@ -9,7 +9,7 @@ public class Brent {
 
     /*
     Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
-    All rights reserved. See https://github.com/StaticBeagle/ETK4J/blob/master/COPYING.
+    All rights reserved. See https://github.com/StaticBeagle/ETK4J/blob/master/SciPy.
      */
     // TODO test
     // https://github.com/scipy/scipy/blob/v1.7.1/scipy/optimize/optimize.py#L1904-L1979

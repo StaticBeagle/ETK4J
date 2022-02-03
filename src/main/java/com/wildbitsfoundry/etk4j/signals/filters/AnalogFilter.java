@@ -46,7 +46,7 @@ public class AnalogFilter {
 
     /*
     Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
-    All rights reserved. See https://github.com/StaticBeagle/ETK4J/blob/master/COPYING.
+    All rights reserved. See https://github.com/StaticBeagle/ETK4J/blob/master/SciPy.
      */
     protected static FilterOrderResults.OrderAndCutoffFrequencies bandPassFilterOrder(FilterSpecs.BandPassSpecs specs,
                                                                                 FilterOrderCalculationStrategy strategy) {
@@ -72,7 +72,7 @@ public class AnalogFilter {
 
     /*
     Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
-    All rights reserved. See https://github.com/StaticBeagle/ETK4J/blob/master/COPYING.
+    All rights reserved. See https://github.com/StaticBeagle/ETK4J/blob/master/SciPy.
      */
     protected static FilterOrderResults.OrderAndCutoffFrequencies bandStopFilterOrder(FilterSpecs.BandStopSpecs specs,
                                                                                 FilterOrderCalculationStrategy strategy) {
@@ -115,7 +115,7 @@ public class AnalogFilter {
 
     /*
     Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
-    All rights reserved. See https://github.com/StaticBeagle/ETK4J/blob/master/COPYING.
+    All rights reserved. See https://github.com/StaticBeagle/ETK4J/blob/master/SciPy.
      */
     private static double bandStopObjMinimize(double wp, Object... params) {
         BandStopSpecs specs = (BandStopSpecs) params[0];

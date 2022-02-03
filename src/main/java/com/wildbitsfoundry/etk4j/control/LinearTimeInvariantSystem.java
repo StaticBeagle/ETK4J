@@ -24,7 +24,7 @@ public abstract class LinearTimeInvariantSystem {
 
     /*
     Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
-    All rights reserved. See https://github.com/StaticBeagle/ETK4J/blob/master/COPYING.
+    All rights reserved. See https://github.com/StaticBeagle/ETK4J/blob/master/SciPy.
      */
 
     /**
@@ -206,7 +206,7 @@ public abstract class LinearTimeInvariantSystem {
 
     /*
     Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
-    All rights reserved. See https://github.com/StaticBeagle/ETK4J/blob/master/COPYING.
+    All rights reserved. See https://github.com/StaticBeagle/ETK4J/blob/master/SciPy.
      */
     protected StepResponse step(double[] time, double[] initialConditions, int numberOfPoints) {
         StateSpace ss = this.toStateSpace();
@@ -219,7 +219,7 @@ public abstract class LinearTimeInvariantSystem {
 
     /*
     Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
-    All rights reserved. See https://github.com/StaticBeagle/ETK4J/blob/master/COPYING.
+    All rights reserved. See https://github.com/StaticBeagle/ETK4J/blob/master/SciPy.
      */
     protected double[] defaultResponseTimes(Matrix A, int numberOfPoints) {
         EigenvalueDecomposition eig = A.eig();
