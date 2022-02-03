@@ -7,6 +7,10 @@ import java.util.function.BiFunction;
 // TODO move brent from solvers here
 public class Brent {
 
+    /*
+    Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
+    All rights reserved. See https://github.com/StaticBeagle/ETK4J/blob/master/COPYING.
+     */
     // TODO test
     // https://github.com/scipy/scipy/blob/v1.7.1/scipy/optimize/optimize.py#L1904-L1979
     public static double brentsMinimizer(BiFunction<Double, Object[], Double> func,

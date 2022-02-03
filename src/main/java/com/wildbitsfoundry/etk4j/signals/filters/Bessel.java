@@ -27,6 +27,10 @@ public class Bessel extends AnalogFilter {
     }
 
     /*
+    Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
+    All rights reserved. See https://github.com/StaticBeagle/ETK4J/blob/master/COPYING.
+     */
+    /*
         Port from scipy
         ``phase``
             The filter is normalized such that the phase response reaches its
@@ -117,6 +121,10 @@ public class Bessel extends AnalogFilter {
         return lpTobsZPK(zpk, w0, bw);
     }
 
+    /*
+    Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
+    All rights reserved. See https://github.com/StaticBeagle/ETK4J/blob/master/COPYING
+     */
     private static Complex[] besselZeros(int n) {
         if (n == 0) {
             return new Complex[0];
@@ -213,6 +221,10 @@ public class Bessel extends AnalogFilter {
         return ComplexArrays.flatten(result);
     };
 
+    /*
+    Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
+    All rights reserved. See https://github.com/StaticBeagle/ETK4J/blob/master/COPYING
+     */
     private static Complex[] camposZeros(int n) {
         if (n == 1) {
             return new Complex[]{Complex.fromReal(-1.0)};
@@ -234,6 +246,10 @@ public class Bessel extends AnalogFilter {
         return ComplexArrays.zip(x, y);
     }
 
+    /*
+    Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
+    All rights reserved. See https://github.com/StaticBeagle/ETK4J/blob/master/COPYING
+     */
     private static Complex[] aberth(Function<Complex[], Complex[]> fx, Function<Complex[], Complex[]> fp,
                                     Complex[] x0, double tol, int maxIter) {
         final int n = x0.length;
@@ -280,6 +296,10 @@ public class Bessel extends AnalogFilter {
         return x;
     }
 
+    /*
+    Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
+    All rights reserved. See https://github.com/StaticBeagle/ETK4J/blob/master/COPYING
+     */
     private static double fallingFactorial(int x, int n) {
         double val = 1.0;
         for(int i = x - n + 1; i < x + 1; ++i) {
@@ -288,6 +308,10 @@ public class Bessel extends AnalogFilter {
         return val;
     }
 
+    /*
+    Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
+    All rights reserved. See https://github.com/StaticBeagle/ETK4J/blob/master/COPYING
+     */
     private static double normFactor(Complex[] poles, double k) {
         UnivariateFunction gw = w -> {
             Complex prod = Complex.fromReal(1.0);

@@ -4,7 +4,10 @@ import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.functions.ComplexUnivariateFunction;
 
-
+/*
+Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
+All rights reserved. see https://github.com/StaticBeagle/ETK4J/blob/master/COPYING.
+ */
 public final class NewtonRaphsonComplex {
     private int maxNumberOfIterations = 100;
     private double absTol = 1e-9;

@@ -656,6 +656,10 @@ public class TransferFunction extends LinearTimeInvariantSystem {
         return rf.isStrictlyProper();
     }
 
+    /*
+    Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
+    All rights reserved. See https://github.com/StaticBeagle/ETK4J/blob/master/COPYING.
+     */
     /***
      * Transform SISO only single input single output TFs
      * @return

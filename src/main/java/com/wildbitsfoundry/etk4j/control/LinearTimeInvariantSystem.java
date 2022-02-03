@@ -17,31 +17,39 @@ public abstract class LinearTimeInvariantSystem {
     }
 
     public abstract StateSpace toStateSpace();
+
     public abstract TransferFunction toTransferFunction();
+
     public abstract ZeroPoleGain toZeroPoleGain();
+
+    /*
+    Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
+    All rights reserved. See https://github.com/StaticBeagle/ETK4J/blob/master/COPYING.
+     */
 
     /**
      * Simulate time response of a continuous-time system.
-     * @param input Array describing the input at every time step.
-     * @param time The time at which to evaluate the system.
+     *
+     * @param input             Array describing the input at every time step.
+     * @param time              The time at which to evaluate the system.
      * @param initialConditions Initial conditions of the system.
-     * @param ss State Space representation of the system.
+     * @param ss                State Space representation of the system.
      * @param integrationMethod Integration method.
      * @return The {@link TimeResponse} of the system.
-     * @throws IllegalArgumentException if the length of the input array does not match the length of the time array.
-     * @throws IllegalArgumentException if the time array is empty.
-     * @throws IllegalArgumentException if the initial time is negative.
+     * @throws IllegalArgumentException     if the length of the input array does not match the length of the time array.
+     * @throws IllegalArgumentException     if the time array is empty.
+     * @throws IllegalArgumentException     if the initial time is negative.
      * @throws NonUniformTimeStepsException if the step of the time array ore not uniform.
      * @see <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.lsim.html">lsim</a>
      */
     protected TimeResponse lsim(double[][] input, double[] time, double[] initialConditions,
-                              StateSpace ss, IntegrationMethod integrationMethod) {
+                                StateSpace ss, IntegrationMethod integrationMethod) {
         double[][] U = NumArrays.transpose(input);
 
-        if(U.length != time.length) {
+        if (U.length != time.length) {
             throw new IllegalArgumentException("The input array and the time array must have the same length.");
         }
-        if(time.length == 0) {
+        if (time.length == 0) {
             throw new IllegalArgumentException("The time array must have at least one element.");
         }
 
@@ -58,15 +66,15 @@ public abstract class LinearTimeInvariantSystem {
         double[] x0 = initialConditions == null ? new double[noStates] : initialConditions;
         double[][] xOut = new double[noSteps][noStates];
 
-        if(time[0] == 0.0) {
+        if (time[0] == 0.0) {
             xOut[0] = x0;
-        } else if(time[0] > 0.0) {
+        } else if (time[0] > 0.0) {
             xOut[0] = NumArrays.dot(x0, A.transpose().multiply(time[0]).expm().getAs2DArray());
         } else {
             throw new IllegalArgumentException("Initial time must be non negative.");
         }
 
-        if(noSteps > 1) {
+        if (noSteps > 1) {
             double dt = time[1] - time[0];
             double[] delta = new double[time.length - 2];
             for (int i = 1; i < time.length - 1; ++i) {
@@ -131,7 +139,7 @@ public abstract class LinearTimeInvariantSystem {
         double[][] yOut = new double[noSteps][noStates];
         double[][] c = C.transpose().getAs2DArray();
         double[][] d = D.transpose().getAs2DArray();
-        for(int i = 0; i < noSteps; ++i) {
+        for (int i = 0; i < noSteps; ++i) {
             yOut[i] = NumArrays.dot(xOut[i], c);
             NumArrays.addElementWiseInPlace(yOut[i], NumArrays.dot(U[i], d));
         }
@@ -163,8 +171,9 @@ public abstract class LinearTimeInvariantSystem {
     /**
      * Step response of the continuous-time system with the given initial conditions and the given {@code numberOfpoints}
      * default (calculated) time points.
+     *
      * @param initialConditions The initial conditions of the system.
-     * @param numberOfPoints The number of points in which to evaluate the step response.
+     * @param numberOfPoints    The number of points in which to evaluate the step response.
      * @return The step response of the system.
      * @see <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.step.html">step</a>
      */
@@ -174,6 +183,7 @@ public abstract class LinearTimeInvariantSystem {
 
     /**
      * Step response of the continuous-time system with zero initial conditions and the given time points.
+     *
      * @param time The times at which to evaluate the step response.
      * @return The step response of the system.
      * @see <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.step.html">step</a>
@@ -184,7 +194,8 @@ public abstract class LinearTimeInvariantSystem {
 
     /**
      * Step response of the continuous-time system with the given initial conditions and the given time points.
-     * @param time The times at which to evaluate the step response.
+     *
+     * @param time              The times at which to evaluate the step response.
      * @param initialConditions The initial conditions of the system.
      * @return The step response of the system.
      * @see <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.step.html">step</a>
@@ -193,6 +204,10 @@ public abstract class LinearTimeInvariantSystem {
         return step(time, initialConditions, time.length);
     }
 
+    /*
+    Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
+    All rights reserved. See https://github.com/StaticBeagle/ETK4J/blob/master/COPYING.
+     */
     protected StepResponse step(double[] time, double[] initialConditions, int numberOfPoints) {
         StateSpace ss = this.toStateSpace();
         time = time == null ? defaultResponseTimes(ss.getA(), numberOfPoints) : time;
@@ -202,14 +217,18 @@ public abstract class LinearTimeInvariantSystem {
         return new StepResponse(lSim.getTime(), lSim.getResponse()[0]);
     }
 
+    /*
+    Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
+    All rights reserved. See https://github.com/StaticBeagle/ETK4J/blob/master/COPYING.
+     */
     protected double[] defaultResponseTimes(Matrix A, int numberOfPoints) {
         EigenvalueDecomposition eig = A.eig();
         double[] realEig = eig.getRealEigenvalues();
-        for(int i = 0; i < realEig.length; ++i) {
+        for (int i = 0; i < realEig.length; ++i) {
             realEig[i] = Math.abs(realEig[i]);
         }
         double r = NumArrays.min(realEig);
-        if(r == 0.0) {
+        if (r == 0.0) {
             r = 1.0;
         }
         double tc = 1.0 / r;
