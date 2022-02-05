@@ -161,7 +161,7 @@ public class MatrixTest {
 		avals[0][0] = columnwise[0];
 		I = new Matrix(ivals);
 		try {
-			check(I, Matrices.Identity(3, 4));
+			check(I, Matrices.identity(3, 4));
 			try_success("identity... ", "");
 		} catch (java.lang.RuntimeException e) {
 			errorCount = try_failure(errorCount, "identity... ", "identity Matrix not successfully created");
@@ -781,7 +781,7 @@ public class MatrixTest {
 		}
 		X = A.inv();
 		try {
-			check(A.multiply(X), Matrices.Identity(3, 3));
+			check(A.multiply(X), Matrices.identity(3, 3));
 			try_success("inverse()...", "");
 		} catch (java.lang.RuntimeException e) {
 			errorCount = try_failure(errorCount, "inverse()...", "incorrect inverse calculation");
@@ -807,9 +807,9 @@ public class MatrixTest {
 			errorCount = try_failure(errorCount, "CholeskyDecomposition...",
 					"incorrect Cholesky decomposition calculation");
 		}
-		X = Chol.solve(Matrices.Identity(3, 3));
+		X = Chol.solve(Matrices.identity(3, 3));
 		try {
-			check(A.multiply(X), Matrices.Identity(3, 3));
+			check(A.multiply(X), Matrices.identity(3, 3));
 			try_success("CholeskyDecomposition solve()...", "");
 		} catch (java.lang.RuntimeException e) {
 			errorCount = try_failure(errorCount, "CholeskyDecomposition solve()...",

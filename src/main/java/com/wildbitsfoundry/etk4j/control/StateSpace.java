@@ -1,11 +1,10 @@
 package com.wildbitsfoundry.etk4j.control;
 
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
-import com.wildbitsfoundry.etk4j.math.linearalgebra.EigenvalueDecomposition;
+import com.wildbitsfoundry.etk4j.math.linearalgebra.ComplexMatrix;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrices;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.NonSquareMatrixException;
-import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
 import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 import com.wildbitsfoundry.etk4j.util.NumArrays;
 
@@ -147,6 +146,12 @@ public class StateSpace extends LinearTimeInvariantSystem {
         return lsim(input, time, initialConditions, this, integrationMethod);
     }
 
+    public Complex[] evaluateAt(double w) {
+        ComplexMatrix inner = Matrices.identity(A.getRowCount()).multiply(Complex.fromImaginary(w)).subtract(A).inv();
+        ComplexMatrix outer = C.multiply(inner).multiply(B);
+        return ComplexArrays.addElementWise(ComplexArrays.fromReal(D.getArray()), outer.getArray());
+    }
+
     public static void main(String[] args) {
         double[][] A = {{-2, -1}, {1, 0}};
         double[][] B = {{1}, {0}};
@@ -156,6 +161,11 @@ public class StateSpace extends LinearTimeInvariantSystem {
         StateSpace ss = new StateSpace(A, B, C, D);
         TransferFunction tf = ss.toTransferFunction();
         System.out.println(tf);
+
+        System.out.println(tf.evaluateAt(100));
+        System.out.println(Arrays.toString(ss.evaluateAt(100)));
+
+        System.out.println(tf.toStateSpace());
 
         A = new double[][]{{-1}};
         B = new double[][]{{1}};
@@ -174,5 +184,9 @@ public class StateSpace extends LinearTimeInvariantSystem {
         ss = new StateSpace(A, B, C, D);
         TransferFunction[] tfs = ss.toTransferFunction(0);
         Arrays.stream(tfs).forEach(System.out::println);
+
+        Arrays.stream(tfs).forEach(x -> System.out.println(x.evaluateAt(100)));
+
+        System.out.println(Arrays.toString(ss.evaluateAt(100)));
     }
 }

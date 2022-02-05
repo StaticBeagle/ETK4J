@@ -25,8 +25,8 @@ public final class Filters {
         Complex[] poles = zpk.getPoles();
         double k = zpk.getGain();
         int degree = getRelativeDegree(zeros, poles);
-        ComplexArrays.multiplyInPlace(zeros, w0);
-        ComplexArrays.multiplyInPlace(poles, w0);
+        ComplexArrays.multiplyElementWiseInPlace(zeros, w0);
+        ComplexArrays.multiplyElementWiseInPlace(poles, w0);
         k *= Math.pow(w0, degree);
         return new ZeroPoleGain(zeros, poles, k);
     }

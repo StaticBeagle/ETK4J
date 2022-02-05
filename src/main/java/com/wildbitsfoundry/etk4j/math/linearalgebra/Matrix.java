@@ -3,8 +3,6 @@ package com.wildbitsfoundry.etk4j.math.linearalgebra;
 import java.util.Arrays;
 
 import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
-import com.wildbitsfoundry.etk4j.control.StateSpace;
-import com.wildbitsfoundry.etk4j.control.TransferFunction;
 import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
@@ -181,25 +179,33 @@ public class Matrix {
     }
 
     public double get(int i, int j) {
+        if(i < 0) {
+            throw new ArrayIndexOutOfBoundsException("Index i cannot be less thant zero.");
+        }
         if (i >= rows) {
-            throw new ArrayIndexOutOfBoundsException(String.format("Index i = %d is greater than the number of rows = %d",
-                    i, rows));
+            throw new ArrayIndexOutOfBoundsException(String.format("Index i: %d >= than number of rows: %d.", i, rows));
+        }
+        if(j < 0) {
+            throw new ArrayIndexOutOfBoundsException("Index j cannot be less thant zero.");
         }
         if (j >= cols) {
-            throw new ArrayIndexOutOfBoundsException(String.format("Index j = %d is greater than the number of columns = %d",
-                    j, cols));
+            throw new ArrayIndexOutOfBoundsException(String.format("Index j: %d >= than number of columns: %d.", j, cols));
         }
         return data[i * cols + j];
     }
 
     public void set(int i, int j, double val) {
+        if(i < 0) {
+            throw new ArrayIndexOutOfBoundsException("Index i cannot be less thant zero.");
+        }
         if (i >= rows) {
-            throw new ArrayIndexOutOfBoundsException(String.format("Index i = %d is greater than the number of rows = %d",
-                    i, rows));
+            throw new ArrayIndexOutOfBoundsException(String.format("Index i: %d >= than number of rows: %d.", i, rows));
+        }
+        if(j < 0) {
+            throw new ArrayIndexOutOfBoundsException("Index j cannot be less thant zero.");
         }
         if (j >= cols) {
-            throw new ArrayIndexOutOfBoundsException(String.format("Index j = %d is greater than the number of columns = %d",
-                    j, cols));
+            throw new ArrayIndexOutOfBoundsException(String.format("Index j: %d >= than number of columns: %d.", j, cols));
         }
         data[i * cols + j] = val;
     }
@@ -332,8 +338,9 @@ public class Matrix {
 
     public Matrix cofactor() {
         int dim = this.rows;
-        // Make sure that matrix is square
-
+        if(!this.isSquared()) {
+            throw new NonSquareMatrixException("Matrix must be a square Matrix.");
+        }
         double[][] cofactor = new double[dim][dim];
 
         int sign = -1;
@@ -369,6 +376,7 @@ public class Matrix {
         return this.cofactor().transpose();
     }
 
+    // region decompositions
     public LUDecomposition LU() {
         return new LUDecomposition(this);
 
@@ -385,7 +393,7 @@ public class Matrix {
     public SingularValueDecomposition SVD() {
         return new SingularValueDecomposition(this);
     }
-
+    // endregion
     /***
      * Get matrix diagonal
      *
@@ -404,7 +412,7 @@ public class Matrix {
     }
 
     public Matrix inv() {
-        return this.solve(Matrices.Identity(rows));
+        return this.solve(Matrices.identity(rows));
     }
 
     public boolean isEmpty() {
@@ -430,6 +438,7 @@ public class Matrix {
         return new Matrix(result, trows, tcols);
     }
 
+    // region norms
     /***
      * One norm
      *
@@ -488,6 +497,7 @@ public class Matrix {
         }
         return norm;
     }
+    // endregion
 
     /**
      * Unary minus
@@ -505,6 +515,7 @@ public class Matrix {
         return new Matrix(x, m, n);
     }
 
+    // region arithmetic operations
     public Matrix add(Matrix m) {
         checkMatrixDimensions(m);
         double[] result = new double[this.rows * this.cols];
@@ -641,6 +652,17 @@ public class Matrix {
     }
 
     /**
+     * Multiply a matrix by a complex scalar, C = s*A
+     *
+     * @param s scalar
+     * @return s*A
+     */
+
+    public ComplexMatrix multiply(Complex s) {
+        return new ComplexMatrix(ComplexArrays.multiplyElementWise(data, s), rows, cols);
+    }
+
+    /**
      * Multiply a matrix by a scalar in place, A = s*A
      *
      * @param s scalar
@@ -655,6 +677,10 @@ public class Matrix {
         Matrix c = new Matrix(0, 0);
         multiplyOp(this, matrix, c);
         return c;
+    }
+
+    public void multiplyEquals(Matrix matrix) {
+        multiplyOp(this, matrix, this);
     }
 
     private static void multiplyOp(Matrix a, Matrix b, Matrix c) {
@@ -681,10 +707,31 @@ public class Matrix {
         c.cols = b.cols;
     }
 
-    public void multiplyEquals(Matrix matrix) {
-        multiplyOp(this, matrix, this);
+    public ComplexMatrix multiply(ComplexMatrix matrix) {
+        int bRows = matrix.getRowCount();
+        int bCols = matrix.getColumnCount();
+        if (bRows != cols) {
+            throw new IllegalArgumentException("Matrix inner dimensions must agree. Check that the number of" +
+                    "columns of the first matrix equal the number of rows of the second matrix.");
+        }
+        Complex[] result = new Complex[rows * bCols];
+        Complex[] bColJ = new Complex[cols];
+        Complex[] bData = matrix.getArray();
+        for (int j = 0; j < bCols; j++) {
+            for (int k = 0; k < cols; k++) {
+                bColJ[k] = bData[k * bCols + j];
+            }
+            for (int i = 0; i < rows; i++) {
+                Complex s = new Complex();
+                for (int k = 0; k < cols; k++) {
+                    s.addEquals(bColJ[k].multiply(data[k + i * cols]));
+                }
+                result[i * bCols + j] = s;
+            }
+        }
+        return new ComplexMatrix(result, rows, bCols);
     }
-
+    // endregion
     public Matrix solve(Matrix B) {
 
         if (rows == cols) { // Matrix is Squared
@@ -1006,8 +1053,8 @@ public class Matrix {
     /**
      * Check if size(A) == size(B)
      **/
-
-    private void checkMatrixDimensions(Matrix B) {
+    // TODO should this be static?
+    void checkMatrixDimensions(Matrix B) {
         if (B.rows != rows || B.cols != cols) {
             throw new IllegalArgumentException("Matrix dimensions must agree.");
         }
@@ -1035,7 +1082,7 @@ public class Matrix {
         }
         n = Math.abs(n);
         if (n == 0) {
-            return Matrices.Identity(rows);
+            return Matrices.identity(rows);
         }
         Matrix a = n < 0 ? inv() : new Matrix(this);
 
@@ -1079,8 +1126,8 @@ public class Matrix {
 
         Matrix X = new Matrix(A);
         double c = 0.5;
-        Matrix E = Matrices.Identity(A.rows, A.cols).add(A.multiply(c));
-        Matrix D = Matrices.Identity(A.rows, A.cols).subtract(A.multiply(c));
+        Matrix E = Matrices.identity(A.rows, A.cols).add(A.multiply(c));
+        Matrix D = Matrices.identity(A.rows, A.cols).subtract(A.multiply(c));
         double q = 6.0;
         boolean p = true;
         for (int k = 2; k <= q; ++k) {

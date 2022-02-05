@@ -111,7 +111,7 @@ public abstract class LinearTimeInvariantSystem {
                     for (int i = 0; i < noStates; ++i) {
                         M[i] = NumArrays.concatenateAll(A.getRow(i), B.getRow(i), new double[noInputs]);
                     }
-                    double[][] identity = Matrices.Identity(noInputs).getAs2DArray();
+                    double[][] identity = Matrices.identity(noInputs).getAs2DArray();
                     for (int i = noStates, j = 0; i < noStates + noInputs; ++i, ++j) {
                         M[i] = NumArrays.concatenate(new double[noStates + noInputs], identity[j]);
                     }
@@ -208,9 +208,18 @@ public abstract class LinearTimeInvariantSystem {
     Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
     All rights reserved. See https://github.com/StaticBeagle/ETK4J/blob/master/SciPy.
      */
+
+    /**
+     * Helper function to support all the step overloads.
+     * @param time The time vector. Can be null then
+     * {@link LinearTimeInvariantSystem#generateDefaultResponseTimes(Matrix, int)} will be used
+     * @param initialConditions Initial conditions of the system.
+     * @param numberOfPoints Number of points to be used in case the time vector is null.
+     * @return The StepReponse of the system.
+     */
     protected StepResponse step(double[] time, double[] initialConditions, int numberOfPoints) {
         StateSpace ss = this.toStateSpace();
-        time = time == null ? defaultResponseTimes(ss.getA(), numberOfPoints) : time;
+        time = time == null ? generateDefaultResponseTimes(ss.getA(), numberOfPoints) : time;
         double[][] U = new double[1][];
         U[0] = NumArrays.ones(time.length);
         TimeResponse lSim = lsim(U, time, initialConditions, ss, IntegrationMethod.ZERO_ORDER_HOLD);
@@ -221,7 +230,14 @@ public abstract class LinearTimeInvariantSystem {
     Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
     All rights reserved. See https://github.com/StaticBeagle/ETK4J/blob/master/SciPy.
      */
-    protected double[] defaultResponseTimes(Matrix A, int numberOfPoints) {
+
+    /**
+     * Default times for the system response.
+     * @param A The input matrix of the State Space system.
+     * @param numberOfPoints The number of points to generate.
+     * @return The default response times.
+     */
+    protected double[] generateDefaultResponseTimes(Matrix A, int numberOfPoints) {
         EigenvalueDecomposition eig = A.eig();
         double[] realEig = eig.getRealEigenvalues();
         for (int i = 0; i < realEig.length; ++i) {

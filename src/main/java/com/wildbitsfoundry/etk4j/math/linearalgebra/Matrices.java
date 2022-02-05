@@ -16,7 +16,7 @@ public final class Matrices {
         return new Matrix(V);
     }
 
-    public static Matrix Identity(int rows, int cols) {
+    public static Matrix identity(int rows, int cols) {
         double[] data = new double[rows * cols];
         for (int i = 0; i < rows; ++i) {
             for (int j = 0; j < cols; ++j) {
@@ -28,8 +28,8 @@ public final class Matrices {
         return new Matrix(data, rows, cols);
     }
 
-    public static Matrix Identity(int n) {
-        return Matrices.Identity(n, n);
+    public static Matrix identity(int n) {
+        return Matrices.identity(n, n);
     }
 
     public static Matrix Random(int n) {

@@ -16,79 +16,6 @@ import java.util.Arrays;
  * The internal structure of the class is a {@link RationalFunction}.
  */
 public class TransferFunction extends LinearTimeInvariantSystem {
-
-    /**
-     * The {@code Frequency Response} holds the {@link Complex }results of the evaluation of the
-     * {@link TransferFunction} at a given set of frequencies.
-     */
-    public static class FrequencyResponse {
-        private Complex[] response;
-        private double[] w;
-
-        FrequencyResponse(Complex[] response, double[] w) {
-            this.response = response;
-            this.w = w;
-        }
-
-        /**
-         * Complex response of the system.
-         * @return The {@link Complex} response of the system.
-         */
-        public Complex[] getResponse() {
-            return response;
-        }
-
-        /**
-         * Frequencies at which the system was evaluated.
-         * @return An array of frequencies at which the system was evaluated.
-         */
-        public double[] getFrequencies() {
-            return w;
-        }
-    }
-
-    /**
-     * The {@code BodeResponse} class holds the magnitude and frequency response after evaluating the given
-     * {@link TransferFunction} at an array of frequencies.
-     */
-    public static class BodeResponse {
-        private double[] magnitudeIndB;
-        private double[] phase;
-        private double[] w;
-
-        BodeResponse(double[] magnitudeIndB, double[] phase, double[] w) {
-            this.magnitudeIndB = magnitudeIndB;
-            this.phase = phase;
-            this.w = w;
-        }
-
-        /**
-         * Magnitude response of the system.
-         * @return The magnitude response of the system. <br>
-         * {@code Mag<sub>dB</sub> = 20 * log10(abs(response))}.
-         */
-        public double[] getMagnitudeIndB() {
-            return magnitudeIndB;
-        }
-
-        /**
-         * Phase response of the system.
-         * @return The wrapped phase response of the system is degrees. The wrapped phase only goes from -180° to 180°. <br>
-         * To unwrap the phase the {@link TransferFunction#unwrapPhase(double[])} can be used.
-         */
-        public double[] getPhaseInDegrees() {
-            return phase;
-        }
-
-        /**
-         * Frequencies at which the system was evaluated.
-         * @return An array of frequencies at which the system was evaluated.
-         */
-        public double[] getFrequencies() {
-            return w;
-        }
-    }
-
     private RationalFunction rf;
 
     /***
@@ -227,16 +154,30 @@ public class TransferFunction extends LinearTimeInvariantSystem {
         return phase;
     }
 
+    /**
+     * Frequency response of the system. The default value for the number of points is 200.
+     * @return The complex frequency response of the system and the frequency at which each point was calculated.
+     */
     public FrequencyResponse getFrequencyResponse() {
         double[] frequencies = findFrequencies(200);
         return this.getFrequencyResponse(frequencies);
     }
 
+    /**
+     * Frequency response of the system.
+     * @param numberOfPoints The number of points in which to evaluate the system.
+     * @return The complex frequency response of the system and the frequency at which each point was calculated.
+     */
     public FrequencyResponse getFrequencyResponse(int numberOfPoints) {
         double[] frequencies = findFrequencies(numberOfPoints);
         return this.getFrequencyResponse(frequencies);
     }
 
+    /**
+     * Frequency response of the system.
+     * @param w The frequencies at which to evaluate the system.
+     * @return The frequency response of the system at each given frequency.
+     */
     public FrequencyResponse getFrequencyResponse(double[] w) {
         Complex[] response = new Complex[w.length];
         for (int i = 0; i < w.length; ++i) {
@@ -245,16 +186,30 @@ public class TransferFunction extends LinearTimeInvariantSystem {
         return new FrequencyResponse(response, w);
     }
 
+    /**
+     * Bode response of the system.
+     * @return The magnitude in dB and phase in degrees of the system.
+     */
     public BodeResponse getBode() {
         double[] frequencies = findFrequencies(200);
         return this.getBode(frequencies);
     }
 
+    /**
+     * Bode response of the system.
+     * @param numberOfPoints The number of points in which to evaluate the system.
+     * @return The magnitude in dB and phase in degrees of the system.
+     */
     public BodeResponse getBode(int numberOfPoints) {
         double[] frequencies = findFrequencies(numberOfPoints);
         return this.getBode(frequencies);
     }
 
+    /**
+     * Bode response of the system.
+     * @param w The frequencies at which to evaluate the system.
+     * @return The magnitude in dB and phase in degrees of the system.
+     */
     public BodeResponse getBode(double[] w) {
         double[] magnitudeIndB = new double[w.length];
         double[] phaseInDegrees = new double[w.length];
@@ -705,13 +660,13 @@ public class TransferFunction extends LinearTimeInvariantSystem {
         System.arraycopy(den, 1, fRow, 0, fRow.length);
         NumArrays.multiplyElementWiseInPlace(fRow, -1.0);
 
-        double[][] eye = Matrices.Identity(k - 2, k - 1).getAs2DArray();
+        double[][] eye = Matrices.identity(k - 2, k - 1).getAs2DArray();
         double[][] A = new double[eye.length + 1][];
         A[0] = fRow;
         for (int i = 0; i < eye.length; ++i) {
             A[i + 1] = Arrays.copyOf(eye[i], eye[0].length);
         }
-        double[][] B = Matrices.Identity(k - 1, 1).getAs2DArray();
+        double[][] B = Matrices.identity(k - 1, 1).getAs2DArray();
         double[][] C = new double[1][];
         double[][] outer = NumArrays.outer(new double[]{numPadded[0]}, Arrays.copyOfRange(den, 1, den.length));
         C[0] = NumArrays.subtract(Arrays.copyOfRange(numPadded, 1, numPadded.length), outer[0]);

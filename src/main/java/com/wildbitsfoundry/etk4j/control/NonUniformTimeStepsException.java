@@ -1,5 +1,9 @@
 package com.wildbitsfoundry.etk4j.control;
 
+/**
+ * The {@cde NonUniformTimeStepsException is thrown when the time vector to a time simulation for a
+ * {@link LinearTimeInvariantSystem} is not uniform i.e. the difference between each point is different.
+ */
 public class NonUniformTimeStepsException extends RuntimeException {
     public NonUniformTimeStepsException(){}
 

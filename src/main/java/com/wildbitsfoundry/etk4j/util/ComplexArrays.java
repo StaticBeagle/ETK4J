@@ -1,13 +1,9 @@
 package com.wildbitsfoundry.etk4j.util;
 
-import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.List;
 import java.util.stream.IntStream;
 
 import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkXYDimensions;
@@ -174,7 +170,8 @@ public final class ComplexArrays {
         return result;
     }
 
-    public static Complex[] add(Complex[] a, Complex b, int start, int end) {
+    // region arithmetic operations
+    public static Complex[] addElementWise(Complex[] a, Complex b, int start, int end) {
         Complex[] result = new Complex[end - start];
         for (int i = start, k = 0; i < end; ++i, ++k) {
             result[k] = a[i].add(b);
@@ -182,10 +179,23 @@ public final class ComplexArrays {
         return result;
     }
 
-    public static Complex[] add(Complex[] a, Complex b) {
-        return add(a, b, 0, a.length);
+    public static Complex[] addElementWise(Complex[] a, Complex b) {
+        return addElementWise(a, b, 0, a.length);
     }
 
+    public static Complex[] addElementWise(Complex[] a, Complex[] b) {
+        int aLength = a.length;
+        int bLength = b.length;
+        if(aLength != bLength) {
+            throw new IllegalArgumentException("Array dimensions must match.");
+        }
+        Complex[] result = new Complex[aLength];
+        for(int i = 0; i < aLength; ++i) {
+            result[i] = a[i].add(b[i]);
+        }
+        return result;
+    }
+    // endregion
     public static Complex[] reverse(Complex[] a) {
         final int length = a.length;
         Complex[] result = new Complex[length];
@@ -204,7 +214,34 @@ public final class ComplexArrays {
         return sum;
     }
 
-    public static void multiplyInPlace(Complex[] a, double d) {
+    public static double[] multiplyElementWise(double[] a, double d) {
+        double[] result = new double[a.length];
+        multiplyElementWiseInPlace(result, d);
+        return result;
+    }
+
+
+    public static void multiplyElementWiseInPlace(double[] a, double d) {
+        for (int i = 0; i < a.length; ++i) {
+            a[i] *= d;
+        }
+    }
+
+    public static Complex[] multiplyElementWise(double[] a, Complex s) {
+        Complex[] result = new Complex[a.length];
+        for(int i = 0; i < a.length; ++i) {
+            result[i] = s.multiply(a[i]);
+        }
+        return result;
+    }
+
+    public static Complex[] multiplyElementWise(Complex[] a, double c) {
+        Complex[] result = new Complex[a.length];
+        multiplyElementWiseInPlace(result, c);
+        return result;
+    }
+
+    public static void multiplyElementWiseInPlace(Complex[] a, double d) {
         for (int i = 0; i < a.length; ++i) {
             a[i].multiplyEquals(d);
         }
@@ -330,4 +367,5 @@ public final class ComplexArrays {
         }
         return result;
     }
+
 }
