@@ -80,8 +80,8 @@ public class StateSpace extends LinearTimeInvariantSystem {
             throw new IllegalArgumentException("System does not have the input specified.");
         }
         // make SIMO from possibly MIMO system.
-        B = B.subMatrix(0, B.getRowCount() - 1, input, input);
-        D = D.subMatrix(0, D.getRowCount() - 1, input, input);
+        Matrix Bb = B.subMatrix(0, B.getRowCount() - 1, input, input);
+        Matrix Dd = D.subMatrix(0, D.getRowCount() - 1, input, input);
 
         double[][] num;
         double[] den;
@@ -91,8 +91,8 @@ public class StateSpace extends LinearTimeInvariantSystem {
         }
         den = A.poly();
 
-        if(B.getRowCount() * B.getColumnCount() == 0 && C.getRowCount() * C.getColumnCount() == 0) {
-            if(D.getRowCount() * D.getColumnCount() == 0 && A.getRowCount() * A.getColumnCount() == 0) {
+        if(Bb.getRowCount() * Bb.getColumnCount() == 0 && C.getRowCount() * C.getColumnCount() == 0) {
+            if(Dd.getRowCount() * Dd.getColumnCount() == 0 && A.getRowCount() * A.getColumnCount() == 0) {
                 den = new double[0];
             }
             return new TransferFunction[] { new TransferFunction(D.getArray(), den)};
@@ -103,8 +103,8 @@ public class StateSpace extends LinearTimeInvariantSystem {
         TransferFunction[] tfs = new TransferFunction[nout];
         for(int k = 0; k < nout; ++k) {
             double[] Ck = C.getRow(k);
-            double Dk = D.get(k, 0);
-            num[k] = A.subtract(new Matrix(dot(B.getArray(), Ck))).poly();
+            double Dk = Dd.get(k, 0);
+            num[k] = A.subtract(new Matrix(dot(Bb.getArray(), Ck))).poly();
             NumArrays.addElementWiseInPlace(num[k], NumArrays.multiplyElementWise(den, Dk - 1));
             tfs[k] = new TransferFunction(num[k], den);
         }
@@ -149,7 +149,7 @@ public class StateSpace extends LinearTimeInvariantSystem {
     public Complex[] evaluateAt(double w) {
         ComplexMatrix inner = Matrices.identity(A.getRowCount()).multiply(Complex.fromImaginary(w)).subtract(A).inv();
         ComplexMatrix outer = C.multiply(inner).multiply(B);
-        return ComplexArrays.addElementWise(ComplexArrays.fromReal(D.getArray()), outer.getArray());
+        return ComplexMatrix.fromRealMatrix(D).add(outer).transpose().getArray();
     }
 
     public static void main(String[] args) {

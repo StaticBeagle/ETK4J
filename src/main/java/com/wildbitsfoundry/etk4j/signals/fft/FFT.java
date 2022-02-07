@@ -134,10 +134,9 @@ public class FFT {
 
 			if (i < j) {
 				// swap data[i] and data[j]
-				t1 = data[i].real();
-				t2 = data[i].imag();
-				data[i].addEquals(-t1 + data[j].real(), -t2 + data[j].imag());
-				data[j].addEquals(-data[j].real() + t1, -data[j].imag() + t2);
+				Complex swap = data[i];
+				data[i] = data[j];
+				data[j] = swap;
 			}
 		}
 

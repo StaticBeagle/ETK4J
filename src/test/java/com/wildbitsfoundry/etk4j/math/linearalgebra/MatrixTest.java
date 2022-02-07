@@ -12,35 +12,35 @@ public class MatrixTest {
 	public void testMagic() {
 
 		Matrix sol = new Matrix(1, 1, 1);
-		Matrix magic = Matrices.Magic(1);
+		Matrix magic = Matrices.magic(1);
 		assertEquals(sol, magic);
 
 		sol = Matrices.empty();
-		magic = Matrices.Magic(2);
+		magic = Matrices.magic(2);
 		assertEquals(sol, magic);
 
 		double[][] values3by3 = { { 8.0, 1.0, 6.0 }, { 3.0, 5.0, 7.0 }, { 4.0, 9.0, 2.0 } };
 		sol = new Matrix(values3by3);
-		magic = Matrices.Magic(3);
+		magic = Matrices.magic(3);
 		assertEquals(sol, magic);
 
 		double[][] values4by4 = { { 16.0, 2.0, 3.0, 13.0 }, { 5.0, 11.0, 10.0, 8.0 }, { 9.0, 7.0, 6.0, 12.0 },
 				{ 4.0, 14.0, 15.0, 1.0 } };
 		sol = new Matrix(values4by4);
-		magic = Matrices.Magic(4);
+		magic = Matrices.magic(4);
 		assertEquals(sol, magic);
 
 		double[][] values5by5 = { { 17.0, 24.0, 1.0, 8.0, 15.0 }, { 23.0, 5.0, 7.0, 14.0, 16.0 },
 				{ 4.0, 6.0, 13.0, 20.0, 22.0 }, { 10.0, 12.0, 19.0, 21.0, 3.0 }, { 11.0, 18.0, 25.0, 2.0, 9.0 } };
 		sol = new Matrix(values5by5);
-		magic = Matrices.Magic(5);
+		magic = Matrices.magic(5);
 		assertEquals(sol, magic);
 
 		double[][] values6by6 = { { 35.0, 1.0, 6.0, 26.0, 19.0, 24.0 }, { 3.0, 32.0, 7.0, 21.0, 23.0, 25.0 },
 				{ 31.0, 9.0, 2.0, 22.0, 27.0, 20.0 }, { 8.0, 28.0, 33.0, 17.0, 10.0, 15.0 },
 				{ 30.0, 5.0, 34.0, 12.0, 14.0, 16.0 }, { 4.0, 36.0, 29.0, 13.0, 18.0, 11.0 } };
 		sol = new Matrix(values6by6);
-		magic = Matrices.Magic(6);
+		magic = Matrices.magic(6);
 		assertEquals(sol, magic);
 	}
 
@@ -521,7 +521,7 @@ public class MatrixTest {
 
 		print("\nTesting array-like methods...\n");
 		S = new Matrix(columnwise, nonconformld);
-		R = Matrices.Random(A.getRowCount(), A.getColumnCount());
+		R = Matrices.random(A.getRowCount(), A.getColumnCount());
 		A = R;
 		try {
 			S = A.subtract(S);
@@ -552,7 +552,7 @@ public class MatrixTest {
 		}
 
 		A = R.copy();
-		B = Matrices.Random(A.getRowCount(), A.getColumnCount());
+		B = Matrices.random(A.getRowCount(), A.getColumnCount());
 		C = A.subtract(B);
 		try {
 			S = A.add(S);
@@ -645,7 +645,7 @@ public class MatrixTest {
 			errorCount = try_failure(errorCount, "arrayRightDivideEquals... ", "(M./M != ones)");
 		}
 		A = R.copy();
-		B = Matrices.Random(A.getRowCount(), A.getColumnCount());
+		B = Matrices.random(A.getRowCount(), A.getColumnCount());
 		try {
 			S = A.arrayMultiply(S);
 			errorCount = try_failure(errorCount, "arrayMultiply conformance check... ", "nonconformance not raised");

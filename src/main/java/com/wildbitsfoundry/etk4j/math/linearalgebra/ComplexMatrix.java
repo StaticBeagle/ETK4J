@@ -2,7 +2,6 @@ package com.wildbitsfoundry.etk4j.math.linearalgebra;
 
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.util.ComplexArrays;
-import com.wildbitsfoundry.etk4j.util.NumArrays;
 
 import java.util.Arrays;
 
@@ -78,10 +77,8 @@ public class ComplexMatrix {
         return new ComplexMatrix(data, this.rows, this.cols);
     }
 
-    public ComplexMatrix(Matrix m) {
-        rows = m.getRowCount();
-        cols = m.getColumnCount();
-        data = ComplexArrays.fromReal(m.getArray());
+    public static ComplexMatrix fromRealMatrix(Matrix m) {
+        return new ComplexMatrix(ComplexArrays.fromReal(m.getArray()), m.getRowCount(), m.getColumnCount());
     }
     // region SubMatrix
 
@@ -138,9 +135,27 @@ public class ComplexMatrix {
     // endregion
 
     // region arithmetic operations
+    public ComplexMatrix add(ComplexMatrix m) {
+        //checkMatrixDimensions(m);
+        Complex[] result = new Complex[this.rows * this.cols];
+        for (int i = 0; i < this.rows * this.cols; ++i) {
+            result[i] = this.data[i].add(m.data[i]);
+        }
+        return new ComplexMatrix(result, rows, cols);
+    }
+
+    //TODO
+//    public void addEquals(Matrix m) {
+//        //checkMatrixDimensions(m);
+//        final int length = rows * cols;
+//        for (int i = 0; i < length; ++i) {
+//            data[i] += m.data[i];
+//        }
+//    }
+
     public ComplexMatrix subtract(Matrix m) {
         double[] data = m.getArray();
-        m.checkMatrixDimensions(m);
+        m.checkMatrixDimensions(m); // TODO make this method static and move it to matrices. It's not doing anything right now
         Complex[] result = new Complex[this.rows * this.cols];
         for (int i = 0; i < this.rows * this.cols; ++i) {
             result[i] = this.data[i].subtract(data[i]);
@@ -186,11 +201,32 @@ public class ComplexMatrix {
     }
     // endregion
 
-    // region inverse
+    public boolean isEmpty() {
+        if ((rows == 0 && cols == 0) || data == null || data.length == 0) {
+            return true;
+        }
+        return false;
+    }
+
+    public ComplexMatrix transpose() {
+        if (this.isEmpty()) {
+            return new ComplexMatrix(null, 0, 0);
+        }
+        Complex[] result = new Complex[rows * cols];
+        final int trows = cols;
+        final int tcols = rows;
+
+        for (int i = 0; i < rows; ++i) {
+            for (int j = 0; j < cols; ++j) {
+                result[j * tcols + i] = data[i * cols + j];
+            }
+        }
+        return new ComplexMatrix(result, trows, tcols);
+    }
+
     public ComplexMatrix inv() {
         return this.solve(Matrices.identity(rows));
     }
-    // endregion
 
     // region solve
     public ComplexMatrix solve(Matrix B) {

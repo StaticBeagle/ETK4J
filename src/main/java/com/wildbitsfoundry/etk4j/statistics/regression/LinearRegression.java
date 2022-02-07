@@ -11,7 +11,7 @@ public class LinearRegression extends UnivariateRegression {
 			throw new IllegalArgumentException("x and y dimensions must match");
 		}
 		final int n = x.length;
-		Matrix X = Matrices.Vandermonde(x, n, 2);
+		Matrix X = Matrices.vandermonde(x, n, 2);
 		this.doRegression(X, x, y);
 	}
 	

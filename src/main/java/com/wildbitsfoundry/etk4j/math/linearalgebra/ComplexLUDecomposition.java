@@ -184,7 +184,7 @@ public class ComplexLUDecomposition {
 
 		// Copy right hand side with pivoting
 		int nx = B.getColumnCount();
-		ComplexMatrix Xmat = new ComplexMatrix(B.subMatrix(_pivot, 0, nx - 1));
+		ComplexMatrix Xmat = ComplexMatrix.fromRealMatrix(B.subMatrix(_pivot, 0, nx - 1));
 		Complex[] X = Xmat.getArray();
 
 		final int cols = _cols;
