@@ -9,7 +9,7 @@ class Chebyshev2OrderCalculationStrategy implements FilterOrderCalculationStrate
     }
 
     @Override
-    public double calculateLowPassWn(int n, FilterSpecs.LowPassSpecs specs) {
+    public double calculateLowPassWn(int n, LowPassSpecs specs) {
         double wp = specs.getPassBandFrequency();
         double rp = specs.getPassBandRipple();
         double rs = specs.getStopBandAttenuation();
@@ -22,7 +22,7 @@ class Chebyshev2OrderCalculationStrategy implements FilterOrderCalculationStrate
     }
 
     @Override
-    public double calculateHighPassWn(int n, FilterSpecs.HighPassSpecs specs) {
+    public double calculateHighPassWn(int n, HighPassSpecs specs) {
         double wp = specs.getPassBandFrequency();
         double rp = specs.getPassBandRipple();
         double rs = specs.getStopBandAttenuation();
@@ -35,7 +35,7 @@ class Chebyshev2OrderCalculationStrategy implements FilterOrderCalculationStrate
     }
 
     @Override
-    public double[] calculateBandPassWn(int n, FilterSpecs.BandPassSpecs specs) {
+    public double[] calculateBandPassWn(int n, BandpassSpecs specs) {
         double wp1 = specs.getLowerPassBandFrequency();
         double wp2 = specs.getUpperPassBandFrequency();
         double rp = specs.getPassBandRipple();
@@ -54,7 +54,7 @@ class Chebyshev2OrderCalculationStrategy implements FilterOrderCalculationStrate
     }
 
     @Override
-    public double[] calculateBandStopWn(int n, FilterSpecs.BandStopSpecs specs) {
+    public double[] calculateBandStopWn(int n, BandStopSpecs specs) {
         double wp1 = specs.getLowerPassBandFrequency();
         double wp2 = specs.getUpperPassBandFrequency();
         double rp = specs.getPassBandRipple();

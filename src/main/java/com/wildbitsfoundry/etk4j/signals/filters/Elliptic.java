@@ -7,15 +7,24 @@ import com.wildbitsfoundry.etk4j.control.TransferFunction;
 import com.wildbitsfoundry.etk4j.control.ZeroPoleGain;
 import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
-import com.wildbitsfoundry.etk4j.math.polynomials.RationalFunction;
 import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 
 import static com.wildbitsfoundry.etk4j.signals.filters.Filters.*;
 
 public class Elliptic extends AnalogFilter {
 
-    // H. J. Orchard and A. N. Willson Jr., “Elliptic functions for filter design,”
-    // IEEE Trans. Circuits Syst., vol. 44, pp. 273–287, 1997
+    /**
+     * Elliptic analog low pass filter prototype.
+     * <br>
+     * References: <pre>
+     *     H. J. Orchard and A. N. Willson Jr., “Elliptic functions for filter design,”
+     *     IEEE Trans. Circuits Syst., vol. 44, pp. 273–287, 1997
+     * </pre>
+     * @param n The order of the filter.
+     * @param rp The pass band ripple in dB.
+     * @param rs The stop band ripple in dB.
+     * @return The zeros and poles of the elliptic filter.
+     */
     public static ZeroPoleGain ellipap(int n, double rp, double rs) {
         if (n == 1) {
             // filter becomes Chebyshev I
@@ -111,8 +120,8 @@ public class Elliptic extends AnalogFilter {
         return new ZeroPoleGain(zeros, poles, k);
     }
 
-    public static FilterOrderResults.OrderAndCutoffFrequency ellipord(FilterSpecs.LowPassSpecs specs) {
-        FilterSpecs.LowPassSpecs specsCopy = new FilterSpecs.LowPassSpecs(specs);
+    public static LowPassResults ellipord(LowPassSpecs specs) {
+        LowPassSpecs specsCopy = new LowPassSpecs(specs);
         double rp = 10 * Math.log10(specs.getPassBandRipple());
         double rs = 10 * Math.log10(specs.getStopBandAttenuation());
         specsCopy.setPassBandRipple(rp);
@@ -120,8 +129,8 @@ public class Elliptic extends AnalogFilter {
         return lowPassFilterOrder(specsCopy, new EllipticOrderCalculationStrategy());
     }
 
-    public static FilterOrderResults.OrderAndCutoffFrequency ellipord(FilterSpecs.HighPassSpecs specs) {
-        FilterSpecs.HighPassSpecs specsCopy = new FilterSpecs.HighPassSpecs(specs);
+    public static HighPassResults ellipord(HighPassSpecs specs) {
+        HighPassSpecs specsCopy = new HighPassSpecs(specs);
         double rp = 10 * Math.log10(specs.getPassBandRipple());
         double rs = 10 * Math.log10(specs.getStopBandAttenuation());
         specsCopy.setPassBandRipple(rp);
@@ -129,17 +138,17 @@ public class Elliptic extends AnalogFilter {
         return highPassFilterOrder(specsCopy, new EllipticOrderCalculationStrategy());
     }
 
-    public static FilterOrderResults.OrderAndCutoffFrequencies ellipord(FilterSpecs.BandPassSpecs specs) {
-        FilterSpecs.BandPassSpecs specsCopy = new FilterSpecs.BandPassSpecs(specs);
+    public static BandpassResults ellipord(BandpassSpecs specs) {
+        BandpassSpecs specsCopy = new BandpassSpecs(specs);
         double rp = 10 * Math.log10(specs.getPassBandRipple());
         double rs = 10 * Math.log10(specs.getStopBandAttenuation());
         specsCopy.setPassBandRipple(rp);
         specsCopy.setStopBandAttenuation(rs);
-        return bandPassFilterOrder(specsCopy, new EllipticOrderCalculationStrategy());
+        return bandpassFilterOrder(specsCopy, new EllipticOrderCalculationStrategy());
     }
 
-    public static FilterOrderResults.OrderAndCutoffFrequencies ellipord(FilterSpecs.BandStopSpecs specs) {
-        FilterSpecs.BandStopSpecs specsCopy = new FilterSpecs.BandStopSpecs(specs);
+    public static BandStopResults ellipord(BandStopSpecs specs) {
+        BandStopSpecs specsCopy = new BandStopSpecs(specs);
         double rp = 10 * Math.log10(specs.getPassBandRipple());
         double rs = 10 * Math.log10(specs.getStopBandAttenuation());
         specsCopy.setPassBandRipple(rp);

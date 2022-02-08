@@ -7,7 +7,7 @@ public class LogarithmicRegression extends UnivariateRegression {
 	public LogarithmicRegression(double[] x, double[] y) {
 		// we need over-determined so more than two points
 		if (x.length != y.length) {
-			throw new IllegalArgumentException("x and y dimensions must match");
+			throw new IllegalArgumentException("x and y dimensions must match.");
 		}
 		final int n = x.length;
 		double[][] X = new double[n][2];

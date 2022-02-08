@@ -249,6 +249,7 @@ public class StateSpaceTest {
         TransferFunction[] tfs = ss.toTransferFunction(0);
         Arrays.stream(tfs).forEach(System.out::println);
 
+        // TODO move the tests from main here and remove the sys outs
         tfs = ss.toTransferFunction(1);
         Arrays.stream(tfs).forEach(System.out::println);
 

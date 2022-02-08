@@ -4,13 +4,23 @@ import com.wildbitsfoundry.etk4j.control.TransferFunction;
 import com.wildbitsfoundry.etk4j.control.ZeroPoleGain;
 import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
-import com.wildbitsfoundry.etk4j.math.polynomials.RationalFunction;
 import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 
 import static com.wildbitsfoundry.etk4j.signals.filters.Filters.*;
 
 public class Chebyshev1 extends AnalogFilter {
-
+    /**
+     * Chebyshev type I analog low pass filter prototype.
+     * <br>
+     * References:
+     * <pre>
+     *     Rolf Schaumann and Mac E. Van Valkenburg, "Design Of Analog Filters"
+     * </pre>
+     *
+     * @param n The order of the filter.
+     * @param rp The pass band ripple in dB.
+     * @return The zeros and poles of the Chebyshev type I filter.
+     */
     public static ZeroPoleGain cheb1ap(int n, double rp) {
         double eps = Math.sqrt(Math.pow(10, rp * 0.1) - 1);
 
@@ -43,19 +53,19 @@ public class Chebyshev1 extends AnalogFilter {
         return new ZeroPoleGain(zeros, poles, k);
     }
 
-    public static FilterOrderResults.OrderAndCutoffFrequency cheb1ord(FilterSpecs.LowPassSpecs specs) {
+    public static LowPassResults cheb1ord(LowPassSpecs specs) {
         return lowPassFilterOrder(specs, new Chebyshev1OrderCalculationStrategy());
     }
 
-    public static FilterOrderResults.OrderAndCutoffFrequency cheb1ord(FilterSpecs.HighPassSpecs specs) {
+    public static HighPassResults cheb1ord(HighPassSpecs specs) {
         return highPassFilterOrder(specs, new Chebyshev1OrderCalculationStrategy());
     }
 
-    public static FilterOrderResults.OrderAndCutoffFrequencies cheb1ord(FilterSpecs.BandPassSpecs specs) {
-        return bandPassFilterOrder(specs, new Chebyshev1OrderCalculationStrategy());
+    public static BandpassResults cheb1ord(BandpassSpecs specs) {
+        return bandpassFilterOrder(specs, new Chebyshev1OrderCalculationStrategy());
     }
 
-    public static FilterOrderResults.OrderAndCutoffFrequencies cheb1ord(FilterSpecs.BandStopSpecs specs) {
+    public static BandStopResults cheb1ord(BandStopSpecs specs) {
         return bandStopFilterOrder(specs, new Chebyshev1OrderCalculationStrategy());
     }
 

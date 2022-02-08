@@ -9,21 +9,21 @@ class ButterworthOrderCalculationStrategy implements FilterOrderCalculationStrat
     }
 
     @Override
-    public double calculateLowPassWn(int n, FilterSpecs.LowPassSpecs specs) {
+    public double calculateLowPassWn(int n, LowPassSpecs specs) {
         double wp = specs.getPassBandFrequency();
         double w0 = calculateW0(n, specs.getPassBandRipple());;
         return w0 * wp;
     }
 
     @Override
-    public double calculateHighPassWn(int n, FilterSpecs.HighPassSpecs specs) {
+    public double calculateHighPassWn(int n, HighPassSpecs specs) {
         double wp = specs.getPassBandFrequency();
         double w0 = calculateW0(n, specs.getPassBandRipple());;
         return wp / w0;
     }
 
     @Override
-    public double[] calculateBandPassWn(int n, FilterSpecs.BandPassSpecs specs) {
+    public double[] calculateBandPassWn(int n, BandpassSpecs specs) {
         double wp1 = specs.getLowerPassBandFrequency();
         double wp2 = specs.getUpperPassBandFrequency();
         double w0 = calculateW0(n, specs.getPassBandRipple());
@@ -44,7 +44,7 @@ class ButterworthOrderCalculationStrategy implements FilterOrderCalculationStrat
     }
 
     @Override
-    public double[] calculateBandStopWn(int n, FilterSpecs.BandStopSpecs specs) {
+    public double[] calculateBandStopWn(int n, BandStopSpecs specs) {
         double wp1 = specs.getLowerPassBandFrequency();
         double wp2 = specs.getUpperPassBandFrequency();
         double w0 = calculateW0(n, specs.getPassBandRipple());

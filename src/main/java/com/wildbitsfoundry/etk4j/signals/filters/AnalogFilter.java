@@ -1,17 +1,12 @@
 package com.wildbitsfoundry.etk4j.signals.filters;
 
 import com.wildbitsfoundry.etk4j.math.optimize.minimizers.Brent;
-import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.BandStopSpecs;
-import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.HighPassSpecs;
-import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.LowPassSpecs;
 
 import java.util.Arrays;
 
-import static com.wildbitsfoundry.etk4j.math.optimize.minimizers.GoldenSection.goldenSectionMinimizer;
-
 public class AnalogFilter {
 
-    protected static FilterOrderResults.OrderAndCutoffFrequency lowPassFilterOrder(LowPassSpecs specs,
+    protected static LowPassResults lowPassFilterOrder(LowPassSpecs specs,
                                                                                    FilterOrderCalculationStrategy strategy) {
         double wp = specs.getPassBandFrequency();
         double ws = specs.getStopBandFrequency();
@@ -25,10 +20,10 @@ public class AnalogFilter {
         int n = strategy.calculateMinOrder(nat, gPass, gStop);
         double wn = strategy.calculateLowPassWn(n, specs);
 
-        return new FilterOrderResults.OrderAndCutoffFrequency(n, wn);
+        return new LowPassResults(n, wn);
     }
 
-    protected static FilterOrderResults.OrderAndCutoffFrequency highPassFilterOrder(HighPassSpecs specs, FilterOrderCalculationStrategy strategy) {
+    protected static HighPassResults highPassFilterOrder(HighPassSpecs specs, FilterOrderCalculationStrategy strategy) {
         double wp = specs.getPassBandFrequency();
         double ws = specs.getStopBandFrequency();
         double rp = specs.getPassBandRipple();
@@ -41,15 +36,14 @@ public class AnalogFilter {
         int n = strategy.calculateMinOrder(nat, gPass, gStop);
         double wn = strategy.calculateHighPassWn(n, specs);
 
-        return new FilterOrderResults.OrderAndCutoffFrequency(n, wn);
+        return new HighPassResults(n, wn);
     }
 
     /*
     Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
     All rights reserved. See https://github.com/StaticBeagle/ETK4J/blob/master/SciPy.
      */
-    protected static FilterOrderResults.OrderAndCutoffFrequencies bandPassFilterOrder(FilterSpecs.BandPassSpecs specs,
-                                                                                FilterOrderCalculationStrategy strategy) {
+    protected static BandpassResults bandpassFilterOrder(BandpassSpecs specs, FilterOrderCalculationStrategy strategy) {
         double wp1 = specs.getLowerPassBandFrequency();
         double wp2 = specs.getUpperPassBandFrequency();
         double ws1 = specs.getLowerStopBandFrequency();
@@ -67,14 +61,14 @@ public class AnalogFilter {
 
         int n = strategy.calculateMinOrder(nat, gPass, gStop);
         double[] wn = strategy.calculateBandPassWn(n, specs);
-        return new FilterOrderResults.OrderAndCutoffFrequencies(n, wn[0], wn[1]);
+        return new BandpassResults(n, wn[0], wn[1]);
     }
 
     /*
     Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
     All rights reserved. See https://github.com/StaticBeagle/ETK4J/blob/master/SciPy.
      */
-    protected static FilterOrderResults.OrderAndCutoffFrequencies bandStopFilterOrder(FilterSpecs.BandStopSpecs specs,
+    protected static BandStopResults bandStopFilterOrder(BandStopSpecs specs,
                                                                                 FilterOrderCalculationStrategy strategy) {
         double wp1 = specs.getLowerPassBandFrequency();
         double wp2 = specs.getUpperPassBandFrequency();
@@ -110,7 +104,7 @@ public class AnalogFilter {
         double[] wn = strategy.calculateBandStopWn(n, specsCopy);
 
         Arrays.sort(wn);
-        return new FilterOrderResults.OrderAndCutoffFrequencies(n, wn[0], wn[1]);
+        return new BandStopResults(n, wn[0], wn[1]);
     }
 
     /*

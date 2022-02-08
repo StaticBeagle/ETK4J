@@ -13,13 +13,28 @@ public final class Filters {
     private Filters() {
     }
 
-    public static TransferFunction lpTolp(double[] num, double[] den, double wo) {
+    /**
+     * Change the cutoff frequency of a low pass filter.
+     *
+     * @param num The numerator coefficients of the filter in descending order.
+     * @param den The denominator coefficients of the filter in descending order.
+     * @param w0  The new cutoff frequency.
+     * @return The {@link TransferFunction} of the new low pass filter with new cutoff.
+     */
+    public static TransferFunction lpTolp(double[] num, double[] den, double w0) {
         TransferFunction tf = new TransferFunction(num, den);
-        tf.substituteInPlace(1.0 / wo);
+        tf.substituteInPlace(1.0 / w0);
         tf.normalize();
         return tf;
     }
 
+    /**
+     * Change the cutoff frequency of a low pass filter.
+     *
+     * @param zpk The {@link ZeroPoleGain} representation of the filter.
+     * @param w0  The new cutoff frequency.
+     * @return The new {@link ZeroPoleGain} representation of the filter with new cutoff frequency.
+     */
     public static ZeroPoleGain lpTolpZPK(ZeroPoleGain zpk, double w0) {
         Complex[] zeros = zpk.getZeros();
         Complex[] poles = zpk.getPoles();
@@ -31,10 +46,25 @@ public final class Filters {
         return new ZeroPoleGain(zeros, poles, k);
     }
 
+    /**
+     * Change the cutoff frequency of a low pass filter.
+     *
+     * @param zpk The {@link ZeroPoleGain} representation of the filter.
+     * @param w0  The new cutoff frequency.
+     * @return The {@link TransferFunction} of the new low pass filter with new cutoff.
+     */
     public static TransferFunction lpTolp(ZeroPoleGain zpk, double w0) {
         return new TransferFunction(lpTolpZPK(zpk, w0));
     }
 
+    /**
+     * Transform a low pass filter into a high pass filter.
+     *
+     * @param num The numerator coefficients of the filter in descending order.
+     * @param den The denominator coefficients of the filter in descending order.
+     * @param w0  The cutoff frequency of the high pass filter.
+     * @return The {@link TransferFunction} of the new high pass filter.
+     */
     public static TransferFunction lpTohp(double[] num, double[] den, double w0) {
         final int numDegree = num.length - 1;
         final int denDegree = den.length - 1;
@@ -58,6 +88,18 @@ public final class Filters {
         return tf;
     }
 
+    /*
+    Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
+    All rights reserved. see https://github.com/StaticBeagle/ETK4J/blob/master/SciPy.
+    */
+
+    /**
+     * Transform a low pass filter into a high pass filter.
+     *
+     * @param zpk The {@link ZeroPoleGain} representation of the filter.
+     * @param w0  The cutoff frequency of the high pass filter.
+     * @return The new {@link ZeroPoleGain} representation of the new high pass filter.
+     */
     public static ZeroPoleGain lpTohpZPK(ZeroPoleGain zpk, double w0) {
         Complex[] zeros = zpk.getZeros();
         Complex[] poles = zpk.getPoles();
@@ -76,10 +118,26 @@ public final class Filters {
         return new ZeroPoleGain(zhp, php, k);
     }
 
+    /**
+     * Transform a low pass filter into a high pass filter.
+     *
+     * @param zpk The {@link ZeroPoleGain} representation of the filter.
+     * @param w0  The cutoff frequency of the high pass filter.
+     * @return The {@link TransferFunction} of the new high pass filter.
+     */
     public static TransferFunction lpTohp(ZeroPoleGain zpk, double w0) {
         return new TransferFunction(lpTohpZPK(zpk, w0));
     }
 
+    /**
+     * Transform a low pass filter into a bandpass filter.
+     *
+     * @param num The numerator coefficients of the filter in descending order.
+     * @param den The denominator coefficients of the filter in descending order.
+     * @param w0  The center frequency.
+     * @param bw  The bandwidth of the filter.
+     * @return The {@link TransferFunction} of the new bandpass filter.
+     */
     public static TransferFunction lpTobp(double[] num, double[] den, double w0, double bw) {
         Polynomial s = new Polynomial(bw, 0.0);
         Polynomial s2w02 = new Polynomial(1.0, 0, w0 * w0);
@@ -92,6 +150,19 @@ public final class Filters {
         return tf;
     }
 
+    /*
+    Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
+    All rights reserved. see https://github.com/StaticBeagle/ETK4J/blob/master/SciPy.
+    */
+
+    /**
+     * Transform a low pass filter into a bandpass filter.
+     *
+     * @param zpk The {@link ZeroPoleGain} representation of the filter.
+     * @param w0  The center frequency of the filter.
+     * @param bw  The bandwidth of the filter.
+     * @return The {@link ZeroPoleGain} representation of the new bandpass filter.
+     */
     public static ZeroPoleGain lpTobpZPK(ZeroPoleGain zpk, double w0, double bw) {
         Complex[] zeros = zpk.getZeros();
         Complex[] poles = zpk.getPoles();
@@ -127,10 +198,27 @@ public final class Filters {
         return new ZeroPoleGain(zbp, pbp, k);
     }
 
+    /**
+     * Transform a low pass filter into a bandpass filter.
+     *
+     * @param zpk The {@link ZeroPoleGain} representation of the filter.
+     * @param w0  The center frequency.
+     * @param bw  The bandwidth.
+     * @return The {@link TransferFunction} of the new bandpass filter.
+     */
     public static TransferFunction lpTobp(ZeroPoleGain zpk, double w0, double bw) {
         return new TransferFunction(lpTobpZPK(zpk, w0, bw));
     }
 
+    /**
+     * Transform low pass filter into a band stop filter.
+     *
+     * @param num The numerator coefficients of the filter in descending order.
+     * @param den The denominator coefficients of the filter in descending order.
+     * @param w0  The center frequency.
+     * @param bw  The bandwidth.
+     * @return The {@link TransferFunction} of the new band stop filter.
+     */
     public static TransferFunction lpTobs(double[] num, double[] den, double w0, double bw) {
         Polynomial s = new Polynomial(bw, 0.0);
         Polynomial s2w02 = new Polynomial(1.0, 0.0, w0 * w0);
@@ -141,6 +229,19 @@ public final class Filters {
         return new TransferFunction(bp);
     }
 
+    /*
+    Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
+    All rights reserved. see https://github.com/StaticBeagle/ETK4J/blob/master/SciPy.
+    */
+
+    /**
+     * Transform a low pass filter into a band stop filter.
+     *
+     * @param zpk The {@link ZeroPoleGain} representation of the filter.
+     * @param w0  The center frequency.
+     * @param bw  The bandwidth.
+     * @return The {@link ZeroPoleGain} representation of the filter.
+     */
     public static ZeroPoleGain lpTobsZPK(ZeroPoleGain zpk, double w0, double bw) {
         Complex[] zeros = zpk.getZeros();
         Complex[] poles = zpk.getPoles();
@@ -185,15 +286,26 @@ public final class Filters {
         return new ZeroPoleGain(zbs, pbs, k);
     }
 
+    /**
+     * Transform a low pass filter into a band stop filter.
+     * @param zpk The {@link ZeroPoleGain} representation of the filter.
+     * @param w0 The center frequency.
+     * @param bw The bandwidth.
+     * @return The {@link TransferFunction} of the new band stop filter.
+     */
     public static TransferFunction lpTobs(ZeroPoleGain zpk, double w0, double bw) {
         return new TransferFunction(lpTobsZPK(zpk, w0, bw));
     }
 
+    /*
+    Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
+    All rights reserved. see https://github.com/StaticBeagle/ETK4J/blob/master/SciPy.
+    */
     private static int getRelativeDegree(Complex[] zeros, Complex[] poles) {
         int degree = poles.length - zeros.length;
         if (degree < 0) {
             throw new NegativeFilterOrderException("The number of poles for the filter is less than the number of zeros."
-                    + "Please check your inputs.");
+                    + " Please check your inputs.");
         }
         return degree;
     }

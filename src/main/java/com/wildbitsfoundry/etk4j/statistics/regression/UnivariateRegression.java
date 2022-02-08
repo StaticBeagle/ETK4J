@@ -5,7 +5,7 @@ import java.util.Arrays;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
 import com.wildbitsfoundry.etk4j.util.NumArrays;
 
-abstract class UnivariateRegression implements RegressionModel {
+abstract class UnivariateRegression {
 
 	// SSE sum of squared errors
 	// SSR sum of squared regression
@@ -37,37 +37,30 @@ abstract class UnivariateRegression implements RegressionModel {
 		}
 	}
 
-	@Override
 	public double R2() {
 		return 1.0 - _sse / _ssr;
 	}
 
-	@Override
 	public double SSE() {
 		return _sse;
  	}
-	
-	@Override
+
 	public double SSR() {
 		return _ssr;
 	}
 
-	@Override
 	public double SST() {
 		return _sse + _ssr;
 	}
 
-	@Override
 	public double[] beta() {
 		return Arrays.copyOf(_beta, _beta.length);
 	}
 
-	@Override
 	public double[] residuals() {
 		return Arrays.copyOf(_residuals, _residuals.length);
 	}
-	
-	@Override
+
 	public double normOfResiduals() {
 		return _rnorm;
 	}

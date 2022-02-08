@@ -22,17 +22,17 @@ class EllipticOrderCalculationStrategy implements FilterOrderCalculationStrategy
     }
 
     @Override
-    public double calculateLowPassWn(int n, FilterSpecs.LowPassSpecs specs) {
+    public double calculateLowPassWn(int n, LowPassSpecs specs) {
         return specs.getPassBandFrequency();
     }
 
     @Override
-    public double calculateHighPassWn(int n, FilterSpecs.HighPassSpecs specs) {
+    public double calculateHighPassWn(int n, HighPassSpecs specs) {
         return specs.getPassBandFrequency();
     }
 
     @Override
-    public double[] calculateBandPassWn(int n, FilterSpecs.BandPassSpecs specs) {
+    public double[] calculateBandPassWn(int n, BandpassSpecs specs) {
         double[] wn = new double[2];
         wn[0] = specs.getLowerPassBandFrequency();
         wn[1] = specs.getUpperPassBandFrequency();
@@ -40,7 +40,7 @@ class EllipticOrderCalculationStrategy implements FilterOrderCalculationStrategy
     }
 
     @Override
-    public double[] calculateBandStopWn(int n, FilterSpecs.BandStopSpecs specs) {
+    public double[] calculateBandStopWn(int n, BandStopSpecs specs) {
         double wp1 = specs.getLowerPassBandFrequency();
         double wp2 = specs.getUpperPassBandFrequency();
         return new double[]{wp1, wp2};

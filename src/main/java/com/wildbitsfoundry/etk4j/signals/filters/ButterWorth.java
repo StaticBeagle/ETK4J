@@ -3,17 +3,23 @@ package com.wildbitsfoundry.etk4j.signals.filters;
 import com.wildbitsfoundry.etk4j.control.TransferFunction;
 import com.wildbitsfoundry.etk4j.control.ZeroPoleGain;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
-import com.wildbitsfoundry.etk4j.math.polynomials.RationalFunction;
-import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.BandPassSpecs;
-import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.BandStopSpecs;
-import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.HighPassSpecs;
-import com.wildbitsfoundry.etk4j.signals.filters.FilterSpecs.LowPassSpecs;
 import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 
 import static com.wildbitsfoundry.etk4j.signals.filters.Filters.*;
 
 public final class ButterWorth extends AnalogFilter {
 
+    /**
+     * Butterworth analog low pass filter prototype.
+     * <br>
+     * References:
+     * <pre>
+     *     Rolf Schaumann and Mac E. Van Valkenburg, "Design Of Analog Filters"
+     * </pre>
+     *
+     * @param n The order of the filter.
+     * @return The zeros and poles of the Butterworth filter.
+     */
     public static ZeroPoleGain buttAp(int n) {
         final double pid = Math.PI / 180.0;
         final double nInv = 1.0 / n;
@@ -36,22 +42,20 @@ public final class ButterWorth extends AnalogFilter {
         return new ZeroPoleGain(zeros, poles, den.real());
     }
 
-    // TODO maybe instead of OrderAndCutoffFrequency we can have
-    // lowpass results, highpass results, etc
-    public static FilterOrderResults.OrderAndCutoffFrequency buttord(LowPassSpecs specs) {
+    public static LowPassResults buttord(LowPassSpecs specs) {
         // TODO validate inputs
         return lowPassFilterOrder(specs, new ButterworthOrderCalculationStrategy());
     }
 
-    public static FilterOrderResults.OrderAndCutoffFrequency buttord(HighPassSpecs specs) {
+    public static HighPassResults buttord(HighPassSpecs specs) {
         return highPassFilterOrder(specs, new ButterworthOrderCalculationStrategy());
     }
 
-    public static FilterOrderResults.OrderAndCutoffFrequencies buttord(BandPassSpecs specs) {
-        return bandPassFilterOrder(specs, new ButterworthOrderCalculationStrategy());
+    public static BandpassResults buttord(BandpassSpecs specs) {
+        return bandpassFilterOrder(specs, new ButterworthOrderCalculationStrategy());
     }
 
-    public static FilterOrderResults.OrderAndCutoffFrequencies buttord(BandStopSpecs specs) {
+    public static BandStopResults buttord(BandStopSpecs specs) {
         return bandStopFilterOrder(specs, new ButterworthOrderCalculationStrategy());
     }
 
@@ -72,13 +76,13 @@ public final class ButterWorth extends AnalogFilter {
 
     // TODO create exceptions. add checks to other filters
     public static TransferFunction newBandPass(int n, double wp1, double wp2) {
-        if(n <= 0) {
+        if (n <= 0) {
             // throw
         }
-        if(wp1 <= 0 || wp2 <= 0) {
-           // throw
+        if (wp1 <= 0 || wp2 <= 0) {
+            // throw
         }
-        if(wp1 <= wp2) {
+        if (wp1 <= wp2) {
             // throw
         }
         ZeroPoleGain zpk = buttAp(n);
@@ -88,13 +92,13 @@ public final class ButterWorth extends AnalogFilter {
     }
 
     public static ZeroPoleGain newBandPassZPK(int n, double wp1, double wp2) {
-        if(n <= 0) {
+        if (n <= 0) {
             // throw
         }
-        if(wp1 <= 0 || wp2 <= 0) {
+        if (wp1 <= 0 || wp2 <= 0) {
             // throw
         }
-        if(wp1 <= wp2) {
+        if (wp1 <= wp2) {
             // throw
         }
         ZeroPoleGain zpk = buttAp(n);
