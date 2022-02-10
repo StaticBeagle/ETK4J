@@ -6,8 +6,7 @@ import java.util.Arrays;
 
 public class AnalogFilter {
 
-    protected static LowPassResults lowPassFilterOrder(LowPassSpecs specs,
-                                                                                   FilterOrderCalculationStrategy strategy) {
+    protected static LowPassResults lowPassFilterOrder(LowPassSpecs specs, FilterOrderCalculationStrategy strategy) {
         double wp = specs.getPassBandFrequency();
         double ws = specs.getStopBandFrequency();
         double rp = specs.getPassBandRipple();
@@ -69,7 +68,7 @@ public class AnalogFilter {
     All rights reserved. See https://github.com/StaticBeagle/ETK4J/blob/master/SciPy.
      */
     protected static BandStopResults bandStopFilterOrder(BandStopSpecs specs,
-                                                                                FilterOrderCalculationStrategy strategy) {
+                                                         FilterOrderCalculationStrategy strategy) {
         double wp1 = specs.getLowerPassBandFrequency();
         double wp2 = specs.getUpperPassBandFrequency();
         double ws1 = specs.getLowerStopBandFrequency();

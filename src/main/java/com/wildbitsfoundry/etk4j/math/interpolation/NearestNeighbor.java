@@ -6,113 +6,97 @@ import com.wildbitsfoundry.etk4j.math.extrapolation.Extrapolators;
 import com.wildbitsfoundry.etk4j.math.functions.PiecewiseFunction;
 import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
 import com.wildbitsfoundry.etk4j.util.NumArrays;
+
 import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkMinXLength;
 import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkXYDimensions;
 
+/**
+ * The {@code NearestNeighbor} class implements 1d interpolation using the Nearest Neighbor method.
+ * @see <a href="https://en.wikipedia.org/wiki/Nearest-neighbor_interpolation">Nearest Neighbor interpolation</a>
+ */
 public class NearestNeighbor extends PiecewiseFunction {
-
-	interface NeighborCalculator {
-		int calculateNeighborIndex(double t);
-	}
 	
-	private double[] _y = null;
-	private double threshold = 0.5;
-	private NeighborCalculator neighborCalculator;
+	private double[] y;
 
-	protected NearestNeighbor(double[] x, double[] y, double threshold, boolean roundUp) {
+	protected NearestNeighbor(double[] x, double[] y) {
 		super(x);
-		_y = Arrays.copyOf(y, y.length);
-		this.threshold = threshold;
-		if(roundUp) {
-			this.neighborCalculator = new NeighborCalculator() {
-				@Override
-				public int calculateNeighborIndex(double t) {
-					return t >= threshold ? 1 : 0;
-				}
-			};
-		} else {
-			this.neighborCalculator = new NeighborCalculator() {
-				@Override
-				public int calculateNeighborIndex(double t) {
-					return t > threshold ? 1 : 0;
-				}
-			};
-		}
-		double x0 = this.x[0];
-		double xn = this.x[this.x.length - 1];
+		this.y = Arrays.copyOf(y, y.length);
+
+		double x0 = x[0];
+		double xn = x[x.length - 1];
 		double y0 = this.evaluateAt(x0);
 		double yn = this.evaluateAt(xn);
 		this.setExtrapolator(new Extrapolators.ClampToEndPointExtrapolator(x0, xn, y0, yn));
 	}
-	
+
+	/**
+	 * Creates a new Nearest Neighbor piecewise interpolant.
+	 * @param x The array of abscissas. A copy of this array is made internally.
+	 * @param y THe array or ordinates.
+	 * @return A newly created Nearest Neighbor piecewise interpolant.
+	 */
 	public static NearestNeighbor newNearestNeighbor(double[] x, double[] y) {
-		return newNearestNeighborInPlace(Arrays.copyOf(x, x.length), y, 0.5, true);
+		return newNearestNeighborInPlace(Arrays.copyOf(x, x.length), y);
 	}
 
-	public static NearestNeighbor newNearestNeighbor(double[] x, double[] y, double threshold) {
-		return newNearestNeighborInPlace(Arrays.copyOf(x, x.length), y, threshold, true);
-	}
-
-	public static NearestNeighbor newNearestNeighbor(double[] x, double[] y, boolean roundUp) {
-		return newNearestNeighborInPlace(Arrays.copyOf(x, x.length), y, 0.5, roundUp);
-	}
-
-	public static NearestNeighbor newNearestNeighbor(double[] x, double[] y, double threshold, boolean roundUp) {
-		return newNearestNeighborInPlace(Arrays.copyOf(x, x.length), y, threshold, roundUp);
-	}
-	
+	/**
+	 * Creates a new Nearest Neighbor piecewise interpolant.
+	 * @param x The array of abscissas.
+	 * @param y THe array or ordinates.
+	 * @return A newly created Nearest Neighbor piecewise interpolant.
+	 */
 	public static NearestNeighbor newNearestNeighborInPlace(double[] x, double[] y) {
-		return newNearestNeighborInPlace(x, y, 0.5, true);
-	}
-
-	public static NearestNeighbor newNearestNeighborInPlace(double[] x, double[] y, double threshold) {
-		return newNearestNeighborInPlace(x, y, threshold, true);
-	}
-
-	public static NearestNeighbor newNearestNeighborInPlace(double[] x, double[] y, boolean roundUp) {
-		return newNearestNeighborInPlace(x, y, 0.5, roundUp);
-	}
-
-	public static NearestNeighbor newNearestNeighborInPlace(double[] x, double[] y, double threshold, boolean roundUp) {
 		checkXYDimensions(x, y);
 		checkMinXLength(x, 2);
-		if(threshold < 0 || threshold > 1) {
-			throw new IllegalArgumentException("Threshold must be 0 < threshold <= 1.");
-		}
-
-		NearestNeighbor nh = new NearestNeighbor(x, y, threshold, roundUp);
+		NearestNeighbor nh = new NearestNeighbor(x, y);
 		return nh;
 	}
 
-
+	/**
+	 * Evaluate the piecewise function.
+	 * @param index The index of the segment to evaluate the function at.
+	 * @param x The value at which to evaluate the function.
+	 * @return The result of evaluating the interpolant piecewise function.
+	 */
 	@Override
 	public double evaluateAt(int index, double x) {
 		double t = (x - this.x[index]) / (this.x[index + 1] - this.x[index]);
-		return _y[index + neighborCalculator.calculateNeighborIndex(t)];
+		index += t >= 0.5 ? 1 : 0;
+		return y[index];
 	}
 
+	/**
+	 * Get a given segment of the piecewise function.
+	 * @param index The index of the segment to fetch.
+	 * @return A {@link UnivariateFunction} which represents the underlying segment of the piecewise function.
+	 */
 	@Override
 	public UnivariateFunction getSegment(int index) {
 		final double yi = this.evaluateAt(index, x[index]);
-		UnivariateFunction fn = new UnivariateFunction() {
-			
-			@Override
-			public double evaluateAt(double x) {
-				return yi;
-			}
-		};
+		UnivariateFunction fn = x -> yi;
 		return fn;
 	}
 
 	public static void main(String[] args) {
-		double[] x = { 1, 2, 3, 4 };
-		double[] y = { 1, 4, 9, 16 };
+		double[] x = NumArrays.linSteps(0, 4, 0.5);
+		double[] y = Arrays.stream(x).map(v -> v * v).toArray();
 
 		NearestNeighbor nh = NearestNeighbor.newNearestNeighbor(x, y);
-		double[] xi = {1, 1.5, 2, 2.5, 3, 3.5, 4};
-		System.out.println();
-		for(double d : xi) {
-			System.out.printf("x: %f, y: %f%n", d, nh.evaluateAt(d));
-		}
+		double[] xi = NumArrays.linSteps(0, 4, 0.05);
+//		System.out.println();
+//		for(double d : xi) {
+//			System.out.printf("x: %f, y: %f%n", d, nh.evaluateAt(d));
+//		}
+		System.out.println(Arrays.toString(nh.evaluateAt(xi)));
+		nh.evaluateAt(xi);
+		xi = NumArrays.linSteps(0, 10, 0.05);
+		x = NumArrays.concatenateAll(NumArrays.linSteps(0, 4.5, 0.5), new double[] {4.99}, NumArrays.linSteps(5, 10, 0.5));// [0:.5:4.5,4.99,5:.5:10];
+		y = Arrays.stream(x).map(v -> Math.sin(2.0 * Math.PI * v / 5.0) - (v >= 5 ? 1 : 0)).toArray();
+		nh = NearestNeighbor.newNearestNeighbor(x, y);
+		//xf = 0:0.05:10;                yf = sin (2*pi*xf/5) - (xf >= 5);
+		System.out.println(Arrays.toString(nh.evaluateAt(xi)));
+
+		LinearSpline ls = LinearSpline.newLinearSpline(x, y);
+		System.out.println(Arrays.toString(ls.evaluateAt(xi)));
 	}
 }
