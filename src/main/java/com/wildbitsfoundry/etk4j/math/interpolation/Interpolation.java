@@ -5,17 +5,17 @@ import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkX
 import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkMinXLength;
 
 /**
- * The {@code Interpolants} class contains methods to perform interpolation at a given argument.
+ * The {@code Interpolation} class contains methods to perform interpolation at a given argument.
  */
-public final class Interpolants {
+public final class Interpolation {
 
-	private Interpolants() {
+	private Interpolation() {
 	}
 
 	/**
 	 * Linear interpolation. Creates a line and evaluates that line at the value specified by {@code xi}.
-	 * @param x0 Lower abscissa.
-	 * @param x1 Upper abscissa.
+	 * @param x0 Lower x coordinate.
+	 * @param x1 Upper x coordinate.
 	 * @param y0 Lower ordinate.
 	 * @param y1 Upper ordinate.
 	 * @param xi Argument at which to evaluate the function.
@@ -32,7 +32,7 @@ public final class Interpolants {
 
 	/**
 	 * Neville's interpolation algorithm. This array must be monotonically increasing.
-	 * @param x Array of abscissas.
+	 * @param x Array of x coordinates.
 	 * @param y Array of ordinates.
 	 * @param xi Argument at which to evaluate the function.
 	 * @return The result of Neville's algorithm evaluated at {@code xi}.
@@ -62,12 +62,12 @@ public final class Interpolants {
 
 	/**
 	 * Quadratic (Parabola) interpolation.
-	 * @param x0 Left abscissa.
-	 * @param x1 Middle abscissa.
-	 * @param x2 Right abscissa.
-	 * @param y0 Left ordinate.
-	 * @param y1 Middle ordinate.
-	 * @param y2 Right ordinate.
+	 * @param x0 Left x coordinate.
+	 * @param x1 Middle x coordinate.
+	 * @param x2 Right x coordinate.
+	 * @param y0 Left y coordinate.
+	 * @param y1 Middle y coordinate.
+	 * @param y2 Right y coordinate.
 	 * @param xi Argument at which to evaluate the function.
 	 * @return Performs a parabolic fit and evaluates the function at the value specified by {@code xi}.
 	 */
@@ -81,8 +81,9 @@ public final class Interpolants {
 
 	/**
 	 * Spline interpolation.
-	 * @param x Array of abscissas. This array must be monotonically increasing.
-	 * @param y Array of ordinates.
+	 * @param x Array of x coordinates. This array must be monotonically increasing.The values in this array must be
+	 *          unique and strictly increasing.
+	 * @param y Array of y coordinates.
 	 * @param xi Argument at which to evaluate the spline.
 	 * @return If the number of points in x ie equal to 2 it performs linear interpolation. If the number of points
 	 * in x is equal to 3 it performs quadratic interpolation. If the number of points is greater than 3 it creates

@@ -30,20 +30,21 @@ public class NearestNeighbor extends PiecewiseFunction {
 	}
 
 	/**
-	 * Creates a new Nearest Neighbor piecewise interpolant.
-	 * @param x The array of abscissas. A copy of this array is made internally.
-	 * @param y THe array or ordinates.
-	 * @return A newly created Nearest Neighbor piecewise interpolant.
+	 * Creates a new Nearest Neighbor instance.
+	 * @param x The array of x coordinates. The values in this array must be unique and strictly increasing.
+	 *          A copy of this array is made internally.
+	 * @param y THe array or y coordinates.
+	 * @return A newly created Nearest Neighbor interpolant.
 	 */
 	public static NearestNeighbor newNearestNeighbor(double[] x, double[] y) {
 		return newNearestNeighborInPlace(Arrays.copyOf(x, x.length), y);
 	}
 
 	/**
-	 * Creates a new Nearest Neighbor piecewise interpolant.
+	 * Creates a new Nearest Neighbor instance.
 	 * @param x The array of abscissas.
 	 * @param y THe array or ordinates.
-	 * @return A newly created Nearest Neighbor piecewise interpolant.
+	 * @return A newly created Nearest Neighbor interpolant.
 	 */
 	public static NearestNeighbor newNearestNeighborInPlace(double[] x, double[] y) {
 		checkXYDimensions(x, y);
@@ -56,7 +57,7 @@ public class NearestNeighbor extends PiecewiseFunction {
 	 * Evaluate the piecewise function.
 	 * @param index The index of the segment to evaluate the function at.
 	 * @param x The value at which to evaluate the function.
-	 * @return The result of evaluating the interpolant piecewise function.
+	 * @return The result of evaluating the piecewise function.
 	 */
 	@Override
 	public double evaluateAt(int index, double x) {
@@ -67,7 +68,7 @@ public class NearestNeighbor extends PiecewiseFunction {
 
 	/**
 	 * Get a given segment of the piecewise function.
-	 * @param index The index of the segment to fetch.
+	 * @param index The index of the segment to get.
 	 * @return A {@link UnivariateFunction} which represents the underlying segment of the piecewise function.
 	 */
 	@Override
@@ -75,28 +76,5 @@ public class NearestNeighbor extends PiecewiseFunction {
 		final double yi = this.evaluateAt(index, x[index]);
 		UnivariateFunction fn = x -> yi;
 		return fn;
-	}
-
-	public static void main(String[] args) {
-		double[] x = NumArrays.linSteps(0, 4, 0.5);
-		double[] y = Arrays.stream(x).map(v -> v * v).toArray();
-
-		NearestNeighbor nh = NearestNeighbor.newNearestNeighbor(x, y);
-		double[] xi = NumArrays.linSteps(0, 4, 0.05);
-//		System.out.println();
-//		for(double d : xi) {
-//			System.out.printf("x: %f, y: %f%n", d, nh.evaluateAt(d));
-//		}
-		System.out.println(Arrays.toString(nh.evaluateAt(xi)));
-		nh.evaluateAt(xi);
-		xi = NumArrays.linSteps(0, 10, 0.05);
-		x = NumArrays.concatenateAll(NumArrays.linSteps(0, 4.5, 0.5), new double[] {4.99}, NumArrays.linSteps(5, 10, 0.5));// [0:.5:4.5,4.99,5:.5:10];
-		y = Arrays.stream(x).map(v -> Math.sin(2.0 * Math.PI * v / 5.0) - (v >= 5 ? 1 : 0)).toArray();
-		nh = NearestNeighbor.newNearestNeighbor(x, y);
-		//xf = 0:0.05:10;                yf = sin (2*pi*xf/5) - (xf >= 5);
-		System.out.println(Arrays.toString(nh.evaluateAt(xi)));
-
-		LinearSpline ls = LinearSpline.newLinearSpline(x, y);
-		System.out.println(Arrays.toString(ls.evaluateAt(xi)));
 	}
 }

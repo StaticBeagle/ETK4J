@@ -4,21 +4,21 @@ import java.util.Arrays;
 
 import com.wildbitsfoundry.etk4j.math.functions.BivariateFunction;
 import com.wildbitsfoundry.etk4j.math.interpolation.CubicSpline;
-import com.wildbitsfoundry.etk4j.math.interpolation.Interpolants;
+import com.wildbitsfoundry.etk4j.math.interpolation.Interpolation;
 import com.wildbitsfoundry.etk4j.math.interpolation.LinearSpline;
 import com.wildbitsfoundry.etk4j.math.interpolation.Spline;
 
 public class Spline2d implements BivariateFunction {
 
-    private double[] _y;
-    private Spline[] _splines;
+    private double[] y;
+    private Spline[] splines;
 
-    private int _order;
+    private int order;
 
     protected Spline2d(double[] y, Spline[] splines, int order) {
-        _y = y;
-        _order = order;
-        _splines = splines;
+        this.y = y;
+        this.order = order;
+        this.splines = splines;
     }
 
     public static Spline2d newBicubicSpline(double[] x, double[] y, double[][] z) {
@@ -87,20 +87,20 @@ public class Spline2d implements BivariateFunction {
     public double evaluateAt(double x, double y) {
         int index = this.findLeftIndex(y);
 
-        double[] tmp = new double[_order];
-        for (int i = 0; i < _order; ++i) {
-            tmp[i] = _splines[i + index].evaluateAt(x);
+        double[] tmp = new double[order];
+        for (int i = 0; i < order; ++i) {
+            tmp[i] = splines[i + index].evaluateAt(x);
         }
-        return Interpolants.spline(Arrays.copyOfRange(_y, index, index + _order), tmp, y);
+        return Interpolation.spline(Arrays.copyOfRange(this.y, index, index + order), tmp, y);
     }
 
     protected int findLeftIndex(double y) {
-        int index = Arrays.binarySearch(_y, y);
+        int index = Arrays.binarySearch(this.y, y);
         if (index >= 0) {
-            return _order * (index / _order);
+            return order * (index / order);
         }
         index = -(index + 2);
-        boolean edge = (index + 1) % _order == 0;
-        return edge ? (index + 1) - (_order >> 1) : _order * (index / _order);
+        boolean edge = (index + 1) % order == 0;
+        return edge ? (index + 1) - (order >> 1) : order * (index / order);
     }
 }

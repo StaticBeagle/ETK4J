@@ -2,7 +2,7 @@ package com.wildbitsfoundry.etk4j.math.interpolation;
 
 import org.junit.Test;
 
-import static com.wildbitsfoundry.etk4j.math.interpolation.Interpolants.*;
+import static com.wildbitsfoundry.etk4j.math.interpolation.Interpolation.*;
 import static org.junit.Assert.assertEquals;
 
 public class InterpolantsTest {

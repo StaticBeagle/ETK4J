@@ -30,7 +30,8 @@ public abstract class LinearTimeInvariantSystem {
     /**
      * Simulate time response of a continuous-time system.
      *
-     * @param input             Array describing the input at every time step.
+     * @param input             Array describing the input at every time step. For multiple inputs, each row of this
+     *                          array represents an input to the system.
      * @param time              The time at which to evaluate the system.
      * @param initialConditions Initial conditions of the system.
      * @param ss                State Space representation of the system.
@@ -66,6 +67,9 @@ public abstract class LinearTimeInvariantSystem {
         double[] x0 = initialConditions == null ? new double[noStates] : initialConditions;
         double[][] xOut = new double[noSteps][noStates];
 
+        if(x0.length > noStates) {
+            throw new IllegalArgumentException("The number of initial conditions is greater than the number of states.");
+        }
         if (time[0] == 0.0) {
             xOut[0] = x0;
         } else if (time[0] > 0.0) {
@@ -237,7 +241,7 @@ public abstract class LinearTimeInvariantSystem {
      * @param numberOfPoints The number of points to generate.
      * @return The default response times.
      */
-    protected double[] generateDefaultResponseTimes(Matrix A, int numberOfPoints) {
+    protected static double[] generateDefaultResponseTimes(Matrix A, int numberOfPoints) {
         EigenvalueDecomposition eig = A.eig();
         double[] realEig = eig.getRealEigenvalues();
         for (int i = 0; i < realEig.length; ++i) {

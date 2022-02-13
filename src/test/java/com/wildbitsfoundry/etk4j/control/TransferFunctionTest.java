@@ -354,7 +354,7 @@ public class TransferFunctionTest {
         };
 
         TransferFunction tf = new TransferFunction(new double[]{1.0, 3.0, 3.0}, new double[]{1.0, 2.0, 1.0});
-        SingleInputSingleOutputTimeResponse SISOtr = tf.simulateTimeResponse(NumArrays.ones(timePoints.length),
+        SISOTimeResponse SISOtr = tf.simulateTimeResponse(NumArrays.ones(timePoints.length),
                 timePoints);
 
         double[][] transposedStateVector = NumArrays.transpose(SISOtr.getEvolutionOfStateVector());
@@ -365,5 +365,58 @@ public class TransferFunctionTest {
         assertArrayEquals(xOut[1], transposedStateVector[1], 1e-12);
 
         // TODO test with inital conditions
+    }
+
+    @Test
+    public void testGetNumeratorCoefficients() {
+        double[] num = {1};
+        double[] den = {1, 1};
+        TransferFunction tf = new TransferFunction(num, den);
+
+        double[] numCoefficients = tf.getNumeratorCoefficients();
+        double[] denCoefficients = tf.getDenominatorCoefficients();
+
+        assertArrayEquals(new double[]{0, 1}, numCoefficients, 1e-12);
+        assertArrayEquals(den, denCoefficients, 1e-12);
+
+        num = new double[]{1};
+        den = new double[]{1, 1, 1};
+        tf = new TransferFunction(num, den);
+
+        numCoefficients = tf.getNumeratorCoefficients();
+        denCoefficients = tf.getDenominatorCoefficients();
+
+        assertArrayEquals(new double[]{0, 0, 1}, numCoefficients, 1e-12);
+        assertArrayEquals(den, denCoefficients, 1e-12);
+
+        num = new double[]{1, 1, 1};
+        den = new double[]{1, 1, 1};
+        tf = new TransferFunction(num, den);
+
+        numCoefficients = tf.getNumeratorCoefficients();
+        denCoefficients = tf.getDenominatorCoefficients();
+
+        assertArrayEquals(num, numCoefficients, 1e-12);
+        assertArrayEquals(den, denCoefficients, 1e-12);
+
+        num = new double[]{1, 1, 1};
+        den = new double[]{1};
+        tf = new TransferFunction(num, den);
+
+        numCoefficients = tf.getNumeratorCoefficients();
+        denCoefficients = tf.getDenominatorCoefficients();
+
+        assertArrayEquals(num, numCoefficients, 1e-12);
+        assertArrayEquals(new double[]{0, 0, 1}, denCoefficients, 1e-12);
+
+        num = new double[]{1, 1};
+        den = new double[]{1};
+        tf = new TransferFunction(num, den);
+
+        numCoefficients = tf.getNumeratorCoefficients();
+        denCoefficients = tf.getDenominatorCoefficients();
+
+        assertArrayEquals(num, numCoefficients, 1e-12);
+        assertArrayEquals(new double[]{0, 1}, denCoefficients, 1e-12);
     }
 }

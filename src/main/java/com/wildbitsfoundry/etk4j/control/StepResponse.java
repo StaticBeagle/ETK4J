@@ -5,7 +5,7 @@ public class StepResponse {
     private double[] time;
     private double[] response;
 
-    public StepResponse(double[] time, double[] response) {
+    StepResponse(double[] time, double[] response) {
         this.time = time;
         this.response = response;
     }

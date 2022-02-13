@@ -112,10 +112,41 @@ public class TransferFunction extends LinearTimeInvariantSystem {
         return rf.getNumerator();
     }
 
+    public double[] getNumeratorCoefficients() {
+        Polynomial num = rf.getNumerator();
+        int numOrder = num.degree();
+        int denOrder = rf.getDenominator().degree();
+        if(numOrder >= denOrder) {
+            return num.getCoefficients();
+        }
+        double[] result = new double[denOrder + 1];
+        int start = denOrder - numOrder;
+        System.arraycopy(num.getCoefficients(), 0, result, start, numOrder + 1);
+        return result;
+    }
+
     public Polynomial getDenominator() {
         return rf.getDenominator();
     }
 
+    public double[] getDenominatorCoefficients() {
+        Polynomial den = rf.getDenominator();
+        int numOrder = rf.getNumerator().degree();
+        int denOrder = den.degree();
+        if(denOrder >= numOrder) {
+            return den.getCoefficients();
+        }
+        double[] result = new double[numOrder + 1];
+        int start = numOrder - denOrder;
+        System.arraycopy(den.getCoefficients(), 0, result, start, denOrder + 1);
+        return result;
+    }
+
+    /**
+     * Evaluate the system at a given frequency.
+     * @param w The frequency at which to evaluate the system.
+     * @return The complex frequency response of the system.
+     */
     public Complex evaluateAt(double w) {
         return rf.evaluateAt(0.0, w);
     }
@@ -684,27 +715,27 @@ public class TransferFunction extends LinearTimeInvariantSystem {
     }
 
 
-    public SingleInputSingleOutputTimeResponse simulateTimeResponse(double[] input, double[] time) {
+    public SISOTimeResponse simulateTimeResponse(double[] input, double[] time) {
         return simulateTimeResponse(input, time, IntegrationMethod.INTERPOLATION);
     }
 
-    public SingleInputSingleOutputTimeResponse simulateTimeResponse(double[] input, double[] time,
-                                                                    double[] initialConditions) {
+    public SISOTimeResponse simulateTimeResponse(double[] input, double[] time,
+                                                 double[] initialConditions) {
         return simulateTimeResponse(input, time, initialConditions, IntegrationMethod.INTERPOLATION);
     }
 
-    public SingleInputSingleOutputTimeResponse simulateTimeResponse(double[] input, double[] time,
-                                                                    IntegrationMethod integrationMethod) {
+    public SISOTimeResponse simulateTimeResponse(double[] input, double[] time,
+                                                 IntegrationMethod integrationMethod) {
         return simulateTimeResponse(input, time, null, integrationMethod);
     }
 
-    public SingleInputSingleOutputTimeResponse simulateTimeResponse(double[] input, double[] time,
-                                                                    double[] initialConditions,
-                                                                    IntegrationMethod integrationMethod) {
+    public SISOTimeResponse simulateTimeResponse(double[] input, double[] time,
+                                                 double[] initialConditions,
+                                                 IntegrationMethod integrationMethod) {
         double[][] U = new double[1][time.length];
         U[0] = input;
         TimeResponse tr = lsim(U, time, initialConditions, this.toStateSpace(), integrationMethod);
-        return new SingleInputSingleOutputTimeResponse(tr.getTime(), tr.getResponse()[0], tr.getEvolutionOfStateVector());
+        return new SISOTimeResponse(tr.getTime(), tr.getResponse()[0], tr.getEvolutionOfStateVector());
     }
 
     public static void main(String[] args) {

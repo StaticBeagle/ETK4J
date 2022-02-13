@@ -10,6 +10,9 @@ import com.wildbitsfoundry.etk4j.util.NumArrays;
 
 import java.util.Arrays;
 
+/**
+ * The {@code StateSpace} class represents a Linear Time Invariant System in state-space form.
+ */
 public class StateSpace extends LinearTimeInvariantSystem {
 
     private Matrix A;
@@ -17,13 +20,23 @@ public class StateSpace extends LinearTimeInvariantSystem {
     private Matrix C;
     private Matrix D;
 
+    /**
+     * Constructs a null system where all the matrices are empty matrices.
+     */
     public StateSpace() {
-        this.A = Matrices.empty();
+        this.A = Matrices.empty();  // TODO remove this method or move it to Matrox
         this.B = Matrices.empty();
         this.C = Matrices.empty();
         this.D = Matrices.empty();
     }
 
+    /**
+     * Constructs a {@code StateSpace} system.
+     * @param A The state matrix in array form.
+     * @param B The input to state matrix in array form.
+     * @param C The state to output matrix in array form.
+     * @param D The feed through matrix in array form.
+     */
     public StateSpace(double[][] A, double[][] B, double[][] C, double[][] D) {
         this.A = new Matrix(A);
         this.B = new Matrix(B);
@@ -31,6 +44,13 @@ public class StateSpace extends LinearTimeInvariantSystem {
         this.D = new Matrix(D);
     }
 
+    /**
+     * Constructs a {@code StateSpace} system.
+     * @param A The state matrix.
+     * @param B The input to state matrix.
+     * @param C The state to output matrix.
+     * @param D The feed through matrix.
+     */
     public StateSpace(Matrix A, Matrix B, Matrix C, Matrix D) {
         this.A = new Matrix(A);
         this.B = new Matrix(B);
@@ -38,18 +58,34 @@ public class StateSpace extends LinearTimeInvariantSystem {
         this.D = new Matrix(D);
     }
 
+    /**
+     * Get the state {@link Matrix}.
+     * @return A copy of the state matrix A.
+     */
     public Matrix getA() {
         return new Matrix(A);
     }
 
+    /**
+     * Get input to state {@link Matrix}.
+     * @return A copy of the input to state matrix B.
+     */
     public Matrix getB() {
         return new Matrix(B);
     }
 
+    /**
+     * Get the state to output {@link Matrix}.
+     * @return A copy of the state to output matrix C.
+     */
     public Matrix getC() {
         return new Matrix(C);
     }
 
+    /**
+     * Get the feed through {@link Matrix}.
+     * @return A copy of the feed through matrix D.
+     */
     public Matrix getD() {
         return new Matrix(D);
     }
@@ -68,9 +104,11 @@ public class StateSpace extends LinearTimeInvariantSystem {
     Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
     All rights reserved. See https://github.com/StaticBeagle/ETK4J/blob/master/SciPy.
      */
+
     /**
-     * https://github.com/scipy/scipy/blob/47bb6febaa10658c72962b9615d5d5aa2513fa3a/scipy/signal/lti_conversion.py#L196
-     * @return
+     * {@link TransferFunction} representation of the {@code StateSpace} system.
+     * @param input For Multiple Input systems this represents the index of the input to use.
+     * @return An array of Transfer Functions one element per each output of the State Space system.
      */
     public TransferFunction[] toTransferFunction(int input) {
         //TODO normalizeABCD
@@ -91,6 +129,7 @@ public class StateSpace extends LinearTimeInvariantSystem {
         }
         den = A.poly();
 
+        // TODO test this
         if(Bb.getRowCount() * Bb.getColumnCount() == 0 && C.getRowCount() * C.getColumnCount() == 0) {
             if(Dd.getRowCount() * Dd.getColumnCount() == 0 && A.getRowCount() * A.getColumnCount() == 0) {
                 den = new double[0];
@@ -119,74 +158,84 @@ public class StateSpace extends LinearTimeInvariantSystem {
         return result;
     }
 
+    /**
+     * {@link TransferFunction} representation of the {@code StateSpace} system. This method assumes that the
+     * system is a Single Input Single Output (SISO) system thus this is similar to calling
+     * {@link StateSpace#toTransferFunction()} with input argument equal to zero and returning the first element
+     * of the array of returned Transfer Functions.
+     * @return The SISO Transfer Function of the system.
+     */
     @Override
     public TransferFunction toTransferFunction() {
         return this.toTransferFunction(0)[0];
     }
 
+    /**
+     * TODO create array overload of this method then document this one.
+     * @return
+     */
     @Override
     public ZeroPoleGain toZeroPoleGain() {
         return this.toTransferFunction().toZeroPoleGain();
     }
 
+    /**
+     * Simulate time response of a continuous time system with zero initial conditions and interpolation between time steps.
+     * @param input Array describing the input at every time step. For multiple inputs, each row of this
+     *              array represents an input to the system.
+     * @param time The time vector at which to evaluate the response.
+     * @return The time response of the system.
+     */
     public TimeResponse simulateTimeResponse(double[][] input, double[] time) {
         return simulateTimeResponse(input, time, IntegrationMethod.INTERPOLATION);
     }
 
+    /**
+     * Simulate time response of a continuous time system with interpolation between time steps.
+     * @param input Array describing the input at every time step. For multiple inputs, each row of this
+     *              array represents an input to the system.
+     * @param time The time vector at which to evaluate the response.
+     * @param initialConditions The initial conditions of the system.
+     * @return The time response of the system.
+     */
     public TimeResponse simulateTimeResponse(double[][] input, double[] time, double[] initialConditions) {
         return simulateTimeResponse(input, time, initialConditions, IntegrationMethod.INTERPOLATION);
     }
 
+    /**
+     * Simulate time response of a continuous time system with zero initial conditions.
+     * @param input Array describing the input at every time step. For multiple inputs, each row of this
+     *              array represents an input to the system.
+     * @param time The time vector at which to evaluate the response.
+     * @param integrationMethod The integration method between time points.
+     * @return The time response of the system.
+     */
     public TimeResponse simulateTimeResponse(double[][] input, double[] time, IntegrationMethod integrationMethod) {
         return simulateTimeResponse(input, time, null, IntegrationMethod.INTERPOLATION);
     }
 
+    /**
+     * Simulate time response of a continuous time system.
+     * @param input Array describing the input at every time step. For multiple inputs, each row of this
+     *              array represents an input to the system.
+     * @param time The time vector at which to evaluate the response.
+     * @param initialConditions The initial conditions of the system.
+     * @param integrationMethod The integration method between time points.
+     * @return The time response of the system.
+     */
     public TimeResponse simulateTimeResponse(double[][] input, double[] time, double[] initialConditions,
                                              IntegrationMethod integrationMethod) {
         return lsim(input, time, initialConditions, this, integrationMethod);
     }
 
+    /**
+     * Evaluate the system at a given frequency.
+     * @param w The frequency at which to evaluate the system.
+     * @return The complex frequency response of the system.
+     */
     public Complex[] evaluateAt(double w) {
         ComplexMatrix inner = Matrices.identity(A.getRowCount()).multiply(Complex.fromImaginary(w)).subtract(A).inv();
         ComplexMatrix outer = C.multiply(inner).multiply(B);
         return ComplexMatrix.fromRealMatrix(D).add(outer).transpose().getArray();
-    }
-
-    public static void main(String[] args) {
-        double[][] A = {{-2, -1}, {1, 0}};
-        double[][] B = {{1}, {0}};
-        double[][] C = {{1, 2}};
-        double[][] D = {{1}};
-
-        StateSpace ss = new StateSpace(A, B, C, D);
-        TransferFunction tf = ss.toTransferFunction();
-        System.out.println(tf);
-
-        System.out.println(tf.evaluateAt(100));
-        System.out.println(Arrays.toString(ss.evaluateAt(100)));
-
-        System.out.println(tf.toStateSpace());
-
-        A = new double[][]{{-1}};
-        B = new double[][]{{1}};
-        C = new double[][]{{1}};
-        D = new double[][]{{0}};
-
-        ss = new StateSpace(A, B, C, D);
-        tf = ss.toTransferFunction();
-        System.out.println(tf);
-
-        A = new double[][] {{-2, -1, 3}, {1, 0, 5}, {4, 5, 10}};
-        B = new double[][]{{1, 2, 4}, {0, 6, 7}, {9, 10, 22}};
-        C = new double[][]{{1, 2, 0}, {0, 1, 0}, {0, 0, 1}};
-        D = new double[][]{{0, 0, 1}, {2, 3, 4}, {5, 6, 7}};
-
-        ss = new StateSpace(A, B, C, D);
-        TransferFunction[] tfs = ss.toTransferFunction(0);
-        Arrays.stream(tfs).forEach(System.out::println);
-
-        Arrays.stream(tfs).forEach(x -> System.out.println(x.evaluateAt(100)));
-
-        System.out.println(Arrays.toString(ss.evaluateAt(100)));
     }
 }
