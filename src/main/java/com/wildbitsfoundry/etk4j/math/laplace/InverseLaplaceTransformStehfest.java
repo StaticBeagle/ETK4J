@@ -35,7 +35,7 @@ public class InverseLaplaceTransformStehfest {
         }
     }
 
-    public double InverseTransform(UnivariateFunction function, double time) {
+    public double inverseTransform(UnivariateFunction function, double time) {
         if (time == 0.0) {
             time = ConstantsETK.DOUBLE_EPS;
         } else if (time == -0.0) {

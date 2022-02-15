@@ -4,13 +4,17 @@ import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
 
 public final class Laplace {
 
+    private Laplace() {
+
+    }
+
     /**
-     * Laplace Transform
+     * Laplace Transform.
      * @param function Function to perform the Laplace transform to.
      * @param s Frequency at which to evaluate the transform.
      * @return {@code L{y(t} = Y(s)} evaluated at s.
      */
-    public static double Transform(UnivariateFunction function, double s) {
+    public static double transform(UnivariateFunction function, double s) {
         final int DefaultIntegralN = 5000;
         double du = 0.5 / (double) DefaultIntegralN;
         double y = -function.evaluateAt(0) / 2.0;

@@ -15,7 +15,6 @@ public class TransferFunctionTest {
     public void testConstructors() {
         TransferFunction tf = new TransferFunction(new double[]{10.0}, new double[]{1.0, 1.0});
         assertEquals(10.0, tf.calculateMagnitudeAt(0.0), 1e-12);
-
     }
 
     @Test
@@ -310,9 +309,6 @@ public class TransferFunctionTest {
 
         assertArrayEquals(frequencies, bode.getFrequencies(), 1e-12);
         assertArrayEquals(magnitudeResponseInDB, bode.getMagnitudeIndB(), 1e-12);
-
-
-        System.out.println(Arrays.toString(bode.getPhaseInDegrees()));
         assertArrayEquals(phaseResponse, bode.getPhaseInDegrees(), 1e-12);
     }
 
