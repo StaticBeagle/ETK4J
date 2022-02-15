@@ -38,6 +38,7 @@ public class ZeroPoleGain extends LinearTimeInvariantSystem {
         return new TransferFunction(this);
     }
 
+    @Override
     public ZeroPoleGain toZeroPoleGain() {
         return this;
     }

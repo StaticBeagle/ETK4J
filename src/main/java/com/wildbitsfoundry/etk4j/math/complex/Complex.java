@@ -223,7 +223,7 @@ public class Complex implements Comparable<Complex> {
     /**
      * Addition of complex numbers.
      *
-     * @param c Summand.
+     * @param c The complex number to add.
      * @return The complex number + {@code c}.
      */
     public Complex add(Complex c) {
@@ -235,7 +235,7 @@ public class Complex implements Comparable<Complex> {
     /**
      * Addition of a complex number and a real number.
      *
-     * @param d Summand.
+     * @param d The real number to add.
      * @return The complex number + {@code d}.
      */
     public Complex add(double d) {
@@ -247,8 +247,8 @@ public class Complex implements Comparable<Complex> {
     /**
      * Addition of complex numbers.
      *
-     * @param real Real part of the summand.
-     * @param imag Imaginary part of the summand.
+     * @param real Real part of number to add.
+     * @param imag Imaginary part of the number to add.
      * @return Complex number + {@code new Complex(real, imag}.
      */
     public Complex add(double real, double imag) {
@@ -261,7 +261,7 @@ public class Complex implements Comparable<Complex> {
      * Addition in place. <br>
      * Performs the equivalent of {@code Complex a += Complex c}.
      *
-     * @param c Complex summand.
+     * @param c Complex number to add.
      */
     public void addEquals(Complex c) {
         addOp(this, c);
@@ -271,7 +271,7 @@ public class Complex implements Comparable<Complex> {
      * Addition in place. <br>
      * Performs the equivalent of {@ code Complex a += d}.
      *
-     * @param d Real summand.
+     * @param d The real number to add.
      */
     public void addEquals(double d) {
         addOp(this, d);
@@ -281,8 +281,8 @@ public class Complex implements Comparable<Complex> {
      * Addition in place. <br>
      * Performs the equivalent of {@code Complex a += new Complex(real, imag)}
      *
-     * @param real the real part of the summand.
-     * @param imag the imaginary part of the summand.
+     * @param real the real part of the number to add.
+     * @param imag the imaginary part of the number to add.
      */
     public void addEquals(double real, double imag) {
         addOp(this, real, imag);
@@ -291,7 +291,7 @@ public class Complex implements Comparable<Complex> {
     /**
      * Subtraction of complex numbers.
      *
-     * @param c Subtrahend.
+     * @param c Complex number to subtract.
      * @return The complex number - {@code c}.
      */
     public Complex subtract(Complex c) {
@@ -301,9 +301,9 @@ public class Complex implements Comparable<Complex> {
     }
 
     /**
-     * Subtracion of a complex number and a real number.
+     * Subtraction of a complex number and a real number.
      *
-     * @param d Subtrahend.
+     * @param d Real number to subtract.
      * @return The complex number - {@code d}.
      */
     public Complex subtract(double d) {
@@ -316,7 +316,7 @@ public class Complex implements Comparable<Complex> {
      * Subtraction in place. <br>
      * Performs the equivalent of {@code Complex a -= Complex c}.
      *
-     * @param c Complex subtrahend.
+     * @param c Complex number to subtract.
      */
     public void subtractEquals(Complex c) {
         subtractOp(this, c);
@@ -326,18 +326,29 @@ public class Complex implements Comparable<Complex> {
      * Subtraction in place. <br>
      * Performs the equivalent of {@ code Complex a -= d}.
      *
-     * @param d Real subtrahend.
+     * @param d Real number to subtract.
      */
     public void subtractEquals(double d) {
         subtractOp(this, d);
     }
 
+    /**
+     * Complex number multiplication.
+     * @param c The complex number to multiply.
+     * @return The complex number * {@code c}.
+     */
     public Complex multiply(Complex c) {
         Complex result = new Complex(real, imag);
         multiplyOp(result, c);
         return result;
     }
 
+    /**
+     * Complex number multiplication.
+     * @param real Real part of the number to multiply.
+     * @param imag Imaginary part of the number to multiply.
+     * @return Complex number * {@code new Complex(real, imag}.
+     */
     public Complex multiply(double real, double imag) {
         Complex result = new Complex(this.real, this.imag);
         multiplyOp(result, real, imag);
@@ -383,6 +394,10 @@ public class Complex implements Comparable<Complex> {
         multiplyOp(this, 1.0 / d);
     }
 
+    /**
+     * Square root ot the complex number.
+     * @return The square root of the complex number.
+     */
     public Complex sqrt() {
         if (real == 0 && imag == 0) {
             return new Complex();
@@ -396,6 +411,11 @@ public class Complex implements Comparable<Complex> {
         }
     }
 
+    /**
+     * Complex power.
+     * @param c
+     * @return
+     */
     public Complex pow(Complex c) {
         return this.log().multiply(c).exp();
     }
@@ -461,6 +481,10 @@ public class Complex implements Comparable<Complex> {
         return this.add(i).divide(i.subtract(this)).log().multiply(i.multiply(new Complex(0.5, 0.0)));
     }
 
+    /**
+     * Urinary minus.
+     * @return For a complex number {@code c} it return {@code -c}.
+     */
     public Complex uminus() {
         return new Complex(-real, -imag);
     }

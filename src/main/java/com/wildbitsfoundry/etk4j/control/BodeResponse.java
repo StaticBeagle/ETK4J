@@ -11,6 +11,7 @@ public class BodeResponse {
 
     BodeResponse(double[] magnitudeIndB, double[] phase, double[] w) {
         this.magnitudeIndB = magnitudeIndB;
+        TransferFunction.unwrapPhase(phase);
         this.phase = phase;
         this.w = w;
     }
@@ -26,8 +27,7 @@ public class BodeResponse {
 
     /**
      * Phase response of the system.
-     * @return The wrapped phase response of the system is degrees. The wrapped phase only goes from -180° to 180°. <br>
-     * To unwrap the phase the {@link TransferFunction#unwrapPhase(double[])} can be used.
+     * @return The unwrapped phase response of the system is degrees.
      */
     public double[] getPhaseInDegrees() {
         return phase;

@@ -36,11 +36,12 @@ public abstract class LinearTimeInvariantSystem {
      * @param initialConditions Initial conditions of the system.
      * @param ss                State Space representation of the system.
      * @param integrationMethod Integration method.
-     * @return The {@link TimeResponse} of the system.
-     * @throws IllegalArgumentException     if the length of the input array does not match the length of the time array.
-     * @throws IllegalArgumentException     if the time array is empty.
-     * @throws IllegalArgumentException     if the initial time is negative.
-     * @throws NonUniformTimeStepsException if the step of the time array ore not uniform.
+     * @return The {@link TimeResponse} Of the system.
+     * @throws IllegalArgumentException     If the length of the input array does not match the length of the time array.
+     * @throws IllegalArgumentException     If the time array is empty.
+     * @throws IllegalArgumentException     If the initial time is negative.
+     * @throws NonUniformTimeStepsException If the step of the time array ore not uniform.
+     * @throws IllegalArgumentException If the length of the initial conditions is different from the number of states.
      * @see <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.lsim.html">lsim</a>
      */
     protected TimeResponse lsim(double[][] input, double[] time, double[] initialConditions,
@@ -67,8 +68,8 @@ public abstract class LinearTimeInvariantSystem {
         double[] x0 = initialConditions == null ? new double[noStates] : initialConditions;
         double[][] xOut = new double[noSteps][noStates];
 
-        if(x0.length > noStates) {
-            throw new IllegalArgumentException("The number of initial conditions is greater than the number of states.");
+        if(x0.length != noStates) {
+            throw new IllegalArgumentException("The number of initial conditions is different from the number of states.");
         }
         if (time[0] == 0.0) {
             xOut[0] = x0;
