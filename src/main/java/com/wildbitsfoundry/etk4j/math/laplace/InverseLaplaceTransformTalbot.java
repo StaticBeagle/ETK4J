@@ -8,6 +8,12 @@ import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 
 /**
  * The {@code InverseLaplaceTransformTalbot} implements the inverse laplace transform using Talbot's method.
+ * <pre>
+ *     References:
+ *     Tucker McClure (2022). Numerical Inverse Laplace Transform
+ *     (https://www.mathworks.com/matlabcentral/fileexchange/39035-numerical-inverse-laplace-transform),
+ *     MATLAB Central File Exchange. Retrieved February 16, 2022.
+ * </pre>
  * @see <a href="http://www.columbia.edu/~ww2040/UnifiedDraft.pdf pages">Unified Framework pages 17-18</a>
  */
 public class InverseLaplaceTransformTalbot {

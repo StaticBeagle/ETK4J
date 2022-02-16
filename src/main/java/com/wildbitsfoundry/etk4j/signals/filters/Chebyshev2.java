@@ -59,18 +59,22 @@ public class Chebyshev2 extends AnalogFilter {
     }
 
     public static LowPassResults cheb2ord(LowPassSpecs specs) {
+        specs.validate();
         return lowPassFilterOrder(specs, new Chebyshev2OrderCalculationStrategy());
     }
 
     public static HighPassResults cheb2ord(HighPassSpecs specs) {
+        specs.validate();
         return highPassFilterOrder(specs, new Chebyshev2OrderCalculationStrategy());
     }
 
     public static BandpassResults cheb2ord(BandpassSpecs specs) {
+        specs.validate();
         return bandpassFilterOrder(specs, new Chebyshev2OrderCalculationStrategy());
     }
 
     public static BandStopResults cheb2ord(BandStopSpecs specs) {
+        specs.validate();
         return bandStopFilterOrder(specs, new Chebyshev2OrderCalculationStrategy());
     }
 

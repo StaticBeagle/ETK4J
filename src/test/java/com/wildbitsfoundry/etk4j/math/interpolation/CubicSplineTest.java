@@ -164,6 +164,7 @@ public class CubicSplineTest {
         CubicSpline cs = CubicSpline.newAkimaSpline(x, y);
 
         double yi = cs.evaluateAt(xi[0]);
+        //1.425865589488636
         assertEquals(1.4258655894886363, yi, 1e-12);
 
         yi = cs.evaluateAt(xi[1]);
@@ -191,6 +192,23 @@ public class CubicSplineTest {
         assertEquals(2940.010698872582, cs.integrate(16.0), 1e-12);
         assertEquals(2940.010698872582, cs.integrate(0.0, 16.0), 1e-12);
         assertEquals(1603.6489464471163, cs.integrate(11., 16.0), 1e-12);
+    }
+
+    @Test
+    public void testGetSegmentNotAKnotSplineInterpolation() {
+        double[] x = new double[]{0.9, 1.3, 1.9, 2.1};
+        double[] y = new double[]{1.3, 1.5, 1.85, 2.1};
+        double[] xi = new double[]{1.15, 1.8, 2.0};
+        CubicSpline cs = CubicSpline.newNotAKnotSpline(x, y);
+
+        double yi = cs.getFirstSegment().evaluateAt(xi[0]);
+        assertEquals(1.4394531249999998, yi, 1e-12);
+
+        yi = cs.getSegment(1).evaluateAt(xi[1]);
+        assertEquals(1.7593750000000004, yi, 1e-12);
+
+        yi = cs.getLastSegment().evaluateAt(xi[2]);
+        assertEquals(1.9622916666666668, yi, 1e-12);
     }
 
     @Test

@@ -47,18 +47,48 @@ public class CubicSpline extends Spline {
         this.coefficients = coefficients;
     }
 
+    /**
+     * Creates a new {@code CubicSpline} with not-a-knot conditions. This method is an alias for
+     * {@link CubicSpline#newNotAKnotSpline(double[], double[])}.
+     * @param x The array of x coordinates. The values in this array must be unique and strictly increasing.
+     *          A copy of this array is made internally.
+     * @param y The array of y coordinates.
+     * @return A new instance of a cubic spline with not-a-knot conditions.
+     */
     public static CubicSpline newCubicSpline(double[] x, double[] y) {
         return newNotAKnotSpline(x, y);
     }
 
+    /**
+     * Creates a new {@code CubicSpline} with not-a-knot conditions. This method is an alias for
+     * {@link CubicSpline#newNotAKnotSplineInPlace(double[], double[])}.
+     * @param x The array of x coordinates. The values in this array must be unique and strictly increasing.This array
+     *          is not copied so any changes to this array will be reflected in the spline.
+     * @param y The array of y coordinates.
+     * @return A new instance of a cubic spline with not-a-knot conditions.
+     */
     public static CubicSpline newCubicSplineInPlace(double[] x, double[] y) {
         return newNotAKnotSplineInPlace(x, y);
     }
 
+    /**
+     * Creates a new {@code CubicSpline} with natural conditions.
+     * @param x The array of x coordinates. The values in this array must be unique and strictly increasing.
+     *          A copy of this array is made internally.
+     * @param y The array of y coordinates.
+     * @return A new instance of a cubic spline with natural conditions.
+     */
     public static CubicSpline newNaturalSpline(double[] x, double[] y) {
         return newNaturalSplineInPlace(Arrays.copyOf(x, x.length), y);
     }
 
+    /**
+     * Creates a new {@code CubicSpline} with natural conditions.
+     * @param x The array of x coordinates. The values in this array must be unique and strictly increasing.This array
+     *          is not copied so any changes to this array will be reflected in the spline.
+     * @param y The array of y coordinates.
+     * @return A new instance of a cubic spline with natural conditions.
+     */
     public static CubicSpline newNaturalSplineInPlace(double[] x, double[] y) {
         checkXYDimensions(x, y);
         checkMinXLength(x, 3);
@@ -106,10 +136,24 @@ public class CubicSpline extends Spline {
         return new CubicSpline(x, y, coefficients);
     }
 
+    /**
+     * Creates a new {@code CubicSpline} with parabolically terminated conditions.
+     * @param x The array of x coordinates. The values in this array must be unique and strictly increasing.
+     *          A copy of this array is made internally.
+     * @param y The array of y coordinates.
+     * @return A new instance of a cubic spline with parabolically terminated conditions.
+     */
     public static CubicSpline newParabolicallyTerminatedSpline(double[] x, double[] y) {
         return newParabolicallyTerminatedSplineInPlace(Arrays.copyOf(x, x.length), y);
     }
 
+    /**
+     * Creates a new {@code CubicSpline} with parabolically terminated conditions.
+     * @param x The array of x coordinates. The values in this array must be unique and strictly increasing.This array
+     *          is not copied so any changes to this array will be reflected in the spline.
+     * @param y The array of y coordinates.
+     * @return A new instance of a cubic spline with parabolically terminated conditions.
+     */
     public static CubicSpline newParabolicallyTerminatedSplineInPlace(double[] x, double[] y) {
         checkXYDimensions(x, y);
         checkMinXLength(x, 3);
@@ -150,10 +194,28 @@ public class CubicSpline extends Spline {
         return new CubicSpline(x, y, coefficients);
     }
 
+    /**
+     * Creates a new {@code CubicSpline} with clamped conditions.
+     * @param x The array of x coordinates. The values in this array must be unique and strictly increasing.
+     *          A copy of this array is made internally.
+     * @param y The array of y coordinates.
+     * @param d0 The value of the derivative at the first endpoint.
+     * @param dn The value of the derivative at the last endpoint.
+     * @return A new instance of a cubic spline with clamped conditions.
+     */
     public static CubicSpline newClampedSpline(double[] x, double[] y, double d0, double dn) {
         return newClampedSplineInPlace(Arrays.copyOf(x, x.length), y, d0, dn);
     }
 
+    /**
+     * Creates a new {@code CubicSpline} with clamped conditions.
+     * @param x The array of x coordinates. The values in this array must be unique and strictly increasing.This array
+     *          is not copied so any changes to this array will be reflected in the spline.
+     * @param y The array of y coordinates.
+     * @param d0 The value of the derivative at the first endpoint.
+     * @param dn The value of the derivative at the last endpoint.
+     * @return A new instance of a cubic spline with clamped conditions.
+     */
     public static CubicSpline newClampedSplineInPlace(double[] x, double[] y, double d0, double dn) {
         checkXYDimensions(x, y);
         checkMinXLength(x, 2);
@@ -194,19 +256,25 @@ public class CubicSpline extends Spline {
         return new CubicSpline(x, y, coefficients);
     }
 
+    /**
+     * Creates a new Akima {@code CubicSpline}.
+     * @param x The array of x coordinates. The values in this array must be unique and strictly increasing.
+     *          A copy of this array is made internally.
+     * @param y The array of y coordinates.
+     * @return A new instance of an Akima cubic spline.
+     */
     public static CubicSpline newAkimaSpline(double[] x, double[] y) {
-        return newAkimaSpline(x, y, ConstantsETK.DOUBLE_EPS);
+        return newAkimaSplineInPlace(x, y);
     }
 
+    /**
+     * Creates a new Akima {@code CubicSpline}.
+     * @param x The array of x coordinates. The values in this array must be unique and strictly increasing.This array
+     *          is not copied so any changes to this array will be reflected in the spline.
+     * @param y The array of y coordinates.
+     * @return A new instance of an Akima cubic spline.
+     */
     public static CubicSpline newAkimaSplineInPlace(double[] x, double[] y) {
-        return newAkimaSplineInPlace(x, y, ConstantsETK.DOUBLE_EPS);
-    }
-
-    public static CubicSpline newAkimaSpline(double[] x, double[] y, double ep) {
-        return newAkimaSplineInPlace(Arrays.copyOf(x, x.length), y, ep);
-    }
-
-    public static CubicSpline newAkimaSplineInPlace(double[] x, double[] y, double ep) {
         checkXYDimensions(x, y);
         checkMinXLength(x, 5);
         final int n = x.length;
@@ -227,7 +295,7 @@ public class CubicSpline extends Spline {
             double c0 = Math.abs(t[i + 3] - t[i + 2]);
             double c1 = Math.abs(t[i + 1] - t[i]);
             double c2 = c0 + c1;
-            if (c2 > ep) {
+            if (c2 != 0.0) {
                 d[i] = (c0 * t[i + 1] + c1 * t[i + 2]) / c2;
             } else {
                 d[i] = 0.5 * (t[i + 2] + t[i + 1]);
@@ -247,6 +315,25 @@ public class CubicSpline extends Spline {
         return new CubicSpline(x, y, coefficients);
     }
 
+    /**
+     * Creates a new {@code CubicSpline} with not-a-knot conditions
+     * @param x The array of x coordinates. The values in this array must be unique and strictly increasing.
+     *          A copy of this array is made internally.
+     * @param y The array of y coordinates.
+     * @return A new instance of a cubic spline with not-a-knot conditions.
+     */
+    public static CubicSpline newNotAKnotSpline(double[] x, double[] y) {
+        return newNotAKnotSplineInPlace(Arrays.copyOf(x, x.length), y);
+    }
+
+    /**
+     * Creates a new {@code CubicSpline} with not-a-knot conditions. This method is an alias for
+     * {@link CubicSpline#newNotAKnotSplineInPlace(double[], double[])}.
+     * @param x The array of x coordinates. The values in this array must be unique and strictly increasing.This array
+     *          is not copied so any changes to this array will be reflected in the spline.
+     * @param y The array of y coordinates.
+     * @return A new instance of a cubic spline with not-a-knot conditions.
+     */
     public static CubicSpline newNotAKnotSplineInPlace(double[] x, double[] y) {
         checkXYDimensions(x, y);
         checkMinXLength(x, 4);
@@ -314,29 +401,43 @@ public class CubicSpline extends Spline {
         return new CubicSpline(x, y, coefficients);
     }
 
-    public static CubicSpline newNotAKnotSpline(double[] x, double[] y) {
-        return newNotAKnotSplineInPlace(Arrays.copyOf(x, x.length), y);
+    /**
+     * Evaluate the spline.
+     * @param index The index of the segment to be evaluated.
+     * @param x The value at which to evaluate the spline.
+     * @return The result of evaluating the spline at {@code x}.
+     */
+    @Override
+    public double evaluateAt(int index, double x) {
+        double t = x - this.x[index];
+        index <<= 2;
+        return coefficients[index + 3] + t * (coefficients[index + 2] + t * (coefficients[index + 1] + t * coefficients[index]));
     }
 
+    /**
+     * Evaluate the derivative of the spline.
+     * @param index The index of the segment to be evaluated.
+     * @param x The value at which to evaluate the derivative of the spline.
+     * @return The result of evaluating the derivative of the spline at {@code x}.
+     */
     @Override
-    public double evaluateAt(int i, double x) {
-        double t = x - this.x[i];
-        i <<= 2;
-        return coefficients[i + 3] + t * (coefficients[i + 2] + t * (coefficients[i + 1] + t * coefficients[i]));
+    public double evaluateDerivativeAt(int index, double x) {
+        double t = x - this.x[index];
+        index <<= 2;
+        return coefficients[index + 2] + t * (2 * coefficients[index + 1] + t * 3 * coefficients[index]);
     }
 
+    /**
+     * Evaluate the antiderivative of the spline.
+     * @param index The index of the segment to be evaluated.
+     * @param x The value at which to evaluate the antiderivative of the spline.
+     * @return The result of evaluating the antiderivative of the spline at {@code x}.
+     */
     @Override
-    public double evaluateDerivativeAt(int i, double x) {
-        double t = x - this.x[i];
-        i <<= 2;
-        return coefficients[i + 2] + t * (2 * coefficients[i + 1] + t * 3 * coefficients[i]);
-    }
-
-    @Override
-    public double evaluateAntiDerivativeAt(int i, double x) {
-        double t = x - this.x[i];
-        i <<= 2;
-        return t * (coefficients[i + 3] + t * (coefficients[i + 2] * P5 + t * (coefficients[i + 1] * P33 + t * coefficients[i] * P25)));
+    public double evaluateAntiDerivativeAt(int index, double x) {
+        double t = x - this.x[index];
+        index <<= 2;
+        return t * (coefficients[index + 3] + t * (coefficients[index + 2] * P5 + t * (coefficients[index + 1] * P33 + t * coefficients[index] * P25)));
     }
 
     @Override

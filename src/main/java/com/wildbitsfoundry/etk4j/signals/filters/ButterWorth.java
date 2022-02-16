@@ -43,19 +43,22 @@ public final class ButterWorth extends AnalogFilter {
     }
 
     public static LowPassResults buttord(LowPassSpecs specs) {
-        // TODO validate inputs
+        specs.validate();
         return lowPassFilterOrder(specs, new ButterworthOrderCalculationStrategy());
     }
 
     public static HighPassResults buttord(HighPassSpecs specs) {
+        specs.validate();
         return highPassFilterOrder(specs, new ButterworthOrderCalculationStrategy());
     }
 
     public static BandpassResults buttord(BandpassSpecs specs) {
+        specs.validate();
         return bandpassFilterOrder(specs, new ButterworthOrderCalculationStrategy());
     }
 
     public static BandStopResults buttord(BandStopSpecs specs) {
+        specs.validate();
         return bandStopFilterOrder(specs, new ButterworthOrderCalculationStrategy());
     }
 

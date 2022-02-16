@@ -121,6 +121,7 @@ public class Elliptic extends AnalogFilter {
     }
 
     public static LowPassResults ellipord(LowPassSpecs specs) {
+        specs.validate();
         LowPassSpecs specsCopy = new LowPassSpecs(specs);
         double rp = 10 * Math.log10(specs.getPassBandRipple());
         double rs = 10 * Math.log10(specs.getStopBandAttenuation());
@@ -130,6 +131,7 @@ public class Elliptic extends AnalogFilter {
     }
 
     public static HighPassResults ellipord(HighPassSpecs specs) {
+        specs.validate();
         HighPassSpecs specsCopy = new HighPassSpecs(specs);
         double rp = 10 * Math.log10(specs.getPassBandRipple());
         double rs = 10 * Math.log10(specs.getStopBandAttenuation());
@@ -139,6 +141,7 @@ public class Elliptic extends AnalogFilter {
     }
 
     public static BandpassResults ellipord(BandpassSpecs specs) {
+        specs.validate();
         BandpassSpecs specsCopy = new BandpassSpecs(specs);
         double rp = 10 * Math.log10(specs.getPassBandRipple());
         double rs = 10 * Math.log10(specs.getStopBandAttenuation());
@@ -148,6 +151,7 @@ public class Elliptic extends AnalogFilter {
     }
 
     public static BandStopResults ellipord(BandStopSpecs specs) {
+        specs.validate();
         BandStopSpecs specsCopy = new BandStopSpecs(specs);
         double rp = 10 * Math.log10(specs.getPassBandRipple());
         double rs = 10 * Math.log10(specs.getStopBandAttenuation());
@@ -155,7 +159,7 @@ public class Elliptic extends AnalogFilter {
         specsCopy.setStopBandAttenuation(rs);
         return bandStopFilterOrder(specsCopy, new EllipticOrderCalculationStrategy());
     }
-
+    //TODO add zpk methods to all filter types for all filter approximations
     public static TransferFunction newLowPass(int n, double rp, double rs, double wn) {
         ZeroPoleGain zpk = ellipap(n, rp, rs);
         return lpTolp(zpk, wn);

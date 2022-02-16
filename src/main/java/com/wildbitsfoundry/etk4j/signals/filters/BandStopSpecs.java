@@ -67,4 +67,37 @@ public class BandStopSpecs {
     public void setStopBandAttenuation(double stopBandAttenuation) {
         this.stopBandAttenuation = stopBandAttenuation;
     }
+
+    void validate() {
+        if (passBandRipple < 0) {
+            throw new IllegalArgumentException("The pass band ripple cannot be less than zero.");
+        }
+        if (stopBandAttenuation < 0) {
+            throw new IllegalArgumentException("The stop band attenuation cannot be less than zero.");
+        }
+        if(passBandRipple >= stopBandAttenuation) {
+            throw new IllegalArgumentException("The stop band attenuation has to be greater than the pass band ripple.");
+        }
+        if (lowerStopBandFrequency <= 0) {
+            throw new IllegalArgumentException("The lower stop band frequency has to be greater than zero.");
+        }
+        if (lowerPassBandFrequency <= 0) {
+            throw new IllegalArgumentException("The lower pass band frequency has to be greater than zero.");
+        }
+        if(upperPassBandFrequency <= 0) {
+            throw new IllegalArgumentException("The upper pass band frequency has to be greater than zero.");
+        }
+        if(upperStopBandFrequency <= 0) {
+            throw new IllegalArgumentException("The upper stop band frequency has to be greater than zero.");
+        }
+        if (lowerStopBandFrequency >= upperStopBandFrequency) {
+            throw new IllegalArgumentException("The lower stop band frequency has to be less than the upper stop band frequency.");
+        }
+        if (lowerPassBandFrequency >= lowerStopBandFrequency) {
+            throw new IllegalArgumentException("The lower pass band frequency has to be less than the lower stop band frequency.");
+        }
+        if (upperStopBandFrequency >= upperPassBandFrequency) {
+            throw new IllegalArgumentException("The upper stop band frequency has to be less than the upper pass band frequency.");
+        }
+    }
 }

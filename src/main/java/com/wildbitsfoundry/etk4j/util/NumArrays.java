@@ -546,10 +546,16 @@ public final class NumArrays {
         }
     }
 
-    public static double horner(double[] coefs, double x) {
+    /**
+     * Horner's method of evaluating a polynomial.
+     * @param coefficients The coefficients of the polynomial.
+     * @param x Argument at which to evaluate the polynomial.
+     * @return The polynomial evaluated at {@code x}.
+     */
+    public static double horner(double[] coefficients, double x) {
         double result = 0.0;
-        for (int j = 0; j < coefs.length; ++j) {
-            result = result * x + coefs[j];
+        for (int j = 0; j < coefficients.length; ++j) {
+            result = result * x + coefficients[j];
         }
         return result;
     }
@@ -630,6 +636,12 @@ public final class NumArrays {
         return result;
     }
 
+    /**
+     * Outer product of two arrays.
+     * @param a The first array.
+     * @param b The second array.
+     * @return {@code output[i, j] = a[i] * b[j]}.
+     */
     public static double[][] outer(double[] a, double[] b) {
         int M = a.length;
         int N = b.length;
@@ -642,9 +654,15 @@ public final class NumArrays {
         return result;
     }
 
+    /**
+     * Dot product between two arrays.
+     * @param a The first array.
+     * @param b The second array.
+     * @return The dot (inner) product of arrays {@code a} and {@code b}.
+     */
     public static double dot(double[] a, double[] b) {
         if(a.length != b.length) {
-            throw new IllegalArgumentException("Both arrays must be of the same length");
+            throw new IllegalArgumentException("Both arrays must be of the same length.");
         }
         double result = 0.0;
         for(int i = 0; i < a.length; ++i) {
@@ -653,27 +671,11 @@ public final class NumArrays {
         return result;
     }
 
-    public static double[] dot(double[][] a, double[] b) {
-        double[] result = new double[a[0].length];
-        for(int i = 0; i < a.length; ++i) {
-            result[i] = dot(a[i], b);
-        }
-        return result;
-    }
-
-    public static double[] dot(double[] a, double[][] b) {
-        if(a.length != b.length) {
-            throw new IllegalArgumentException("The number of elements in a must match the number of rows in b.");
-        }
-        Matrix A = new Matrix(a, 1);
-        A.multiplyEquals(new Matrix(b));
-        return A.getArray();
-    }
-
-    public static double[] dot(double[] a, double b) {
-        return multiplyElementWise(a, b);
-    }
-
+    /**
+     * Array product.
+     * @param a The input array.
+     * @return The product of multiplying all the elements in the array.
+     */
     public static double product(double[] a) {
         double prod = 1.0;
         for(int i = 0; i < a.length; ++i) {
@@ -746,9 +748,9 @@ public final class NumArrays {
 
         double[][] aa = {{1, 2}, {3, 4}};
         double[] bb = {5, 6};
-        System.out.println(Arrays.toString(dot(bb, aa)));
+        //System.out.println(Arrays.toString(dot(bb, aa)));
 
-        System.out.println(Arrays.toString(dot(aa, bb)));
+        //System.out.println(Arrays.toString(dot(aa, bb)));
 
         System.out.println(product(a));
 

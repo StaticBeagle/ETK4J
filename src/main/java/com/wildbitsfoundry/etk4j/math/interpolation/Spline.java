@@ -13,27 +13,27 @@ import java.util.Arrays;
 
 public abstract class Spline extends PiecewiseFunction implements DifferentiableFunction, IntegrableFunction {
 	
-	private int _order;
+	private int order;
 	private double[] _indefiniteIntegral = null;
 
 	protected Spline(double[] x, int order) {
 		super(x);
-		_order = order;
+		this.order = order;
 	}
 	
 	@Override
 	public UnivariateFunction getSegment(int index) {
-		int offset = index * _order;
-		final double[] coefs = Arrays.copyOfRange(coefficients, offset, offset + _order);
+		int offset = index * order;
+		final double[] coefficients = Arrays.copyOfRange(this.coefficients, offset, offset + order);
 		final double x0 = x[index];
-		UnivariateFunction fn = x -> NumArrays.horner(coefs, x - x0);
+		UnivariateFunction fn = x -> NumArrays.horner(coefficients, x - x0);
 		return fn;
 	}
 
 	protected double evaluateDerivativeAt(int index, double x) {
 		double t = x - this.x[index];
-		index *= _order;
-		final int length = _order - 1;
+		index *= order;
+		final int length = order - 1;
 		double result = 0.0;
 		for (int j = 0; j < length; ++j) {
 			result *= t;
@@ -44,10 +44,10 @@ public abstract class Spline extends PiecewiseFunction implements Differentiable
 
 	public double evaluateAntiDerivativeAt(int index, double x) {
 		double t = x - this.x[index];
-		index *= _order;
+		index *= order;
 		double result = 0.0;
-		for (int j = 0; j < _order; ++j) {
-			result += coefficients[index++] / (_order - j);
+		for (int j = 0; j < order; ++j) {
+			result += coefficients[index++] / (order - j);
 			result *= t;
 		}
 		return result;
@@ -56,9 +56,9 @@ public abstract class Spline extends PiecewiseFunction implements Differentiable
 	@Override
 	public double evaluateAt(int index, double x) {
 		double t = x - this.x[index];
-		index *= _order;
+		index *= order;
 		double result = 0;
-		for (int j = 0; j < _order; ++j) {
+		for (int j = 0; j < order; ++j) {
 			result *= t;
 			result += coefficients[index++];
 		}
@@ -97,7 +97,7 @@ public abstract class Spline extends PiecewiseFunction implements Differentiable
 			return;
 		}
 
-		final int size = coefficients.length / _order;
+		final int size = coefficients.length / order;
 		_indefiniteIntegral = new double[size];
 		for (int i = 0; i < size - 1; ++i) {
 			_indefiniteIntegral[i + 1] = _indefiniteIntegral[i] + this.evaluateAntiDerivativeAt(i, x[i + 1]);

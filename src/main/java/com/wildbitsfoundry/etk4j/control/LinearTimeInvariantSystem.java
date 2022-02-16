@@ -74,7 +74,7 @@ public abstract class LinearTimeInvariantSystem {
         if (time[0] == 0.0) {
             xOut[0] = x0;
         } else if (time[0] > 0.0) {
-            xOut[0] = NumArrays.dot(x0, A.transpose().multiply(time[0]).expm().getAs2DArray());
+            xOut[0] = dot(x0, A.transpose().multiply(time[0]).expm().getAs2DArray());
         } else {
             throw new IllegalArgumentException("Initial time must be non negative.");
         }
@@ -105,7 +105,7 @@ public abstract class LinearTimeInvariantSystem {
                     double[][] Ad = expMT.subMatrix(0, noStates - 1, 0, noStates - 1).getAs2DArray();
                     double[][] Bd = expMT.subMatrix(noStates, expMT.getRowCount() - 1, 0, noStates - 1).getAs2DArray();
                     for (int i = 1; i < noSteps; ++i) {
-                        xOut[i] = NumArrays.add(NumArrays.dot(xOut[i - 1], Ad), NumArrays.dot(U[i - 1], Bd));
+                        xOut[i] = NumArrays.add(dot(xOut[i - 1], Ad), dot(U[i - 1], Bd));
                     }
                     break;
                 }
@@ -132,8 +132,8 @@ public abstract class LinearTimeInvariantSystem {
                         NumArrays.subtractElementWiseInPlace(Bd0[i], Bd1[i]);
                     }
                     for (int i = 1; i < noSteps; ++i) {
-                        xOut[i] = NumArrays.add(NumArrays.dot(xOut[i - 1], Ad), NumArrays.dot(U[i - 1], Bd0));
-                        NumArrays.addElementWiseInPlace(xOut[i], NumArrays.dot(U[i], Bd1));
+                        xOut[i] = NumArrays.add(dot(xOut[i - 1], Ad), dot(U[i - 1], Bd0));
+                        NumArrays.addElementWiseInPlace(xOut[i], dot(U[i], Bd1));
                     }
                     break;
                 }
@@ -145,10 +145,19 @@ public abstract class LinearTimeInvariantSystem {
         double[][] c = C.transpose().getAs2DArray();
         double[][] d = D.transpose().getAs2DArray();
         for (int i = 0; i < noSteps; ++i) {
-            yOut[i] = NumArrays.dot(xOut[i], c);
-            NumArrays.addElementWiseInPlace(yOut[i], NumArrays.dot(U[i], d));
+            yOut[i] = dot(xOut[i], c);
+            NumArrays.addElementWiseInPlace(yOut[i], dot(U[i], d));
         }
         return new TimeResponse(time, NumArrays.transpose(yOut), xOut);
+    }
+
+    private static double[] dot(double[] a, double[][] b) {
+        if(a.length != b.length) {
+            throw new IllegalArgumentException("The number of elements in a must match the number of rows in b.");
+        }
+        Matrix A = new Matrix(a, 1);
+        A.multiplyEquals(new Matrix(b));
+        return A.getArray();
     }
 
     /**

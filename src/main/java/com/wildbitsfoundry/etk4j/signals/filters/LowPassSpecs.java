@@ -47,4 +47,16 @@ public class LowPassSpecs {
     public void setStopBandAttenuation(double stopBandAttenuation) {
         this.stopBandAttenuation = stopBandAttenuation;
     }
+
+    void validate() {
+        if (passBandRipple < 0) {
+            throw new IllegalArgumentException("The pass band ripple cannot be less than zero.");
+        }
+        if (stopBandAttenuation < 0) {
+            throw new IllegalArgumentException("The stop band attenuation cannot be less than zero.");
+        }
+        if(passBandRipple >= stopBandAttenuation) {
+            throw new IllegalArgumentException("The stop band attenuation has to be greater than the pass band ripple.");
+        }
+    }
 }
