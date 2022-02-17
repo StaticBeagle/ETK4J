@@ -161,7 +161,7 @@ public class StateSpace extends LinearTimeInvariantSystem {
     /**
      * {@link TransferFunction} representation of the {@code StateSpace} system. This method assumes that the
      * system is a Single Input Single Output (SISO) system thus this is similar to calling
-     * {@link StateSpace#toTransferFunction()} with input argument equal to zero and returning the first element
+     * {@link #toTransferFunction()} with input argument equal to zero and returning the first element
      * of the array of returned Transfer Functions.
      * @return The SISO Transfer Function of the system.
      */

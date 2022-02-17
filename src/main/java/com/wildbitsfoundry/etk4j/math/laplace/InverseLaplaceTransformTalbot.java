@@ -29,7 +29,7 @@ public class InverseLaplaceTransformTalbot {
     /**
      * Construct an Inverse Laplace Transform using Talbot's method.
      * @param M The number of times to sum each time sample used in
-     * {@link InverseLaplaceTransformTalbot#inverseTransform(ComplexUnivariateFunction, double)}
+     * {@link #inverseTransform(ComplexUnivariateFunction, double)}
      */
     public InverseLaplaceTransformTalbot(int M) {
         this.M = M;

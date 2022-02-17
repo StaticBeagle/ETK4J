@@ -15,8 +15,6 @@ public class LinearSplineTest {
 	double[] xi;
 	double left;
 	double right;
-
-	// TODO test throw extrapolator
 	
 	@Rule
 	public final ExpectedException exception = ExpectedException.none();

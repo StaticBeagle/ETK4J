@@ -329,7 +329,7 @@ public class PolynomialTest {
 		assertArrayEquals(re, real, 1e-12);
 		assertArrayEquals(im, imag, 1e-12);
 		
-		roots = new Polynomial().getRoots();
+		roots = new Polynomial(1).getRoots();
 
 		assertEquals(0, roots.length);		
 	}

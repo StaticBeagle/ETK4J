@@ -88,7 +88,7 @@ public final class Interpolation {
 	 * @return If the number of points in x ie equal to 2 it performs linear interpolation. If the number of points
 	 * in x is equal to 3 it performs quadratic interpolation. If the number of points is greater than 3 it creates
 	 * a cubic spline with {@link CubicSpline#newNotAKnotSpline(double[], double[])} with not-a-knot conditions and
-	 * evaluates given spline at {@xi}.
+	 * evaluates given spline at {@code xi}.
 	 */
 	public static double spline(double[] x, double[] y, double xi) {
 		checkXYDimensions(x, y);

@@ -30,13 +30,6 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
     protected Complex[] roots = null;
 
     /***
-     * Constructs a polynomial with a constant value of 1.
-     */
-    public Polynomial() {
-        coefficients = new double[]{1.0};
-    }
-
-    /***
      * Copy constructor
      */
     public Polynomial(Polynomial polynomial) {
@@ -526,10 +519,20 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
         return new Polynomial(coeffs);
     }
 
+    /**
+     * Indefinite integral of the {@code Polynomial}.
+     * This method is equivalent to calling {@link #integral()} with integration constant equal to 0.
+     * @return The indefinite integral of the polynomial.
+     */
     public Polynomial integral() {
         return this.integral(0.0);
     }
 
+    /**
+     * Indefinite integral of the {@Polynomial}.
+     * @param constant The integration constant.
+     * @return The indefinite integral of the polynomial.
+     */
     public Polynomial integral(double constant) {
         final int length = coefficients.length;
         double[] integral = new double[length + 1];
@@ -540,12 +543,23 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
         return new Polynomial(integral);
     }
 
+    /**
+     * Definite integral of the {@code Polynomial}.
+     * @param a The lower bound of the integration.
+     * @param b The upper bound of the integration.
+     * @return The definite integral of the polynomial from a to b.
+     */
     @Override
     public double integrate(double a, double b) {
         Polynomial integral = this.integral();
         return integral.evaluateAt(b) - integral.evaluateAt(a);
     }
 
+    /**
+     * Differentiate {@code Polynomial}.
+     * @param x The argument at which to evaluate the derivative of the polynomial.
+     * @return The derivative of the polynomial evaluate at {@code x}.
+     */
     @Override
     public double differentiate(double x) {
         final int length = coefficients.length - 1;
@@ -557,10 +571,22 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
         return result;
     }
 
+    /**
+     * Evaluate a {@Polynomial} from its coefficients.
+     * @param coefficients The coefficients of the polynomial to evaluate.
+     * @param x The argument at which to evaluate the polynomial.
+     * @returnThe The value of the polynomial at {@code x}.
+     */
     public static double polyval(double[] coefficients, double x) {
-        return new Polynomial(coefficients).evaluateAt(x);
+        return NumArrays.horner(coefficients, x);
     }
 
+    /**
+     * Evaluate a {@Polynomial} from its coefficients.
+     * @param coefficients The coefficients of the polynomial to evaluate.
+     * @param x The array of argument at which to evaluate the polynomial.
+     * @returnThe The values of the polynomial at {@code x}.
+     */
     public static double[] polyval(double[] coefficients, double[] x) {
         final int length = x.length;
         double[] result = new double[length];
@@ -571,5 +597,25 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
         return result;
     }
 
+    /**
+     * Evaluate a {@code Polynomial}.
+     * @param roots The roots of teh polynomial.
+     * @param x Argument at which to evaluate the polynomial.
+     * @return The value of the polynomial at {@code x}.
+     * @see <a href="https://numpy.org/doc/stable/reference/generated/numpy.polynomial.polynomial.polyfromroots.html">
+     *     polyfromroots</a>
+     */
+    public static Complex polyvalFromRoots(Complex[] roots, Complex x) {
+        return ComplexArrays.product(ComplexArrays.subtract(x, roots));
+    }
 
+    public static void main(String[] args) {
+        // [1, 2, 1]
+        // [3, 1, 2, 0]
+        Polynomial poly = new Polynomial(3, 1, 2, 0);
+        System.out.println(Arrays.toString(poly.getRoots()));
+        System.out.println(polyvalFromRoots(poly.getRoots(), Complex.fromReal(2.0)));
+
+        System.out.println(polyvalFromRoots(poly.getRoots(), Complex.fromImaginary(2.0)));
+    }
 }

@@ -117,7 +117,7 @@ public class TransferFunction extends LinearTimeInvariantSystem {
     }
 
     /**
-     * Numerator {@link Polynomial}.
+     * Numerator {@code Polynomial}.
      * @return The numerator polynomial.
      */
     public Polynomial getNumerator() {
@@ -127,7 +127,7 @@ public class TransferFunction extends LinearTimeInvariantSystem {
     /**
      * Numerator coefficients.
      * @return An array containing the coefficients of the numerator in descending order.This is equivalent to
-     * calling {@link TransferFunction#getNumerator()} and subsequently calling {@link Polynomial#getCoefficients()}.
+     * calling {@link #getNumerator()} and subsequently calling {@link Polynomial#getCoefficients()}.
      * However, this method pads the resulting array with zeros if the degree of the denominator is greater than the degree
      * of the numerator e.g.
      * <pre>
@@ -159,7 +159,7 @@ public class TransferFunction extends LinearTimeInvariantSystem {
     /**
      * Denominator coefficients.
      * @return An array containing the coefficients of the denominator in descending order. This is equivalent to
-     * calling {@link TransferFunction#getDenominator()} and subsequently calling {@link Polynomial#getCoefficients()}.
+     * calling {@link #getDenominator()} and subsequently calling {@link Polynomial#getCoefficients()}.
      * However, this method pads the resulting array with zeros if the degree of the numerator is greater than the degree
      * of the denominator e.g.
      * <pre>
@@ -704,7 +704,7 @@ public class TransferFunction extends LinearTimeInvariantSystem {
      * Finds all the phase crossover frequencies by solving H(s) = H(-s). The phase crossover frequencies are defined
      * as the frequencies at which the phase of the system crosses -180°. Typically, the first frequency at which
      * the phase crosses -180° is the frequency of interest and in that case
-     * {@link TransferFunction#calculatePhaseCrossoverFrequency()} can be used. <br>
+     * {@link #calculatePhaseCrossoverFrequency()} can be used. <br>
      *
      * <pre>
      * Let's define our system as:

@@ -104,6 +104,7 @@ public final class MathETK {
 	 * @param absTol The absolute tolerance.
 	 * @param relTol The relative tolerance.
 	 * @return {@code Math.abs(a - b) <= absTol + relTol * Math.abs(b)}
+	 * @see <a href="https://numpy.org/doc/stable/reference/generated/numpy.isclose.html">isClose</a>
 	 */
 	public static boolean isClose(double a, double b, double absTol, double relTol) {
 		return Math.abs(a - b) <= absTol + relTol * Math.abs(b);
@@ -116,6 +117,7 @@ public final class MathETK {
 	 * @param absTol The absolute tolerance.
 	 * @param relTol The relative tolerance.
 	 * @return {@code Math.abs(a - b) <= absTol + relTol * Math.abs(b)}
+	 * @see <a href="https://numpy.org/doc/stable/reference/generated/numpy.isclose.html">isClose</a>
 	 */
 	public static boolean isClose(Complex a, Complex b, double absTol, double relTol) {
 		return a.subtract(b).abs() <= absTol + relTol * b.abs();
@@ -128,6 +130,7 @@ public final class MathETK {
 	 * @param b Argument in which to evaluate the function at.
 	 * @param absTol The absolute tolerance.
 	 * @return {@code Math.abs(a - b) <= absTol + 1e-5 * Math.abs(b)}
+	 * @see <a href="https://numpy.org/doc/stable/reference/generated/numpy.isclose.html">isClose</a>
 	 */
 	public static boolean isClose(double a, double b, double absTol) {
 		return isClose(a, b, absTol, 1e-5);
@@ -140,6 +143,7 @@ public final class MathETK {
 	 * @param a Argument in which to evaluate the function at.
 	 * @param b Argument in which to evaluate the function at.
 	 * @return {@code Math.abs(a - b) <= 1e-8 + 1e-5 * Math.abs(b)}
+	 * @see <a href="https://numpy.org/doc/stable/reference/generated/numpy.isclose.html">isClose</a>
 	 */
 	public static boolean isClose(double a, double b) {
 		return isClose(a, b, 1e-8, 1e-5);

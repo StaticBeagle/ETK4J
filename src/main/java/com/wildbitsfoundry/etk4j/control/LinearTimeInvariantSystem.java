@@ -226,7 +226,7 @@ public abstract class LinearTimeInvariantSystem {
     /**
      * Helper function to support all the step overloads.
      * @param time The time vector. Can be null then
-     * {@link LinearTimeInvariantSystem#generateDefaultResponseTimes(Matrix, int)} will be used
+     * {@link #generateDefaultResponseTimes(Matrix, int)} will be used
      * @param initialConditions Initial conditions of the system.
      * @param numberOfPoints Number of points to be used in case the time vector is null.
      * @return The StepReponse of the system.

@@ -67,30 +67,4 @@ public class LinearSpline extends Spline {
 		return sb.toString().replace("+ -", "- ").replace("- -", "+ ")
 				.replace("=  + ", "= ").replace("=  - ", "= -");
 	}
-
-	public static void main(String[] args) {
-		double[] x = { 1, 2, 3, 4 };
-		double[] y = { 1, 4, 9, 16 };
-
-		LinearSpline ls = newLinearSpline(x, y);
-		CubicSpline cs = CubicSpline.newNotAKnotSpline(x, y);
-		NearestNeighbor nh = NearestNeighbor.newNearestNeighbor(x, y);
-
-		System.out.println(ls.evaluateAt(4));
-
-		System.out.println(ls.integrate(1, 4));
-
-		System.out.println(cs.evaluateAt(4));
-
-		System.out.println(cs.integrate(1, 4));
-
-		System.out.println(nh.evaluateAt(1.6));
-
-		double[] vgs = {1.25, 1.5, 2.0, 3.5, 4.5, 5.5};
-		double[] rdson = {95, 75, 47, 30, 25, 24};
-
-		// TODO integrable function
-		LinearSpline ls2 = newLinearSpline(vgs, rdson);
-		System.out.println(ls2.evaluateAt(2.0));
-	}
 }
