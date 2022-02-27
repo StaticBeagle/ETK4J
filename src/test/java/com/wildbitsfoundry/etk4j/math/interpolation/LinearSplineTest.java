@@ -59,8 +59,6 @@ public class LinearSplineTest {
 		assertEquals(102.16799999999999, ls.integrate(0.0, 3.0), 1e-12);
 		assertEquals(1612.173, ls.integrate(11.,16.0), 1e-12);
 	}
-	
-	
 
 	@Test
 	public void testLinearSplineExtrapolateLeft() {
@@ -88,7 +86,7 @@ public class LinearSplineTest {
 
 		lspline.setExtrapolationMethod(ExtrapolationMethod.THROW);
 		exception.expect(IndexOutOfBoundsException.class);
-		yi = lspline.evaluateAt(left);
+		lspline.evaluateAt(left);
 	}
 	
 	@Test
@@ -117,6 +115,6 @@ public class LinearSplineTest {
 		
 		lspline.setExtrapolationMethod(ExtrapolationMethod.THROW);
 		exception.expect(IndexOutOfBoundsException.class);
-		yi = lspline.evaluateAt(right);
+		lspline.evaluateAt(right);
 	}
 }

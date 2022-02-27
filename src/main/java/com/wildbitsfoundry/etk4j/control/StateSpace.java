@@ -108,7 +108,7 @@ public class StateSpace extends LinearTimeInvariantSystem {
     /**
      * {@link TransferFunction} representation of the {@code StateSpace} system.
      * @param input For Multiple Input systems this represents the index of the input to use.
-     * @return An array of Transfer Functions one element per each output of the State Space system.
+     * @return An array of Transfer Functions, one transfer function per each output of the State Space system.
      */
     public TransferFunction[] toTransferFunction(int input) {
         //TODO normalizeABCD
@@ -161,8 +161,8 @@ public class StateSpace extends LinearTimeInvariantSystem {
     /**
      * {@link TransferFunction} representation of the {@code StateSpace} system. This method assumes that the
      * system is a Single Input Single Output (SISO) system thus this is similar to calling
-     * {@link #toTransferFunction()} with input argument equal to zero and returning the first element
-     * of the array of returned Transfer Functions.
+     * {@link #toTransferFunction(int)} with input argument equal to zero and returning the first element
+     * of the array of returned {@link TransferFunction} array.
      * @return The SISO Transfer Function of the system.
      */
     @Override
@@ -171,8 +171,21 @@ public class StateSpace extends LinearTimeInvariantSystem {
     }
 
     /**
-     * TODO create array overload of this method then document this one.
-     * @return
+     * {@link ZeroPoleGain} representation of the {@code StateSpace} system.
+     * @param input For Multiple Input systems this represents the index of the input to use.
+     * @return An array of {@link ZeroPoleGain}, one {@link ZeroPoleGain} per each output of the State Space system.
+     */
+    public ZeroPoleGain[] toZeroPoleGain(int input) {
+        TransferFunction[] tfs = this.toTransferFunction(input);
+        return Arrays.stream(tfs).map(TransferFunction::toZeroPoleGain).toArray(ZeroPoleGain[]::new);
+    }
+
+    /**
+     * {@link ZeroPoleGain} representation of the {@code StateSpace} system. This method assumes that the
+     * system is a Single Input Single Output (SISO) system thus this is similar to calling
+     * {@link #toZeroPoleGain(int)} with input argument equal to zero and returning the first element
+     * of the array of returned {@link ZeroPoleGain} array.
+     * @return The SISO Zero, Pole, gain representation of the system.
      */
     @Override
     public ZeroPoleGain toZeroPoleGain() {

@@ -1,7 +1,6 @@
 package com.wildbitsfoundry.etk4j.control;
 
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
-// TODO test
 /**
  * The {@code Frequency Response} holds the {@link Complex }results of the evaluation of the
  * {@link TransferFunction} at a given set of frequencies.

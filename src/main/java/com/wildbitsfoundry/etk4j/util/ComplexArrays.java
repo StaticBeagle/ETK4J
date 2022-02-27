@@ -287,33 +287,6 @@ public final class ComplexArrays {
         return result;
     }
 
-    public static Complex[] remove(Complex[] a, int index) {
-        if (index < 0 || index >= a.length) {
-            throw new IllegalArgumentException("index must be within the length of array a.");
-        }
-        Complex[] result = new Complex[a.length - 1];
-        for (int i = 0, j = 0; i < result.length; ) {
-            if (j == index) {
-                ++j;
-                continue;
-            } else {
-                result[i++] = a[j++];
-            }
-        }
-        return result;
-    }
-
-    public static Complex[] remove(Complex[] a, Complex c) {
-        int index = 0;
-        for (int i = 0; i < a.length; ++i) {
-            if (c.equals(a[i])) {
-                index = i;
-                break;
-            }
-        }
-        return remove(a, index);
-    }
-
     public static int[] argSort(Complex[] a) {
         Integer[] indexes = IntStream.range(0, a.length).boxed().toArray(Integer[]::new);
         Arrays.sort(indexes, Comparator.comparing(i -> a[i]));
@@ -335,11 +308,11 @@ public final class ComplexArrays {
                 new Complex(1, -1)
         };
 
-        Complex[] b = remove(a, 3);
+        //Complex[] b = remove(a, 3);
         System.out.println(Arrays.toString(a));
-        System.out.println(Arrays.toString(b));
-        Complex[] c = remove(a, new Complex(2, 2));
-        System.out.println(Arrays.toString(c));
+        //System.out.println(Arrays.toString(b));
+        //Complex[] c = remove(a, new Complex(2, 2));
+        //System.out.println(Arrays.toString(c));
 
         System.out.println(Arrays.toString(argSort(a)));
     }

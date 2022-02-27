@@ -311,8 +311,7 @@ public class TransferFunction extends LinearTimeInvariantSystem {
      * @return The complex frequency response of the system and the frequency at which each point was calculated.
      */
     public FrequencyResponse calculateFrequencyResponse() {
-        double[] frequencies = findFrequencies(200);
-        return this.calculateFrequencyResponse(frequencies);
+        return this.calculateFrequencyResponse(200);
     }
 
     /**
@@ -343,8 +342,7 @@ public class TransferFunction extends LinearTimeInvariantSystem {
      * @return The magnitude in dB and phase in degrees of the system.
      */
     public BodeResponse calculateBode() {
-        double[] frequencies = findFrequencies(200);
-        return this.calculateBode(frequencies);
+        return this.calculateBode(200);
     }
 
     /**
@@ -412,7 +410,7 @@ public class TransferFunction extends LinearTimeInvariantSystem {
     }
 
     /**
-     * Unwraps the radian (or degree) frequency. For example, consider a system where the phase response goes from 0°
+     * Unwraps frequency in degrees. For example, consider a system where the phase response goes from 0°
      * to 360°. If the phase is wrapped, it will only vary between 180° and -180° e.g. (Careful, ASCII art coming your way)
      * <pre>
      *  Expected:                     Actual:
@@ -640,7 +638,7 @@ public class TransferFunction extends LinearTimeInvariantSystem {
         Polynomial magPolyNum = getPolynomialMagnitude(rf.getNumerator());
         Polynomial magPolyDen = getPolynomialMagnitude(rf.getDenominator());
 
-        Complex[] solution = magPolyNum.subtract(magPolyDen).getRoots();
+        Complex[] solution = magPolyNum.subtract(magPolyDen).calculateRoots();
         double[] wgc = new double[solution.length];
         int j = 0;
         for (int i = 0; i < solution.length; i++) {
@@ -656,11 +654,21 @@ public class TransferFunction extends LinearTimeInvariantSystem {
     }
 
     /**
-     * Gain cross over frequency.
+     * Gain cross over frequency. The tolerance used to discern the minimum acceptable frequency to be considered is
+     * equal to: {@code Math.sqrt(DOUBLE_EPSILON)}.
      * @return The first frequency at where the gain (in dB) crosses 0 dB.
      */
     public double calculateGainCrossoverFrequency() {
-        double[] freqs = this.calculateAllGainCrossoverFrequencies();
+        return calculateGainCrossoverFrequency(Math.sqrt(ConstantsETK.DOUBLE_EPS));
+    }
+
+    /**
+     * Gain cross over frequency.
+     * @tol The tolerance used to determine the smallest acceptable frequency that can be considered.
+     * @return The first frequency at where the gain (in dB) crosses 0 dB.
+     */
+    public double calculateGainCrossoverFrequency(double tol) {
+        double[] freqs = this.calculateAllGainCrossoverFrequencies(tol);
         // Get the first one where the magnitude was decreasing
         for (double f : freqs) {
             double slope = this.calculateMagnitudeAt(f) - this.calculateMagnitudeAt(f + 1e-12);
@@ -742,7 +750,7 @@ public class TransferFunction extends LinearTimeInvariantSystem {
         Polynomial b = new Polynomial(convRHS);
         a.subtractEquals(b);
 
-        Complex[] roots = a.getRoots();
+        Complex[] roots = a.calculateRoots();
         double[] wpc = new double[roots.length];
         int j = 0;
         for (int i = 0; i < roots.length; i++) {
@@ -826,7 +834,7 @@ public class TransferFunction extends LinearTimeInvariantSystem {
 
         tf.normalize();
         if (!tf.isProper()) {
-            throw new ImproperTransferFunctionException("Transfer function must be proper");
+            throw new ImproperTransferFunctionException("Transfer function must be proper.");
         }
         double[] num = tf.rf.getNumerator().getCoefficients();
         double[] den = tf.rf.getDenominator().getCoefficients();

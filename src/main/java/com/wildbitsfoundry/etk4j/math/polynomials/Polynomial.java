@@ -21,6 +21,7 @@ import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkX
 
 /**
  * //TODO
+ *
  * @author Marcos L. Lopez-Rivera
  */
 public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction, DifferentiableFunction,
@@ -71,8 +72,8 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
      */
     public Polynomial(Complex... roots) {
         List<Complex> finiteRoots = new ArrayList<>(roots.length);
-        for(int i = 0; i < roots.length; ++i) {
-            if(Math.abs(roots[i].real()) != Double.POSITIVE_INFINITY
+        for (int i = 0; i < roots.length; ++i) {
+            if (Math.abs(roots[i].real()) != Double.POSITIVE_INFINITY
                     && Math.abs(roots[i].imag()) != Double.POSITIVE_INFINITY) {
                 finiteRoots.add(roots[i]);
             }
@@ -96,10 +97,7 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
                 result[j + 1].subtractEquals(tmp[j]);
             }
         }
-        coefficients = new double[size + 1];
-        for (int i = 0; i <= size; i++) {
-            coefficients[i] = result[i].real();
-        }
+        coefficients = ComplexArrays.real(result);
         this.roots = ComplexArrays.deepCopy(roots);
     }
 
@@ -137,7 +135,7 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
      * @return normalizing factor
      */
     public double normalize() {
-        double cn =  1.0 / this.coefficients[0];
+        double cn = 1.0 / this.coefficients[0];
         for (int j = 0; j < this.coefficients.length; j++) {
             this.coefficients[j] = this.coefficients[j] * cn;
         }
@@ -341,7 +339,7 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
         return result;
     }
 
-    public Complex[] getRoots() {
+    public Complex[] calculateRoots() {
         // lazy creation of roots
         if (roots == null) {
             int N = this.degree();
@@ -522,6 +520,7 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
     /**
      * Indefinite integral of the {@code Polynomial}.
      * This method is equivalent to calling {@link #integral()} with integration constant equal to 0.
+     *
      * @return The indefinite integral of the polynomial.
      */
     public Polynomial integral() {
@@ -530,6 +529,7 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
 
     /**
      * Indefinite integral of the {@Polynomial}.
+     *
      * @param constant The integration constant.
      * @return The indefinite integral of the polynomial.
      */
@@ -545,6 +545,7 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
 
     /**
      * Definite integral of the {@code Polynomial}.
+     *
      * @param a The lower bound of the integration.
      * @param b The upper bound of the integration.
      * @return The definite integral of the polynomial from a to b.
@@ -557,6 +558,7 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
 
     /**
      * Differentiate {@code Polynomial}.
+     *
      * @param x The argument at which to evaluate the derivative of the polynomial.
      * @return The derivative of the polynomial evaluate at {@code x}.
      */
@@ -573,8 +575,9 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
 
     /**
      * Evaluate a {@Polynomial} from its coefficients.
+     *
      * @param coefficients The coefficients of the polynomial to evaluate.
-     * @param x The argument at which to evaluate the polynomial.
+     * @param x            The argument at which to evaluate the polynomial.
      * @returnThe The value of the polynomial at {@code x}.
      */
     public static double polyval(double[] coefficients, double x) {
@@ -583,8 +586,9 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
 
     /**
      * Evaluate a {@Polynomial} from its coefficients.
+     *
      * @param coefficients The coefficients of the polynomial to evaluate.
-     * @param x The array of argument at which to evaluate the polynomial.
+     * @param x            The array of argument at which to evaluate the polynomial.
      * @returnThe The values of the polynomial at {@code x}.
      */
     public static double[] polyval(double[] coefficients, double[] x) {
@@ -599,23 +603,14 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
 
     /**
      * Evaluate a {@code Polynomial}.
+     *
      * @param roots The roots of teh polynomial.
-     * @param x Argument at which to evaluate the polynomial.
+     * @param x     Argument at which to evaluate the polynomial.
      * @return The value of the polynomial at {@code x}.
      * @see <a href="https://numpy.org/doc/stable/reference/generated/numpy.polynomial.polynomial.polyfromroots.html">
-     *     polyfromroots</a>
+     * polyfromroots</a>
      */
     public static Complex polyvalFromRoots(Complex[] roots, Complex x) {
         return ComplexArrays.product(ComplexArrays.subtract(x, roots));
-    }
-
-    public static void main(String[] args) {
-        // [1, 2, 1]
-        // [3, 1, 2, 0]
-        Polynomial poly = new Polynomial(3, 1, 2, 0);
-        System.out.println(Arrays.toString(poly.getRoots()));
-        System.out.println(polyvalFromRoots(poly.getRoots(), Complex.fromReal(2.0)));
-
-        System.out.println(polyvalFromRoots(poly.getRoots(), Complex.fromImaginary(2.0)));
     }
 }

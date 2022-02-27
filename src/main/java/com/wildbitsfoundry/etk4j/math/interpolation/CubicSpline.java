@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
 import com.wildbitsfoundry.etk4j.math.MathETK;
+import com.wildbitsfoundry.etk4j.util.NumArrays;
 
 import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkMinXLength;
 import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkXYDimensions;
@@ -53,7 +54,7 @@ public class CubicSpline extends Spline {
      * {@link #newNotAKnotSpline(double[], double[])}.
      *
      * @param x The array of x coordinates. The values in this array must be unique and strictly increasing.
-     *          A copy of this array is made internally.
+     *          A copy of this array is made internally. This array must contain 4 values or more.
      * @param y The array of y coordinates.
      * @return A new instance of a cubic spline with not-a-knot conditions.
      */
@@ -66,7 +67,8 @@ public class CubicSpline extends Spline {
      * {@link #newNotAKnotSplineInPlace(double[], double[])}.
      *
      * @param x The array of x coordinates. The values in this array must be unique and strictly increasing.This array
-     *          is not copied so any changes to this array will be reflected in the spline.
+     *          is not copied so any changes to this array will be reflected in the spline. This array must contain 4
+     *          values or more.
      * @param y The array of y coordinates.
      * @return A new instance of a cubic spline with not-a-knot conditions.
      */
@@ -78,9 +80,10 @@ public class CubicSpline extends Spline {
      * Creates a new {@code CubicSpline} with natural conditions.
      *
      * @param x The array of x coordinates. The values in this array must be unique and strictly increasing.
-     *          A copy of this array is made internally.
+     *          A copy of this array is made internally. This array must contain 3 values or more.
      * @param y The array of y coordinates.
      * @return A new instance of a cubic spline with natural conditions.
+     * @see <a href="https://www.bragitoff.com/2018/02/cubic-spline-piecewise-interpolation-c-program/">Natural Spline</a>
      */
     public static CubicSpline newNaturalSpline(double[] x, double[] y) {
         return newNaturalSplineInPlace(Arrays.copyOf(x, x.length), y);
@@ -90,9 +93,11 @@ public class CubicSpline extends Spline {
      * Creates a new {@code CubicSpline} with natural conditions.
      *
      * @param x The array of x coordinates. The values in this array must be unique and strictly increasing.This array
-     *          is not copied so any changes to this array will be reflected in the spline.
+     *          is not copied so any changes to this array will be reflected in the spline. This array must contain 3
+     *          values or more.
      * @param y The array of y coordinates.
      * @return A new instance of a cubic spline with natural conditions.
+     * @see <a href="https://www.bragitoff.com/2018/02/cubic-spline-piecewise-interpolation-c-program/">Natural Spline</a>
      */
     public static CubicSpline newNaturalSplineInPlace(double[] x, double[] y) {
         checkXYDimensions(x, y);
@@ -146,7 +151,7 @@ public class CubicSpline extends Spline {
      * Creates a new {@code CubicSpline} with parabolically terminated conditions.
      *
      * @param x The array of x coordinates. The values in this array must be unique and strictly increasing.
-     *          A copy of this array is made internally.
+     *          A copy of this array is made internally. This array must contain 3 values or more.
      * @param y The array of y coordinates.
      * @return A new instance of a cubic spline with parabolically terminated conditions.
      */
@@ -158,7 +163,8 @@ public class CubicSpline extends Spline {
      * Creates a new {@code CubicSpline} with parabolically terminated conditions.
      *
      * @param x The array of x coordinates. The values in this array must be unique and strictly increasing.This array
-     *          is not copied so any changes to this array will be reflected in the spline.
+     *          is not copied so any changes to this array will be reflected in the spline. This array must contain 3
+     *          values or more.
      * @param y The array of y coordinates.
      * @return A new instance of a cubic spline with parabolically terminated conditions.
      */
@@ -206,7 +212,7 @@ public class CubicSpline extends Spline {
      * Creates a new {@code CubicSpline} with clamped conditions.
      *
      * @param x  The array of x coordinates. The values in this array must be unique and strictly increasing.
-     *           A copy of this array is made internally.
+     *           A copy of this array is made internally. This array must contain 2 values or more.
      * @param y  The array of y coordinates.
      * @param d0 The value of the derivative at the first endpoint.
      * @param dn The value of the derivative at the last endpoint.
@@ -220,7 +226,8 @@ public class CubicSpline extends Spline {
      * Creates a new {@code CubicSpline} with clamped conditions.
      *
      * @param x  The array of x coordinates. The values in this array must be unique and strictly increasing.This array
-     *           is not copied so any changes to this array will be reflected in the spline.
+     *           is not copied so any changes to this array will be reflected in the spline. This array must contain 2
+     *           values or more.
      * @param y  The array of y coordinates.
      * @param d0 The value of the derivative at the first endpoint.
      * @param dn The value of the derivative at the last endpoint.
@@ -276,7 +283,7 @@ public class CubicSpline extends Spline {
      * Creates a new Akima {@code CubicSpline}.
      *
      * @param x The array of x coordinates. The values in this array must be unique and strictly increasing.
-     *          A copy of this array is made internally.
+     *          A copy of this array is made internally. This array must contain 5 values or more.
      * @param y The array of y coordinates.
      * @return A new instance of an Akima cubic spline.
      */
@@ -288,7 +295,8 @@ public class CubicSpline extends Spline {
      * Creates a new Akima {@code CubicSpline}.
      *
      * @param x The array of x coordinates. The values in this array must be unique and strictly increasing.This array
-     *          is not copied so any changes to this array will be reflected in the spline.
+     *          is not copied so any changes to this array will be reflected in the spline. This array must contain 5
+     *          values or more.
      * @param y The array of y coordinates.
      * @return A new instance of an Akima cubic spline.
      */
@@ -354,7 +362,7 @@ public class CubicSpline extends Spline {
      * Creates a new {@code CubicSpline} with not-a-knot conditions
      *
      * @param x The array of x coordinates. The values in this array must be unique and strictly increasing.
-     *          A copy of this array is made internally.
+     *          A copy of this array is made internally. This array must contain 4 values or more.
      * @param y The array of y coordinates.
      * @return A new instance of a cubic spline with not-a-knot conditions.
      */
@@ -367,7 +375,8 @@ public class CubicSpline extends Spline {
      * {@link #newNotAKnotSplineInPlace(double[], double[])}.
      *
      * @param x The array of x coordinates. The values in this array must be unique and strictly increasing.This array
-     *          is not copied so any changes to this array will be reflected in the spline.
+     *          is not copied so any changes to this array will be reflected in the spline. This array must contain 4
+     *          values or more.
      * @param y The array of y coordinates.
      * @return A new instance of a cubic spline with not-a-knot conditions.
      */

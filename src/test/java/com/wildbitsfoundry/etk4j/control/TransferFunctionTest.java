@@ -137,15 +137,22 @@ public class TransferFunctionTest {
                 7.462732134984385, 0.7462732134984399, 0.009851853368415734, 9.993041654128302E-5, 9.999676843499274E-7,
                 9.999985000018753E-9};
 
-        double[] phaseResponse = {-0.17188728124350178, -0.7978246216992994, -3.7026276509801344, -17.13177941249893,
-                -74.69637093434646, -195.30362906565347, -252.86822058750107, -266.29737234901984, -269.2021753783007,
+        double[] phaseResponseRadians= {-0.002999999000000599, -0.013924666502130971, -0.06462304348498679,
+                -0.29900595747348613, -1.303697612095339, 2.874493938890237, 1.8698022842683828, 1.6354193702798836,
+                1.5847209932970276, 1.5737963257948973};
+
+        double[] phaseResponseDegrees = {-0.17188728124350178, -0.7978246216992994, -3.7026276509801344,
+                -17.13177941249893, -74.69637093434646, -195.30362906565347, -252.86822058750107, -266.29737234901984,
+                -269.2021753783007,
                 -269.8281127187565};
 
         assertArrayEquals(magnitudeResponse, tf.calculateMagnitudeAt(frequencies), 1e-12);
+        double[] systemPhaseResponse = tf.calculatePhaseAt(frequencies);
+        assertArrayEquals(phaseResponseRadians, systemPhaseResponse, 1e-12);
 
-        double[] systemPhaseResponse = tf.calculatePhaseInDegreesAt(frequencies);
+        systemPhaseResponse = tf.calculatePhaseInDegreesAt(frequencies);
         TransferFunction.unwrapPhase(systemPhaseResponse);
-        assertArrayEquals(phaseResponse, systemPhaseResponse, 1e-12);
+        assertArrayEquals(phaseResponseDegrees, systemPhaseResponse, 1e-12);
     }
 
     @Test
@@ -310,6 +317,29 @@ public class TransferFunctionTest {
         assertArrayEquals(frequencies, bode.getFrequencies(), 1e-12);
         assertArrayEquals(magnitudeResponseInDB, bode.getMagnitudeIndB(), 1e-12);
         assertArrayEquals(phaseResponse, bode.getPhaseInDegrees(), 1e-12);
+    }
+
+    @Test
+    public void testFrequencyResponse() {
+        Complex[] poles = new Complex[]{Complex.fromReal(-1.0), Complex.fromReal(-1.0), Complex.fromReal(-1.0)};
+        TransferFunction tf = new TransferFunction(new Polynomial(10.0), new Polynomial(poles));
+
+        double[] frequencies = NumArrays.logSpace(-3, 3, 10);
+
+        Complex[] freqResp = {new Complex(9.999940000150001, -0.029999900000209998),
+                new Complex(9.998707408807014, -0.13923766546079788),
+                new Complex(9.972182755539547, -0.6453313809681731),
+                new Complex(9.414724434898151, -2.9020645423036577),
+                new Complex(1.9696698155428358, -7.198108900000614),
+                new Complex(-0.719810890000063, 0.19696698155428308),
+                new Complex(-0.002902064542303657, 0.009414724434898152),
+                new Complex(-6.453313809681766E-6, 9.972182755539584E-5),
+                new Complex(-1.3923766546079828E-8, 9.998707408807033E-7),
+                new Complex(-2.999990000021E-11, 9.999940000150002E-9)};
+
+        FrequencyResponse fr = tf.calculateFrequencyResponse(frequencies);
+        assertArrayEquals(freqResp, fr.getResponse());
+        assertArrayEquals(frequencies, fr.getFrequencies(), 1e-12);
     }
 
     @Test
