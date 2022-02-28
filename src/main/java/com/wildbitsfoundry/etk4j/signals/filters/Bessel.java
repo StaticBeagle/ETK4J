@@ -4,8 +4,8 @@ import com.wildbitsfoundry.etk4j.control.TransferFunction;
 import com.wildbitsfoundry.etk4j.control.ZeroPoleGain;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
+import com.wildbitsfoundry.etk4j.math.optimize.solvers.NewtonRaphson;
 import com.wildbitsfoundry.etk4j.math.optimize.solvers.NewtonRaphsonComplex;
-import com.wildbitsfoundry.etk4j.math.optimize.solvers.Secant;
 import com.wildbitsfoundry.etk4j.math.optimize.solvers.SolverResults;
 import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
 import com.wildbitsfoundry.etk4j.util.ComplexArrays;
@@ -322,7 +322,12 @@ public class Bessel extends AnalogFilter {
         };
         UnivariateFunction cutoff = w -> gw.evaluateAt(w) - 1.0 / Math.sqrt(2.0);
         // 1.0 / Math.sqrt(2.0) = -3 db which is equal to 10 ^ (-3.0 / 20.0) TODO change -3 to an arbitrary input
-        double result = Secant.solve(cutoff, 1.5, 1.5 * (1 + 1e-4), 1.48e-8, 0.0, 50);
+        double result = new NewtonRaphson(cutoff, 1.5)
+                .absTolerance(1.48e-8)
+                .relTolerance(0.0)
+                .iterationLimit(50)
+                .solve()
+                .getValue();
         return result;
     }
 }

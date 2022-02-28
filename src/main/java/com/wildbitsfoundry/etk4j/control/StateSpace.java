@@ -24,10 +24,10 @@ public class StateSpace extends LinearTimeInvariantSystem {
      * Constructs a null system where all the matrices are empty matrices.
      */
     public StateSpace() {
-        this.A = Matrices.empty();  // TODO remove this method or move it to Matrox
-        this.B = Matrices.empty();
-        this.C = Matrices.empty();
-        this.D = Matrices.empty();
+        this.A = Matrix.empty();
+        this.B = Matrix.empty();
+        this.C = Matrix.empty();
+        this.D = Matrix.empty();
     }
 
     /**
@@ -247,7 +247,7 @@ public class StateSpace extends LinearTimeInvariantSystem {
      * @return The complex frequency response of the system.
      */
     public Complex[] evaluateAt(double w) {
-        ComplexMatrix inner = Matrices.identity(A.getRowCount()).multiply(Complex.fromImaginary(w)).subtract(A).inv();
+        ComplexMatrix inner = Matrix.identity(A.getRowCount()).multiply(Complex.fromImaginary(w)).subtract(A).inv();
         ComplexMatrix outer = C.multiply(inner).multiply(B);
         return ComplexMatrix.fromRealMatrix(D).add(outer).transpose().getArray();
     }

@@ -173,7 +173,7 @@ public class QRDecomposition {
 	 */
 	public Matrix getQ() {
 		// Compute Q = Q * I
-		Matrix Q = Matrices.identity(_rows, _rows);
+		Matrix Q = Matrix.identity(_rows, _rows);
 		double[] X = Q.getArray();
 		int mr = Math.min(_rows, _cols);
 		for (int k = mr - 1; k >= 0; --k) {
@@ -217,7 +217,7 @@ public class QRDecomposition {
 	 */
 	public Matrix getQT() {
 		// Compute Q = Q * I
-		Matrix Q = Matrices.identity(_rows, _rows);
+		Matrix Q = Matrix.identity(_rows, _rows);
 		double[] X = Q.getArray();
 		int mr = Math.min(_rows, _cols);
 		for (int k = 0; k < mr; ++k) {

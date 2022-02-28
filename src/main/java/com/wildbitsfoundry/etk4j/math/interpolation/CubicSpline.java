@@ -1,11 +1,11 @@
 package com.wildbitsfoundry.etk4j.math.interpolation;
 
+import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
+
 import java.util.Arrays;
 
-import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
-import com.wildbitsfoundry.etk4j.math.MathETK;
-import com.wildbitsfoundry.etk4j.util.NumArrays;
-
+import static com.wildbitsfoundry.etk4j.math.linearalgebra.Matrices.solveLDLtTridiagonalSystem;
+import static com.wildbitsfoundry.etk4j.math.linearalgebra.Matrices.solveLDUTridiagonalSystem;
 import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkMinXLength;
 import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkXYDimensions;
 
@@ -13,38 +13,7 @@ public class CubicSpline extends Spline {
 
     private static final double P5 = 0.5, P33 = 1.0 / 3.0, P25 = 0.25;
 
-    // TODO move this to matrix?
-    private static void solveLDUTridiagonalSystem(double[] lower, double[] diagonal, double[] upper, double[] b) {
-        final int m = b.length;
-        b[0] = b[0] / diagonal[0];
-        // Forward Substitution
-        for (int i = 0; i < m - 1; ++i) {
-            upper[i] = upper[i] / diagonal[i];
-            diagonal[i + 1] = diagonal[i + 1] - lower[i] * upper[i];
-            b[i + 1] = (b[i + 1] - lower[i] * b[i]) / diagonal[i + 1];
-        }
-        // Backwards Substitution
-        for (int i = m - 2; i >= 0; --i) {
-            b[i] = b[i] - upper[i] * b[i + 1];
-        }
-    }
-
-    private static double[] solveLDLtTridiagonalSystem(double[] lower, double[] diagonal, double[] b) {
-        final int length = diagonal.length;
-        for (int i = 0; i < length - 1; ++i) {
-            double ui = lower[i];
-            lower[i] /= diagonal[i];
-            diagonal[i + 1] -= ui * lower[i];
-            b[i + 1] -= lower[i] * b[i];
-        }
-        b[length - 1] /= diagonal[length - 1];
-        for (int i = length - 2; i >= 0; --i) {
-            b[i] = b[i] / diagonal[i] - lower[i] * b[i + 1];
-        }
-        return b;
-    }
-
-    private CubicSpline(double[] x, double[] y, double[] coefficients) {
+    private CubicSpline(double[] x, double[] coefficients) {
         super(x, 4);
         this.coefficients = coefficients;
     }
@@ -142,9 +111,8 @@ public class CubicSpline extends Spline {
         coefficients[j] = -r[n - 1] / (6.0 * (x[n + 1] - x[n]));
         coefficients[++j] = r[n - 1] / 2.0;
         coefficients[++j] = (y[n + 1] - y[n]) / (x[n + 1] - x[n]) - (x[n + 1] - x[n]) * (2.0 * r[n - 1]) / 6.0;
-        ;
         coefficients[++j] = y[n];
-        return new CubicSpline(x, y, coefficients);
+        return new CubicSpline(x, coefficients);
     }
 
     /**
@@ -178,7 +146,6 @@ public class CubicSpline extends Spline {
         double[] lower = new double[n - 1];
         double[] upper = new double[n - 1];
 
-        double hn = x[n - 1] - x[n - 2];
         diagonal[0] = 1.0;
         diagonal[n - 1] = -1.0;
 
@@ -205,7 +172,7 @@ public class CubicSpline extends Spline {
             coefficients[++j] = dy / hi - hi * (r[i + 1] + 2.0 * r[i]) / 3.0;
             coefficients[++j] = y[i];
         }
-        return new CubicSpline(x, y, coefficients);
+        return new CubicSpline(x, coefficients);
     }
 
     /**
@@ -270,7 +237,7 @@ public class CubicSpline extends Spline {
             coefficients[++j] = dy / hi - hi * (r[i + 1] + 2.0 * r[i]) / 3.0;
             coefficients[++j] = y[i];
         }
-        return new CubicSpline(x, y, coefficients);
+        return new CubicSpline(x, coefficients);
     }
 
     // <copyright file="CubicSpline.cs" company="Math.NET">
@@ -341,7 +308,7 @@ public class CubicSpline extends Spline {
             coefficients[++j] = dd[i];
             coefficients[++j] = y[i];
         }
-        return new CubicSpline(x, y, coefficients);
+        return new CubicSpline(x, coefficients);
     }
 
     private static double differentiateThreePoint(double[] xx, double[] yy, int indexT, int index0, int index1, int index2) {
@@ -371,8 +338,7 @@ public class CubicSpline extends Spline {
     }
 
     /**
-     * Creates a new {@code CubicSpline} with not-a-knot conditions. This method is an alias for
-     * {@link #newNotAKnotSplineInPlace(double[], double[])}.
+     * Creates a new {@code CubicSpline} with not-a-knot conditions
      *
      * @param x The array of x coordinates. The values in this array must be unique and strictly increasing.This array
      *          is not copied so any changes to this array will be reflected in the spline. This array must contain 4
@@ -428,7 +394,6 @@ public class CubicSpline extends Spline {
         coefficients[3] = y[0];
 
         final int noPoints = y.length;
-        ;
         for (int i = 0, j = 4; i < noPoints - 3; ++i, ++j) {
             coefficients[j] = (r[i + 1] - r[i]) / (3.0 * (x[i + 2] - x[i + 1]));
             coefficients[++j] = r[i];
@@ -445,7 +410,7 @@ public class CubicSpline extends Spline {
         coefficients[++j] = (y[noPoints - 1] - y[noPoints - 2]) / (x[noPoints - 1] - x[noPoints - 2]) -
                 (x[noPoints - 1] - x[noPoints - 2]) * (bn + 2 * r[m - 1]) / 3.0;
         coefficients[++j] = y[noPoints - 2];
-        return new CubicSpline(x, y, coefficients);
+        return new CubicSpline(x, coefficients);
     }
 
     /**
@@ -503,7 +468,7 @@ public class CubicSpline extends Spline {
                     .append(a != 0d ? String.format("%.4g * (x - %.4f)^3", a, x[i]) : "")
                     .append(b != 0d ? String.format(" + %.4g * (x - %.4f)^2", b, x[i]) : "")
                     .append(c != 0d ? String.format(" + %.4g * (x - %.4f)", c, x[i]) : "")
-                    .append(d != 0d ? String.format(" + %.4g", d, x[i]) : "").append(System.lineSeparator());
+                    .append(d != 0d ? String.format(" + %.4g", d) : "").append(System.lineSeparator());
         }
         sb.setLength(Math.max(sb.length() - System.lineSeparator().length(), 0));
         return sb.toString().replace("+ -", "- ").replace("- -", "+ ")

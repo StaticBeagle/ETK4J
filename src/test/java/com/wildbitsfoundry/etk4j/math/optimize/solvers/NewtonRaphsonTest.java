@@ -47,7 +47,7 @@ public class NewtonRaphsonTest {
     }
 
     @Test
-    public void testSecantMethodWithSecondGess() {
+    public void testSecantMethodWithSecondGuess() {
         SolverResults<Double> nr = new NewtonRaphson(x ->  x * x * x - x * x + 2, -20.0)
                 .secondInitialGuess(-19.0)
                 .solve();

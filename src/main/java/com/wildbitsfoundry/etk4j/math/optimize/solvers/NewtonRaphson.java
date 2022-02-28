@@ -1,5 +1,6 @@
 package com.wildbitsfoundry.etk4j.math.optimize.solvers;
 
+import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
 import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
 
@@ -15,49 +16,85 @@ public final class NewtonRaphson {
     private double x0 = 0;
     private Double x1 = null;
 
-    private UnivariateFunction func;
+    private UnivariateFunction function;
     private UnivariateFunction derivative;
     private UnivariateFunction secondDerivative;
 
-
-    public NewtonRaphson(UnivariateFunction func, double initialGuess) {
-        this.func = func;
+    /**
+     * Constructs an instance of the {@code NewtonRaphson}'s root finding algorithm.
+     * @param function The function whose root is to be found.
+     * @param initialGuess The initial guess of where the root might be.
+     */
+    public NewtonRaphson(UnivariateFunction function, double initialGuess) {
+        this.function = function;
         x0 = initialGuess;
     }
 
+    /**
+     * Second initial guess.
+     * @param secondInitialGuess
+     */
     public NewtonRaphson secondInitialGuess(double secondInitialGuess) {
         this.x1 = secondInitialGuess;
         return this;
     }
 
+    /**
+     * Derivative of the function.
+     * @param derivative The first derivative of the function. If this argument is not provided, the Secant method
+     *                   is used to find the root of the function.
+     */
     public NewtonRaphson derivative(UnivariateFunction derivative) {
         this.derivative = derivative;
         return this;
     }
 
+    /**
+     * Second derivative of the function.
+     * @param secondDerivative The second derivative of the function. If this argument is provided, Halley's method
+     *                         is used to find the root of the function.
+     * @return
+     */
     public NewtonRaphson secondDerivative(UnivariateFunction secondDerivative) {
         this.secondDerivative = secondDerivative;
         return this;
     }
 
+    /**
+     * Maximum number of iterations.
+     * @param limit The maximum number of iterations allowed.
+     */
     public NewtonRaphson iterationLimit(int limit) {
         maxNumberOfIterations = limit;
         return this;
     }
 
+    /**
+     * Absolute tolerance.
+     * @param tol The maximum allowed absolute tolerance.
+     */
     public NewtonRaphson absTolerance(double tol) {
         absTol = tol;
         return this;
     }
 
+    /**
+     * Relative tolerance.
+     * @param tol The maximum allowed relative tolerance. This value must be bigger than 4 * {@link ConstantsETK#DOUBLE_EPS}.
+     * @return
+     */
     public NewtonRaphson relTolerance(double tol) {
         relTol = tol;
         return this;
     }
 
+    /**
+     * Find the root.
+     * @return The {@link SolverResults} containing the root and other solver results.
+     */
     public SolverResults<Double> solve() {
         int currentIteration = 0;
-        UnivariateFunction func = this.func;
+        UnivariateFunction func = this.function;
 
         double xCurrent = x0;
         double xFinal = 0.0;

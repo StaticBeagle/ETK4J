@@ -1,19 +1,17 @@
 package com.wildbitsfoundry.etk4j.math.optimize.solvers;
 
-
 import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
-import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
 
 /**
- * The {@code Ridder}'s class contains the Brent's root finding algorithm.
- * @see <a href="https://en.wikipedia.org/wiki/Ridders%27_method#:~:text=In%20numerical%20analysis%2C%20Ridders%27%20method%20is%20a%20root-finding,function.%20The%20method%20is%20due%20to%20C.%20Ridders.">Ridder's method</a>
+ * The {@code Brent}'s class contains the Brent's root finding algorithm.
+ * @see <a href="https://en.wikipedia.org/wiki/Brent%27s_method">Brent's method</a>
  */
-public class Ridder {
+public class Brent {
 
     private int maxNumberOfIterations = 100;
     private double absTol = 1e-9;
-    private double relTol = 4.0 * ConstantsETK.DOUBLE_EPS;
+    private double relTol = 2 * ConstantsETK.DOUBLE_EPS;
     private double a;
     private double b;
 
@@ -21,12 +19,12 @@ public class Ridder {
 
 
     /**
-     * Constructs an instance of the {@code Ridder}'s root finding algorithm.
+     * Constructs an instance of the {@code Brent}'s root finding algorithm.
      * @param function The function whose root is to be found.
      * @param a The lower end of the bracketing interval [a, b].
      * @param b The upper end of the bracketing interval [a, b].
      */
-    public Ridder(UnivariateFunction function, double a, double b) {
+    public Brent(UnivariateFunction function, double a, double b) {
         this.function = function;
         this.a = a;
         this.b = b;
@@ -39,7 +37,7 @@ public class Ridder {
      * Maximum number of iterations.
      * @param limit The maximum number of iterations allowed.
      */
-    public Ridder iterationLimit(int limit) {
+    public Brent iterationLimit(int limit) {
         maxNumberOfIterations = limit;
         return this;
     }
@@ -48,7 +46,7 @@ public class Ridder {
      * Absolute tolerance.
      * @param tol The maximum allowed absolute tolerance.
      */
-    public Ridder absTolerance(double tol) {
+    public Brent absTolerance(double tol) {
         absTol = tol;
         return this;
     }
@@ -58,7 +56,7 @@ public class Ridder {
      * @param tol The maximum allowed relative tolerance. This value must be bigger than 4 * {@link ConstantsETK#DOUBLE_EPS}.
      * @return
      */
-    public Ridder relTolerance(double tol) {
+    public Brent relTolerance(double tol) {
         if (tol < 4.0 * ConstantsETK.DOUBLE_EPS) {
             throw new IllegalArgumentException("Relative tolerance cannot be smaller than 4 * ConstantsETK.DOUBLE_EPS");
         }
@@ -66,103 +64,130 @@ public class Ridder {
         return this;
     }
 
+    /*
+    Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
+    All rights reserved. See https://github.com/StaticBeagle/ETK4J/blob/master/SciPy.
+     */
+
     /**
      * Find the root.
      * @return The {@link SolverResults} containing the root and other solver results.
      */
     SolverResults<Double> solve() {
-        double fa, fb, fc, fx, c, s, dx, x = 0.0, xold = 0.0, error = 0.0;
+        double xpre = a, xcur = b;
+        double xblk = 0., fpre, fcur, fblk = 0., spre = 0., scur = 0., sbis;
+        /* the tolerance is 2*delta */
+        double delta;
+        double stry, dpre, dblk;
         int currentIteration = 0;
-        fa = function.evaluateAt(a);
-        fb = function.evaluateAt(b);
 
-        if (fa * fb > 0.0) {
-            error = Math.abs(Double.NaN);
+        fpre = function.evaluateAt(xpre);
+        fcur = function.evaluateAt(xcur);
+        if (fpre * fcur > 0) {
+            double error = Math.abs(Double.NaN);
             SolverResults<Double> solverResults = new SolverResults<>();
             solverResults.setSolverStatus("Root is not bracketed.");
             solverResults.setHasConverged(false);
             solverResults.setError(error);
-            solverResults.setValue(b);
+            solverResults.setValue(xcur);
             solverResults.setNumberOfIterations(currentIteration);
             return solverResults;
         }
-        if (fa == 0) {
-            error = 0.0;
+        if (fpre == 0) {
+            double error = 0.0;
             SolverResults<Double> solverResults = new SolverResults<>();
             solverResults.setSolverStatus("Converged");
             solverResults.setHasConverged(true);
             solverResults.setError(error);
-            solverResults.setValue(xold);
+            solverResults.setValue(xpre);
             solverResults.setNumberOfIterations(currentIteration);
             return solverResults;
         }
-        if (fb == 0) {
-            error = 0.0;
+        if (fcur == 0) {
+            double error = 0.0;
             SolverResults<Double> solverResults = new SolverResults<>();
             solverResults.setSolverStatus("Converged");
             solverResults.setHasConverged(true);
             solverResults.setError(error);
-            solverResults.setValue(x);
+            solverResults.setValue(xcur);
             solverResults.setNumberOfIterations(currentIteration);
             return solverResults;
         }
 
+        //solver_stats->iterations = 0;
         for (currentIteration = 1; currentIteration <= maxNumberOfIterations; currentIteration++) {
-            c = 0.5 * (a + b);
-            fc = function.evaluateAt(c);
-            s = Math.sqrt(fc * fc - fa * fb);
-            if (s == 0.0) {
-                error = Math.abs(x - xold);
+            //solver_stats->iterations++;
+            if (fpre != 0 && fcur != 0 &&
+                    (Math.signum(fpre) != Math.signum(fcur))) {
+                xblk = xpre;
+                fblk = fpre;
+                spre = scur = xcur - xpre;
+            }
+            if (Math.abs(fblk) < Math.abs(fcur)) {
+                xpre = xcur;
+                xcur = xblk;
+                xblk = xpre;
+
+                fpre = fcur;
+                fcur = fblk;
+                fblk = fpre;
+            }
+
+            delta = (absTol + relTol * Math.abs(xcur)) / 2;
+            sbis = (xblk - xcur) / 2;
+            if (fcur == 0 || Math.abs(sbis) < delta) {
+                double error = Math.abs(xcur - xpre);
                 SolverResults<Double> solverResults = new SolverResults<>();
                 solverResults.setSolverStatus("Converged");
                 solverResults.setHasConverged(true);
                 solverResults.setError(error);
-                solverResults.setValue(x);
+                solverResults.setValue(xcur);
                 solverResults.setNumberOfIterations(currentIteration);
                 return solverResults;
             }
-            dx = (c - a) * fc / s;
-            if (fa - fb < 0.0) {
-                dx = -dx;
-            }
-            x = c + dx;
-            fx = function.evaluateAt(x);
-            if (currentIteration > 1) { // Check if we are done
-                if (MathETK.isClose(x, xold, absTol, relTol)) {
-                    error = Math.abs(x - xold);
-                    SolverResults<Double> solverResults = new SolverResults<>();
-                    solverResults.setSolverStatus("Converged");
-                    solverResults.setHasConverged(true);
-                    solverResults.setError(error);
-                    solverResults.setValue(x);
-                    solverResults.setNumberOfIterations(currentIteration);
-                    return solverResults;
-                }
-            }
-            error = Math.abs(x - xold);
-            xold = x; // Update the root
-            // Re-bracket and continue
-            if (fc * fx > 0.0) {
-                if (fa * fx < 0.0) {
-                    b = x;
-                    fb = fx;
+
+            if (Math.abs(spre) > delta && Math.abs(fcur) < Math.abs(fpre)) {
+                if (xpre == xblk) {
+                    /* interpolate */
+                    stry = -fcur * (xcur - xpre) / (fcur - fpre);
                 } else {
-                    a = x;
-                    fa = fx;
+                    /* extrapolate */
+                    dpre = (fpre - fcur) / (xpre - xcur);
+                    dblk = (fblk - fcur) / (xblk - xcur);
+                    stry = -fcur * (fblk * dblk - fpre * dpre)
+                            / (dblk * dpre * (fblk - fpre));
+                }
+                if (2 * Math.abs(stry) < Math.min(Math.abs(spre), 3 * Math.abs(sbis) - delta)) {
+                    /* good short step */
+                    spre = scur;
+                    scur = stry;
+                } else {
+                    /* bisect */
+                    spre = sbis;
+                    scur = sbis;
                 }
             } else {
-                a = c;
-                b = x;
-                fa = fc;
-                fb = fx;
+                /* bisect */
+                spre = sbis;
+                scur = sbis;
             }
 
+            xpre = xcur;
+            fpre = fcur;
+            if (Math.abs(scur) > delta) {
+                xcur += scur;
+            } else {
+                xcur += (sbis > 0 ? delta : -delta);
+            }
+
+            fcur = function.evaluateAt(xcur);
         }
+        double error = Math.abs(xcur - xpre);
         SolverResults<Double> solverResults = new SolverResults<>();
         solverResults.setSolverStatus("Maximum number of iterations exceeded");
         solverResults.setHasConverged(false);
         solverResults.setError(error);
-        solverResults.setValue(x);
+        solverResults.setValue(xcur);
         solverResults.setNumberOfIterations(currentIteration);
         return solverResults;
     }

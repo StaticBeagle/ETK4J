@@ -4,6 +4,7 @@ import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
 import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrices;
+import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
 import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
 import com.wildbitsfoundry.etk4j.math.polynomials.RationalFunction;
 import com.wildbitsfoundry.etk4j.util.ComplexArrays;
@@ -867,13 +868,13 @@ public class TransferFunction extends LinearTimeInvariantSystem {
         System.arraycopy(den, 1, fRow, 0, fRow.length);
         NumArrays.multiplyElementWiseInPlace(fRow, -1.0);
 
-        double[][] eye = Matrices.identity(k - 2, k - 1).getAs2DArray();
+        double[][] eye = Matrix.identity(k - 2, k - 1).getAs2DArray();
         double[][] A = new double[eye.length + 1][];
         A[0] = fRow;
         for (int i = 0; i < eye.length; ++i) {
             A[i + 1] = Arrays.copyOf(eye[i], eye[0].length);
         }
-        double[][] B = Matrices.identity(k - 1, 1).getAs2DArray();
+        double[][] B = Matrix.identity(k - 1, 1).getAs2DArray();
         double[][] C = new double[1][];
         double[][] outer = NumArrays.outer(new double[]{numPadded[0]}, Arrays.copyOfRange(den, 1, den.length));
         C[0] = NumArrays.subtract(Arrays.copyOfRange(numPadded, 1, numPadded.length), outer[0]);
@@ -883,7 +884,14 @@ public class TransferFunction extends LinearTimeInvariantSystem {
     public void normalize() {
         this.rf.normalize();
     }
-    // TODO add getOrder
+
+    /**
+     * Order of the transfer function.
+     * @return The order/degree of the denominator.
+     */
+    public int getOrder() {
+        return this.getDenominator().degree();
+    }
 
     @Override
     public TransferFunction toTransferFunction() {
@@ -891,20 +899,49 @@ public class TransferFunction extends LinearTimeInvariantSystem {
     }
 
 
+    /**
+     * Single-input Single-output system time response.
+     * @param input The values of the input vs time.
+     * @param time The array of time points.
+     * @return The time domain response of the system.
+     */
     public SISOTimeResponse simulateTimeResponse(double[] input, double[] time) {
         return simulateTimeResponse(input, time, IntegrationMethod.INTERPOLATION);
     }
 
+    /**
+     * Single-input Single-output system time response.
+     * @param input The values of the input vs time.
+     * @param time The array of time points.
+     * @param initialConditions The initial conditions of the system.
+     * @return The time domain response of the system.
+     */
     public SISOTimeResponse simulateTimeResponse(double[] input, double[] time,
                                                  double[] initialConditions) {
         return simulateTimeResponse(input, time, initialConditions, IntegrationMethod.INTERPOLATION);
     }
 
+    /**
+     * Single-input Single-output system time response.
+     * @param input The values of the input vs time.
+     * @param time The array of time points.
+     * @param integrationMethod The {@link com.wildbitsfoundry.etk4j.control.LinearTimeInvariantSystem.IntegrationMethod}.
+     *                          default is INTERPOLATION.
+     * @return The time domain response of the system.
+     */
     public SISOTimeResponse simulateTimeResponse(double[] input, double[] time,
                                                  IntegrationMethod integrationMethod) {
         return simulateTimeResponse(input, time, null, integrationMethod);
     }
 
+    /**
+     * Single-input Single-output system time response.
+     * @param input The values of the input vs time.
+     * @param time The array of time points.
+     * @param initialConditions The initial conditions of the system.
+     * @param integrationMethod The {@link com.wildbitsfoundry.etk4j.control.LinearTimeInvariantSystem.IntegrationMethod}.
+     * @return The time domain response of the system.
+     */
     public SISOTimeResponse simulateTimeResponse(double[] input, double[] time,
                                                  double[] initialConditions,
                                                  IntegrationMethod integrationMethod) {

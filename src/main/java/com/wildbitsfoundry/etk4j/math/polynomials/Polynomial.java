@@ -356,7 +356,7 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
                 default:
                     // Use generalized eigenvalue decomposition to find the roots
                     roots = new Complex[N];
-                    Matrix c = Matrices.companion(coefficients, N);
+                    Matrix c = Matrix.companion(coefficients, N);
                     EigenvalueDecomposition evd = c.eig();
                     double[] realEig = evd.getRealEigenvalues();
                     double[] imagEig = evd.getImagEigenvalues();
@@ -505,7 +505,7 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
         checkXYDimensions(x, y);
         int dim = x.length;
         // Building the coefficient matrix
-        Matrix A = Matrices.vandermonde(x, dim, n + 1);
+        Matrix A = Matrix.vandermonde(x, dim, n + 1);
         // Building the solution vector
         Matrix b = new Matrix(y, dim);
         Matrix c = A.solve(b);

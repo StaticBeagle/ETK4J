@@ -8,6 +8,9 @@ import com.wildbitsfoundry.etk4j.math.interpolation.Interpolation;
 import com.wildbitsfoundry.etk4j.math.interpolation.LinearSpline;
 import com.wildbitsfoundry.etk4j.math.interpolation.Spline;
 
+/**
+ *
+ */
 public class Spline2d implements BivariateFunction {
 
     private double[] y;

@@ -225,7 +225,7 @@ public class ComplexMatrix {
     }
 
     public ComplexMatrix inv() {
-        return this.solve(Matrices.identity(rows));
+        return this.solve(Matrix.identity(rows));
     }
 
     // region solve
@@ -267,7 +267,7 @@ public class ComplexMatrix {
 
         double w = 100;
         Complex jw = Complex.fromImaginary(w);
-        ComplexMatrix gg = Matrices.identity(A.getRowCount()).multiply(jw).subtract(A);
+        ComplexMatrix gg = Matrix.identity(A.getRowCount()).multiply(jw).subtract(A);
         ComplexMatrix inv = gg.inv();
         System.out.println(gg);
         System.out.println(inv);

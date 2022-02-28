@@ -324,7 +324,7 @@ public class Complex implements Comparable<Complex> {
 
     /**
      * Subtraction in place. <br>
-     * Performs the equivalent of {@ code Complex a -= d}.
+     * Performs the equivalent of {@code Complex a -= d}.
      *
      * @param d Real number to subtract.
      */
@@ -334,8 +334,8 @@ public class Complex implements Comparable<Complex> {
 
     /**
      * Complex number multiplication.
-     * @param c The complex number to multiply.
-     * @return The complex number * {@code c}.
+     * @param c The Complex number to multiply.
+     * @return The Complex number * {@code c}.
      */
     public Complex multiply(Complex c) {
         Complex result = new Complex(real, imag);
@@ -347,7 +347,7 @@ public class Complex implements Comparable<Complex> {
      * Complex number multiplication.
      * @param real Real part of the number to multiply.
      * @param imag Imaginary part of the number to multiply.
-     * @return Complex number * {@code new Complex(real, imag}.
+     * @return Complex number * {@code Complex(real, imag}.
      */
     public Complex multiply(double real, double imag) {
         Complex result = new Complex(this.real, this.imag);
@@ -355,41 +355,85 @@ public class Complex implements Comparable<Complex> {
         return result;
     }
 
+    /**
+     * Complex number multiplication.
+     * @param d The real number to add.
+     * @return The Complex number + {@code d}.
+     */
     public Complex multiply(double d) {
         Complex result = new Complex(real, imag);
         multiplyOp(result, d);
         return result;
     }
 
+    /**
+     * Multiplication in place. <br>
+     * Performs the equivalent of {@code Complex a *= c}.
+     *
+     * @param c The Complex number to multiply.
+     */
     public void multiplyEquals(Complex c) {
         multiplyOp(this, c);
     }
 
+    /**
+     * Multiplication in place. <br>
+     * Performs the equivalent of {@code Complex a *= Complex(real, imag)}.
+     * @param real The real part of the Complex number.
+     * @param imag the imag part of the Complex number.
+     */
     public void multiplyEquals(double real, double imag) {
         multiplyOp(this, real, imag);
     }
 
+    /**
+     * Multiplication in place. <br>
+     * Performs the equivalent of {@code Complex a *= d}.
+     * @param d The real number to multiply
+     */
     public void multiplyEquals(double d) {
         multiplyOp(this, d);
     }
 
+    /**
+     * Complex number division.
+     * @param c The Complex number to divide.
+     * @return The Complex number / {@code c}.
+     */
     public Complex divide(Complex c) {
         Complex result = c.invert();
         multiplyOp(result, this);
         return result;
     }
 
+    /**
+     * Complex number division.
+     * @param d The real number to divide.
+     * @return The Complex number / {@code d}.
+     */
     public Complex divide(double d) {
         Complex result = new Complex(real, imag);
         multiplyOp(result, 1.0 / d);
         return result;
     }
 
+    /**
+     * Division in place. <br>
+     * Performs the equivalent of {@code Complex a /= c}.
+     *
+     * @param c The Complex number to divide.
+     */
     public void divideEquals(Complex c) {
         Complex result = c.invert();
         multiplyOp(this, result);
     }
 
+    /**
+     * Division in place. <br>
+     * Performs the equivalent of {@code Complex a /= d}.
+     *
+     * @param d The real number to divide.
+     */
     public void divideEquals(double d) {
         multiplyOp(this, 1.0 / d);
     }
@@ -413,54 +457,95 @@ public class Complex implements Comparable<Complex> {
 
     /**
      * Complex power.
-     * @param c
-     * @return
+     * @param c The complex power.
+     * @return {@code Complex a<sup>c</sup>}.
      */
     public Complex pow(Complex c) {
         return this.log().multiply(c).exp();
     }
 
+    /**
+     * Complex power.
+     * @param d The real power.
+     * @return {@code Complex a<sup>d</sup>}.
+     */
     public Complex pow(double d) {
         return this.log().multiply(d).exp();
     }
 
+    /**
+     * Complex number squared.
+     * @return {@code a<sup>2</sup>}
+     */
     public Complex pow2() {
         double real = this.real * this.real - imag * imag;
         double imag = 2 * this.real * this.imag;
         return new Complex(real, imag);
     }
 
+    /**
+     * Complex natural logarithm.
+     * @return The natural logarithm of the complex number.
+     */
     public Complex log() {
         return new Complex(Math.log(this.abs()), this.arg());
     }
 
+    /**
+     * Complex exponential.
+     * @return {@code e<sup>c</sup>}.
+     */
     public Complex exp() {
         double exp = Math.exp(real);
         return new Complex(exp * Math.cos(imag), exp * Math.sin(imag));
     }
 
+    /**
+     * Square root of {@code 1 - Complex<sup>2</sup>}.
+     * @return {@code 1 - Complex<sup>2</sup>}.
+     */
     public Complex sqrt1z() {
         Complex result = Complex.fromReal(1.0);
         result.subtractEquals(this.pow2());
         return result.sqrt();
     }
 
+    /**
+     * Sine of Complex number.
+     * @return The Sine evaluated at the Complex number.
+     */
     public Complex sin() {
         return new Complex(Math.sin(real) * Math.cosh(imag), Math.cos(real) * Math.sinh(imag));
     }
 
+    /**
+     * Arc-sine of Complex number.
+     * @return The Arc-sine evaluated at the Complex number.
+     */
     public Complex asin() {
         return sqrt1z().add(this.multiply(0.0, 1.0)).log().multiply(0.0, -1.0);
     }
 
+    /**
+     * Cosine of Complex number.
+     * @return The Cosine evaluated at the Complex number.
+     */
     public Complex cos() {
         return new Complex(Math.cos(real) * Math.cosh(imag), -Math.sin(real) * Math.sinh(imag));
     }
 
+    /**
+     * Arc-cosine of the Complex number.
+     * @return The Arc-cosine evaluated at the Complex number.
+     */
     public Complex acos() {
         return this.add(this.sqrt1z().multiply(0.0, 1.0)).log().multiply(0.0, -1.0);
     }
 
+    /**
+     * Tangent of the Complex number.
+     * @return The Tangent evaluated at the Complex number.
+     */
     public Complex tan() {
         if (imag > 20.0) {
             return Complex.fromImaginary(1.0);
@@ -476,6 +561,10 @@ public class Complex implements Comparable<Complex> {
         return new Complex(Math.sin(dreal) * tmp, Math.sinh(dimag) * tmp);
     }
 
+    /**
+     * Arc-tangent of the Complex number.
+     * @return The Arc-tangent evaluated at the Complex number.
+     */
     public Complex atan() {
         Complex i = Complex.fromImaginary(1.0);
         return this.add(i).divide(i.subtract(this)).log().multiply(i.multiply(new Complex(0.5, 0.0)));
@@ -492,6 +581,32 @@ public class Complex implements Comparable<Complex> {
     @Override
     public String toString() {
         return String.format("(%.4f %s %.4fj)", real, imag >= 0.0 ? "+" : "-", Math.abs(imag));
+    }
+
+    /**
+     * Hyperbolic Sine of the Complex number.
+     * @return The Hyperbolic Sine evaluated at the Complex number.
+     */
+    public Complex sinh() {
+        return new Complex(Math.sinh(real) * Math.cos(imag), Math.cosh(real) * Math.sin(imag));
+    }
+
+    /**
+     * Hyperbolic Cosine of the Complex number.
+     * @return The Hyperbolic Cosine evaluated at the Complex number.
+     */
+    public Complex cosh() {
+        return new Complex(Math.cosh(real) * Math.cos(imag), Math.sinh(real) * Math.sin(imag));
+    }
+
+    /**
+     * Hyperbolic Tangent of the Complex number.
+     * @return The Hyperbolic Tangent evaluated at the Complex number.
+     */
+    public Complex tanh() {
+        Complex num = new Complex(Math.tanh(real), Math.tan(imag));
+        Complex den = new Complex(1.0, Math.tanh(real) * Math.tan(imag));
+        return num.divide(den);
     }
 
     private static final void invertOp(Complex c) {
@@ -538,19 +653,5 @@ public class Complex implements Comparable<Complex> {
     private static final void multiplyOp(Complex c, double d) {
         c.real *= d;
         c.imag *= d;
-    }
-
-    public Complex sinh() {
-        return new Complex(Math.sinh(real) * Math.cos(imag), Math.cosh(real) * Math.sin(imag));
-    }
-
-    public Complex cosh() {
-        return new Complex(Math.cosh(real) * Math.cos(imag), Math.sinh(real) * Math.sin(imag));
-    }
-
-    public Complex tanh() {
-        Complex num = new Complex(Math.tanh(real), Math.tan(imag));
-        Complex den = new Complex(1.0, Math.tanh(real) * Math.tan(imag));
-        return num.divide(den);
     }
 }

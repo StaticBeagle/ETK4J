@@ -5,7 +5,9 @@ import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
 
 import static com.wildbitsfoundry.etk4j.util.ComplexArrays.deepCopy;
 
-// TODO document
+/**
+ * The {@code ZeroPoleGain} (ZPK) class represents a Linear Time Invariant system broken into its zeros, poles, and gain.
+ */
 public class ZeroPoleGain extends LinearTimeInvariantSystem {
     private final Complex[] zeros;
     private final Complex[] poles;
@@ -17,28 +19,53 @@ public class ZeroPoleGain extends LinearTimeInvariantSystem {
         this.gain = gain;
     }
 
+    /**
+     * Zeros of the system.
+     * @return The zeros of the system.
+     */
     public Complex[] getZeros() {
         return deepCopy(zeros);
     }
 
+    /**
+     * Poles of the system.
+     * @return The poles of the system.
+     */
     public Complex[] getPoles() {
         return deepCopy(poles);
     }
 
+    /**
+     * Gain of the system.
+     * @return The scalar gain of the system.
+     */
     public double getGain() {
         return gain;
     }
 
+    /**
+     * {@link StateSpace} representation of the system.
+     * @return The State-Space representation of the system. This method converts the zpk representation into a
+     * {@link TransferFunction} and then calls {@link TransferFunction#toStateSpace()}.
+     */
     @Override
     public StateSpace toStateSpace() {
         return new TransferFunction(this).toStateSpace();
     }
 
+    /**
+     * {@link TransferFunction} representation of the system.
+     * @return The transfer function of the system.
+     */
     @Override
     public TransferFunction toTransferFunction() {
         return new TransferFunction(this);
     }
 
+    /**
+     * {@link ZeroPoleGain} representation of the system.
+     * @return Itself.
+     */
     @Override
     public ZeroPoleGain toZeroPoleGain() {
         return this;

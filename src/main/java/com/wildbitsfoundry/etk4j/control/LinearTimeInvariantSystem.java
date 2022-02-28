@@ -116,7 +116,7 @@ public abstract class LinearTimeInvariantSystem {
                     for (int i = 0; i < noStates; ++i) {
                         M[i] = NumArrays.concatenateAll(A.getRow(i), B.getRow(i), new double[noInputs]);
                     }
-                    double[][] identity = Matrices.identity(noInputs).getAs2DArray();
+                    double[][] identity = Matrix.identity(noInputs).getAs2DArray();
                     for (int i = noStates, j = 0; i < noStates + noInputs; ++i, ++j) {
                         M[i] = NumArrays.concatenate(new double[noStates + noInputs], identity[j]);
                     }

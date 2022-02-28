@@ -12,35 +12,35 @@ public class MatrixTest {
 	public void testMagic() {
 
 		Matrix sol = new Matrix(1, 1, 1);
-		Matrix magic = Matrices.magic(1);
+		Matrix magic = Matrix.magic(1);
 		assertEquals(sol, magic);
 
-		sol = Matrices.empty();
-		magic = Matrices.magic(2);
+		sol = Matrix.empty();
+		magic = Matrix.magic(2);
 		assertEquals(sol, magic);
 
 		double[][] values3by3 = { { 8.0, 1.0, 6.0 }, { 3.0, 5.0, 7.0 }, { 4.0, 9.0, 2.0 } };
 		sol = new Matrix(values3by3);
-		magic = Matrices.magic(3);
+		magic = Matrix.magic(3);
 		assertEquals(sol, magic);
 
 		double[][] values4by4 = { { 16.0, 2.0, 3.0, 13.0 }, { 5.0, 11.0, 10.0, 8.0 }, { 9.0, 7.0, 6.0, 12.0 },
 				{ 4.0, 14.0, 15.0, 1.0 } };
 		sol = new Matrix(values4by4);
-		magic = Matrices.magic(4);
+		magic = Matrix.magic(4);
 		assertEquals(sol, magic);
 
 		double[][] values5by5 = { { 17.0, 24.0, 1.0, 8.0, 15.0 }, { 23.0, 5.0, 7.0, 14.0, 16.0 },
 				{ 4.0, 6.0, 13.0, 20.0, 22.0 }, { 10.0, 12.0, 19.0, 21.0, 3.0 }, { 11.0, 18.0, 25.0, 2.0, 9.0 } };
 		sol = new Matrix(values5by5);
-		magic = Matrices.magic(5);
+		magic = Matrix.magic(5);
 		assertEquals(sol, magic);
 
 		double[][] values6by6 = { { 35.0, 1.0, 6.0, 26.0, 19.0, 24.0 }, { 3.0, 32.0, 7.0, 21.0, 23.0, 25.0 },
 				{ 31.0, 9.0, 2.0, 22.0, 27.0, 20.0 }, { 8.0, 28.0, 33.0, 17.0, 10.0, 15.0 },
 				{ 30.0, 5.0, 34.0, 12.0, 14.0, 16.0 }, { 4.0, 36.0, 29.0, 13.0, 18.0, 11.0 } };
 		sol = new Matrix(values6by6);
-		magic = Matrices.magic(6);
+		magic = Matrix.magic(6);
 		assertEquals(sol, magic);
 	}
 
@@ -161,7 +161,7 @@ public class MatrixTest {
 		avals[0][0] = columnwise[0];
 		I = new Matrix(ivals);
 		try {
-			check(I, Matrices.identity(3, 4));
+			check(I, Matrix.identity(3, 4));
 			try_success("identity... ", "");
 		} catch (java.lang.RuntimeException e) {
 			errorCount = try_failure(errorCount, "identity... ", "identity Matrix not successfully created");
@@ -521,7 +521,7 @@ public class MatrixTest {
 
 		print("\nTesting array-like methods...\n");
 		S = new Matrix(columnwise, nonconformld);
-		R = Matrices.random(A.getRowCount(), A.getColumnCount());
+		R = Matrix.random(A.getRowCount(), A.getColumnCount());
 		A = R;
 		try {
 			S = A.subtract(S);
@@ -552,7 +552,7 @@ public class MatrixTest {
 		}
 
 		A = R.copy();
-		B = Matrices.random(A.getRowCount(), A.getColumnCount());
+		B = Matrix.random(A.getRowCount(), A.getColumnCount());
 		C = A.subtract(B);
 		try {
 			S = A.add(S);
@@ -645,7 +645,7 @@ public class MatrixTest {
 			errorCount = try_failure(errorCount, "arrayRightDivideEquals... ", "(M./M != ones)");
 		}
 		A = R.copy();
-		B = Matrices.random(A.getRowCount(), A.getColumnCount());
+		B = Matrix.random(A.getRowCount(), A.getColumnCount());
 		try {
 			S = A.arrayMultiply(S);
 			errorCount = try_failure(errorCount, "arrayMultiply conformance check... ", "nonconformance not raised");
@@ -781,7 +781,7 @@ public class MatrixTest {
 		}
 		X = A.inv();
 		try {
-			check(A.multiply(X), Matrices.identity(3, 3));
+			check(A.multiply(X), Matrix.identity(3, 3));
 			try_success("inverse()...", "");
 		} catch (java.lang.RuntimeException e) {
 			errorCount = try_failure(errorCount, "inverse()...", "incorrect inverse calculation");
@@ -807,9 +807,9 @@ public class MatrixTest {
 			errorCount = try_failure(errorCount, "CholeskyDecomposition...",
 					"incorrect Cholesky decomposition calculation");
 		}
-		X = Chol.solve(Matrices.identity(3, 3));
+		X = Chol.solve(Matrix.identity(3, 3));
 		try {
-			check(A.multiply(X), Matrices.identity(3, 3));
+			check(A.multiply(X), Matrix.identity(3, 3));
 			try_success("CholeskyDecomposition solve()...", "");
 		} catch (java.lang.RuntimeException e) {
 			errorCount = try_failure(errorCount, "CholeskyDecomposition solve()...",
