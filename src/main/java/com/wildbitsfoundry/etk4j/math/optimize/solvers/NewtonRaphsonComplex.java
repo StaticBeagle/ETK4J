@@ -8,6 +8,11 @@ import com.wildbitsfoundry.etk4j.math.functions.ComplexUnivariateFunction;
 Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
 All rights reserved. see https://github.com/StaticBeagle/ETK4J/blob/master/SciPy.
  */
+/**
+ * The {@code NewtonRaphson}'s class contains the Newton-Raphson root finding algorithm for complex valued functions.
+ *
+ * @see <a href="https://en.wikipedia.org/wiki/Newton%27s_method">Newton's method</a>
+ */
 public final class NewtonRaphsonComplex {
     private int maxNumberOfIterations = 100;
     private double absTol = 1e-9;
@@ -15,49 +20,96 @@ public final class NewtonRaphsonComplex {
     private Complex x0 = null;
     private Complex x1 = null;
 
-    private ComplexUnivariateFunction func;
+    private ComplexUnivariateFunction function;
     private ComplexUnivariateFunction derivative;
     private ComplexUnivariateFunction secondDerivative;
 
 
-    public NewtonRaphsonComplex(ComplexUnivariateFunction func, Complex initialGuess) {
-        this.func = func;
+    /**
+     * Constructs an instance of the {@code NewtonRaphson}'s root finding algorithm.
+     *
+     * @param function     The function whose root is to be found.
+     * @param initialGuess The initial guess of where the root might be.
+     */
+    public NewtonRaphsonComplex(ComplexUnivariateFunction function, Complex initialGuess) {
+        this.function = function;
         x0 = initialGuess;
     }
 
+    /**
+     * Second initial guess.
+     *
+     * @param secondInitialGuess
+     */
     public NewtonRaphsonComplex secondInitialGuess(Complex secondInitialGuess) {
         this.x1 = secondInitialGuess;
         return this;
     }
 
+    /**
+     * Derivative of the function.
+     *
+     * @param derivative The first derivative of the function. If this argument is not provided, the Secant method
+     *                   is used to find the root of the function.
+     */
     public NewtonRaphsonComplex derivative(ComplexUnivariateFunction derivative) {
         this.derivative = derivative;
         return this;
     }
 
+    /**
+     * Second derivative of the function.
+     *
+     * @param secondDerivative The second derivative of the function. If this argument is provided, Halley's method
+     *                         is used to find the root of the function.
+     * @return
+     */
     public NewtonRaphsonComplex secondDerivative(ComplexUnivariateFunction secondDerivative) {
         this.secondDerivative = secondDerivative;
         return this;
     }
 
+    /**
+     * Maximum number of iterations.
+     *
+     * @param limit The maximum number of iterations allowed.
+     */
     public NewtonRaphsonComplex iterationLimit(int limit) {
         maxNumberOfIterations = limit;
         return this;
     }
 
+    /**
+     * Absolute tolerance. The real and imaginary part of the complex location of the root is used to compare against
+     * the tolerance so if the method fails to converge, try relaxing the tolerance criteria.
+     *
+     * @param tol The maximum allowed absolute tolerance.
+     */
     public NewtonRaphsonComplex absTolerance(double tol) {
         absTol = tol;
         return this;
     }
 
+    /**
+     * Relative tolerance.The real and imaginary part of the complex location of the root is used to compare against
+     * the tolerance so if the method fails to converge, try relaxing the tolerance criteria.
+     *
+     * @param tol The maximum allowed relative tolerance.
+     * @return
+     */
     public NewtonRaphsonComplex relTolerance(double tol) {
         relTol = tol;
         return this;
     }
 
+    /**
+     * Find the root.
+     *
+     * @return The {@link SolverResults} containing the root and other solver results.
+     */
     public SolverResults<Complex> solve() {
         int currentIteration = 0;
-        ComplexUnivariateFunction func = this.func;
+        ComplexUnivariateFunction func = this.function;
 
         Complex xCurrent = x0;
         Complex xFinal = new Complex();

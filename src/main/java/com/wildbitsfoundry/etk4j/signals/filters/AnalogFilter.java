@@ -79,12 +79,18 @@ public class AnalogFilter {
         double[] wp = new double[2];
         // maximize the pass band
         // https://github.com/scipy/scipy/blob/master/scipy/signal/filter_design.py
-        wp[0] = Brent.brentsMinimizer(AnalogFilter::bandStopObjMinimize, wp1, ws1 - 1e-12,
-                1e-5, 500, specs, strategy, 0);
+        wp[0] = new Brent(AnalogFilter::bandStopObjMinimize, wp1, ws1 - 1e-12, specs, strategy, 0)
+                .tolerance(1e-5)
+                .iterationLimit(500)
+                .minimize()
+                .getValue();
 
         specs.setLowerPassBandFrequency(wp[0]);
-        wp[1] = Brent.brentsMinimizer(AnalogFilter::bandStopObjMinimize, ws2 + 1e-12, wp2,
-                1e-5, 500, specs, strategy, 1);
+        wp[1] = new Brent(AnalogFilter::bandStopObjMinimize, ws2 + 1e-12, wp2, specs, strategy, 1)
+                .tolerance(1e-5)
+                .iterationLimit(500)
+                .minimize()
+                .getValue();
 
         wp1 = wp[0];
         wp2 = wp[1];

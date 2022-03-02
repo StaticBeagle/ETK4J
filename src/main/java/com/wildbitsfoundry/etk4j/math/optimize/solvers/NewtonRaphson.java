@@ -1,12 +1,17 @@
 package com.wildbitsfoundry.etk4j.math.optimize.solvers;
 
-import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
 import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
 
 /*
 Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
 All rights reserved. see https://github.com/StaticBeagle/ETK4J/blob/master/SciPy.
+ */
+
+/**
+ * The {@code NewtonRaphson}'s class contains the Newton-Raphson root finding algorithm.
+ *
+ * @see <a href="https://en.wikipedia.org/wiki/Newton%27s_method">Newton's method</a>
  */
 public final class NewtonRaphson {
 
@@ -22,7 +27,8 @@ public final class NewtonRaphson {
 
     /**
      * Constructs an instance of the {@code NewtonRaphson}'s root finding algorithm.
-     * @param function The function whose root is to be found.
+     *
+     * @param function     The function whose root is to be found.
      * @param initialGuess The initial guess of where the root might be.
      */
     public NewtonRaphson(UnivariateFunction function, double initialGuess) {
@@ -32,6 +38,7 @@ public final class NewtonRaphson {
 
     /**
      * Second initial guess.
+     *
      * @param secondInitialGuess
      */
     public NewtonRaphson secondInitialGuess(double secondInitialGuess) {
@@ -41,6 +48,7 @@ public final class NewtonRaphson {
 
     /**
      * Derivative of the function.
+     *
      * @param derivative The first derivative of the function. If this argument is not provided, the Secant method
      *                   is used to find the root of the function.
      */
@@ -51,6 +59,7 @@ public final class NewtonRaphson {
 
     /**
      * Second derivative of the function.
+     *
      * @param secondDerivative The second derivative of the function. If this argument is provided, Halley's method
      *                         is used to find the root of the function.
      * @return
@@ -62,6 +71,7 @@ public final class NewtonRaphson {
 
     /**
      * Maximum number of iterations.
+     *
      * @param limit The maximum number of iterations allowed.
      */
     public NewtonRaphson iterationLimit(int limit) {
@@ -71,6 +81,7 @@ public final class NewtonRaphson {
 
     /**
      * Absolute tolerance.
+     *
      * @param tol The maximum allowed absolute tolerance.
      */
     public NewtonRaphson absTolerance(double tol) {
@@ -80,7 +91,8 @@ public final class NewtonRaphson {
 
     /**
      * Relative tolerance.
-     * @param tol The maximum allowed relative tolerance. This value must be bigger than 4 * {@link ConstantsETK#DOUBLE_EPS}.
+     *
+     * @param tol The maximum allowed relative tolerance.
      * @return
      */
     public NewtonRaphson relTolerance(double tol) {
@@ -90,6 +102,7 @@ public final class NewtonRaphson {
 
     /**
      * Find the root.
+     *
      * @return The {@link SolverResults} containing the root and other solver results.
      */
     public SolverResults<Double> solve() {
@@ -166,7 +179,7 @@ public final class NewtonRaphson {
             }
             double q0 = func.evaluateAt(xCurrent);
             double q1 = func.evaluateAt(xFinal);
-            if(Math.abs(q1) < Math.abs(q0)) {
+            if (Math.abs(q1) < Math.abs(q0)) {
                 double swap = xCurrent;
                 xCurrent = xFinal;
                 xFinal = swap;
@@ -176,8 +189,8 @@ public final class NewtonRaphson {
             }
             while (currentIteration++ < maxNumberOfIterations) {
                 double x = 0;
-                if(q1 == q0) {
-                    if(xFinal != xCurrent) {
+                if (q1 == q0) {
+                    if (xFinal != xCurrent) {
                         double error = Math.abs(xFinal - xCurrent);
                         SolverResults<Double> solverResults = new SolverResults<>();
                         solverResults.setSolverStatus("Tolerance was reached");
@@ -197,13 +210,13 @@ public final class NewtonRaphson {
                     solverResults.setNumberOfIterations(currentIteration);
                     return solverResults;
                 } else {
-                    if(Math.abs(q1) > Math.abs(q0)) {
+                    if (Math.abs(q1) > Math.abs(q0)) {
                         x = (-q0 / q1 * xFinal + xCurrent) / (1 - q0 / q1);
                     } else {
                         x = (-q1 / q0 * xCurrent + xFinal) / (1 - q1 / q0);
                     }
                 }
-                if(MathETK.isClose(x, xFinal, absTol, relTol)) {
+                if (MathETK.isClose(x, xFinal, absTol, relTol)) {
                     double error = Math.abs(xFinal - xCurrent);
                     SolverResults<Double> solverResults = new SolverResults<>();
                     solverResults.setSolverStatus("Converged");
