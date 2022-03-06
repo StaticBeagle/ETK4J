@@ -99,8 +99,6 @@ public final class Bessel {
     private Bessel() {
     }
 
-    // TODO test
-
     /**
      * Modified Bessel function of the third kind of order zero and one.
      *
@@ -139,8 +137,6 @@ public final class Bessel {
             k0[0] *= expx;
         }
     }
-
-    // TODO test
 
     /**
      * Modified Bessel function of the third kind of order zero and one.
@@ -191,8 +187,6 @@ public final class Bessel {
             k0[0].multiplyEquals(expx);
         }
     }
-
-    // TODO test
 
     /**
      * Exponentially scaled modified Bessel function of the third kind of order zero and one.
@@ -274,8 +268,6 @@ public final class Bessel {
             k1[0] = (1.0 + 0.5 / x) * f0 + (10.0 / x / x) * expx * f1;
         }
     }
-
-    // TODO test
 
     /**
      * Exponentially scaled modified Bessel function of the third kind of order zero and one.
@@ -372,8 +364,6 @@ public final class Bessel {
         }
     }
 
-    // TODO test
-
     /**
      * Modified Bessel function of the third kind of order a and a + 1.
      *
@@ -458,8 +448,6 @@ public final class Bessel {
             }
         }
     }
-
-    // TODO test
 
     /**
      * Modified Bessel function of the third kind of order a and a + 1.
@@ -558,7 +546,6 @@ public final class Bessel {
             }
         }
     }
-    // TODO test
 
     /**
      * Exponentially scaled modified Bessel function of the third kind of order a and a + 1.
@@ -631,8 +618,6 @@ public final class Bessel {
             }
         }
     }
-
-    // TODO test
 
     /**
      * Exponentially scaled modified Bessel function of the third kind of order a and a + 1.
@@ -714,23 +699,6 @@ public final class Bessel {
                 ka1[0] = g;
             }
         }
-    }
-
-    public static void main(String[] args) {
-        double[] ka = new double[1];
-        double[] ka1 = new double[1];
-
-        besska01(1.0, -1, ka, ka1);
-
-        Complex[] kaComplex = new Complex[1];
-        Complex[] ka1Complex = new Complex[1];
-
-        besska01(1.0, -1, ka, ka1);
-
-        besska01(1e-16, new Complex(-0.1, 0.1), kaComplex, ka1Complex);
-
-        System.out.println(ka[0]);
-        System.out.println(kaComplex[0]);
     }
 }
 

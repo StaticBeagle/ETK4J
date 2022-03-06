@@ -10,12 +10,34 @@ import com.wildbitsfoundry.etk4j.math.optimize.solvers.SolverResults;
 import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
 import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 import com.wildbitsfoundry.etk4j.util.NumArrays;
+
 import static com.wildbitsfoundry.etk4j.signals.filters.Filters.*;
 
 import java.util.Arrays;
 import java.util.function.Function;
 
 public class Bessel extends AnalogFilter {
+    /**
+     * Frequency normalization for Bessel filters.
+     * <pre>
+     *         PHASE
+     *             The filter is normalized such that the phase response reaches its
+     *             midpoint at an angular (e.g., rad/s) cutoff frequency of 1. This
+     *             happens for both low-pass and high-pass filters, so this is the
+     *             "phase-matched" case. [6]
+     *             The magnitude response asymptotes are the same as a Butterworth
+     *             filter of the same order with a cutoff of `Wn`.
+     *             This is the default, and matches MATLAB's implementation.
+     *         DELAY
+     *             The filter is normalized such that the group delay in the passband
+     *             is 1 (e.g., 1 second). This is the "natural" type obtained by
+     *             solving Bessel polynomials
+     *         MAGNITUDE
+     *             The filter is normalized such that the gain magnitude is -3 dB at
+     *             angular frequency 1. This is called "frequency normalization" by
+     *             Bond. [1]
+     *      </pre>
+     */
     public enum FrequencyNormalization {
         PHASE,
         DELAY,
@@ -30,27 +52,16 @@ public class Bessel extends AnalogFilter {
     Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
     All rights reserved. See https://github.com/StaticBeagle/ETK4J/blob/master/SciPy.
      */
-    /*
-        Port from scipy
-        ``phase``
-            The filter is normalized such that the phase response reaches its
-            midpoint at an angular (e.g., rad/s) cutoff frequency of 1. This
-            happens for both low-pass and high-pass filters, so this is the
-            "phase-matched" case. [6]_
-            The magnitude response asymptotes are the same as a Butterworth
-            filter of the same order with a cutoff of `Wn`.
-            This is the default, and matches MATLAB's implementation.
-        ``delay``
-            The filter is normalized such that the group delay in the passband
-            is 1 (e.g., 1 second). This is the "natural" type obtained by
-            solving Bessel polynomials
-        ``mag``
-            The filter is normalized such that the gain magnitude is -3 dB at
-            angular frequency 1. This is called "frequency normalization" by
-            Bond. [1]_
+
+    /**
+     * Bessel analog low pass filter prototype.
+     * Port from scipy
+     *
+     * @param n    The order of the filter.
+     * @param norm The {@link FrequencyNormalization}.
      */
     public static ZeroPoleGain besselap(int n, FrequencyNormalization norm) { // change norm to enum
-        if(n == 0) {
+        if (n == 0) {
             return new ZeroPoleGain(new Complex[]{}, new Complex[]{}, 1.0);
         }
         Complex[] zeros = {};
@@ -64,57 +75,178 @@ public class Bessel extends AnalogFilter {
                 break;
             case MAGNITUDE:
                 k = aLast;
-                double normFactor = normFactor(poles, k);
-                for(int i = 0; i < n; ++i) {
+                double normFactor = normFactor(poles, k, 1.0 / Math.sqrt(2.0));
+                for (int i = 0; i < n; ++i) {
                     poles[i].divideEquals(normFactor);
                 }
                 k = Math.pow(normFactor, -n) * aLast;
                 break;
             case PHASE:
-                for(int i = 0; i < n; ++i) {
+                for (int i = 0; i < n; ++i) {
                     poles[i].multiplyEquals(Math.pow(10, -Math.log10(aLast) / n));
                 }
                 break;
-        };
+        }
         return new ZeroPoleGain(zeros, poles, k);
     }
 
-    // TODO add normalization phase,delay,mag as an overload
+    // TODO test these implementations and remove the enum
+    public static ZeroPoleGain besselapPhaseNormalized(int n) {
+        if (n == 0) {
+            return new ZeroPoleGain(new Complex[]{}, new Complex[]{}, 1.0);
+        }
+        Complex[] zeros = {};
+        Complex[] poles = Arrays.stream(besselZeros(n)).map(Complex::invert).toArray(Complex[]::new);
+        double k = 1.0;
+
+        double aLast = Math.floor(fallingFactorial(2 * n, n) / Math.pow(2, n));
+        for (int i = 0; i < n; ++i) {
+            poles[i].multiplyEquals(Math.pow(10, -Math.log10(aLast) / n));
+        }
+        return new ZeroPoleGain(zeros, poles, k);
+    }
+
+    public static ZeroPoleGain besselapDelayNormalized(int n) {
+        if (n == 0) {
+            return new ZeroPoleGain(new Complex[]{}, new Complex[]{}, 1.0);
+        }
+        Complex[] zeros = {};
+        Complex[] poles = Arrays.stream(besselZeros(n)).map(Complex::invert).toArray(Complex[]::new);
+        double aLast = Math.floor(fallingFactorial(2 * n, n) / Math.pow(2, n));
+        return new ZeroPoleGain(zeros, poles, aLast);
+    }
+
+    public static ZeroPoleGain besselapMagnitudeNormalized(int n, double magDrop) {
+        if (n == 0) {
+            return new ZeroPoleGain(new Complex[]{}, new Complex[]{}, 1.0);
+        }
+        Complex[] zeros = {};
+        Complex[] poles = Arrays.stream(besselZeros(n)).map(Complex::invert).toArray(Complex[]::new);
+
+        double aLast = Math.floor(fallingFactorial(2 * n, n) / Math.pow(2, n));
+        double k = aLast;
+        // 1.0 / Math.sqrt(2.0) = -3 db which is equal to 10 ^ (-3.0 / 20.0)
+        double normFactor = normFactor(poles, k, magDrop);
+        for (int i = 0; i < n; ++i) {
+            poles[i].divideEquals(normFactor);
+        }
+        k = Math.pow(normFactor, -n) * aLast;
+        return new ZeroPoleGain(zeros, poles, k);
+    }
+
+    /**
+     * Low pass filter realization.
+     * @param n The order of the filter.
+     * @param wn The cutoff frequency of the filter.
+     * @return A {@link TransferFunction} representation of the filter. {@link Bessel#newLowPassZPK(int, double)},
+     * is more numerically accurate than converting the zeros, poles, and gain into a {@link TransferFunction} so if the
+     * coefficients of the numerator and denominator are not needed, please consider using the {@link ZeroPoleGain}
+     * variant.
+     */
     public static TransferFunction newLowPass(int n, double wn) {
+        ButterWorth.validateInputsLowPass(n, wn);
         ZeroPoleGain zpk = besselap(n);
         return lpTolp(zpk, wn);
     }
 
+    /**
+     * Low pass filter realization.
+     * @param n The order of the filter.
+     * @param wn The cutoff frequency of the filter.
+     * @return A {@link ZeroPoleGain} representation of the filter.
+     */
+    public static ZeroPoleGain newLowPassZPK(int n, double wn) {
+        ButterWorth.validateInputsLowPass(n, wn);
+        return besselap(n);
+    }
+
+    /**
+     * High pass filter realization.
+     * @param n The order of the filter.
+     * @param wn The cutoff frequency of the filter.
+     * @return A {@link TransferFunction} representation of the filter. {@link Bessel#newHighPassZPK(int, double)},
+     * is more numerically accurate than converting the zeros, poles, and gain into a {@link TransferFunction} so if the
+     * coefficients of the numerator and denominator are not needed, please consider using the {@link ZeroPoleGain}
+     * variant.
+     */
     public static TransferFunction newHighPass(int n, double wn) {
+        ButterWorth.validateInputsHighPass(n, wn);
         ZeroPoleGain zpk = besselap(n);
         return lpTohp(zpk, wn);
     }
 
-    // TODO create exceptions. add checks to other filters
-    public static TransferFunction newBandPass(int n, double wp1, double wp2) {
-        if(n <= 0) {
-            // throw
-        }
-        if(wp1 <= 0 || wp2 <= 0) {
-            // throw
-        }
-        if(wp1 <= wp2) {
-            // throw
-        }
+    /**
+     * High pass filter realization.
+     * @param n The order of the filter.
+     * @param wn The cutoff frequency of the filter.
+     * @return A {@link ZeroPoleGain} representation of the filter.
+     */
+    public static ZeroPoleGain newHighPassZPK(int n, double wn) {
+        ButterWorth.validateInputsHighPass(n, wn);
+        ZeroPoleGain zpk = besselap(n);
+        return lpTohpZPK(zpk, wn);
+    }
+
+    /**
+     * Bandpass filter realization.
+     * @param n The order of the filter.
+     * @param wp1 The lower cutoff frequency of the filter.
+     * @param wp2 The upper cutoff frequency of the filter.
+     * @return A {@link TransferFunction} representation of the filter. {@link Bessel#newBandpassZPK(int, double, double)},
+     * is more numerically accurate than converting the zeros, poles, and gain into a {@link TransferFunction} so if the
+     * coefficients of the numerator and denominator are not needed, please consider using the {@link ZeroPoleGain}
+     * variant.
+     */
+    public static TransferFunction newBandpass(int n, double wp1, double wp2) {
+        ButterWorth.validateInputsBandpass(n, wp1, wp2);
         ZeroPoleGain zpk = besselap(n);
         double w0 = Math.sqrt(wp1 * wp2);
         double bw = wp2 - wp1;
         return lpTobp(zpk, w0, bw);
     }
 
+    /**
+     * Bandpass filter realization.
+     * @param n The order of the filter.
+     * @param wp1 The lower cutoff frequency of the filter.
+     * @param wp2 The upper cutoff frequency of the filter.
+     * @return A {@link ZeroPoleGain} representation of the filter.
+     */
+    public static ZeroPoleGain newBandpassZPK(int n, double wp1, double wp2) {
+        ButterWorth.validateInputsBandpass(n, wp1, wp2);
+        ZeroPoleGain zpk = besselap(n);
+        double w0 = Math.sqrt(wp1 * wp2);
+        double bw = wp2 - wp1;
+        return lpTobpZPK(zpk, w0, bw);
+    }
+
+    /**
+     * Band stop filter realization.
+     * @param n The order of the filter.
+     * @param wp1 The lower cutoff frequency of the filter.
+     * @param wp2 The upper cutoff frequency of the filter.
+     * @return A {@link TransferFunction} representation of the filter. {@link Bessel#newBandStopZPK(int, double, double)},
+     * is more numerically accurate than converting the zeros, poles, and gain into a {@link TransferFunction} so if the
+     * coefficients of the numerator and denominator are not needed, please consider using the {@link ZeroPoleGain}
+     * variant.
+     */
     public static TransferFunction newBandStop(int n, double wp1, double wp2) {
+        ButterWorth.validateInputsBandStop(n, wp1, wp2);
         ZeroPoleGain zpk = besselap(n);
         double w0 = Math.sqrt(wp1 * wp2);
         double bw = wp2 - wp1;
         return lpTobs(zpk, w0, bw);
     }
 
+    /**
+     * Band stop filter realization.
+     * @param n The order of the filter.
+     * @param wp1 The lower cutoff frequency of the filter.
+     * @param wp2 The upper cutoff frequency of the filter.
+     * @return A {@link ZeroPoleGain} representation of the filter.
+     */
     public static ZeroPoleGain newBandStopZPK(int n, double wp1, double wp2) {
+        ButterWorth.validateInputsBandStop(n, wp1, wp2);
         ZeroPoleGain zpk = besselap(n);
         double w0 = Math.sqrt(wp1 * wp2);
         double bw = wp2 - wp1;
@@ -141,24 +273,24 @@ public class Bessel extends AnalogFilter {
                         return result[0];
                     }, x[i])
                     .derivative(
-                    z -> {
-                        Complex[] a0 = new Complex[1];
-                        com.wildbitsfoundry.etk4j.math.specialfunctions.
-                                Bessel.nonexpbesska01(n - 0.5, z.invert(), a0, new Complex[1]);
-                        a0[0] = a0[0].divide(z.pow(2).multiply(2));
+                            z -> {
+                                Complex[] a0 = new Complex[1];
+                                com.wildbitsfoundry.etk4j.math.specialfunctions.
+                                        Bessel.nonexpbesska01(n - 0.5, z.invert(), a0, new Complex[1]);
+                                a0[0] = a0[0].divide(z.pow(2).multiply(2));
 
-                        Complex[] a1 = new Complex[1];
-                        com.wildbitsfoundry.etk4j.math.specialfunctions.
-                                Bessel.nonexpbesska01(n + 0.5, z.invert(), a1, new Complex[1]);
-                        a1[0] = a1[0].divide(z.pow(2));
+                                Complex[] a1 = new Complex[1];
+                                com.wildbitsfoundry.etk4j.math.specialfunctions.
+                                        Bessel.nonexpbesska01(n + 0.5, z.invert(), a1, new Complex[1]);
+                                a1[0] = a1[0].divide(z.pow(2));
 
-                        Complex[] a2 = new Complex[1];
-                        com.wildbitsfoundry.etk4j.math.specialfunctions.
-                                Bessel.nonexpbesska01(n + 1.5, z.invert(), a2, new Complex[1]);
-                        a2[0] = a2[0].divide(z.pow(2).multiply(2));
+                                Complex[] a2 = new Complex[1];
+                                com.wildbitsfoundry.etk4j.math.specialfunctions.
+                                        Bessel.nonexpbesska01(n + 1.5, z.invert(), a2, new Complex[1]);
+                                a2[0] = a2[0].divide(z.pow(2).multiply(2));
 
-                        return a0[0].subtract(a1[0]).add(a2[0]);
-                    })
+                                return a0[0].subtract(a1[0]).add(a2[0]);
+                            })
                     .absTolerance(1e-15)
                     .relTolerance(0.0)
                     .iterationLimit(50)
@@ -168,21 +300,21 @@ public class Bessel extends AnalogFilter {
 
         Complex[][] mean = new Complex[2][n];
         mean[0] = ComplexArrays.deepCopy(x);
-        for(int i = 0; i < n; ++i) {
+        for (int i = 0; i < n; ++i) {
             mean[1][n - i - 1] = x[i].conj();
         }
 
-        for(int j = 0; j < n; ++j) {
+        for (int j = 0; j < n; ++j) {
             Complex[] temp = new Complex[mean.length];
-            for(int i = 0; i < mean.length; ++i) {
+            for (int i = 0; i < mean.length; ++i) {
                 temp[i] = mean[i][j];
             }
             x[j] = ComplexArrays.mean(temp);
         }
 
         // zeros should sum to -1
-        if(ComplexArrays.sum(x).add(1.0).abs() > 1e-15) {
-            // throw exception TODO
+        if (ComplexArrays.sum(x).add(1.0).abs() > 1e-15) {
+            throw new RuntimeException("Generated zeros are inaccurate.");
         }
         return x;
     }
@@ -279,8 +411,9 @@ public class Bessel extends AnalogFilter {
                 x[i].addEquals(alpha[i].divide(alpha[i].multiply(beta[i]).add(1.0)));
             }
 
-            // TODO
-            // if not all are finite throw exception
+            if (!Arrays.stream(x).allMatch(Complex::isFinite)) {
+                throw new NonFiniteRootsException("Non finite roots in Aberth's method.");
+            }
 
             boolean done = true;
             for (int i = 0; i < n; ++i) {
@@ -290,7 +423,7 @@ public class Bessel extends AnalogFilter {
                 break;
             }
             if (++iter >= maxIter) {
-                // throw failed to converge
+                throw new MaximumNumberOfIterationsReachedException("Aberth maximum number of iterations reached.");
             }
         }
         return x;
@@ -302,7 +435,7 @@ public class Bessel extends AnalogFilter {
      */
     private static double fallingFactorial(int x, int n) {
         double val = 1.0;
-        for(int i = x - n + 1; i < x + 1; ++i) {
+        for (int i = x - n + 1; i < x + 1; ++i) {
             val *= i;
         }
         return val;
@@ -312,16 +445,16 @@ public class Bessel extends AnalogFilter {
     Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
     All rights reserved. See https://github.com/StaticBeagle/ETK4J/blob/master/SciPy
      */
-    private static double normFactor(Complex[] poles, double k) {
+    private static double normFactor(Complex[] poles, double k, double magDrop) {
         UnivariateFunction gw = w -> {
             Complex prod = Complex.fromReal(1.0);
-            for(int i = 0; i < poles.length; ++i) {
+            for (int i = 0; i < poles.length; ++i) {
                 prod.multiplyEquals(Complex.fromImaginary(w).subtract(poles[i]));
             }
             return prod.invert().multiply(k).abs();
         };
-        UnivariateFunction cutoff = w -> gw.evaluateAt(w) - 1.0 / Math.sqrt(2.0);
-        // 1.0 / Math.sqrt(2.0) = -3 db which is equal to 10 ^ (-3.0 / 20.0) TODO change -3 to an arbitrary input
+        UnivariateFunction cutoff = w -> gw.evaluateAt(w) - magDrop;
+
         double result = new NewtonRaphson(cutoff, 1.5)
                 .absTolerance(1.48e-8)
                 .relTolerance(0.0)

@@ -609,6 +609,10 @@ public class Complex implements Comparable<Complex> {
         return num.divide(den);
     }
 
+    public boolean isFinite() {
+        return Double.isFinite(real) && Double.isFinite(imag);
+    }
+
     private static final void invertOp(Complex c) {
         double mag = 1.0 / c.norm();
         c.real *= mag;

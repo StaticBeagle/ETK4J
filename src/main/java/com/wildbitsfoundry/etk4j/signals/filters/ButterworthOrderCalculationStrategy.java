@@ -58,8 +58,11 @@ class ButterworthOrderCalculationStrategy implements FilterOrderCalculationStrat
     }
 
     private static double calculateW0(int n, double rp) {
+        if(n <= 0) {
+            throw new IllegalArgumentException("The order of the Butterworth filter must be greater than zero.");
+        }
         double gPass = Math.pow(10, 0.1 * Math.abs(rp));
-        double w0 = Math.pow(gPass - 1.0, -1.0 / (2.0 * n)); // TODO check division by zero
+        double w0 = Math.pow(gPass - 1.0, -1.0 / (2.0 * n));
         return w0;
     }
 }

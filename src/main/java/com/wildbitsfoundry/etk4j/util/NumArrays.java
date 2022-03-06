@@ -448,7 +448,8 @@ public final class NumArrays {
     public static double[] reverse(double[] a) {
         final int length = a.length;
         double[] result = new double[a.length];
-        for (int i = length - 1, j = 0; i >= 0; --i, ++j) {
+        for (int i = 0, j = length - 1; i <= length / 2; ++i, --j) {
+            result[i] = a[j];
             result[j] = a[i];
         }
         return result;

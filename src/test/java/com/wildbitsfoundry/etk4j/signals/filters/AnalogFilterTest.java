@@ -55,7 +55,7 @@ public class AnalogFilterTest {
                 6.416238909177713E-4}, ba.getDenominator().getCoefficients(), 1e-12);
 
         BandpassResults bpr = ButterWorth.buttord(bpSpecs);
-        ba = ButterWorth.newBandPass(bpr.getOrder(), bpr.getLowerCutoffFrequency(), bpr.getUpperCutoffFrequency());
+        ba = ButterWorth.newBandpass(bpr.getOrder(), bpr.getLowerCutoffFrequency(), bpr.getUpperCutoffFrequency());
         assertArrayEquals(new double[]{160000.0, 0.0, 0.0, 0.0, 0.0}, ba.getNumerator().getCoefficients(), 1e-12);
         assertArrayEquals(new double[]{1.0, 52.26251859505506, 160965.68542494922, 6276728.483266111,
                 9.66120169691095E9, 2.5044146648231787E11, 2.562589808533734E14, 3.319777843917693E15,
@@ -117,7 +117,7 @@ public class AnalogFilterTest {
                 ba.getDenominator().getCoefficients(), 1e-12);
 
         BandpassResults bpr = Chebyshev1.cheb1ord(bpSpecs);
-        ba = Chebyshev1.newBandPass(bpr.getOrder(), bpSpecs.getPassBandRipple(), bpr.getLowerCutoffFrequency(),
+        ba = Chebyshev1.newBandpass(bpr.getOrder(), bpSpecs.getPassBandRipple(), bpr.getLowerCutoffFrequency(),
                 bpr.getUpperCutoffFrequency());
         assertArrayEquals(new double[]{1999.9999999999993, 0.0, 0.0, 0.0}, ba.getNumerator().getCoefficients(), 1e-12);
         assertArrayEquals(new double[]{1.0, 11.921432759666429, 120071.06027952161, 953330.334221381,
@@ -181,7 +181,7 @@ public class AnalogFilterTest {
                 ba.getDenominator().getCoefficients(), 1e-12);
 
         BandpassResults bpr = Chebyshev2.cheb2ord(bpSpecs);
-        ba = Chebyshev2.newBandPass(bpr.getOrder(), bpSpecs.getStopBandAttenuation(), bpr.getLowerCutoffFrequency(),
+        ba = Chebyshev2.newBandpass(bpr.getOrder(), bpSpecs.getStopBandAttenuation(), bpr.getLowerCutoffFrequency(),
                 bpr.getUpperCutoffFrequency());
         assertArrayEquals(new double[]{9.277258525655208, 0.0, 752036.1337575477, 0.0, 1.4769488345428343E10, 0.0},
                 ba.getNumerator().getCoefficients(), 1e-12);
@@ -246,7 +246,7 @@ public class AnalogFilterTest {
                 ba.getDenominator().getCoefficients(), 1e-12);
 
         BandpassResults bpr = Elliptic.ellipord(bpSpecs);
-        ba = Elliptic.newBandPass(bpr.getOrder(), bpSpecs.getPassBandRipple(), bpSpecs.getStopBandAttenuation(),
+        ba = Elliptic.newBandpass(bpr.getOrder(), bpSpecs.getPassBandRipple(), bpSpecs.getStopBandAttenuation(),
                 bpr.getLowerCutoffFrequency(), bpr.getUpperCutoffFrequency());
         assertArrayEquals(new double[]{0.10000000000000003, 0.0, 8198.997487421326, 0.0, 1.5920100000000003E8},
                 ba.getNumerator().getCoefficients(), 1e-12);
@@ -273,7 +273,7 @@ public class AnalogFilterTest {
         assertArrayEquals(new double[]{1.0000000000000004, 0.0, 0.0}, ba.getNumerator().getCoefficients(), 1e-12);
         assertArrayEquals(new double[]{1.0, 1732.0508075688779, 1000000.0000000005}, ba.getDenominator().getCoefficients(), 1e-12);
 
-        ba = Bessel.newBandPass(4, 190e6, 210e6);
+        ba = Bessel.newBandpass(4, 190e6, 210e6);
         assertArrayEquals(new double[]{1.6E29, 0.0, 0.0, 0.0, 0.0}, ba.getNumerator().getCoefficients(), 1e-12);
         assertArrayEquals(new double[]{1.0, 6.2478798738405116E7, 1.61356620131307328E17, 7.504320895970641E24,
                 9.692398286478327E33, 2.9942240374922867E41, 2.5688135281524276E50, 3.968728207943182E57,

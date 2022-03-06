@@ -115,4 +115,17 @@ public class NumArraysTest {
         double rms = NumArrays.rms(a);
         assertEquals(3.894440481849308, rms, 1e-12);
     }
+
+    @Test
+    public void testReverse() {
+        double[] a = {1, 2, 3, 4, 5};
+        double[] expected = {5, 4, 3, 2, 1};
+
+        assertArrayEquals(expected, NumArrays.reverse(a), 1e-12);
+
+        a = new double[]{1, 2, 3, 4, 5, 6};
+        expected = new double[]{6, 5, 4, 3, 2, 1};
+
+        assertArrayEquals(expected, NumArrays.reverse(a), 1e-12);
+    }
 }

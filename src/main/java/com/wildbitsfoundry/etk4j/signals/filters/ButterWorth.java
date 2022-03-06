@@ -42,94 +42,192 @@ public final class ButterWorth extends AnalogFilter {
         return new ZeroPoleGain(zeros, poles, den.real());
     }
 
+    /**
+     * Butterworth filter order.
+     * @param specs The filter design specifications.
+     * @return The minimum order required to meet the design specifications.
+     */
     public static LowPassResults buttord(LowPassSpecs specs) {
         specs.validate();
         return lowPassFilterOrder(specs, new ButterworthOrderCalculationStrategy());
     }
 
+    /**
+     * Butterworth filter order.
+     * @param specs The filter design specifications.
+     * @return The minimum order required to meet the design specifications.
+     */
     public static HighPassResults buttord(HighPassSpecs specs) {
         specs.validate();
         return highPassFilterOrder(specs, new ButterworthOrderCalculationStrategy());
     }
 
+    /**
+     * Butterworth filter order.
+     * @param specs The filter design specifications.
+     * @return The minimum order required to meet the design specifications.
+     */
     public static BandpassResults buttord(BandpassSpecs specs) {
         specs.validate();
         return bandpassFilterOrder(specs, new ButterworthOrderCalculationStrategy());
     }
 
+    /**
+     * Butterworth filter order.
+     * @param specs The filter design specifications.
+     * @return The minimum order required to meet the design specifications.
+     */
     public static BandStopResults buttord(BandStopSpecs specs) {
         specs.validate();
         return bandStopFilterOrder(specs, new ButterworthOrderCalculationStrategy());
     }
 
+    /**
+     * Low pass filter realization.
+     * @param n The order of the filter.
+     * @param wn The cutoff frequency of the filter.
+     * @return A {@link TransferFunction} representation of the filter. {@link ButterWorth#newLowPassZPK(int, double)},
+     * is more numerically accurate than converting the zeros, poles, and gain into a {@link TransferFunction} so if the
+     * coefficients of the numerator and denominator are not needed, please consider using the {@link ZeroPoleGain}
+     * variant.
+     */
     public static TransferFunction newLowPass(int n, double wn) {
+        validateInputsLowPass(n, wn);
         ZeroPoleGain zpk = buttAp(n);
         return lpTolp(zpk, wn);
     }
 
+    /**
+     * Low pass filter realization.
+     * @param n The order of the filter.
+     * @param wn The cutoff frequency of the filter.
+     * @return A {@link ZeroPoleGain} representation of the filter.
+     */
     public static ZeroPoleGain newLowPassZPK(int n, double wn) {
+        validateInputsLowPass(n, wn);
         ZeroPoleGain zpk = buttAp(n);
         return lpTolpZPK(zpk, wn);
     }
 
+    /**
+     * High pass filter realization.
+     * @param n The order of the filter.
+     * @param wn The cutoff frequency of the filter.
+     * @return A {@link TransferFunction} representation of the filter. {@link ButterWorth#newHighPassZPK(int, double)},
+     * is more numerically accurate than converting the zeros, poles, and gain into a {@link TransferFunction} so if the
+     * coefficients of the numerator and denominator are not needed, please consider using the {@link ZeroPoleGain}
+     * variant.
+     */
     public static TransferFunction newHighPass(int n, double wn) {
+        validateInputsHighPass(n, wn);
         ZeroPoleGain zpk = buttAp(n);
         return lpTohp(zpk, wn);
     }
 
-    // TODO create exceptions. add checks to other filters
-    public static TransferFunction newBandPass(int n, double wp1, double wp2) {
-        if (n <= 0) {
-            // throw
-        }
-        if (wp1 <= 0 || wp2 <= 0) {
-            // throw
-        }
-        if (wp1 <= wp2) {
-            // throw
-        }
+    /**
+     * High pass filter realization.
+     * @param n The order of the filter.
+     * @param wn The cutoff frequency of the filter.
+     * @return A {@link ZeroPoleGain} representation of the filter.
+     */
+    public static ZeroPoleGain newHighPassZPK(int n, double wn) {
+        validateInputsHighPass(n, wn);
+        ZeroPoleGain zpk = buttAp(n);
+        return lpTohpZPK(zpk, wn);
+    }
+
+    /**
+     * Bandpass filter realization.
+     * @param n The order of the filter.
+     * @param wp1 The lower cutoff frequency of the filter.
+     * @param wp2 The upper cutoff frequency of the filter.
+     * @return A {@link TransferFunction} representation of the filter. {@link ButterWorth#newBandpassZPK(int, double, double)},
+     * is more numerically accurate than converting the zeros, poles, and gain into a {@link TransferFunction} so if the
+     * coefficients of the numerator and denominator are not needed, please consider using the {@link ZeroPoleGain}
+     * variant.
+     */
+    public static TransferFunction newBandpass(int n, double wp1, double wp2) {
+        validateInputsBandpass(n, wp1, wp2);
         ZeroPoleGain zpk = buttAp(n);
         double w0 = Math.sqrt(wp1 * wp2);
         double bw = wp2 - wp1;
         return lpTobp(zpk, w0, bw);
     }
 
-    public static ZeroPoleGain newBandPassZPK(int n, double wp1, double wp2) {
-        if (n <= 0) {
-            // throw
-        }
-        if (wp1 <= 0 || wp2 <= 0) {
-            // throw
-        }
-        if (wp1 <= wp2) {
-            // throw
-        }
+    /**
+     * Bandpass filter realization.
+     * @param n The order of the filter.
+     * @param wp1 The lower cutoff frequency of the filter.
+     * @param wp2 The upper cutoff frequency of the filter.
+     * @return A {@link ZeroPoleGain} representation of the filter.
+     */
+    public static ZeroPoleGain newBandpassZPK(int n, double wp1, double wp2) {
+        validateInputsBandpass(n, wp1, wp2);
         ZeroPoleGain zpk = buttAp(n);
         double w0 = Math.sqrt(wp1 * wp2);
         double bw = wp2 - wp1;
         return lpTobpZPK(zpk, w0, bw);
     }
 
+    /**
+     * Band stop filter realization.
+     * @param n The order of the filter.
+     * @param wp1 The lower cutoff frequency of the filter.
+     * @param wp2 The upper cutoff frequency of the filter.
+     * @return A {@link TransferFunction} representation of the filter. {@link ButterWorth#newBandStopZPK(int, double, double)},
+     * is more numerically accurate than converting the zeros, poles, and gain into a {@link TransferFunction} so if the
+     * coefficients of the numerator and denominator are not needed, please consider using the {@link ZeroPoleGain}
+     * variant.
+     */
     public static TransferFunction newBandStop(int n, double wp1, double wp2) {
+        validateInputsBandStop(n, wp1, wp2);
         ZeroPoleGain zpk = buttAp(n);
         double w0 = Math.sqrt(wp1 * wp2);
         double bw = wp2 - wp1;
         return lpTobs(zpk, w0, bw);
     }
 
+    /**
+     * Band stop filter realization.
+     * @param n The order of the filter.
+     * @param wp1 The lower cutoff frequency of the filter.
+     * @param wp2 The upper cutoff frequency of the filter.
+     * @return A {@link ZeroPoleGain} representation of the filter.
+     */
     public static ZeroPoleGain newBandStopZPK(int n, double wp1, double wp2) {
+        validateInputsBandStop(n, wp1, wp2);
         ZeroPoleGain zpk = buttAp(n);
         double w0 = Math.sqrt(wp1 * wp2);
         double bw = wp2 - wp1;
         return lpTobsZPK(zpk, w0, bw);
     }
 
-//    private static void checkInputsLowPassHighPass(int n, double wn) {
-//        if (n <= 0) {
-//            // throw
-//        }
-//        if (wn <= 0) {
-//            // throw
-//        }
-//    }
+    protected static void validateInputsLowPass(int n, double wn) {
+        if(n <= 0) {
+            throw new IllegalArgumentException("The filter order n must be greater than zero.");
+        }
+        if(wn <= 0) {
+            throw new IllegalArgumentException("The cutoff frequency wn must be greater than zero.");
+        }
+    }
+
+    protected static void validateInputsHighPass(int n, double wn) {
+        validateInputsLowPass(n, wn);
+    }
+
+    protected static void validateInputsBandpass(int n, double wp1, double wp2) {
+        if (n <= 0) {
+            throw new IllegalArgumentException("The filter order n must be greater than zero.");
+        }
+        if (wp1 <= 0 || wp2 <= 0) {
+            throw new IllegalArgumentException("The cutoff frequencies wp1 & wp2 must be greater than zero.");
+        }
+        if (wp1 >= wp2) {
+            throw new IllegalArgumentException("The cutoff frequency wp2 must be greater than wp1.");
+        }
+    }
+
+    protected static void validateInputsBandStop(int n, double wp1, double wp2) {
+        validateInputsBandpass(n, wp1, wp2);
+    }
 }

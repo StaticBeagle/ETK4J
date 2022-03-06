@@ -2,6 +2,10 @@ package com.wildbitsfoundry.etk4j.signals.fft;
 
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 
+/**
+ * The {@code FFT} class provides and implementation of the Fast Fourier Transform.
+ * @see <a href="https://en.wikipedia.org/wiki/Fast_Fourier_transform">Fast Fourier Transform.</a>
+ */
 public class FFT {
 
 	private int _n;
@@ -10,6 +14,10 @@ public class FFT {
 	private double[] _cos;
 	private double[] _sin;
 
+	/**
+	 * Construcsts and instance of the {@code FFT} class.
+	 * @param n The length of the {@code FFT}. Must be a power of 2.
+	 */
 	public FFT(int n) {
 		_n = n;
 		_m = (int) (Math.log(n) / Math.log(2.0));
@@ -41,6 +49,12 @@ public class FFT {
 	 * Permission to copy and use this program is granted as long as this header
 	 * is included.
 	 ****************************************************************/
+	/**
+	 * Fast Fourier Transform in place.The real and imaginary parts after performing the {@code FFT}, are stored in the
+	 * input arrays {@code real} and {@code imag} respectively.
+	 * @param real The real part of the data.
+	 * @param imag The imaginary part of the data.
+	 */
 	public void direct(double[] real, double[] imag) {
 		if(real.length != imag.length) {
 			throw new IllegalArgumentException("Length mismatch between real and imag");
@@ -98,7 +112,12 @@ public class FFT {
 			}
 		}
 	}
-	
+
+	/**
+	 * Inverse Fast Fourier Transform in place.
+	 * @param real The real part of the data.
+	 * @param imag The imaginary part of the data.
+	 */
 	public void inverse(double[] real, double[] imag) {
 		this.direct(imag, real);
 		double factor = 1.0 / _n;
@@ -112,7 +131,11 @@ public class FFT {
             b[i] *= d;
         }
     }
-    
+
+	/**
+	 * Fast Fourier Transform in place.
+	 * @param data The input data.
+	 */
 	public void direct(Complex[] data) {
 		if(data.length != _n) {
 			throw new IllegalArgumentException(String.format("The lengths of the arrays must be equal to n = %d.", _n));
@@ -163,7 +186,11 @@ public class FFT {
 			}
 		}
 	}
-	
+
+	/**
+	 * Inverse Fast Fourier Transform in place.
+	 * @param data The input data.
+	 */
 	public void inverse(Complex[] data) {
 		double t1;
 		// finding the conjugate of the complex number

@@ -37,32 +37,60 @@ abstract class UnivariateRegression {
 		}
 	}
 
+	/**
+	 * R-squared (a.k.a. Coefficient of determination).
+	 * @return The computed {@code R-squared}.
+	 */
 	public double R2() {
 		return 1.0 - _sse / _ssr;
 	}
 
+	/**
+	 * Sum of squared errors. The sum of the squared differences between predicted data points and observed data points.
+	 * @return The computed SSE.
+	 */
 	public double SSE() {
 		return _sse;
  	}
 
+	/**
+	 * Sum of squared regression. The sum of the squared differences between predicted data points and the mean of the
+	 * response variable.
+	 * @return The computed SSR.
+	 */
 	public double SSR() {
 		return _ssr;
 	}
 
+	/**
+	 * Sum of squared total.
+	 * @return SSR + SSE,
+	 */
 	public double SST() {
 		return _sse + _ssr;
 	}
 
+	/**
+	 * Line of best fit coefficients.
+	 * @return The coefficients of the line of best fit.
+	 */
 	public double[] beta() {
 		return Arrays.copyOf(_beta, _beta.length);
 	}
 
+	/**
+	 * Residuals. The difference between each data point and the line of best fit.
+	 * @return The computed residuals.
+	 */
 	public double[] residuals() {
 		return Arrays.copyOf(_residuals, _residuals.length);
 	}
 
+	/**
+	 * Norm of residuals. The square root of the sum of the squares of the residuals.
+	 * @return The {@link NumArrays#norm2(double[])} of the residuals}.
+	 */
 	public double normOfResiduals() {
 		return _rnorm;
 	}
-
 }

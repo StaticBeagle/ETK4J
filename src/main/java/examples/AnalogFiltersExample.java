@@ -116,19 +116,19 @@ public class AnalogFiltersExample {
 
     public static void buildBandPassFilters(BandpassSpecs bpSpecs) {
         BandpassResults bpr = ButterWorth.buttord(bpSpecs);
-        TransferFunction bu = ButterWorth.newBandPass(bpr.getOrder(), bpr.getLowerCutoffFrequency(),
+        TransferFunction bu = ButterWorth.newBandpass(bpr.getOrder(), bpr.getLowerCutoffFrequency(),
                 bpr.getUpperCutoffFrequency());
 
         bpr = Chebyshev1.cheb1ord(bpSpecs);
-        TransferFunction cb1 = Chebyshev1.newBandPass(bpr.getOrder(), bpSpecs.getPassBandRipple(),
+        TransferFunction cb1 = Chebyshev1.newBandpass(bpr.getOrder(), bpSpecs.getPassBandRipple(),
                 bpr.getLowerCutoffFrequency(), bpr.getUpperCutoffFrequency());
 
         bpr = Chebyshev2.cheb2ord(bpSpecs);
-        TransferFunction cb2 = Chebyshev2.newBandPass(bpr.getOrder(), bpSpecs.getStopBandAttenuation(),
+        TransferFunction cb2 = Chebyshev2.newBandpass(bpr.getOrder(), bpSpecs.getStopBandAttenuation(),
                 bpr.getLowerCutoffFrequency(), bpr.getUpperCutoffFrequency());
 
         bpr = Elliptic.ellipord(bpSpecs);
-        TransferFunction el = Elliptic.newBandPass(bpr.getOrder(), bpSpecs.getPassBandRipple(),
+        TransferFunction el = Elliptic.newBandpass(bpr.getOrder(), bpSpecs.getPassBandRipple(),
                 bpSpecs.getStopBandAttenuation(), bpr.getLowerCutoffFrequency(), bpr.getUpperCutoffFrequency());
 
         System.out.println();
