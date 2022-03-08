@@ -1,22 +1,22 @@
 package com.wildbitsfoundry.etk4j.signals.filters;
 
-// TODO other methods to match other exceptions
+/**
+ * The {@code NegativeFilterOrderException} class is thrown when a collection of arrays contain complex values that are not
+ * finite.
+ */
 public class NegativeFilterOrderException extends RuntimeException {
 
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = 3135934681615853289L;
+    public NegativeFilterOrderException(){}
 
-	public NegativeFilterOrderException(String message) {
+    public NegativeFilterOrderException(String message) {
         super(message);
-    }
-
-    public NegativeFilterOrderException(Throwable cause) {
-        super(cause);
     }
 
     public NegativeFilterOrderException(String message, Throwable cause) {
         super(message, cause);
+    }
+
+    public NegativeFilterOrderException(Throwable cause) {
+        super(cause);
     }
 }

@@ -1,10 +1,7 @@
 package com.wildbitsfoundry.etk4j.math.interpolation;
 
-import com.wildbitsfoundry.etk4j.util.NumArrays;
-import org.junit.BeforeClass;
-import org.junit.Rule;
+import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import static org.junit.Assert.*;
 
@@ -20,7 +17,7 @@ public class QuadraticSplineTest {
                 183.9024, 227.04, 268.796, 303.248, 330.39599999999996, 350.24, 362.78, 376.0732, 398.17679999999996,
                 429.09079999999994, 468.8152, 517.35, 562.8132, 593.3228, 611.5570222222223, 633.5852,
                 662.0855555555555, 697.0580888888888, 738.5028, 786.4196888888889, 840.8087555555555, 901.67};
-        assertArrayEquals(expected, qs.evaluateAt(NumArrays.linSteps(0, 30)), 1e-12);
+        assertArrayEquals(expected, qs.evaluateAt(DoubleArrays.linSteps(0, 30)), 1e-12);
 
         assertEquals(376.0732, qs.evaluateAt(16.0), 1e-12);
         assertEquals(17.6984, qs.differentiate(16.0), 1e-12);
@@ -41,7 +38,7 @@ public class QuadraticSplineTest {
                 227.04, 258.6328, 288.0032, 315.1512, 340.0768, 362.78, 386.23639999999995, 413.42159999999996,
                 444.3356, 478.97839999999997, 517.35, 555.1908000000001, 588.2412, 617.4855555555556, 648.83,
                 683.2588888888889, 720.7722222222222, 761.37, 805.0522222222222, 851.8188888888889, 901.67};
-        assertArrayEquals(expected, qs.evaluateAt(NumArrays.linSteps(0, 30)), 1e-12);
+        assertArrayEquals(expected, qs.evaluateAt(DoubleArrays.linSteps(0, 30)), 1e-12);
 
         assertEquals(386.23639999999995, qs.evaluateAt(16.0), 1e-12);
         assertEquals(25.3208, qs.differentiate(16.0), 1e-12);

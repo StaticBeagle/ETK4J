@@ -1,7 +1,7 @@
 package com.wildbitsfoundry.etk4j.math.linearalgebra;
 
 import com.wildbitsfoundry.etk4j.math.MathETK;
-import com.wildbitsfoundry.etk4j.util.NumArrays;
+import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 
 /**
  * Singular Value Decomposition.
@@ -495,7 +495,7 @@ public class SingularValueDecomposition {
 	 */
 
 	public Matrix getU() {
-		return new Matrix(NumArrays.flatten(U), _rows, Math.min(_rows + 1, _cols));
+		return new Matrix(DoubleArrays.flatten(U), _rows, Math.min(_rows + 1, _cols));
 	}
 
 	/**
@@ -505,7 +505,7 @@ public class SingularValueDecomposition {
 	 */
 
 	public Matrix getV() {
-		return new Matrix(NumArrays.flatten(V), _cols, _cols);
+		return new Matrix(DoubleArrays.flatten(V), _cols, _cols);
 	}
 
 	/**

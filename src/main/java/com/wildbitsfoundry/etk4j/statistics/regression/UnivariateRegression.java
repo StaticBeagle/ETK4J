@@ -3,7 +3,7 @@ package com.wildbitsfoundry.etk4j.statistics.regression;
 import java.util.Arrays;
 
 import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
-import com.wildbitsfoundry.etk4j.util.NumArrays;
+import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 
 abstract class UnivariateRegression {
 
@@ -22,19 +22,27 @@ abstract class UnivariateRegression {
 		Matrix Y = new Matrix(y, n);
 		Matrix B = X.solve(Y);
 
-		_beta = NumArrays.reverse(B.getArray());
+		_beta = DoubleArrays.reverse(B.getArray());
 
 		_residuals = Y.subtract(X.multiply(B)).getArray();
-		_rnorm = NumArrays.norm2(_residuals);
+		_rnorm = DoubleArrays.norm2(_residuals);
 		_sse = Math.pow(_rnorm, 2);
 
-		double ybar = NumArrays.mean(y);
+		double ybar = DoubleArrays.mean(y);
 
 		// SST
 		for (int i = 0; i < n; ++i) {
 			double dev = y[i] - ybar;
 			_ssr += dev * dev;
 		}
+	}
+
+	/**
+	 * R (a.k.a. Correlation).
+	 * @return The computed {@code R-squared}.
+	 */
+	public double R() {
+		return Math.sqrt(this.R2());
 	}
 
 	/**
@@ -88,7 +96,7 @@ abstract class UnivariateRegression {
 
 	/**
 	 * Norm of residuals. The square root of the sum of the squares of the residuals.
-	 * @return The {@link NumArrays#norm2(double[])} of the residuals}.
+	 * @return The {@link DoubleArrays#norm2(double[])} of the residuals}.
 	 */
 	public double normOfResiduals() {
 		return _rnorm;

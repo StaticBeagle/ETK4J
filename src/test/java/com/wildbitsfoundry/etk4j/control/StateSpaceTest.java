@@ -2,10 +2,10 @@ package com.wildbitsfoundry.etk4j.control;
 
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
-import com.wildbitsfoundry.etk4j.util.NumArrays;
+import com.wildbitsfoundry.etk4j.util.ComplexArrays;
+import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 import org.junit.Test;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 
 import static org.junit.Assert.assertArrayEquals;
@@ -149,7 +149,7 @@ public class StateSpaceTest {
 
     @Test
     public void testTimeResponse() {
-        double[] timePoints = NumArrays.linSpace(0.0, 15.0, 50);
+        double[] timePoints = DoubleArrays.linSpace(0.0, 15.0, 50);
 
         double[][] yOut = {
                 {
@@ -264,7 +264,7 @@ public class StateSpaceTest {
         });
         double[][] U = new double[2][timePoints.length];
         for (int i = 0; i < 2; ++i) {
-            U[i] = NumArrays.ones(timePoints.length);
+            U[i] = DoubleArrays.ones(timePoints.length);
         }
         StateSpace ss = new StateSpace(A, B, C, D);
         TimeResponse tr = ss.simulateTimeResponse(U, timePoints);
@@ -275,7 +275,7 @@ public class StateSpaceTest {
         assertArrayEquals(yOut[1], tr.getResponse()[1], 1e-12);
         assertArrayEquals(yOut[2], tr.getResponse()[2], 1e-12);
 
-        double[][] transposedStateVector = NumArrays.transpose(tr.getEvolutionOfStateVector());
+        double[][] transposedStateVector = DoubleArrays.transpose(tr.getEvolutionOfStateVector());
 
         assertArrayEquals(xOut[0], transposedStateVector[0], 1e-12);
         assertArrayEquals(xOut[1], transposedStateVector[1], 1e-12);
@@ -284,7 +284,7 @@ public class StateSpaceTest {
 
     @Test
     public void testTimeResponseWithInitialConditions() {
-        double[] timePoints = NumArrays.linSpace(0.0, 15.0, 50);
+        double[] timePoints = DoubleArrays.linSpace(0.0, 15.0, 50);
 
         double[][] yOut = {
                 {
@@ -400,7 +400,7 @@ public class StateSpaceTest {
         });
         double[][] U = new double[2][timePoints.length];
         for (int i = 0; i < 2; ++i) {
-            U[i] = NumArrays.ones(timePoints.length);
+            U[i] = DoubleArrays.ones(timePoints.length);
         }
         StateSpace ss = new StateSpace(A, B, C, D);
         double[] initialConditions = {1, 1, 1};
@@ -411,7 +411,7 @@ public class StateSpaceTest {
         assertArrayEquals(yOut[1], tr.getResponse()[1], 1e-12);
         assertArrayEquals(yOut[2], tr.getResponse()[2], 1e-12);
 
-        double[][] transposedStateVector = NumArrays.transpose(tr.getEvolutionOfStateVector());
+        double[][] transposedStateVector = DoubleArrays.transpose(tr.getEvolutionOfStateVector());
 
         assertArrayEquals(xOut[0], transposedStateVector[0], 1e-12);
         assertArrayEquals(xOut[1], transposedStateVector[1], 1e-12);
@@ -426,7 +426,29 @@ public class StateSpaceTest {
         double[][] D = {{1}};
 
         StateSpace ss = new StateSpace(A, B, C, D);
-        Complex[] out = ss.evaluateAt(100);
+        Complex out = ss.evaluateAt(100);
+        assertEquals(1.0000000199960006, out.real(), 1e-12);
+        assertEquals(-0.010000999700049994, out.imag(), 1e-12);
+
+        A = new double[][]{{-2, -1, 3}, {1, 0, 5}, {4, 5, 10}};
+        B = new double[][]{{1, 2, 4}, {0, 6, 7}, {9, 10, 22}};
+        C = new double[][]{{1, 2, 0}, {0, 1, 0}, {0, 0, 1}};
+        D = new double[][]{{0, 0, 1}, {2, 3, 4}, {5, 6, 7}};
+
+        ss = new StateSpace(A, B, C, D);
+        Complex result = new Complex(-0.011542373908342127, -0.008843720085419242);
+        assertEquals(result, ss.evaluateAt(100));
+    }
+
+    @Test
+    public void testEvaluateMIMOAt() {
+        double[][] A = {{-2, -1}, {1, 0}};
+        double[][] B = {{1}, {0}};
+        double[][] C = {{1, 2}};
+        double[][] D = {{1}};
+
+        StateSpace ss = new StateSpace(A, B, C, D);
+        Complex[] out = ss.evaluateMIMOAt(100);
         assertEquals(1.0000000199960006, out[0].real(), 1e-12);
         assertEquals(-0.010000999700049994, out[0].imag(), 1e-12);
 
@@ -445,7 +467,100 @@ public class StateSpaceTest {
                 new Complex(0.9725318695647737, -0.17664584358826158),
                 new Complex(3.988777297177795, -0.06861654835210704),
                 new Complex(6.973335512000304, -0.21657150706728753)};
-        assertArrayEquals(result, ss.evaluateAt(100));
+        assertArrayEquals(result, ss.evaluateMIMOAt(100));
+    }
+
+    @Test
+    public void testCalculateMagnitudeMIMOAt() {
+        double[][] A = {{-2, -1}, {1, 0}};
+        double[][] B = {{1}, {0}};
+        double[][] C = {{1, 2}};
+        double[][] D = {{1}};
+
+        StateSpace ss = new StateSpace(A, B, C, D);
+        double[][] out = ss.calculateMagnitudeMIMOAt(new double[]{100});
+        assertEquals(1.000050028742064, out[0][0], 1e-12);
+
+        A = new double[][]{{-2, -1, 3}, {1, 0, 5}, {4, 5, 10}};
+        B = new double[][]{{1, 2, 4}, {0, 6, 7}, {9, 10, 22}};
+        C = new double[][]{{1, 2, 0}, {0, 1, 0}, {0, 0, 1}};
+        D = new double[][]{{0, 0, 1}, {2, 3, 4}, {5, 6, 7}};
+
+        ss = new StateSpace(A, B, C, D);
+        Complex[] result = {new Complex(-0.011542373908342127, -0.008843720085419242),
+                new Complex(1.9954643232641387, 4.86878158958262E-4),
+                new Complex(4.990756640908159, -0.08875003943655803),
+                new Complex(-0.012186972440090565, -0.1382853147258124),
+                new Complex(2.9948877925087123, -0.0593012177526939),
+                new Complex(5.986416866545381, -0.09830757398167314),
+                new Complex(0.9725318695647737, -0.17664584358826158),
+                new Complex(3.988777297177795, -0.06861654835210704),
+                new Complex(6.973335512000304, -0.21657150706728753)};
+        double[] magnitude = Arrays.stream(result).mapToDouble(Complex::abs).toArray();
+        double[][] actual = ss.calculateMagnitudeMIMOAt(new double[]{100});
+        assertArrayEquals(magnitude, DoubleArrays.transpose(actual)[0], 1e-12);
+    }
+
+    @Test
+    public void testCalculatePhaseMIMOAt() {
+        double[][] A = {{-2, -1}, {1, 0}};
+        double[][] B = {{1}, {0}};
+        double[][] C = {{1, 2}};
+        double[][] D = {{1}};
+
+        StateSpace ss = new StateSpace(A, B, C, D);
+        double[][] out = ss.calculatePhaseMIMOAt(new double[]{100});
+        assertEquals(new Complex(1.0000000199960006, -0.010000999700049994).arg(), out[0][0], 1e-12);
+
+        A = new double[][]{{-2, -1, 3}, {1, 0, 5}, {4, 5, 10}};
+        B = new double[][]{{1, 2, 4}, {0, 6, 7}, {9, 10, 22}};
+        C = new double[][]{{1, 2, 0}, {0, 1, 0}, {0, 0, 1}};
+        D = new double[][]{{0, 0, 1}, {2, 3, 4}, {5, 6, 7}};
+
+        ss = new StateSpace(A, B, C, D);
+        Complex[] result = {new Complex(-0.011542373908342127, -0.008843720085419242),
+                new Complex(1.9954643232641387, 4.86878158958262E-4),
+                new Complex(4.990756640908159, -0.08875003943655803),
+                new Complex(-0.012186972440090565, -0.1382853147258124),
+                new Complex(2.9948877925087123, -0.0593012177526939),
+                new Complex(5.986416866545381, -0.09830757398167314),
+                new Complex(0.9725318695647737, -0.17664584358826158),
+                new Complex(3.988777297177795, -0.06861654835210704),
+                new Complex(6.973335512000304, -0.21657150706728753)};
+        double[] phase = Arrays.stream(result).mapToDouble(Complex::arg).toArray();
+        double[][] actual = ss.calculatePhaseMIMOAt(new double[]{100});
+        assertArrayEquals(phase, DoubleArrays.transpose(actual)[0], 1e-12);
+    }
+
+    @Test
+    public void testCalculatePhaseInDegreesMIMOAt() {
+        double[][] A = {{-2, -1}, {1, 0}};
+        double[][] B = {{1}, {0}};
+        double[][] C = {{1, 2}};
+        double[][] D = {{1}};
+
+        StateSpace ss = new StateSpace(A, B, C, D);
+        double[][] out = ss.calculatePhaseInDegreesMIMOAt(new double[]{100});
+        assertEquals(Math.toDegrees(new Complex(1.0000000199960006, -0.010000999700049994).arg()), out[0][0], 1e-12);
+
+        A = new double[][]{{-2, -1, 3}, {1, 0, 5}, {4, 5, 10}};
+        B = new double[][]{{1, 2, 4}, {0, 6, 7}, {9, 10, 22}};
+        C = new double[][]{{1, 2, 0}, {0, 1, 0}, {0, 0, 1}};
+        D = new double[][]{{0, 0, 1}, {2, 3, 4}, {5, 6, 7}};
+
+        ss = new StateSpace(A, B, C, D);
+        Complex[] result = {new Complex(-0.011542373908342127, -0.008843720085419242),
+                new Complex(1.9954643232641387, 4.86878158958262E-4),
+                new Complex(4.990756640908159, -0.08875003943655803),
+                new Complex(-0.012186972440090565, -0.1382853147258124),
+                new Complex(2.9948877925087123, -0.0593012177526939),
+                new Complex(5.986416866545381, -0.09830757398167314),
+                new Complex(0.9725318695647737, -0.17664584358826158),
+                new Complex(3.988777297177795, -0.06861654835210704),
+                new Complex(6.973335512000304, -0.21657150706728753)};
+        double[] phase = Arrays.stream(result).mapToDouble(c -> Math.toDegrees(c.arg())).toArray();
+        double[][] actual = ss.calculatePhaseInDegreesMIMOAt(new double[]{100});
+        assertArrayEquals(phase, DoubleArrays.transpose(actual)[0], 1e-12);
     }
 
     @Test

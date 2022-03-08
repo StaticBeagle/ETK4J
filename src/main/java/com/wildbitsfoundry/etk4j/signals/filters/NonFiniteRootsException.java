@@ -1,7 +1,7 @@
 package com.wildbitsfoundry.etk4j.signals.filters;
 
 /**
- * The {@code NonFiniteRootsException} class is thrown when a collection of arrays contain complex values that are not
+ * The {@code NonFiniteRootsException} class is thrown when a collection of complex values contain values that are not
  * finite.
  */
 public class NonFiniteRootsException extends RuntimeException {

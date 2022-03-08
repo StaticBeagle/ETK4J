@@ -4,7 +4,7 @@ import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
 import com.wildbitsfoundry.etk4j.math.functions.MultivariateFunction;
 import com.wildbitsfoundry.etk4j.math.solvers.multivariate.SolverResults.SolverStatus;
 import com.wildbitsfoundry.etk4j.math.solvers.multivariate.SolverUtils.LU;
-import com.wildbitsfoundry.etk4j.util.NumArrays;
+import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 
 public class NewtonRaphson implements MultivariateSolver {
 	
@@ -148,7 +148,7 @@ public class NewtonRaphson implements MultivariateSolver {
 				return buildResults(xfinal, SolverStatus.SUCCESS, _maxIter - maxiter, error);
 			}
 
-			if (!Double.isNaN(maxval) && Double.compare(NumArrays.normInf(xfinal), maxval) >= 0) {
+			if (!Double.isNaN(maxval) && Double.compare(DoubleArrays.normInf(xfinal), maxval) >= 0) {
 				double error = this.estimateError(xfinal, xcurrent);
 				return buildResults(xfinal, SolverStatus.MAX_ABS_VALUE_EXCEEDED, _maxIter - maxiter, error);
 			}

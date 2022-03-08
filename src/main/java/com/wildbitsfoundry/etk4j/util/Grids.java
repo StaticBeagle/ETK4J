@@ -24,9 +24,9 @@ public final class Grids {
 			final int yl = y.length;			
 
 			// Build grid
-			x = NumArrays.repeat(x, yl);
+			x = DoubleArrays.repeat(x, yl);
 
-			y = NumArrays.repeat(y, xl);
+			y = DoubleArrays.repeat(y, xl);
 			Arrays.sort(y);
 			return new GridData(x, y, yl, xl);
 		}

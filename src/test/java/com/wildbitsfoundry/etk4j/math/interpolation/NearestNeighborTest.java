@@ -1,6 +1,6 @@
 package com.wildbitsfoundry.etk4j.math.interpolation;
 
-import com.wildbitsfoundry.etk4j.util.NumArrays;
+import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -11,11 +11,11 @@ public class NearestNeighborTest {
 
     @Test
     public void testInterpolation() {
-        double[] x = NumArrays.linSteps(0, 4, 0.5);
+        double[] x = DoubleArrays.linSteps(0, 4, 0.5);
         double[] y = Arrays.stream(x).map(v -> v * v).toArray();
 
         NearestNeighbor nh = NearestNeighbor.newNearestNeighbor(x, y);
-        double[] xi = NumArrays.linSteps(0, 4, 0.05);
+        double[] xi = DoubleArrays.linSteps(0, 4, 0.05);
         double[] expected = {0.0, 0.0, 0.0, 0.0, 0.0, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 1.0,
                 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.25, 2.25, 2.25, 2.25, 2.25, 2.25, 2.25, 2.25, 2.25, 2.25,
                 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 6.25, 6.25, 6.25, 6.25, 6.25, 6.25, 6.25, 6.25, 6.25,

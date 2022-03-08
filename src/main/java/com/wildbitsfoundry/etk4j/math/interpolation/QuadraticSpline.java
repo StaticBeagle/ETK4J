@@ -1,6 +1,6 @@
 package com.wildbitsfoundry.etk4j.math.interpolation;
 
-import com.wildbitsfoundry.etk4j.util.NumArrays;
+import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 
 import java.util.Arrays;
 
@@ -124,6 +124,6 @@ public class QuadraticSpline extends Spline {
 
         CubicSpline cs = CubicSpline.newNotAKnotSpline(x, y);
 
-        System.out.println(Arrays.toString(cs.evaluateAt(NumArrays.linSteps(0, 30))));
+        System.out.println(Arrays.toString(cs.evaluateAt(DoubleArrays.linSteps(0, 30))));
     }
 }

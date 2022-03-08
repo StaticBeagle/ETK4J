@@ -4,7 +4,7 @@ import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.functions.ComplexUnivariateFunction;
 import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
 import com.wildbitsfoundry.etk4j.util.ComplexArrays;
-import com.wildbitsfoundry.etk4j.util.NumArrays;
+import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 
 public class RationalFunction implements UnivariateFunction, ComplexUnivariateFunction {
     private Polynomial numerator;
@@ -33,8 +33,8 @@ public class RationalFunction implements UnivariateFunction, ComplexUnivariateFu
 
     public RationalFunction(double[] num, double[] den) {
         double factor = 1.0 / den[0];
-        num = NumArrays.multiplyElementWise(num, factor);
-        den = NumArrays.multiplyElementWise(den, factor);
+        num = DoubleArrays.multiplyElementWise(num, factor);
+        den = DoubleArrays.multiplyElementWise(den, factor);
         numerator = new Polynomial(num);
         denominator = new Polynomial(den);
     }

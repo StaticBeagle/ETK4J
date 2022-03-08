@@ -98,20 +98,6 @@ public final class ComplexArrays {
         return result;
     }
 
-    public static double[] abs(Complex[] a) {
-        if (a.length == 0) {
-            return new double[0];
-        }
-        if (a == null) {
-            return null;
-        }
-        double[] result = new double[a.length];
-        for (int i = 0; i < a.length; ++i) {
-            result[i] = a[i].abs();
-        }
-        return result;
-    }
-
     public static Complex[] zip(double[] real, double[] imag) {
         checkXYDimensions(real, imag);
         final int length = real.length;
@@ -120,19 +106,6 @@ public final class ComplexArrays {
             c[i] = new Complex(real[i], imag[i]);
         }
         return c;
-    }
-
-    /***
-     *
-     * @param a
-     * @return
-     */
-    public static Complex[] conj(Complex[] a) {
-        Complex[] result = new Complex[a.length];
-        for (int i = 0; i < a.length; ++i) {
-            result[i] = a[i].conj();
-        }
-        return result;
     }
 
     public static Complex mean(Complex[] a) {
@@ -192,15 +165,6 @@ public final class ComplexArrays {
         Complex[] result = new Complex[aLength];
         for(int i = 0; i < aLength; ++i) {
             result[i] = a[i].add(b[i]);
-        }
-        return result;
-    }
-    // endregion
-    public static Complex[] reverse(Complex[] a) {
-        final int length = a.length;
-        Complex[] result = new Complex[length];
-        for (int i = 0; i < length; ++i) {
-            result[length - i - 1] = a[i];
         }
         return result;
     }
@@ -291,30 +255,6 @@ public final class ComplexArrays {
         Integer[] indexes = IntStream.range(0, a.length).boxed().toArray(Integer[]::new);
         Arrays.sort(indexes, Comparator.comparing(i -> a[i]));
         return Arrays.stream(indexes).mapToInt(Integer::intValue).toArray();
-    }
-
-    public static void main(String[] args) {
-        Complex[] a = new Complex[]{
-                Complex.fromReal(4.0),
-                Complex.fromReal(3.0),
-                Complex.fromReal(1.0),
-                new Complex(2, -2),
-                new Complex(2, 2),
-                new Complex(2, -1),
-                new Complex(2, 1),
-                new Complex(2, -1),
-                new Complex(2, 1),
-                new Complex(1, 1),
-                new Complex(1, -1)
-        };
-
-        //Complex[] b = remove(a, 3);
-        System.out.println(Arrays.toString(a));
-        //System.out.println(Arrays.toString(b));
-        //Complex[] c = remove(a, new Complex(2, 2));
-        //System.out.println(Arrays.toString(c));
-
-        System.out.println(Arrays.toString(argSort(a)));
     }
 
     public static Complex[] subtract(Complex[] a, Complex c) {

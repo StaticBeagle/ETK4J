@@ -1,10 +1,7 @@
 package com.wildbitsfoundry.etk4j.math.interpolation;
 
-import com.wildbitsfoundry.etk4j.util.NumArrays;
+import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 import org.junit.Test;
-
-import java.lang.reflect.Array;
-import java.util.Arrays;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -22,7 +19,7 @@ public class QuadraticSplineZeroCenteredTest {
                 332.0768, 362.78, 394.2363999999999, 425.4216, 456.3356, 486.97839999999997, 517.35, 549.1908000000001,
                 584.2412000000002, 622.1522222222222, 660.8299999999999, 699.9255555555555, 739.438888888889,
                 779.3700000000001, 819.718888888889, 860.4855555555556, 901.6700000000001};
-        assertArrayEquals(expected, qs.evaluateAt(NumArrays.linSteps(0, 30)), 1e-12);
+        assertArrayEquals(expected, qs.evaluateAt(DoubleArrays.linSteps(0, 30)), 1e-12);
 
         assertEquals(394.2363999999999, qs.evaluateAt(16.0), 1e-12);
         assertEquals(31.3208, qs.differentiate(16.0), 1e-12);

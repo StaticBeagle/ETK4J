@@ -8,7 +8,7 @@ import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
 import com.wildbitsfoundry.etk4j.util.ComplexArrays;
-import com.wildbitsfoundry.etk4j.util.NumArrays;
+import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 
 import static com.wildbitsfoundry.etk4j.math.MathETK.frexp;
 import static com.wildbitsfoundry.etk4j.math.linearalgebra.Matrices.fwdSubsSolve;
@@ -49,7 +49,7 @@ public class Matrix {
     public Matrix(double[][] data) {
         rows = data.length;
         cols = data[0].length;
-        this.data = NumArrays.flatten(data);
+        this.data = DoubleArrays.flatten(data);
     }
 
     // row packed
@@ -562,7 +562,7 @@ public class Matrix {
 
     public Matrix arrayMultiply(Matrix m) {
         checkMatrixDimensions(m);
-        return new Matrix(NumArrays.multiplyElementWise(data, m.data), rows, cols);
+        return new Matrix(DoubleArrays.multiplyElementWise(data, m.data), rows, cols);
     }
 
     /**
@@ -574,7 +574,7 @@ public class Matrix {
 
     public void arrayMultiplyEquals(Matrix m) {
         checkMatrixDimensions(m);
-        NumArrays.multiplyElementWiseInPlace(data, m.data);
+        DoubleArrays.multiplyElementWiseInPlace(data, m.data);
     }
 
     /**
@@ -586,7 +586,7 @@ public class Matrix {
 
     public Matrix arrayRightDivide(Matrix m) {
         checkMatrixDimensions(m);
-        return new Matrix(NumArrays.divideElementWise(data, m.data), rows, cols);
+        return new Matrix(DoubleArrays.divideElementWise(data, m.data), rows, cols);
     }
 
     /**
@@ -598,7 +598,7 @@ public class Matrix {
 
     public void arrayRightDivideEquals(Matrix m) {
         checkMatrixDimensions(m);
-        NumArrays.divideElementWiseInPlace(data, m.data);
+        DoubleArrays.divideElementWiseInPlace(data, m.data);
     }
 
     /**
@@ -649,7 +649,7 @@ public class Matrix {
      */
 
     public Matrix multiply(double s) {
-        return new Matrix(NumArrays.multiplyElementWise(data, s), rows, cols);
+        return new Matrix(DoubleArrays.multiplyElementWise(data, s), rows, cols);
     }
 
     /**
@@ -671,7 +671,7 @@ public class Matrix {
      */
 
     public void multiplyEquals(double s) {
-        NumArrays.multiplyElementWiseInPlace(data, s);
+        DoubleArrays.multiplyElementWiseInPlace(data, s);
     }
 
     public Matrix multiply(Matrix matrix) {

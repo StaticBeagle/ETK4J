@@ -6,14 +6,13 @@ import java.util.stream.IntStream;
 
 import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.interpolation.CubicSpline;
-import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
 
 /**
- * The {@code NumArrays} class provides methods to manipulate arrays of native {@code double} values.
+ * The {@code DoubleArrays} utility class provides methods to manipulate arrays of native {@code double} values.
  */
-public final class NumArrays {
+public final class DoubleArrays {
 
-    private NumArrays() {
+    private DoubleArrays() {
     }
 
     /***
@@ -364,10 +363,10 @@ public final class NumArrays {
         int bLength = b.length;
         double[] c = new double[aLength * bLength];
         if (a.length == 1) {
-            return NumArrays.multiplyElementWise(b, a[0]);
+            return DoubleArrays.multiplyElementWise(b, a[0]);
         }
         if (b.length == 1) {
-            return NumArrays.multiplyElementWise(a, b[0]);
+            return DoubleArrays.multiplyElementWise(a, b[0]);
         }
         for (int i = 0; i < aLength; i++) {
             for (int j = 0; j < bLength; j++) {

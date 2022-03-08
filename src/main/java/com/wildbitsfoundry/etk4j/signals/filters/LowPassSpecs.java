@@ -1,5 +1,8 @@
 package com.wildbitsfoundry.etk4j.signals.filters;
 
+/**
+ * The {@code LowPassSpecs} class represents the design specifications for a low pass filter.
+ */
 public class LowPassSpecs {
 
     private double passBandFrequency;
@@ -20,6 +23,10 @@ public class LowPassSpecs {
         return passBandFrequency;
     }
 
+    /**
+     * Pass band (cutoff) frequency.
+     * @param passBandFrequency The pass band frequency in radians per second (rad/s).
+     */
     public void setPassBandFrequency(double passBandFrequency) {
         this.passBandFrequency = passBandFrequency;
     }
@@ -28,6 +35,10 @@ public class LowPassSpecs {
         return stopBandFrequency;
     }
 
+    /**
+     * Stop band frequency.
+     * @param stopBandFrequency The stop band frequency in radians per second (rad/s).
+     */
     public void setStopBandFrequency(double stopBandFrequency) {
         this.stopBandFrequency = stopBandFrequency;
     }
@@ -36,6 +47,10 @@ public class LowPassSpecs {
         return passBandRipple;
     }
 
+    /**
+     * The pass band ripple.
+     * @param passBandRipple Pass band ripple in decibels (dB). This value must be greater than zero.
+     */
     public void setPassBandRipple(double passBandRipple) {
         this.passBandRipple = passBandRipple;
     }
@@ -44,19 +59,32 @@ public class LowPassSpecs {
         return stopBandAttenuation;
     }
 
+    /**
+     * The stop band attenuation.
+     * @param stopBandAttenuation Stop band attenuation in decibels (dB). This value must be greater than zero.
+     */
     public void setStopBandAttenuation(double stopBandAttenuation) {
         this.stopBandAttenuation = stopBandAttenuation;
     }
 
     void validate() {
-        if (passBandRipple < 0) {
-            throw new IllegalArgumentException("The pass band ripple cannot be less than zero.");
+        if(passBandFrequency <= 0) {
+            throw new IllegalArgumentException("The pass band frequency must be grater than zero.");
         }
-        if (stopBandAttenuation < 0) {
-            throw new IllegalArgumentException("The stop band attenuation cannot be less than zero.");
+        if(stopBandFrequency <= 0) {
+            throw new IllegalArgumentException("The stop band frequency must be grater than zero.");
         }
-        if(passBandRipple >= stopBandAttenuation) {
-            throw new IllegalArgumentException("The stop band attenuation has to be greater than the pass band ripple.");
+        if(passBandRipple <= 0) {
+            throw new IllegalArgumentException("The pass band ripple must be grater than zero.");
+        }
+        if(stopBandAttenuation <= 0) {
+            throw new IllegalArgumentException("The stop band attenuation must be grater than zero.");
+        }
+        if(stopBandAttenuation < passBandRipple) {
+            throw new IllegalArgumentException("The stop band attenuation has to be greater than the pass band ripple");
+        }
+        if(stopBandFrequency <= passBandFrequency) {
+            throw new IllegalArgumentException("The stop band frequency has to be greater than the pass band frequency");
         }
     }
 }

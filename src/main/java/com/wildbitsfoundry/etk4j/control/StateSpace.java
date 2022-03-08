@@ -2,11 +2,9 @@ package com.wildbitsfoundry.etk4j.control;
 
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.ComplexMatrix;
-import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrices;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.NonSquareMatrixException;
-import com.wildbitsfoundry.etk4j.util.ComplexArrays;
-import com.wildbitsfoundry.etk4j.util.NumArrays;
+import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 
 import java.util.Arrays;
 
@@ -144,7 +142,7 @@ public class StateSpace extends LinearTimeInvariantSystem {
             double[] Ck = C.getRow(k);
             double Dk = Dd.get(k, 0);
             num[k] = A.subtract(new Matrix(dot(Bb.getArray(), Ck))).poly();
-            NumArrays.addElementWiseInPlace(num[k], NumArrays.multiplyElementWise(den, Dk - 1));
+            DoubleArrays.addElementWiseInPlace(num[k], DoubleArrays.multiplyElementWise(den, Dk - 1));
             tfs[k] = new TransferFunction(num[k], den);
         }
         return tfs;
@@ -153,7 +151,7 @@ public class StateSpace extends LinearTimeInvariantSystem {
     private static double[][] dot(double[] a, double[] b) {
         double[][] result = new double[a.length][b.length];
         for(int i = 0; i < a.length; ++i) {
-            result[i] = NumArrays.multiplyElementWise(b, a[i]);
+            result[i] = DoubleArrays.multiplyElementWise(b, a[i]);
         }
         return result;
     }
@@ -241,14 +239,97 @@ public class StateSpace extends LinearTimeInvariantSystem {
         return lsim(input, time, initialConditions, this, integrationMethod);
     }
 
+    @Override
+    public Complex evaluateAt(double w) {
+        return evaluateMIMOAt(w)[0];
+    }
+
     /**
      * Evaluate the system at a given frequency.
      * @param w The frequency at which to evaluate the system.
      * @return The complex frequency response of the system.
      */
-    public Complex[] evaluateAt(double w) {
+    public Complex[] evaluateMIMOAt(double w) {
         ComplexMatrix inner = Matrix.identity(A.getRowCount()).multiply(Complex.fromImaginary(w)).subtract(A).inv();
         ComplexMatrix outer = C.multiply(inner).multiply(B);
         return ComplexMatrix.fromRealMatrix(D).add(outer).transpose().getArray();
+    }
+
+    /**
+     * Magnitude of the system.
+     * @param w Argument at which to evaluate the function.
+     * @return The absolute value of the complex response.
+     */
+    public double[] calculateMagnitudeMIMOAt(double w) {
+        return Arrays.stream(evaluateMIMOAt(w)).mapToDouble(Complex::abs).toArray();
+    }
+
+    /**
+     * Magnitude of the system.
+     * @param w Argument at which to evaluate the function.
+     * @return The absolute value of the complex response. Each row in the output represents one I/O combination.
+     */
+    public double[][] calculateMagnitudeMIMOAt(double[] w) {
+        int dim = D.getRowCount() * D.getColumnCount();
+        double[][] result = new double[dim][w.length];
+        for (int i = 0; i < w.length; ++i) {
+            double[] magnitude = this.calculateMagnitudeMIMOAt(w[i]);
+            for(int j = 0; j < dim; ++j) {
+                result[j][i] = magnitude[j];
+            }
+        }
+        return result;
+    }
+
+    /***
+     * Calculate the system wrapped phase response.
+     * @param w the frequencies where the phase needs to be calculated at.
+     * @return The phase response of the system in rad/s.
+     */
+    public double[] calculatePhaseMIMOAt(double w) {
+        return Arrays.stream(evaluateMIMOAt(w)).mapToDouble(Complex::arg).toArray();
+    }
+
+    /***
+     * Calculate the system wrapped phase response. 
+     * @param w the frequencies where the phase needs to be calculated at.
+     * @return The phase response of the system in rad/s. Each row in the output represents one I/O combination.
+     */
+    public double[][] calculatePhaseMIMOAt(double[] w) {
+        int dim = D.getRowCount() * D.getColumnCount();
+        double[][] result = new double[dim][w.length];
+        for (int i = 0; i < w.length; ++i) {
+            double[] phase = this.calculatePhaseMIMOAt(w[i]);
+            for(int j = 0; j < dim; ++j) {
+                result[j][i] = phase[j];
+            }
+        }
+        return result;
+    }
+
+    /***
+     * Calculate the system wrapped phase response.
+     * @param w the frequency where the phase needs to be calculated at.
+     * @return The phase response of the system in degrees.
+     */
+    public double[] calculatePhaseInDegreesMIMOAt(double w) {
+        return Arrays.stream(evaluateMIMOAt(w)).mapToDouble(c -> Math.toDegrees(c.arg())).toArray();
+    }
+
+    /***
+     * Calculate the system wrapped phase response.
+     * @param w the frequencies where the phase needs to be calculated at.
+     * @return The phase response of the system in degrees. Each row in the output represents one I/O combination.
+     */
+    public double[][] calculatePhaseInDegreesMIMOAt(double[] w) {
+        int dim = D.getRowCount() * D.getColumnCount();
+        double[][] result = new double[dim][w.length];
+        for (int i = 0; i < w.length; ++i) {
+            double[] phase = this.calculatePhaseInDegreesMIMOAt(w[i]);
+            for(int j = 0; j < dim; ++j) {
+                result[j][i] = phase[j];
+            }
+        }
+        return result;
     }
 }

@@ -1,7 +1,7 @@
 package com.wildbitsfoundry.etk4j.math.interpolation;
 
 import com.wildbitsfoundry.etk4j.math.extrapolation.ExtrapolationMethod;
-import com.wildbitsfoundry.etk4j.util.NumArrays;
+import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -49,7 +49,7 @@ public class LinearSplineTest {
 		double[] x = new double[]{0.0, 10.0, 15.0, 20.0, 22.5, 30.0};
 		double[] y = new double[]{0.0, 227.04, 362.78, 517.35, 602.97, 901.67};
 		ls = LinearSpline.newLinearSpline(x, y);
-		assertArrayEquals(expected, ls.evaluateAt(NumArrays.linSteps(0, 30)), 1e-12);
+		assertArrayEquals(expected, ls.evaluateAt(DoubleArrays.linSteps(0, 30)), 1e-12);
 
 		assertEquals(393.69399999999996, ls.evaluateAt(16.0), 1e-12);
 		assertEquals(30.91400000000001, ls.differentiate(16.0), 1e-12);

@@ -4,7 +4,7 @@ import java.util.Arrays;
 import com.wildbitsfoundry.etk4j.math.functions.BivariateFunction;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
 import com.wildbitsfoundry.etk4j.util.Grids;
-import com.wildbitsfoundry.etk4j.util.NumArrays;
+import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 
 public class Polynomial2d implements BivariateFunction {
 	private double[] _coefs;
@@ -75,7 +75,7 @@ public class Polynomial2d implements BivariateFunction {
 		vars[1] = gd.Y;
 
 		int[] nm = new int[] { n, m };
-		double[] coefs = polyfitN(vars, NumArrays.flatten(z), nm);
+		double[] coefs = polyfitN(vars, DoubleArrays.flatten(z), nm);
 		return new Polynomial2d(coefs, n, m);
 	}
 
@@ -95,7 +95,7 @@ public class Polynomial2d implements BivariateFunction {
 			vandermonde[i] = buildPowerSeriesDescending(vars[k][i], degrees[k]);
 			for (int j = k - 1; j >= 0; --j) {
 				double[] tmp = buildPowerSeriesDescending(vars[j][i], degrees[j]);
-				vandermonde[i] = NumArrays.kronecker(vandermonde[i], tmp);
+				vandermonde[i] = DoubleArrays.kronecker(vandermonde[i], tmp);
 			}
 		}
 

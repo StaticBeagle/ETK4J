@@ -11,7 +11,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import com.wildbitsfoundry.etk4j.util.NumArrays;
+import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 
 public class Polynomial2dTest {
 	static double[] x;
@@ -64,11 +64,11 @@ public class Polynomial2dTest {
 	@Test
 	public void testPolynomial2dFlatPolyFit() {
 		int length = z.length;
-		double[] xx = NumArrays.repeat(x, length);
-		double[] yy = NumArrays.repeat(y, length);
+		double[] xx = DoubleArrays.repeat(x, length);
+		double[] yy = DoubleArrays.repeat(y, length);
 		Arrays.sort(yy);
 
-		double[] zz = NumArrays.flatten(z);
+		double[] zz = DoubleArrays.flatten(z);
 		Polynomial2d poly = polyFit2d(xx, yy, zz, 2, 2);
 
 		double yi = poly.evaluateAt(xiyi[0][0], xiyi[0][1]);

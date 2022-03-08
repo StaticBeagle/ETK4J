@@ -7,7 +7,7 @@ import com.wildbitsfoundry.etk4j.math.interpolation.CubicSpline;
 import com.wildbitsfoundry.etk4j.math.interpolation.Interpolation;
 import com.wildbitsfoundry.etk4j.math.interpolation.LinearSpline;
 import com.wildbitsfoundry.etk4j.math.interpolation.Spline;
-
+// TODO document
 /**
  *
  */

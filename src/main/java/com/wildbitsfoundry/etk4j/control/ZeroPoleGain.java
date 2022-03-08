@@ -82,6 +82,7 @@ public class ZeroPoleGain extends LinearTimeInvariantSystem {
      * @param w The frequency at which to evaluate the system.
      * @return The complex frequency response of the system.
      */
+    @Override
     public Complex evaluateAt(double w) {
         Complex num = Polynomial.polyvalFromRoots(zeros, Complex.fromImaginary(w));
         Complex den = Polynomial.polyvalFromRoots(poles, Complex.fromImaginary(w));

@@ -1,6 +1,6 @@
 package com.wildbitsfoundry.etk4j.math.linearalgebra;
 
-import com.wildbitsfoundry.etk4j.util.NumArrays;
+import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 
 /**
  * Cholesky Decomposition.
@@ -148,7 +148,7 @@ public class CholeskyDecomposition {
 	 */
 
 	public Matrix getL() {
-		return new Matrix(NumArrays.flatten(L), _n, _n);
+		return new Matrix(DoubleArrays.flatten(L), _n, _n);
 	}
 
 	/**

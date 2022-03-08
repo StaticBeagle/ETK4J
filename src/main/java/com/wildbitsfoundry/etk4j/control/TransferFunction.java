@@ -3,12 +3,11 @@ package com.wildbitsfoundry.etk4j.control;
 import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
 import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
-import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrices;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
 import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
 import com.wildbitsfoundry.etk4j.math.polynomials.RationalFunction;
 import com.wildbitsfoundry.etk4j.util.ComplexArrays;
-import com.wildbitsfoundry.etk4j.util.NumArrays;
+import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 
 import java.util.Arrays;
 
@@ -186,74 +185,9 @@ public class TransferFunction extends LinearTimeInvariantSystem {
      * @param w The frequency at which to evaluate the system.
      * @return The complex frequency response of the system.
      */
+    @Override
     public Complex evaluateAt(double w) {
         return rf.evaluateAt(0.0, w);
-    }
-
-    /**
-     * Magnitude of the system.
-     * @param w Argument at which to evaluate the function.
-     * @return The absolute value of the complex response.
-     */
-    public double calculateMagnitudeAt(double w) {
-        return this.evaluateAt(w).abs();
-    }
-
-    /**
-     * Magnitude of the system.
-     * @param w Argument at which to evaluate the function.
-     * @return The absolute value of the complex response.
-     */
-    public double[] calculateMagnitudeAt(double[] w) {
-        double[] magnitude = new double[w.length];
-        for (int i = 0; i < w.length; ++i) {
-            magnitude[i] = this.calculateMagnitudeAt(w[i]);
-        }
-        return magnitude;
-    }
-
-    /***
-     * Calculate the system wrapped phase response.
-     * @param w the frequencies where the phase needs to be calculated at.
-     * @return The phase response of the system in rad / s.
-     */
-    public double calculatePhaseAt(double w) {
-        return this.evaluateAt(w).arg();
-    }
-
-    /***
-     * Calculate the system wrapped phase response.
-     * @param w the frequencies where the phase needs to be calculated at.
-     * @return The phase response of the system in rad / s.
-     */
-    public double[] calculatePhaseAt(double[] w) {
-        double[] phase = new double[w.length];
-        for (int i = 0; i < w.length; ++i) {
-            phase[i] = this.calculatePhaseAt(w[i]);
-        }
-        return phase;
-    }
-
-    /***
-     * Calculate the system wrapped phase response.
-     * @param w the frequency where the phase needs to be calculated at.
-     * @return The phase response of the system in degrees.
-     */
-    public double calculatePhaseInDegreesAt(double w) {
-        return Math.toDegrees(this.evaluateAt(w).arg());
-    }
-
-    /***
-     * Calculate the system wrapped phase response.
-     * @param w the frequencies where the phase needs to be calculated at.
-     * @return The phase response of the system in degrees.
-     */
-    public double[] calculatePhaseInDegreesAt(double[] w) {
-        double[] phase = new double[w.length];
-        for (int i = 0; i < w.length; ++i) {
-            phase[i] = this.calculatePhaseInDegreesAt(w[i]);
-        }
-        return phase;
     }
 
     /***
@@ -305,170 +239,6 @@ public class TransferFunction extends LinearTimeInvariantSystem {
             }
         }
         return phase;
-    }
-
-    /**
-     * Frequency response of the system. The default value for the number of points is 200.
-     * @return The complex frequency response of the system and the frequency at which each point was calculated.
-     */
-    public FrequencyResponse calculateFrequencyResponse() {
-        return this.calculateFrequencyResponse(200);
-    }
-
-    /**
-     * Frequency response of the system.
-     * @param numberOfPoints The number of points in which to evaluate the system.
-     * @return The complex frequency response of the system and the frequency at which each point was calculated.
-     */
-    public FrequencyResponse calculateFrequencyResponse(int numberOfPoints) {
-        double[] frequencies = findFrequencies(numberOfPoints);
-        return this.calculateFrequencyResponse(frequencies);
-    }
-
-    /**
-     * Frequency response of the system.
-     * @param w The frequencies at which to evaluate the system.
-     * @return The frequency response of the system at each given frequency.
-     */
-    public FrequencyResponse calculateFrequencyResponse(double[] w) {
-        Complex[] response = new Complex[w.length];
-        for (int i = 0; i < w.length; ++i) {
-            response[i] = this.evaluateAt(w[i]);
-        }
-        return new FrequencyResponse(response, w);
-    }
-
-    /**
-     * Bode response of the system.
-     * @return The magnitude in dB and phase in degrees of the system.
-     */
-    public BodeResponse calculateBode() {
-        return this.calculateBode(200);
-    }
-
-    /**
-     * Bode response of the system.
-     * @param numberOfPoints The number of points in which to evaluate the system.
-     * @return The magnitude in dB and phase in degrees of the system.
-     */
-    public BodeResponse calculateBode(int numberOfPoints) {
-        double[] frequencies = findFrequencies(numberOfPoints);
-        return this.calculateBode(frequencies);
-    }
-
-    /**
-     * Bode response of the system.
-     * @param w The frequencies at which to evaluate the system.
-     * @return The magnitude in dB and phase in degrees of the system.
-     */
-    public BodeResponse calculateBode(double[] w) {
-        double[] magnitudeIndB = new double[w.length];
-        double[] phaseInDegrees = new double[w.length];
-        for (int i = 0; i < w.length; ++i) {
-            magnitudeIndB[i] = 20 * Math.log10(this.calculateMagnitudeAt(w[i]));
-            phaseInDegrees[i] = this.evaluateAt(w[i]).arg() * (180 / Math.PI);
-        }
-        return new BodeResponse(magnitudeIndB, phaseInDegrees, w);
-    }
-
-    /**
-     * Helper method to find the "interesting frequencies" where the system is exhibiting change.
-     * @param numberOfPoints The number of points to calculate the frequency at.
-     * @return
-     */
-    private double[] findFrequencies(int numberOfPoints) {
-        Complex[] ep = this.getPoles();
-        Complex[] tz = this.getZeros();
-
-        // TODO check if length of the poles == 0?
-        Complex[] ez = ComplexArrays.concatenate(
-                Arrays.stream(ep).filter(c -> c.imag() >= 0.0).toArray(Complex[]::new),
-                Arrays.stream(tz).filter(c -> c.abs() < 1e5 && c.imag() >= 0.0).toArray(Complex[]::new)
-        );
-        int[] integ = Arrays.stream(ez).mapToInt(c -> c.abs() < 1e-8 ? 1 : 0).toArray();
-        double[] argument = new double[ez.length];
-        for(int i = 0; i < argument.length; ++i) {
-            argument[i] = 3.0 * Math.abs(ez[i].real() + integ[i]) + 1.5 * ez[i].imag();
-        }
-        int hiFreq = roundFrequency(Math.log10(NumArrays.max(argument)) + 0.5);
-
-        for(int i = 0; i < argument.length; ++i) {
-            argument[i] = Math.abs(ez[i].add(integ[i]).real()) + 2 * ez[i].imag();
-        }
-        int loFreq = roundFrequency(Math.log10(0.1 * NumArrays.min(argument)) - 0.5);
-
-        return NumArrays.logSpace(loFreq, hiFreq, numberOfPoints);
-    }
-
-    private static int roundFrequency(double d) {
-        // get numbers after the decimal point
-        double decimal = d - Math.floor(d);
-        if(Math.abs(decimal) == 0.5) {
-            return (int) MathETK.roundEven(d);
-        } else{
-            return (int) Math.round(d);
-        }
-    }
-
-    /**
-     * Unwraps frequency in degrees. For example, consider a system where the phase response goes from 0°
-     * to 360°. If the phase is wrapped, it will only vary between 180° and -180° e.g. (Careful, ASCII art coming your way)
-     * <pre>
-     *  Expected:                     Actual:
-     *      |                           |
-     *      |                           |
-     *      |                           |
-     *      ---------------------       ---------------------
-     *    0 |*******                    |******* *******
-     *  180 |       *                   |       *
-     *  360 |       *******             |
-     *  </pre>
-     * @param phase The phase to unwrap. This operation is done in plase and the phase array contains the result of
-     *              unwrapping the frequency.
-     */
-    public static void unwrapPhase(double[] phase) {
-        int length = phase.length;
-        double[] dp = new double[length];
-        double[] dps = new double[length];
-        double[] C = new double[length];
-        double[] cumulativeSum = new double[length];
-
-        double cutoff = 180.0;
-        int j;
-
-        // incremental phase variation
-        for (j = 0; j < length - 1; j++) {
-            dp[j] = phase[j + 1] - phase[j];
-        }
-        // equivalent phase variation in [-pi, pi]
-        for (j = 0; j < length - 1; j++) {
-            dps[j] = (dp[j] + 180.0) - Math.floor((dp[j] + 180.0) / (2 * 180.0)) * (2 * 180.0) - 180.0;
-        }
-        // preserve variation sign for +pi vs. -pi
-        for (j = 0; j < length - 1; j++) {
-            if ((dps[j] == -180.0) && (dp[j] > 0)) {
-                dps[j] = 180.0;
-            }
-        }
-        // incremental phase correction
-        for (j = 0; j < length - 1; j++) {
-            C[j] = dps[j] - dp[j];
-        }
-        // Ignore correction when incremental variation is smaller than cutoff
-        for (j = 0; j < length - 1; j++) {
-            if (Math.abs(dp[j]) < cutoff) {
-                C[j] = 0;
-            }
-        }
-        // Find cumulative sum of deltas
-        cumulativeSum[0] = C[0];
-        for (j = 1; j < length - 1; j++) {
-            cumulativeSum[j] = cumulativeSum[j - 1] + C[j];
-        }
-        // Integrate corrections and add to P to produce smoothed phase values
-        for (j = 1; j < length; j++) {
-            phase[j] += cumulativeSum[j - 1];
-        }
     }
 
     /**
@@ -561,7 +331,7 @@ public class TransferFunction extends LinearTimeInvariantSystem {
      * @return [norm0, norm1, .... normn]
      */
     private static double[] norm(Complex[] a) {
-        Complex[] mag = ComplexArrays.convolution(a, ComplexArrays.conj(a));
+        Complex[] mag = ComplexArrays.convolution(a, Arrays.stream(a).map(Complex::conj).toArray(Complex[]::new));
         double[] coefficients = new double[mag.length];
         for (int i = 0; i < mag.length; ++i) {
             coefficients[i] = mag[i].real();
@@ -744,8 +514,8 @@ public class TransferFunction extends LinearTimeInvariantSystem {
         Complex[] num = evaluateAtjw(rf.getNumerator().getCoefficients());
         Complex[] den = evaluateAtjw(rf.getDenominator().getCoefficients());
 
-        double[] convLHS = NumArrays.convolution(ComplexArrays.imag(num), ComplexArrays.real(den));
-        double[] convRHS = NumArrays.convolution(ComplexArrays.real(num), ComplexArrays.imag(den));
+        double[] convLHS = DoubleArrays.convolution(ComplexArrays.imag(num), ComplexArrays.real(den));
+        double[] convRHS = DoubleArrays.convolution(ComplexArrays.real(num), ComplexArrays.imag(den));
 
         Polynomial a = new Polynomial(convLHS);
         Polynomial b = new Polynomial(convRHS);
@@ -866,7 +636,7 @@ public class TransferFunction extends LinearTimeInvariantSystem {
         }
         double[] fRow = new double[k - 1];
         System.arraycopy(den, 1, fRow, 0, fRow.length);
-        NumArrays.multiplyElementWiseInPlace(fRow, -1.0);
+        DoubleArrays.multiplyElementWiseInPlace(fRow, -1.0);
 
         double[][] eye = Matrix.identity(k - 2, k - 1).getAs2DArray();
         double[][] A = new double[eye.length + 1][];
@@ -876,8 +646,8 @@ public class TransferFunction extends LinearTimeInvariantSystem {
         }
         double[][] B = Matrix.identity(k - 1, 1).getAs2DArray();
         double[][] C = new double[1][];
-        double[][] outer = NumArrays.outer(new double[]{numPadded[0]}, Arrays.copyOfRange(den, 1, den.length));
-        C[0] = NumArrays.subtract(Arrays.copyOfRange(numPadded, 1, numPadded.length), outer[0]);
+        double[][] outer = DoubleArrays.outer(new double[]{numPadded[0]}, Arrays.copyOfRange(den, 1, den.length));
+        C[0] = DoubleArrays.subtract(Arrays.copyOfRange(numPadded, 1, numPadded.length), outer[0]);
         return new StateSpace(A, B, C, D);
     }
 
@@ -896,58 +666,5 @@ public class TransferFunction extends LinearTimeInvariantSystem {
     @Override
     public TransferFunction toTransferFunction() {
         return this;
-    }
-
-
-    /**
-     * Single-input Single-output system time response.
-     * @param input The values of the input vs time.
-     * @param time The array of time points.
-     * @return The time domain response of the system.
-     */
-    public SISOTimeResponse simulateTimeResponse(double[] input, double[] time) {
-        return simulateTimeResponse(input, time, IntegrationMethod.INTERPOLATION);
-    }
-
-    /**
-     * Single-input Single-output system time response.
-     * @param input The values of the input vs time.
-     * @param time The array of time points.
-     * @param initialConditions The initial conditions of the system.
-     * @return The time domain response of the system.
-     */
-    public SISOTimeResponse simulateTimeResponse(double[] input, double[] time,
-                                                 double[] initialConditions) {
-        return simulateTimeResponse(input, time, initialConditions, IntegrationMethod.INTERPOLATION);
-    }
-
-    /**
-     * Single-input Single-output system time response.
-     * @param input The values of the input vs time.
-     * @param time The array of time points.
-     * @param integrationMethod The {@link com.wildbitsfoundry.etk4j.control.LinearTimeInvariantSystem.IntegrationMethod}.
-     *                          default is INTERPOLATION.
-     * @return The time domain response of the system.
-     */
-    public SISOTimeResponse simulateTimeResponse(double[] input, double[] time,
-                                                 IntegrationMethod integrationMethod) {
-        return simulateTimeResponse(input, time, null, integrationMethod);
-    }
-
-    /**
-     * Single-input Single-output system time response.
-     * @param input The values of the input vs time.
-     * @param time The array of time points.
-     * @param initialConditions The initial conditions of the system.
-     * @param integrationMethod The {@link com.wildbitsfoundry.etk4j.control.LinearTimeInvariantSystem.IntegrationMethod}.
-     * @return The time domain response of the system.
-     */
-    public SISOTimeResponse simulateTimeResponse(double[] input, double[] time,
-                                                 double[] initialConditions,
-                                                 IntegrationMethod integrationMethod) {
-        double[][] U = new double[1][time.length];
-        U[0] = input;
-        TimeResponse tr = lsim(U, time, initialConditions, this.toStateSpace(), integrationMethod);
-        return new SISOTimeResponse(tr.getTime(), tr.getResponse()[0], tr.getEvolutionOfStateVector());
     }
 }

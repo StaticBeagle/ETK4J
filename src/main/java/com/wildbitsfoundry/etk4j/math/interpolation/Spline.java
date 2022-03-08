@@ -6,7 +6,7 @@ import com.wildbitsfoundry.etk4j.math.functions.DifferentiableFunction;
 import com.wildbitsfoundry.etk4j.math.functions.IntegrableFunction;
 import com.wildbitsfoundry.etk4j.math.functions.PiecewiseFunction;
 import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
-import com.wildbitsfoundry.etk4j.util.NumArrays;
+import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 
 import java.util.Arrays;
 
@@ -26,7 +26,7 @@ public abstract class Spline extends PiecewiseFunction implements Differentiable
 		int offset = index * order;
 		final double[] coefficients = Arrays.copyOfRange(this.coefficients, offset, offset + order);
 		final double x0 = x[index];
-		UnivariateFunction fn = x -> NumArrays.horner(coefficients, x - x0);
+		UnivariateFunction fn = x -> DoubleArrays.horner(coefficients, x - x0);
 		return fn;
 	}
 
@@ -74,6 +74,10 @@ public abstract class Spline extends PiecewiseFunction implements Differentiable
 
 	@Override
 	public double integrate(double a, double b) {
+		if(b < a) {
+			throw new IllegalArgumentException("The upper integration limit b has to be greater or equal to the lower" +
+					" integration limit a.");
+		}
 		if (a < x[0] || b > x[x.length - 1]) {
 			throw new IllegalArgumentException(
 					String.format("The spline is not defined outside of [%.4g, %.4g]", x[0], x[x.length - 1]));
@@ -131,7 +135,7 @@ public abstract class Spline extends PiecewiseFunction implements Differentiable
 				this.setExtrapolator(new Extrapolators.ThrowExtrapolator(x0, xn));
 				break;
 			default:
-				throw new IllegalArgumentException("Invalid extrapolation option");
+				throw new IllegalArgumentException("Invalid extrapolation option.");
 		}
 	}
 }

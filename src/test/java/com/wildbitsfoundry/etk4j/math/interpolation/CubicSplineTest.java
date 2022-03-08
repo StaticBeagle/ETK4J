@@ -1,10 +1,8 @@
 package com.wildbitsfoundry.etk4j.math.interpolation;
 
 import com.wildbitsfoundry.etk4j.math.extrapolation.ExtrapolationMethod;
-import com.wildbitsfoundry.etk4j.util.NumArrays;
+import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 import org.junit.Test;
-
-import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
@@ -36,7 +34,7 @@ public class CubicSplineTest {
         x = new double[]{0.0, 10.0, 15.0, 20.0, 22.5, 30.0};
         y = new double[]{0.0, 227.04, 362.78, 517.35, 602.97, 901.67};
         cs = CubicSpline.newNaturalSpline(x, y);
-        assertArrayEquals(expected, cs.evaluateAt(NumArrays.linSteps(0, 30)), 1e-12);
+        assertArrayEquals(expected, cs.evaluateAt(DoubleArrays.linSteps(0, 30)), 1e-12);
 
         assertEquals(392.15420158375633, cs.evaluateAt(16.0), 1e-12);
         assertEquals(29.746182686971242, cs.differentiate(16.0), 1e-12);
@@ -73,7 +71,7 @@ public class CubicSplineTest {
         x = new double[]{0.0, 10.0, 15.0, 20.0, 22.5, 30.0};
         y = new double[]{0.0, 227.04, 362.78, 517.35, 602.97, 901.67};
         cs = CubicSpline.newParabolicallyTerminatedSpline(x, y);
-        assertArrayEquals(expected, cs.evaluateAt(NumArrays.linSteps(0, 30)), 1e-12);
+        assertArrayEquals(expected, cs.evaluateAt(DoubleArrays.linSteps(0, 30)), 1e-12);
 
         assertEquals(392.0648895704187, cs.evaluateAt(16.0), 1e-12);
         assertEquals(29.67555571506254, cs.differentiate(16.0), 1e-12);
@@ -110,7 +108,7 @@ public class CubicSplineTest {
         x = new double[]{0.0, 10.0, 15.0, 20.0, 22.5, 30.0};
         y = new double[]{0.0, 227.04, 362.78, 517.35, 602.97, 901.67};
         cs = CubicSpline.newClampedSpline(x, y, 2, 1);
-        assertArrayEquals(expected, cs.evaluateAt(NumArrays.linSteps(0, 30)), 1e-12);
+        assertArrayEquals(expected, cs.evaluateAt(DoubleArrays.linSteps(0, 30)), 1e-12);
 
         assertEquals(392.21514849315065, cs.evaluateAt(16.0), 1e-12);
         assertEquals(30.15093041095891, cs.differentiate(16.0), 1e-12);
@@ -147,7 +145,7 @@ public class CubicSplineTest {
         x = new double[]{0.0, 10.0, 15.0, 20.0, 22.5, 30.0};
         y = new double[]{0.0, 227.04, 362.78, 517.35, 602.97, 901.67};
         cs = CubicSpline.newNotAKnotSpline(x, y);
-        assertArrayEquals(expected, cs.evaluateAt(NumArrays.linSteps(0, 30)), 1e-12);
+        assertArrayEquals(expected, cs.evaluateAt(DoubleArrays.linSteps(0, 30)), 1e-12);
 
         assertEquals(392.0707644444444, cs.evaluateAt(16.0), 1e-12);
         assertEquals(29.674004444444453, cs.differentiate(16.0), 1e-12);
@@ -184,7 +182,7 @@ public class CubicSplineTest {
         x = new double[]{0.0, 10.0, 15.0, 20.0, 22.5, 30.0};
         y = new double[]{0.0, 227.04, 362.78, 517.35, 602.97, 901.67};
         cs = CubicSpline.newAkimaSpline(x, y);
-        assertArrayEquals(expected, cs.evaluateAt(NumArrays.linSteps(0, 30)), 1e-12);
+        assertArrayEquals(expected, cs.evaluateAt(DoubleArrays.linSteps(0, 30)), 1e-12);
 
         assertEquals(392.4458809357619, cs.evaluateAt(16.0), 1e-12);
         assertEquals(30.021212979830768, cs.differentiate(16.0), 1e-12);

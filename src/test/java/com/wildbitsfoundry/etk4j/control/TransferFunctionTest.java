@@ -2,10 +2,8 @@ package com.wildbitsfoundry.etk4j.control;
 
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
-import com.wildbitsfoundry.etk4j.util.NumArrays;
+import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 import org.junit.Test;
-
-import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
@@ -131,7 +129,7 @@ public class TransferFunctionTest {
         double phase = tf.calculateUnwrappedPhaseInDegreesAt(100.0);
         assertEquals(-268.2811839069496, phase, 1e-12);
 
-        double[] frequencies = NumArrays.logSpace(-3, 3, 10);
+        double[] frequencies = DoubleArrays.logSpace(-3, 3, 10);
 
         double[] magnitudeResponse = {9.999985000018752, 9.999676843499255, 9.993041654128266, 9.851853368415734,
                 7.462732134984385, 0.7462732134984399, 0.009851853368415734, 9.993041654128302E-5, 9.999676843499274E-7,
@@ -160,7 +158,7 @@ public class TransferFunctionTest {
         Complex[] poles = new Complex[]{Complex.fromReal(-1.0), Complex.fromReal(-1.0), Complex.fromReal(-1.0)};
         TransferFunction tf = new TransferFunction(new Polynomial(10.0), new Polynomial(poles));
 
-        double[] frequencies = NumArrays.logSpace(-3, 3, 10);
+        double[] frequencies = DoubleArrays.logSpace(-3, 3, 10);
         double[] magnitudeResponseInDB = {19.99998697117206, 19.99971930529443, 19.993953953801398, 19.870358786520722,
                 17.45795706934761, -2.542042930652374, -40.129641213479275, -80.00604604619858, -120.00028069470557,
                 -160.00001302882794};
@@ -324,7 +322,7 @@ public class TransferFunctionTest {
         Complex[] poles = new Complex[]{Complex.fromReal(-1.0), Complex.fromReal(-1.0), Complex.fromReal(-1.0)};
         TransferFunction tf = new TransferFunction(new Polynomial(10.0), new Polynomial(poles));
 
-        double[] frequencies = NumArrays.logSpace(-3, 3, 10);
+        double[] frequencies = DoubleArrays.logSpace(-3, 3, 10);
 
         Complex[] freqResp = {new Complex(9.999940000150001, -0.029999900000209998),
                 new Complex(9.998707408807014, -0.13923766546079788),
@@ -550,10 +548,10 @@ public class TransferFunctionTest {
         };
 
         TransferFunction tf = new TransferFunction(new double[]{1.0, 3.0, 3.0}, new double[]{1.0, 2.0, 1.0});
-        SISOTimeResponse SISOtr = tf.simulateTimeResponse(NumArrays.ones(timePoints.length),
+        SISOTimeResponse SISOtr = tf.simulateTimeResponse(DoubleArrays.ones(timePoints.length),
                 timePoints);
 
-        double[][] transposedStateVector = NumArrays.transpose(SISOtr.getEvolutionOfStateVector());
+        double[][] transposedStateVector = DoubleArrays.transpose(SISOtr.getEvolutionOfStateVector());
 
         assertArrayEquals(timePoints, SISOtr.getTime(), 1e-12);
         assertArrayEquals(yOut, SISOtr.getResponse(), 1e-12);

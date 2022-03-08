@@ -8,10 +8,9 @@ import com.wildbitsfoundry.etk4j.math.functions.DifferentiableFunction;
 import com.wildbitsfoundry.etk4j.math.functions.IntegrableFunction;
 import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.EigenvalueDecomposition;
-import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrices;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
 import com.wildbitsfoundry.etk4j.util.ComplexArrays;
-import com.wildbitsfoundry.etk4j.util.NumArrays;
+import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -150,11 +149,11 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
      * @return Pnew(x) = P(x) * poly
      */
     public Polynomial multiply(final Polynomial p) {
-        return new Polynomial(NumArrays.convolution(coefficients, p.coefficients));
+        return new Polynomial(DoubleArrays.convolution(coefficients, p.coefficients));
     }
 
     public Polynomial multiply(double... coefs) {
-        return new Polynomial(NumArrays.convolution(coefficients, coefs));
+        return new Polynomial(DoubleArrays.convolution(coefficients, coefs));
     }
 
     /***
@@ -164,7 +163,7 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
      *            Another polynomial
      */
     public void multiplyEquals(final Polynomial p) {
-        coefficients = NumArrays.convolution(coefficients, p.coefficients);
+        coefficients = DoubleArrays.convolution(coefficients, p.coefficients);
         roots = null;
     }
 
@@ -175,12 +174,12 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
      *            Another polynomial
      */
     public void multiplyEquals(double... coefs) {
-        coefficients = NumArrays.convolution(coefficients, coefs);
+        coefficients = DoubleArrays.convolution(coefficients, coefs);
         roots = null;
     }
 
     public Polynomial multiply(double d) {
-        return new Polynomial(NumArrays.multiplyElementWise(coefficients, d));
+        return new Polynomial(DoubleArrays.multiplyElementWise(coefficients, d));
     }
 
     public void multiplyEquals(double d) {
@@ -305,7 +304,7 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
     }
 
     public void reverseInPlace() {
-        coefficients = NumArrays.reverse(coefficients);
+        coefficients = DoubleArrays.reverse(coefficients);
         roots = null;
     }
 
@@ -477,7 +476,7 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
         }
         double[] tmp = Arrays.copyOf(coefficients, coefficients.length);
         while (--n > 0) {
-            tmp = NumArrays.convolution(tmp, coefficients);
+            tmp = DoubleArrays.convolution(tmp, coefficients);
         }
         return new Polynomial(tmp);
     }
@@ -581,7 +580,7 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
      * @returnThe The value of the polynomial at {@code x}.
      */
     public static double polyval(double[] coefficients, double x) {
-        return NumArrays.horner(coefficients, x);
+        return DoubleArrays.horner(coefficients, x);
     }
 
     /**

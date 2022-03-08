@@ -1,5 +1,8 @@
 package com.wildbitsfoundry.etk4j.signals.filters;
 
+/**
+ * The {@code BandStopSpec} class represents the design specifications for a band stop (notch) filter.
+ */
 public class BandStopSpecs {
 
     private double lowerPassBandFrequency;
@@ -24,6 +27,10 @@ public class BandStopSpecs {
         return lowerPassBandFrequency;
     }
 
+    /**
+     * Lower pass band frequency.
+     * @param lowerPassBandFrequency The lower pass band frequency in radians per second (rad/s).
+     */
     public void setLowerPassBandFrequency(double lowerPassBandFrequency) {
         this.lowerPassBandFrequency = lowerPassBandFrequency;
     }
@@ -32,6 +39,10 @@ public class BandStopSpecs {
         return upperPassBandFrequency;
     }
 
+    /**
+     * Upper pass band frequency.
+     * @param upperPassBandFrequency The upper pass band frequency in radians per second (rad/s).
+     */
     public void setUpperPassBandFrequency(double upperPassBandFrequency) {
         this.upperPassBandFrequency = upperPassBandFrequency;
     }
@@ -40,6 +51,10 @@ public class BandStopSpecs {
         return lowerStopBandFrequency;
     }
 
+    /**
+     * Lower stop band frequency.
+     * @param lowerStopBandFrequency The lower stop band frequency in radians per second (rad/s).
+     */
     public void setLowerStopBandFrequency(double lowerStopBandFrequency) {
         this.lowerStopBandFrequency = lowerStopBandFrequency;
     }
@@ -48,6 +63,10 @@ public class BandStopSpecs {
         return upperStopBandFrequency;
     }
 
+    /**
+     * Upper stop band frequency.
+     * @param upperStopBandFrequency The upper stop band frequency in radians per second (rad/s).
+     */
     public void setUpperStopBandFrequency(double upperStopBandFrequency) {
         this.upperStopBandFrequency = upperStopBandFrequency;
     }
@@ -56,6 +75,10 @@ public class BandStopSpecs {
         return passBandRipple;
     }
 
+    /**
+     * The pass band ripple.
+     * @param passBandRipple Pass band ripple in decibels (dB). This value must be greater than zero.
+     */
     public void setPassBandRipple(double passBandRipple) {
         this.passBandRipple = passBandRipple;
     }
@@ -64,16 +87,20 @@ public class BandStopSpecs {
         return stopBandAttenuation;
     }
 
+    /**
+     * The stop band attenuation.
+     * @param stopBandAttenuation Stop band attenuation in decibels (dB). This value must be greater than zero.
+     */
     public void setStopBandAttenuation(double stopBandAttenuation) {
         this.stopBandAttenuation = stopBandAttenuation;
     }
 
     void validate() {
-        if (passBandRipple < 0) {
-            throw new IllegalArgumentException("The pass band ripple cannot be less than zero.");
+        if (passBandRipple <= 0) {
+            throw new IllegalArgumentException("The pass band ripple has to be greater than zero.");
         }
-        if (stopBandAttenuation < 0) {
-            throw new IllegalArgumentException("The stop band attenuation cannot be less than zero.");
+        if (stopBandAttenuation <= 0) {
+            throw new IllegalArgumentException("The stop band attenuation has to be greater than zero.");
         }
         if(passBandRipple >= stopBandAttenuation) {
             throw new IllegalArgumentException("The stop band attenuation has to be greater than the pass band ripple.");

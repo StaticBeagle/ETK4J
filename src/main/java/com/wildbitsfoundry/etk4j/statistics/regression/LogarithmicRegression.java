@@ -2,6 +2,10 @@ package com.wildbitsfoundry.etk4j.statistics.regression;
 
 import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
 
+/**
+ * The {@code LogarithmicRegression} class implements a logarithmic fit in the least square sense for a given set of
+ * (x, y) points.
+ */
 public class LogarithmicRegression extends UnivariateRegression {
 
 	public LogarithmicRegression(double[] x, double[] y) {
