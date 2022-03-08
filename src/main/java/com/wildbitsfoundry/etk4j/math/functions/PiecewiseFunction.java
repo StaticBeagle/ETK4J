@@ -13,7 +13,7 @@ public abstract class PiecewiseFunction implements UnivariateFunction {
 	private int numberOfSegments;
 	protected double[] x;
 	protected double[] coefficients = null;
-	Extrapolator extrapolators;
+	Extrapolator extrapolator;
 
 	private double x0, xn;
 
@@ -22,12 +22,11 @@ public abstract class PiecewiseFunction implements UnivariateFunction {
 		x0 = x[0];
 		numberOfSegments = this.x.length - 1;
 		xn = x[numberOfSegments];
-		// TODO check Default extrapolator is throw
-		extrapolators = new Extrapolators.ThrowExtrapolator(x0, xn);
+		extrapolator = new Extrapolators.ThrowExtrapolator(x0, xn);
 	}
 
 	protected void setExtrapolator(Extrapolator extrapolator) {
-		extrapolators = extrapolator;
+		this.extrapolator = extrapolator;
 	}
 
 	public int findSegmentIndex(double x) {
@@ -71,7 +70,7 @@ public abstract class PiecewiseFunction implements UnivariateFunction {
 	}
 
 	protected double extrapolate(double x) {
-		return extrapolators.extrapolate(x);
+		return extrapolator.extrapolate(x);
 	}
 
 	public double[] getBreaks() {

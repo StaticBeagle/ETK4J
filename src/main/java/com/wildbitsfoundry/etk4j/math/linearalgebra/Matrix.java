@@ -11,13 +11,19 @@ import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 
 import static com.wildbitsfoundry.etk4j.math.MathETK.frexp;
-import static com.wildbitsfoundry.etk4j.math.linearalgebra.Matrices.fwdSubsSolve;
+import static com.wildbitsfoundry.etk4j.math.linearalgebra.Matrices.forwardSubstitutionSolve;
 
 public class Matrix {
     private double[] data;
     private int rows;
     private int cols;
 
+    /**
+     * Constructs a {@code Matrix}.
+     *
+     * @param rows The number of rows of the {@code Matrix}..
+     * @param cols The number of columns of the {@code Matrix}..
+     */
     public Matrix(int rows, int cols) {
         this.rows = rows;
         this.cols = cols;
@@ -26,15 +32,22 @@ public class Matrix {
     }
 
     /***
-     * Column packed
-     * @param data
-     * @param rows
+     * Construct {@code Matrix}  from column packed data. Column packed data can be represented as:
+     * <pre>
+     *     For a given Matrix:
+     *     A = 1 2 3
+     *         4 5 6
+     *         7 8 9
+     *     The column packed data will be [1, 4, 7, 2, 5, 8, 3, 6, 9]
+     * </pre>
+     * @param data The column packed data.
+     * @param rows The number of rows of the {@code Matrix}.
      */
     public Matrix(double[] data, int rows) {
         this.rows = rows;
         cols = (this.rows != 0 ? data.length / this.rows : 0);
         if (this.rows * cols != data.length) {
-            throw new IllegalArgumentException("Array length must be a multiple of rows");
+            throw new IllegalArgumentException("Array length must be a multiple of rows.");
         }
 
         int dim = this.rows * cols;
@@ -46,22 +59,41 @@ public class Matrix {
         }
     }
 
+    /**
+     * Construct matrix from a non-jagged 2d array of values.
+     *
+     * @param data The 2d array of values used to populate the {@code Matrix} internal storage.
+     */
     public Matrix(double[][] data) {
         rows = data.length;
         cols = data[0].length;
         this.data = DoubleArrays.flatten(data);
     }
 
-    // row packed
-    // _rows = rows
-    // _cols = cols
-    // _data = data;
+    /***
+     * Construct {@code Matrix}  from row packed data. Row packed data can be represented as:
+     * <pre>
+     *     For a given Matrix:
+     *     A = 1 2 3
+     *         4 5 6
+     *         7 8 9
+     *     The row packed data will be [1, 2, 3, 4, 5, 6, 7, 8, 9]
+     * </pre>
+     * @param data The row packed data.
+     * @param rows The number of rows of the {@code Matrix}.
+     * @param cols The number of columns of the {@code Matrix}.
+     */
     public Matrix(double[] data, int rows, int cols) {
         this.rows = rows;
         this.cols = cols;
         this.data = data;
     }
 
+    /**
+     * Copy constructor.
+     *
+     * @param matrix The argument {@code Matrix} to be copied.
+     */
     public Matrix(Matrix matrix) {
         rows = matrix.rows;
         cols = matrix.cols;
@@ -69,6 +101,13 @@ public class Matrix {
         System.arraycopy(matrix.data, 0, this.data, 0, this.rows * this.cols);
     }
 
+    /**
+     * Constructs a {@code Matrix} filled with a predefined value.
+     *
+     * @param rows The number of rows of the {@code Matrix}.
+     * @param cols The number of columns of the {@code Matrix}.
+     * @param val  The argument used to fill up the {@code Matrix}.
+     */
     public Matrix(int rows, int cols, double val) {
         this.rows = rows;
         this.cols = cols;
@@ -77,8 +116,8 @@ public class Matrix {
     }
 
     /***
-     * Deep copy
-     * @return
+     * Deep copy.
+     * @return A deep copy of the {@code Matrix}.
      */
     public Matrix copy() {
         double[] data = Arrays.copyOf(this.data, this.data.length);
@@ -86,21 +125,27 @@ public class Matrix {
     }
 
     /***
-     * Get submatrix
+     * Get sub-matrix.
      *
-     * @param row0
-     *            Initial row index
-     * @param row1
-     *            Final row index
-     * @param col0
-     *            Initial column index
-     * @param col1
-     *            Final column index
-     * @return A(row0 : row1, col0 : col1)
+     * @param row0 The initial row index.
+     * @param row1 The final row index.
+     * @param col0 The initial column index.
+     * @param col1 The final column index.
+     * @return {@code A(row0 : row1, col0 : col1)}.
      */
     public Matrix subMatrix(int row0, int row1, int col0, int col1) {
-        // TODO check bounds and check that the 1's are bigger than the 0's
-        // check bounds
+        if (row0 < 0 || row1 < 0) {
+            throw new IllegalArgumentException("The row indexes row0 and row1 must be greater than zero.");
+        }
+        if (col0 < 0 || col1 < 0) {
+            throw new IllegalArgumentException("The column indexes col0 and col1 must be greater than zero.");
+        }
+        if (row1 >= rows) {
+            throw new ArrayIndexOutOfBoundsException("The final row index cannot be greater than the number of rows in the Matrix.");
+        }
+        if (col1 >= cols) {
+            throw new ArrayIndexOutOfBoundsException("The final column index cannot be greater than the number of columns in the Matrix.");
+        }
         int rowDim = row1 - row0 + 1;
         int colDim = col1 - col0 + 1;
         double[] data = new double[rowDim * colDim];
@@ -113,17 +158,23 @@ public class Matrix {
     }
 
     /***
-     * Get submatrix
+     * Get sub-matrix
      *
-     * @param rows
-     *            Array of row indices
-     * @param col0
-     *            Initial column index
-     * @param col1
-     *            Final column index
-     * @return A(rows ( :), col0 : col1)
+     * @param rows The array of row indices.
+     * @param col0 The initial column index.
+     * @param col1 The final column index.
+     * @return {@code A(rows(:), col0 : col1)}.
      */
     public Matrix subMatrix(int[] rows, int col0, int col1) {
+        if (col0 < 0 || col1 < 0) {
+            throw new IllegalArgumentException("The column indexes col0 and col1 must be greater than zero.");
+        }
+        if (Arrays.stream(rows).anyMatch(i -> i >= this.rows || i < 0)) {
+            throw new ArrayIndexOutOfBoundsException("The row indexes cannot be greater than the number of rows in the Matrix. and must be greater than zero.");
+        }
+        if (col1 >= cols) {
+            throw new ArrayIndexOutOfBoundsException("The final column index cannot be greater than the number of columns in the Matrix.");
+        }
         int rowDim = rows.length;
         int colDim = col1 - col0 + 1;
         double[] data = new double[rowDim * colDim];
@@ -136,17 +187,23 @@ public class Matrix {
     }
 
     /***
-     * Get submatrix
+     * Get sub-matrix.
      *
-     * @param row0
-     *            Initial row index
-     * @param row1
-     *            Final row index
-     * @param cols
-     *            Array of column indices
-     * @return A(row0 : row1, cols ( :))
+     * @param row0 The initial row index.
+     * @param row1 The final row index.
+     * @param cols The array of column indices.
+     * @return {@code A(row0 : row1, cols (:))}.
      */
     public Matrix subMatrix(int row0, int row1, int[] cols) {
+        if (row0 < 0 || row1 < 0) {
+            throw new ArrayIndexOutOfBoundsException("The row indexes row0 and row1 must be greater than zero.");
+        }
+        if (Arrays.stream(cols).anyMatch(i -> i >= this.cols || i < 0)) {
+            throw new ArrayIndexOutOfBoundsException("The column indexes cannot be greater than the number of columns in the Matrix and must be greater than zero.");
+        }
+        if (row1 >= rows) {
+            throw new ArrayIndexOutOfBoundsException("The final ros index cannot be greater than the number of rows in the Matrix.");
+        }
         int rowDim = row1 - row0 + 1;
         int colDim = cols.length;
         double[] data = new double[rowDim * colDim];
@@ -159,15 +216,19 @@ public class Matrix {
     }
 
     /***
-     * Get submatrix
+     * Get sub-matrix.
      *
-     * @param rows
-     *            Array or row indices
-     * @param cols
-     *            Array of column indices
-     * @return A(rows ( :), cols(:))
+     * @param rows The array or row indices.
+     * @param cols The array of column indices
+     * @return {@code A(rows(:), cols(:))}.
      */
     public Matrix subMatrix(int[] rows, int[] cols) {
+        if (Arrays.stream(rows).anyMatch(i -> i >= this.rows || i < 0)) {
+            throw new ArrayIndexOutOfBoundsException("The row indexes cannot be greater than the number of rows in the Matrix. and must be greater than zero.");
+        }
+        if (Arrays.stream(cols).anyMatch(i -> i >= this.cols || i < 0)) {
+            throw new ArrayIndexOutOfBoundsException("The column indexes cannot be greater than the number of columns in the Matrix and must be greater than zero.");
+        }
         int rowDim = rows.length;
         int colDim = cols.length;
         double[] data = new double[rowDim * colDim];
@@ -179,14 +240,21 @@ public class Matrix {
         return new Matrix(data, rowDim, colDim);
     }
 
+    /**
+     * Retrieve value from {@code Matrix} at a given position.
+     *
+     * @param i The row index.
+     * @param j The column index.
+     * @return The value at {@code A(i, j)}.
+     */
     public double get(int i, int j) {
-        if(i < 0) {
+        if (i < 0) {
             throw new ArrayIndexOutOfBoundsException("Index i cannot be less thant zero.");
         }
         if (i >= rows) {
             throw new ArrayIndexOutOfBoundsException(String.format("Index i: %d >= than number of rows: %d.", i, rows));
         }
-        if(j < 0) {
+        if (j < 0) {
             throw new ArrayIndexOutOfBoundsException("Index j cannot be less thant zero.");
         }
         if (j >= cols) {
@@ -195,14 +263,21 @@ public class Matrix {
         return data[i * cols + j];
     }
 
+    /**
+     * Set the value of the {@code Matrix} at a given position.
+     *
+     * @param i   The row index.
+     * @param j   The column index.
+     * @param val The value used to set {@code A(i, j) = val}.
+     */
     public void set(int i, int j, double val) {
-        if(i < 0) {
+        if (i < 0) {
             throw new ArrayIndexOutOfBoundsException("Index i cannot be less thant zero.");
         }
         if (i >= rows) {
             throw new ArrayIndexOutOfBoundsException(String.format("Index i: %d >= than number of rows: %d.", i, rows));
         }
-        if(j < 0) {
+        if (j < 0) {
             throw new ArrayIndexOutOfBoundsException("Index j cannot be less thant zero.");
         }
         if (j >= cols) {
@@ -211,104 +286,120 @@ public class Matrix {
         data[i * cols + j] = val;
     }
 
+    /**
+     * {@code Matrix} determinant.
+     *
+     * @return The determinant of the squared {@code Matrix}.
+     */
     public double det() {
         return new LUDecomposition(this).det();
     }
 
     /**
-     * Set a submatrix.
+     * Set a sub-matrix.
      *
      * @param i0 Initial row index
      * @param i1 Final row index
      * @param j0 Initial column index
      * @param j1 Final column index
-     * @param X  A(i0:i1,j0:j1)
-     * @throws ArrayIndexOutOfBoundsException Submatrix indices
+     * @param X  {@codeA(i0:i1,j0:j1)}
      */
-
     public void setMatrix(int i0, int i1, int j0, int j1, Matrix X) {
-        try {
-            for (int i = i0; i <= i1; i++) {
-                for (int j = j0; j <= j1; j++) {
-                    data[i * cols + j] = X.get(i - i0, j - j0);
-                }
+        if(i0 < 0 || i0 >= rows) {
+            throw new ArrayIndexOutOfBoundsException("The initial row index i0 must be greater than zero and less than the number of rows.");
+        }
+        if(i1 < 0 || i1 >= rows) {
+            throw new ArrayIndexOutOfBoundsException("The final row index i1 must be greater than zero and less than the number of rows.");
+        }
+        if(j0 < 0 || j0 >= cols) {
+            throw new ArrayIndexOutOfBoundsException("The initial column index j0 must be greater than zero and less than the number of columns.");
+        }
+        if(j1 < 0 || j1 >= cols) {
+            throw new ArrayIndexOutOfBoundsException("The final column index j1 must be greater than zero and less than the number of columns.");
+        }
+        for (int i = i0; i <= i1; i++) {
+            for (int j = j0; j <= j1; j++) {
+                data[i * cols + j] = X.get(i - i0, j - j0);
             }
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new ArrayIndexOutOfBoundsException("Submatrix indices");
         }
     }
 
     /**
-     * Set a submatrix.
+     * Set a sub-matrix.
      *
      * @param r Array of row indices.
      * @param c Array of column indices.
-     * @param X A(r(:),c(:))
-     * @throws ArrayIndexOutOfBoundsException Submatrix indices
+     * @param X {@code A(r(:),c(:))}
      */
-
     public void setMatrix(int[] r, int[] c, Matrix X) {
-        try {
-            for (int i = 0; i < r.length; i++) {
-                for (int j = 0; j < c.length; j++) {
-                    data[r[i] * cols + c[j]] = X.get(i, j);
-                }
+        if(Arrays.stream(r).anyMatch(i -> i < 0 || i >= rows)) {
+            throw new ArrayIndexOutOfBoundsException("The row indexes must be greater than zero and less than the number of rows.");
+        }
+        if(Arrays.stream(c).anyMatch(j -> j < 0 || j >= cols)) {
+            throw new ArrayIndexOutOfBoundsException("The column indexes must be greater than zero and less than the number of columns.");
+        }
+        for (int i = 0; i < r.length; i++) {
+            for (int j = 0; j < c.length; j++) {
+                data[r[i] * cols + c[j]] = X.get(i, j);
             }
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new ArrayIndexOutOfBoundsException("Submatrix indices");
         }
     }
 
     /**
-     * Set a submatrix.
+     * Set a sub-matrix.
      *
      * @param r  Array of row indices.
      * @param j0 Initial column index
      * @param j1 Final column index
      * @param X  A(r(:),j0:j1)
-     * @throws ArrayIndexOutOfBoundsException Submatrix indices
      */
-
     public void setMatrix(int[] r, int j0, int j1, Matrix X) {
-        try {
-            for (int i = 0; i < r.length; i++) {
-                for (int j = j0; j <= j1; j++) {
-                    data[r[i] * cols + j] = X.get(i, j - j0);
-                }
+        if(Arrays.stream(r).anyMatch(i -> i < 0 || i >= rows)) {
+            throw new ArrayIndexOutOfBoundsException("The row indexes must be greater than zero and less than the number of rows.");
+        }
+        if(j0 < 0 || j0 >= cols) {
+            throw new ArrayIndexOutOfBoundsException("The initial column index j0 must be greater than zero and less than the number of columns.");
+        }
+        if(j1 < 0 || j1 >= cols) {
+            throw new ArrayIndexOutOfBoundsException("The final column index j1 must be greater than zero and less than the number of columns.");
+        }
+        for (int i = 0; i < r.length; i++) {
+            for (int j = j0; j <= j1; j++) {
+                data[r[i] * cols + j] = X.get(i, j - j0);
             }
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new ArrayIndexOutOfBoundsException("Submatrix indices");
         }
     }
 
     /**
-     * Set a submatrix.
+     * Set a sub-matrix.
      *
      * @param i0 Initial row index
      * @param i1 Final row index
      * @param c  Array of column indices.
      * @param X  A(i0:i1,c(:))
-     * @throws ArrayIndexOutOfBoundsException Submatrix indices
      */
-
     public void setMatrix(int i0, int i1, int[] c, Matrix X) {
-        try {
-            for (int i = i0; i <= i1; i++) {
-                for (int j = 0; j < c.length; j++) {
-                    data[i * cols + c[j]] = X.get(i - i0, j);
-                }
+        if(i0 < 0 || i0 >= rows) {
+            throw new ArrayIndexOutOfBoundsException("The initial row index i0 must be greater than zero and less than the number of rows.");
+        }
+        if(i1 < 0 || i1 >= rows) {
+            throw new ArrayIndexOutOfBoundsException("The final row index i1 must be greater than zero and less than the number of rows.");
+        }
+        if(Arrays.stream(c).anyMatch(j -> j < 0 || j >= cols)) {
+            throw new ArrayIndexOutOfBoundsException("The column indexes must be greater than zero and less than the number of columns.");
+        }
+        for (int i = i0; i <= i1; i++) {
+            for (int j = 0; j < c.length; j++) {
+                data[i * cols + c[j]] = X.get(i - i0, j);
             }
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new ArrayIndexOutOfBoundsException("Submatrix indices");
         }
     }
 
     /**
-     * Matrix rank
+     * Matrix rank.
      *
-     * @return effective numerical rank, obtained from SVD.
+     * @return The effective numerical rank, obtained from SVD.
      */
-
     public int rank() {
         return new SingularValueDecomposition(this).rank();
     }
@@ -316,7 +407,7 @@ public class Matrix {
     /**
      * Matrix condition (2 norm)
      *
-     * @return ratio of largest to smallest singular value.
+     * @return ratio of largest to the smallest singular value.
      */
 
     public double cond() {
@@ -328,7 +419,6 @@ public class Matrix {
      *
      * @return sum of the diagonal elements.
      */
-
     public double trace() {
         double t = 0;
         for (int i = 0; i < Math.min(rows, cols); ++i) {
@@ -337,9 +427,15 @@ public class Matrix {
         return t;
     }
 
+    /**
+     * Cofactor {@code Matrix}
+     *
+     * @return The cofactor {@code Matrix}.
+     * @see <a href="https://mathworld.wolfram.com/Cofactor.html">Cofactor Matrix.</a>
+     */
     public Matrix cofactor() {
         int dim = this.rows;
-        if(!this.isSquared()) {
+        if (!this.isSquared()) {
             throw new NonSquareMatrixException("Matrix must be a square Matrix.");
         }
         double[][] cofactor = new double[dim][dim];
@@ -354,10 +450,23 @@ public class Matrix {
         return new Matrix(cofactor);
     }
 
+    /**
+     * Is the {@code Matrix} squared.
+     *
+     * @return {@code true} if the matrix is squared (same number of rows and columns) or {@code false} otherwise.
+     */
     public boolean isSquared() {
         return rows == cols;
     }
 
+    /**
+     * {@code Matrix} minor.
+     *
+     * @param row The row index.
+     * @param col The column index.
+     * @return The minor of the {@code Matrix} by omitting the {@code row} and {@code column} indexes.
+     * @see <a href="https://mathworld.wolfram.com/Minor.html">Matrix minor</a>
+     */
     public Matrix minor(int row, int col) {
         final int dim = this.rows;
         double[][] minor = new double[dim - 1][dim - 1];
@@ -373,28 +482,59 @@ public class Matrix {
         return new Matrix(minor);
     }
 
+    /**
+     * Adjoint (adjugate) {@code Matrix}.
+     *
+     * @return The {@link Matrix#transpose()} of the {@link Matrix#adjoint()} {@code Matrix}.
+     * @see <a href="https://en.wikipedia.org/wiki/Adjugate_matrix">Adjoint matrix</a>
+     */
     public Matrix adjoint() {
         return this.cofactor().transpose();
     }
 
     // region decompositions
+
+    /**
+     * LU decomposition of the {@code Matrix}.
+     *
+     * @return The {@link LUDecomposition} of the {@code Matrix}.
+     * @see <a href="https://en.wikipedia.org/wiki/LU_decomposition">LU Decomposition</a>
+     */
     public LUDecomposition LU() {
         return new LUDecomposition(this);
-
     }
 
+    /**
+     * QR decomposition of the {@code Matrix}.
+     *
+     * @return The {@link QRDecomposition} of the {@code Matrix}.
+     * @see <a href="https://en.wikipedia.org/wiki/QR_decomposition">QR Decomposition</a>
+     */
     public QRDecomposition QR() {
         return new QRDecomposition(this);
     }
 
+    /**
+     * Cholesky decomposition of the {@code Matrix}.
+     *
+     * @return The {@link CholeskyDecomposition} of the {@code Matrix}.
+     * @see <a href="https://en.wikipedia.org/wiki/Cholesky_decomposition">Cholesky Decomposition</a>
+     */
     public CholeskyDecomposition Chol() {
         return new CholeskyDecomposition(this);
     }
 
+    /**
+     * Singular Value Decomposition of the {@code Matrix}.
+     *
+     * @return The {@link SingularValueDecomposition} of the {@code Matrix}.
+     * @see <a href="https://en.wikipedia.org/wiki/Singular_value_decomposition">Singular Value Decomposition</a>
+     */
     public SingularValueDecomposition SVD() {
         return new SingularValueDecomposition(this);
     }
     // endregion
+
     /***
      * Get matrix diagonal
      *
@@ -412,10 +552,21 @@ public class Matrix {
         return diag;
     }
 
+    /**
+     * Inverse of the {@code Matrix}.
+     *
+     * @return {@code A<sup>-1</sup>}.
+     */
     public Matrix inv() {
         return this.solve(Matrix.identity(rows));
     }
 
+    /**
+     * Is the {@code Matrix} empty.
+     *
+     * @return {@code true} if the number of columns and rows are equal to zero or the internal data is null or the
+     * length of the internal data is equal to zero. Returns {@code false} otherwise.
+     */
     public boolean isEmpty() {
         if ((rows == 0 && cols == 0) || data == null || data.length == 0) {
             return true;
@@ -423,6 +574,12 @@ public class Matrix {
         return false;
     }
 
+    /**
+     * {@code Matrix} transpose.
+     *
+     * @return {@code A<sup>T</sup>}.
+     * @see <a href="https://en.wikipedia.org/wiki/Transpose">Matrix transpose</a>
+     */
     public Matrix transpose() {
         if (this.isEmpty()) {
             return Matrix.empty();
@@ -440,10 +597,11 @@ public class Matrix {
     }
 
     // region norms
+
     /***
      * One norm
      *
-     * @return maximum column sum
+     * @return maximum column sum.
      */
     public double norm1() {
         double norm = 0.0;
@@ -470,7 +628,7 @@ public class Matrix {
     /***
      * Infinity norm
      *
-     * @return maximum row sum
+     * @return maximum row sum.
      */
     public double normInf() {
         double norm = 0.0;
@@ -487,7 +645,7 @@ public class Matrix {
     /***
      * Frobenius norm
      *
-     * @return square root of the sum of squares of all elements
+     * @return square root of the sum of squares of all elements.
      */
     public double normFrob() {
         double norm = 0.0;
@@ -517,107 +675,118 @@ public class Matrix {
     }
 
     // region arithmetic operations
-    public Matrix add(Matrix m) {
-        checkMatrixDimensions(m);
+
+    /**
+     * Matrix addition.
+     * @param M The {@code Matrix} to add.
+     * @return {@code A + M}.
+     */
+    public Matrix add(Matrix M) {
+        checkMatrixDimensions(M);
         double[] result = new double[this.rows * this.cols];
         for (int i = 0; i < this.rows * this.cols; ++i) {
-            result[i] = this.data[i] + m.data[i];
+            result[i] = this.data[i] + M.data[i];
         }
         return new Matrix(result, rows, cols);
     }
 
-    public void addEquals(Matrix m) {
-        checkMatrixDimensions(m);
+    /**
+     * Matrix addition in place. This is equivalent to {@code A += B}.
+     * @param B The {@code Matrix} to add.
+     */
+    public void addEquals(Matrix B) {
+        checkMatrixDimensions(B);
         final int length = rows * cols;
         for (int i = 0; i < length; ++i) {
-            data[i] += m.data[i];
+            data[i] += B.data[i];
         }
     }
 
-    public Matrix subtract(Matrix m) {
-        checkMatrixDimensions(m);
+    /**
+     * Matrix subtraction.
+     * @param M The {@code Matrix} to subtract.
+     * @return {@code A - M}.
+     */
+    public Matrix subtract(Matrix M) {
+        checkMatrixDimensions(M);
         double[] result = new double[this.rows * this.cols];
         for (int i = 0; i < this.rows * this.cols; ++i) {
-            result[i] = this.data[i] - m.data[i];
+            result[i] = this.data[i] - M.data[i];
         }
         return new Matrix(result, rows, cols);
     }
 
-    public void subtractEquals(Matrix m) {
-        checkMatrixDimensions(m);
+    /**
+     * Matrix subtraction in place. This is equivalent to {@code A -= B}.
+     * @param B The {@code Matrix} to subtract.
+     */
+    public void subtractEquals(Matrix B) {
+        checkMatrixDimensions(B);
         final int length = rows * cols;
         for (int i = 0; i < length; ++i) {
-            data[i] -= m.data[i];
+            data[i] -= B.data[i];
         }
     }
-
-    // TODO documents all this multiply methods. Change m for B
 
     /**
      * Element-by-element multiplication, C = A.*B
      *
-     * @param m another matrix
+     * @param B another matrix
      * @return A.*B
      */
-
-    public Matrix arrayMultiply(Matrix m) {
-        checkMatrixDimensions(m);
-        return new Matrix(DoubleArrays.multiplyElementWise(data, m.data), rows, cols);
+    public Matrix arrayMultiply(Matrix B) {
+        checkMatrixDimensions(B);
+        return new Matrix(DoubleArrays.multiplyElementWise(data, B.data), rows, cols);
     }
 
     /**
      * Element-by-element multiplication in place, A = A.*B
      *
-     * @param m another matrix
+     * @param B another matrix
      * @return A.*B
      */
-
-    public void arrayMultiplyEquals(Matrix m) {
-        checkMatrixDimensions(m);
-        DoubleArrays.multiplyElementWiseInPlace(data, m.data);
+    public void arrayMultiplyEquals(Matrix B) {
+        checkMatrixDimensions(B);
+        DoubleArrays.multiplyElementWiseInPlace(data, B.data);
     }
 
     /**
      * Element-by-element right division, C = A./B
      *
-     * @param m another matrix
+     * @param B another matrix
      * @return A./B
      */
-
-    public Matrix arrayRightDivide(Matrix m) {
-        checkMatrixDimensions(m);
-        return new Matrix(DoubleArrays.divideElementWise(data, m.data), rows, cols);
+    public Matrix arrayRightDivide(Matrix B) {
+        checkMatrixDimensions(B);
+        return new Matrix(DoubleArrays.divideElementWise(data, B.data), rows, cols);
     }
 
     /**
      * Element-by-element right division in place, A = A./B
      *
-     * @param m another matrix
-     * @return A./B
+     * @param B another matrix
      */
-
-    public void arrayRightDivideEquals(Matrix m) {
-        checkMatrixDimensions(m);
-        DoubleArrays.divideElementWiseInPlace(data, m.data);
+    public void arrayRightDivideEquals(Matrix B) {
+        checkMatrixDimensions(B);
+        DoubleArrays.divideElementWiseInPlace(data, B.data);
     }
 
     /**
      * Element-by-element left division, C = A.\B
      *
-     * @param m another matrix
+     * @param B another matrix
      * @return A.\B
      */
-
-    public Matrix arrayLeftDivide(Matrix m) {
-        checkMatrixDimensions(m);
-        if (data.length != m.data.length) {
+    public Matrix arrayLeftDivide(Matrix B) {
+        checkMatrixDimensions(B);
+        if (data.length != B.data.length) {
             throw new IllegalArgumentException("a and b dimensions must match");
         }
 
         final int length = data.length;
         double[] data = Arrays.copyOf(this.data, length);
         for (int i = 0; i < length; ++i) {
-            data[i] = m.data[i] / data[i];
+            data[i] = B.data[i] / data[i];
         }
         return new Matrix(data, rows, cols);
     }
@@ -625,19 +794,17 @@ public class Matrix {
     /**
      * Element-by-element left division in place, A = A.\B
      *
-     * @param m another matrix
-     * @return A.\B
+     * @param B another matrix
      */
-
-    public void arrayLeftDivideEquals(Matrix m) {
-        checkMatrixDimensions(m);
-        if (data.length != m.data.length) {
+    public void arrayLeftDivideEquals(Matrix B) {
+        checkMatrixDimensions(B);
+        if (data.length != B.data.length) {
             throw new IllegalArgumentException("a and b dimensions must match");
         }
 
         final int length = data.length;
         for (int i = 0; i < length; ++i) {
-            data[i] = m.data[i] / data[i];
+            data[i] = B.data[i] / data[i];
         }
     }
 
@@ -647,7 +814,6 @@ public class Matrix {
      * @param s scalar
      * @return s*A
      */
-
     public Matrix multiply(double s) {
         return new Matrix(DoubleArrays.multiplyElementWise(data, s), rows, cols);
     }
@@ -658,7 +824,6 @@ public class Matrix {
      * @param s scalar
      * @return s*A
      */
-
     public ComplexMatrix multiply(Complex s) {
         return new ComplexMatrix(ComplexArrays.multiplyElementWise(data, s), rows, cols);
     }
@@ -667,21 +832,28 @@ public class Matrix {
      * Multiply a matrix by a scalar in place, A = s*A
      *
      * @param s scalar
-     * @return replace A by s*A
      */
-
     public void multiplyEquals(double s) {
         DoubleArrays.multiplyElementWiseInPlace(data, s);
     }
 
-    public Matrix multiply(Matrix matrix) {
+    /**
+     * Matrix multiplication.
+     * @param B The matrix to multiply.
+     * @return {@code A * B}
+     */
+    public Matrix multiply(Matrix B) {
         Matrix c = new Matrix(0, 0);
-        multiplyOp(this, matrix, c);
+        multiplyOp(this, B, c);
         return c;
     }
 
-    public void multiplyEquals(Matrix matrix) {
-        multiplyOp(this, matrix, this);
+    /**
+     * Matrix multiplication in place. This is equivalent to {@code A *= B}
+     * @param B The {@code Matrix} to multiply.
+     */
+    public void multiplyEquals(Matrix B) {
+        multiplyOp(this, B, this);
     }
 
     private static void multiplyOp(Matrix a, Matrix b, Matrix c) {
@@ -708,6 +880,11 @@ public class Matrix {
         c.cols = b.cols;
     }
 
+    /**
+     * Complex {@code Matrix} multiplication.
+     * @param matrix The complex {@code Matrix} to multiply;
+     * @return {@code A * B}.
+     */
     public ComplexMatrix multiply(ComplexMatrix matrix) {
         int bRows = matrix.getRowCount();
         int bCols = matrix.getColumnCount();
@@ -732,16 +909,29 @@ public class Matrix {
         }
         return new ComplexMatrix(result, rows, bCols);
     }
+
     // endregion
-    public Matrix solve(Matrix B) {
+
+    /**
+     * Solve system of linear equations. Three different algorithms are used depending on the shape of the matrix:
+     * <pre>
+     *     LU Decomposition if the matrix is squared.
+     *     QR if the matrix is thin in other words it has more rows than columns. (Overdetermined system)
+     *     Transpose QR if the matrix is short and wide in other words it has more columns than rows. (Under-determined system)
+     * </pre>
+     *
+     * @param b The solution {@Matrix}.
+     * @return The solution to {@code Ax = b}
+     */
+    public Matrix solve(Matrix b) {
 
         if (rows == cols) { // Matrix is Squared
-            return new LUDecomposition(this).solve(B);
+            return new LUDecomposition(this).solve(b);
         } else if (rows > cols) { // Matrix is thin (Overdetermined system)
-            return new QRDecomposition(this).solve(B);
-        } else { // Matrix is fat (Under-determined system)
+            return new QRDecomposition(this).solve(b);
+        } else { // Matrix is short and wide (Under-determined system)
             QRDecomposition qr = this.transpose().QR();
-            Matrix R1 = fwdSubsSolve(qr.getRT(), B);
+            Matrix R1 = forwardSubstitutionSolve(qr.getRT(), b);
             R1.appendRows(cols - R1.rows);
             return qr.QmultiplyX(R1);
         }
@@ -753,7 +943,6 @@ public class Matrix {
      * @param B right hand side
      * @return solution if A is square, least squares solution otherwise.
      */
-
     public Matrix transposeSolve(Matrix B) {
         return transpose().solve(B.transpose());
     }
@@ -762,9 +951,13 @@ public class Matrix {
         rows += count;
         final int newSize = rows * cols;
         data = Arrays.copyOf(data, newSize);
-
     }
 
+    /**
+     * Pseudo inverse of the {@code Matrix}.
+     *
+     * @return {@code A<sup>+</sup>}.
+     */
     public Matrix pinv() {
         int rows = this.rows;
         int cols = this.cols;
@@ -817,22 +1010,36 @@ public class Matrix {
         return sb.toString();
     }
 
+    /**
+     * Eigenvalue decomposition. The {@Matrix} is balanced ({@link Matrix#balance()}) prior to the decomposition.
+     *
+     * @return The {@link EigenvalueDecomposition} of the {@code Matrix}.
+     */
     public EigenvalueDecomposition eig() {
         return new EigenvalueDecomposition(this);
     }
 
+    /**
+     * Eigenvalue decomposition with optional pre balance.
+     *
+     * @param balance If this flag is set to {@code true}, the {@code Matrix} is balanced prior to the decomposition.
+     * @return The {@link EigenvalueDecomposition} of the {@code Matrix}.
+     */
     public EigenvalueDecomposition eig(boolean balance) {
         return new EigenvalueDecomposition(this, balance);
     }
 
-    /***
-     * Balances the matrix using the algorithm by parlett and reinsch with norm - 1.
+    /**
+     * Balances the matrix using the algorithm by Parlett and Reinsch with norm -1.
+     * References:
+     * <pre>
      * http://www.netlib.org/eispack/balanc.f
      * https://arxiv.org/pdf/1401.5766.pdf algorithm #2
+     * </pre>
      *
-     * @return
-     *
-     * @see "https://stackoverflow.com/a/43169781/6383857"
+     * @return A balanced copy of the {@code Matrix}.
+     * @see <a href="https://stackoverflow.com/a/43169781/6383857">Balancing a matrix</a>
+     * @see <a href="https://www.mathworks.com/help/matlab/ref/balance.html">Matrix balance</a>
      */
     public Matrix balance() {
         if (!this.isSquared()) {
@@ -925,14 +1132,30 @@ public class Matrix {
         return new Matrix(data, rows, rows);
     }
 
+    /**
+     * Number of rows.
+     *
+     * @return The number of rows of the {@code Matrix}.
+     */
     public int getRowCount() {
         return rows;
     }
 
+    /**
+     * Number of columns.
+     *
+     * @return The number of columns of the {@code Matrix}.
+     */
     public int getColumnCount() {
         return cols;
     }
 
+    /**
+     * Retrieve a row.
+     *
+     * @param row The index of the column to retrieve.
+     * @return The values of the row at the specified index.
+     */
     public double[] getRow(int row) {
         double[] result = new double[cols];
         int rowIndex = row * cols;
@@ -942,7 +1165,16 @@ public class Matrix {
         return result;
     }
 
+    /**
+     * Retrieve a column.
+     *
+     * @param col The index of the column to retrieve.
+     * @return The values of the column at the specified index.
+     */
     public double[] getCol(int col) {
+        if (col < 0 || col >= cols) {
+            throw new IllegalArgumentException("The column index col must be greater than zero and less than the number of columns.");
+        }
         double[] result = new double[rows];
         for (int i = 0; i < rows; ++i) {
             result[i] = data[i * rows + col];
@@ -950,15 +1182,44 @@ public class Matrix {
         return result;
     }
 
+    /**
+     * Retrieves the copy of the row packed data of the {@code Matrix}.
+     * <pre>
+     *     For a given Matrix:
+     *     A = 1 2 3
+     *         4 5 6
+     *         7 8 9
+     *     The row packed data will be [1, 2, 3, 4, 5, 6, 7, 8, 9]
+     * </pre>
+     *
+     * @return A copy of the internal data of the {@code Matrix}.
+     */
     public double[] getArrayCopy() {
         return Arrays.copyOf(data, data.length);
     }
 
+    /**
+     * Retrieves the row packed data of the {@code Matrix}. Changes to this array will change the contents of the {@code Matrix}.
+     * <pre>
+     *     For a given Matrix:
+     *     A = 1 2 3
+     *         4 5 6
+     *         7 8 9
+     *     The row packed data will be [1, 2, 3, 4, 5, 6, 7, 8, 9]
+     * </pre>
+     *
+     * @return The internal data of the {@code Matrix}.
+     */
     public double[] getArray() {
         return data;
     }
 
-    public double[][] getAs2DArray() {
+    /**
+     * Retrieve {@code Matrix} data as 2d array.
+     *
+     * @return A 2d array copy of the internal data of the {@Matrix}.
+     */
+    public double[][] getAs2dArray() {
         double[][] data = new double[rows][cols];
         for (int i = 0; i < rows; ++i) {
             data[i] = Arrays.copyOfRange(this.data, i * cols, i * cols + cols);
@@ -968,10 +1229,16 @@ public class Matrix {
 
     /**
      * Make a one-dimensional column packed copy of the internal array.
+     * <pre>
+     *     For a given Matrix:
+     *     A = 1 2 3
+     *         4 5 6
+     *         7 8 9
+     *     The column packed data will be [1, 4, 7, 2, 5, 8, 3, 6, 9]
+     * </pre>
      *
      * @return Matrix elements packed in a one-dimensional array by columns.
      */
-
     public double[] getColumnPackedCopy() {
         final int m = rows;
         final int n = cols;
@@ -1021,43 +1288,49 @@ public class Matrix {
 
     /**
      * Make a one-dimensional row packed copy of the internal array.
-     *
+     * <pre>
+     *     For a given Matrix:
+     *     A = 1 2 3
+     *         4 5 6
+     *         7 8 9
+     *     The row packed data will be [1, 2, 3, 4, 5, 6, 7, 8, 9]
+     * </pre>
      * @return Matrix elements packed in a one-dimensional array by rows.
      */
-
     public double[] getRowPackedCopy() {
         return this.getArrayCopy();
     }
 
-    /*
-     * ------------------------ Private Methods ------------------------
-     */
-
     /**
      * Check if size(A) == size(B)
      **/
-    // TODO should this be static?
     void checkMatrixDimensions(Matrix B) {
         if (B.rows != rows || B.cols != cols) {
             throw new IllegalArgumentException("Matrix dimensions must agree.");
         }
     }
 
-    // TODO
+    /**
+     * Set a row to a predefined set of values.
+     *
+     * @param i   The index of the row to set.
+     * @param row The values to set.
+     */
     public void setRow(int i, double[] row) {
         if (i < 0 || i >= rows) {
-            throw new IndexOutOfBoundsException("f");
+            throw new IndexOutOfBoundsException("The row index i is out of bounds, it must be greater than zero and less than the number of rows.");
         }
         if (row.length != cols) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("The length of the row cannot be greater than the number of columns.");
         }
         System.arraycopy(row, 0, data, i * cols, cols);
     }
 
     /**
      * Power of Matrix.
+     *
      * @param n The power to raise the matrix to.
-     * @return A^n
+     * @return {@code A<sup>n</n>}.
      */
     public Matrix pow(int n) {
         if (!this.isSquared()) {
@@ -1099,8 +1372,34 @@ public class Matrix {
     }
 
     /**
-     * Exponential of Matrix.
-     * @return e^A
+     * Power of Matrix using the Eigenvalues method.
+     *
+     * @param n The power to raise the matrix to.
+     * @return {@code A<sup>n</n>}.
+     */
+    public Matrix pow(double n) {
+        if (!this.isSquared()) {
+            throw new IllegalArgumentException("Matrix must be squared");
+        }
+        n = Math.abs(n);
+        if (n == 0.0 || n == 1.0 || n == 2.0 || n == 3.0) {
+            return pow((int) n);
+        }
+        Matrix a = n < 0 ? inv() : new Matrix(this);
+        EigenvalueDecomposition eig = a.eig();
+        Matrix D = eig.getD();
+        for (int i = 0, j = 0; i < D.rows; ++i, ++j) {
+            D.set(i, j, Math.pow(D.get(i, j), n));
+        }
+        Matrix result = eig.getV().multiply(D);
+        result.multiplyEquals(eig.getV().inv());
+        return result;
+    }
+
+    /**
+     * {@code Matrix} exponential.
+     *
+     * @return {@code e<sup>A</sup>}.
      */
     public Matrix expm() {
         MathETK.FRexpResult result = frexp(this.normInf());
@@ -1134,6 +1433,14 @@ public class Matrix {
 
     }
 
+    /**
+     * Vandermonde {@code Matrix}.
+     * @param x The coefficient values.
+     * @param rows The number of rows.
+     * @param cols The number of columns.
+     * @return {@code Vandermonde(rows, cols)}.
+     * @see <a href="https://en.wikipedia.org/wiki/Vandermonde_matrix">Vandermonde matrix</a>
+     */
     public static Matrix vandermonde(double[] x, int rows, int cols) {
         double[][] V = new double[rows][cols];
         for (int i = 0; i < rows; i++) {
@@ -1144,6 +1451,12 @@ public class Matrix {
         return new Matrix(V);
     }
 
+    /**
+     * Identity {@code Matrix}.
+     * @param rows The number of rows.
+     * @param cols The number of columns.
+     * @return {@code identity(rows, cols)}.
+     */
     public static Matrix identity(int rows, int cols) {
         double[] data = new double[rows * cols];
         for (int i = 0; i < rows; ++i) {
@@ -1156,14 +1469,30 @@ public class Matrix {
         return new Matrix(data, rows, cols);
     }
 
+    /**
+     * Identity {@code Matrix.}
+     * @param n The number of rows and columns.
+     * @return {@code identity(n, n)}.
+     */
     public static Matrix identity(int n) {
         return Matrix.identity(n, n);
     }
 
+    /**
+     * Random {@code Matrix.}
+     * @param n The number of rows and columns.
+     * @return {@code random(n, n)}.
+     */
     public static Matrix random(int n) {
         return random(n, n);
     }
 
+    /**
+     * Random {@code Matrix.}
+     * @param rows The number of rows
+     * @param cols The number of columns.
+     * @return {@code random(rows, cols)}.
+     */
     public static Matrix random(int rows, int cols) {
         Random rand = new Random();
         double[] data = new double[rows * cols];
@@ -1174,13 +1503,20 @@ public class Matrix {
         return new Matrix(data, rows, cols);
     }
 
-    public static Matrix companion(double[] coefs, int n) {
+    /**
+     * Companion matrix.
+     * @param coefficients The polynomial coefficients.
+     * @param n The number of rows and columns.
+     * @return The companion {@code Matrix} for the prescribed coefficients.
+     * @see <a href="https://mathworld.wolfram.com/CompanionMatrix.html">Companion matrix</a>
+     */
+    public static Matrix companion(double[] coefficients, int n) {
         // Construct the companion matrix
         Matrix c = new Matrix(n, n);
 
-        double a = 1.0 / coefs[0];
+        double a = 1.0 / coefficients[0];
         for (int i = 0; i < n; i++) {
-            c.set(0, n - 1 - i, -coefs[n - i] * a);
+            c.set(0, n - 1 - i, -coefficients[n - i] * a);
         }
         for (int i = 1; i < n; i++) {
             c.set(i, i - 1, 1);
@@ -1188,10 +1524,20 @@ public class Matrix {
         return c;
     }
 
+    /**
+     * Create empty {@code Matrix}.
+     * @return A {@code Matrix} with zero rows and zero columns.
+     */
     public static Matrix empty() {
         return new Matrix(0, 0);
     }
 
+    /**
+     * Magic {@code Matrix}.
+     * @param n The number of rows and columns.
+     * @return A magic {@code Matrix} of dimensions {@code n}.
+     * @see <a href="https://www.mathworks.com/help/matlab/ref/magic.html">Magic matrix</a>
+     */
     public static Matrix magic(int n) {
         Matrix magicMatrix;
         if (n == 1) {
@@ -1257,160 +1603,6 @@ public class Matrix {
             M[k + p][k] = t;
         }
         return new Matrix(M);
-    }
-
-    // Power using Eigen values
-//    public Matrix pow(double n) {
-//        if (!this.isSquared()) {
-//            throw new IllegalArgumentException("Matrix must be squared");
-//        }
-//        n = Math.abs(n);
-//        if (n == 0.0 || n == 1.0 || n == 2.0 || n == 3.0) {
-//            return pow((int) n);
-//        }
-//        Matrix a = n < 0 ? inv() : new Matrix(this);
-//        EigenvalueDecomposition eig = a.eig();
-//        Matrix D = eig.getD();
-//        for(int i = 0, j = 0; i < D._rows; ++i, ++j) {
-//            D.set(i, j, Math.pow(D.get(i, j), n));
-//        }
-//        Matrix result = eig.getV().multiply(D);
-//        result.multiplyEquals(eig.getV().inv());
-//        return result;
-//    }
-
-    // TODO add more matrix multiplication tests?
-    public static void main(String[] args) {
-//        Matrix a = Matrices.Magic(3);
-//        double[] rowPacked = a.getRowPackedCopy();
-//        double[] colPacked = a.getColumnPackedCopy();
-//
-//        System.out.println(a);
-//        System.out.println(Arrays.toString(rowPacked));
-//        System.out.println(Arrays.toString(colPacked));
-//
-//        System.out.println(Arrays.toString(a.getRow(1)));
-//        System.out.println(Arrays.toString(a.getCol(2)));
-//
-//        Matrix b = Matrices.Magic(3);
-//        Matrix c = new Matrix(b);
-//
-//        b = b.balance();
-//
-//        System.out.println();
-//        System.out.println(b);
-//        System.out.println();
-//        System.out.println(c);
-//
-//        double[] data = {1, 0.01, 0.0001, 100, 1, 0.01, 10000, 100, 1};
-//        Matrix d = new Matrix(data, 3);
-//        System.out.println();
-//        System.out.println(d);
-//
-//        d = d.balance();
-//        System.out.println();
-//        System.out.println(d);
-//
-//        Matrix mul = Matrices.Magic(3);
-//        System.out.println();
-//        System.out.println(mul);
-//        System.out.println();
-//        System.out.println(mul.pow(0));
-//        System.out.println();
-//        System.out.println(mul.pow(1));
-//        System.out.println();
-//        System.out.println(mul.pow(2));
-//        System.out.println();
-//        System.out.println(mul.pow(3));
-//        System.out.println();
-//        System.out.println(mul.pow(4));
-//        System.out.println();
-//        System.out.println(mul.pow(5));
-//
-//        double[][] ddata = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
-//
-//        Matrix E = new Matrix(ddata);
-//        System.out.println();
-//        System.out.println(E.expm());
-//
-//        double[][] Aa = {{-2, -1}, {1, 0}};
-//        EigenvalueDecomposition eigenvalueDecomposition = new EigenvalueDecomposition(new Matrix(Aa));
-//        Complex[] roots = ComplexArrays.zip(eigenvalueDecomposition.getRealEigenvalues(), eigenvalueDecomposition.getImagEigenvalues());
-//        double[] coefficients = new Polynomial(roots).getCoefficients();
-//        System.out.println(Arrays.toString(coefficients));
-//
-//        Aa = new double[][]{{-1}};
-//        eigenvalueDecomposition = new EigenvalueDecomposition(new Matrix(Aa));
-//        roots = ComplexArrays.zip(eigenvalueDecomposition.getRealEigenvalues(), eigenvalueDecomposition.getImagEigenvalues());
-//        coefficients = new Polynomial(roots).getCoefficients();
-//        System.out.println(Arrays.toString(coefficients));
-//
-//        System.out.println(Arrays.toString(new Polynomial(new Complex[]{Complex.fromReal(-1)}).getCoefficients()));
-//
-//        TransferFunction tf = new TransferFunction(new double[]{1}, new double[]{1});
-//        System.out.println(tf);
-//
-//        StateSpace ss = tf.toStateSpace();
-//        System.out.println(ss);
-
-        Test2();
-    }
-
-    public static void Test2() {
-        double value = -5.35;
-        double value1 = 0.0;
-        double value2 = -0.0;
-        double value3 = Double.NaN;
-        double value4 = Double.NEGATIVE_INFINITY;
-        double value5 = Double.POSITIVE_INFINITY;
-
-        MathETK.FRexpResult frexp = frexp(value);
-        System.out.println("Mantissa: " + frexp.mantissa);
-        System.out.println("Exponent: " + frexp.exponent);
-        System.out.println("Original value was: " + value);
-        System.out.println(frexp.mantissa + " * 2^" + frexp.exponent + " = ");
-        System.out.println(frexp.mantissa * (1 << frexp.exponent));
-        System.out.println();
-
-        frexp = frexp(value1);
-        System.out.println("Mantissa: " + frexp.mantissa);
-        System.out.println("Exponent: " + frexp.exponent);
-        System.out.println("Original value was: " + value1);
-        System.out.println(frexp.mantissa + " * 2^" + frexp.exponent + " = ");
-        System.out.println(frexp.mantissa * (1 << frexp.exponent));
-        System.out.println();
-
-        frexp = frexp(value2);
-        System.out.println("Mantissa: " + frexp.mantissa);
-        System.out.println("Exponent: " + frexp.exponent);
-        System.out.println("Original value was: " + value2);
-        System.out.println(frexp.mantissa + " * 2^" + frexp.exponent + " = ");
-        System.out.println(frexp.mantissa * (1 << frexp.exponent));
-        System.out.println();
-
-
-        frexp = frexp(value3);
-        System.out.println("Mantissa: " + frexp.mantissa);
-        System.out.println("Exponent: " + frexp.exponent);
-        System.out.println("Original value was: " + value3);
-        System.out.println(frexp.mantissa + " * 2^" + frexp.exponent + " = ");
-        System.out.println(frexp.mantissa * (1 << frexp.exponent));
-        System.out.println();
-
-        frexp = frexp(value4);
-        System.out.println("Mantissa: " + frexp.mantissa);
-        System.out.println("Exponent: " + frexp.exponent);
-        System.out.println("Original value was: " + value4);
-        System.out.println(frexp.mantissa + " * 2^" + frexp.exponent + " = ");
-        System.out.println(frexp.mantissa * (1 << frexp.exponent));
-        System.out.println();
-
-        frexp = frexp(value5);
-        System.out.println("Mantissa: " + frexp.mantissa);
-        System.out.println("Exponent: " + frexp.exponent);
-        System.out.println("Original value was: " + value5);
-        System.out.println(frexp.mantissa + " * 2^" + frexp.exponent + " = ");
-        System.out.println(frexp.mantissa * (1 << frexp.exponent));
     }
 
     /**

@@ -4,6 +4,20 @@ public final class Matrices {
     private Matrices() {
     }
 
+    /**
+     * Solve an {@code LDU Tri-diagonal system. A Tri-diagonal system is a matrix that only has entries
+     * in its sub-diagonal, its diagonal, and its super-diagonal e.g:
+     * <pre>
+     *     1 1 0
+     *     1 1 1
+     *     0 1 1
+     * </pre>
+     * @param lower The sub-diagonal.
+     * @param diagonal The diagonal.
+     * @param upper The super-diagonal.
+     * @param b The solution vector.
+     * @return The solution to {@code LDUX = b}
+     */
     public static void solveLDUTridiagonalSystem(double[] lower, double[] diagonal, double[] upper, double[] b) {
         final int m = b.length;
         b[0] = b[0] / diagonal[0];
@@ -19,6 +33,19 @@ public final class Matrices {
         }
     }
 
+    /**
+     * Solve an {@code LDL<sup>T</sup>} Tri-diagonal system. A Tri-diagonal system is a matrix that only has entries
+     * in its sub-diagonal, its diagonal, and its super-diagonal e.g:
+     * <pre>
+     *     1 1 0
+     *     1 1 1
+     *     0 1 1
+     * </pre>
+     * @param lower The sub-diagonal.
+     * @param diagonal The diagonal.
+     * @param b The solution vector.
+     * @return The solution to {@code LDL<sup>T</sup>X = b}
+     */
     public static double[] solveLDLtTridiagonalSystem(double[] lower, double[] diagonal, double[] b) {
         final int length = diagonal.length;
         for (int i = 0; i < length - 1; ++i) {
@@ -36,16 +63,16 @@ public final class Matrices {
 
     /**
      * Forward Substitution Solve.
-     * @param U The upper triangular Matrix.
-     * @param B The RHS (Solution) Matrix
-     * @return The solution of {@code UX = B}.
+     * @param L The Lower triangular Matrix.
+     * @param b The RHS (Solution) Matrix
+     * @return The solution of {@code LX = b}.
      */
-    public static Matrix fwdSubsSolve(Matrix U, Matrix B) {
-        final int nx = B.getColumnCount();
-        final int m = U.getRowCount();
-        final int n = U.getColumnCount();
-        double[] t = U.getArray();
-        double[] X = B.getArrayCopy();
+    public static Matrix forwardSubstitutionSolve(Matrix L, Matrix b) {
+        final int nx = b.getColumnCount();
+        final int m = L.getRowCount();
+        final int n = L.getColumnCount();
+        double[] t = L.getArray();
+        double[] X = b.getArrayCopy();
 
         for (int j = 0; j < nx; ++j) {
             for (int i = 0; i < m; ++i) {

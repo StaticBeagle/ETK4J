@@ -4,6 +4,8 @@ import com.wildbitsfoundry.etk4j.math.extrapolation.ExtrapolationMethod;
 import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 import org.junit.Test;
 
+import java.util.Arrays;
+
 import static org.junit.Assert.*;
 
 public class CubicSplineTest {
@@ -280,5 +282,13 @@ public class CubicSplineTest {
             cs.evaluateAt(right);
         });
         assertEquals("x = 3.0000 is bigger than every number in x[]", exception.getMessage());
+    }
+
+    @Test
+    public void testGetNumberOfSegments() {
+        double[] x = {1, 2, 3, 4};
+        double[] y = Arrays.copyOf(x, x.length);
+        CubicSpline cs = CubicSpline.newCubicSpline(x, y);
+        assertEquals(3, cs.getNumberOfSegments());
     }
 }
