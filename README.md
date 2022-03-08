@@ -1,21 +1,22 @@
 # ETK4J
-Engineering Toolkit for Java
+##Engineering Toolkit for Java
 
-This is a project that I work on my spare time. The purpose of the project
-is to have a centralized library that's 100% in Java that allows one to prototype solutions
-to engineering problems. 
+The purpose of this project is to create a library that can be used to prototype solutions to engineering problems. One 
+of the main goals of the library is to be a 100% in Java. Some algorithms in the library are not state-of-the-art, but 
+they should be good enough in terms of accuracy and speed for many applications.
 
-The linear algebra part of the library was taken from [Jama](https://math.nist.gov/javanumerics/jama/)
-and the internal data representation was changed from 2d array of doubles to a 1d array of doubles
-and the values are accessed via an offset.
+The linear algebra part of the library is based on [Jama](https://math.nist.gov/javanumerics/jama/).
+The main difference between [Jama](https://math.nist.gov/javanumerics/jama/) and this project is that the internal
+representation of the data was changed from a 2d array of doubles to a 1d array of doubles and the values are accessed
+using an offset. Other matrix methods were added as well.
 
-Some algorithms in the library are not state-of-the-art, but they should be good enough in terms of accuracy
-and speed for many applications.
+The library also uses code translated from [SciPy](https://scipy.org/) and [NumPy](https://numpy.org/). 
+Pleas see [SciPy](https://github.com/StaticBeagle/ETK4J/blob/master/SciPy).
 
-The library also uses code translated from SciPy and Numpy especially the analog filter part.
+Last but not least, this project includes code that was translated from [numal](https://github.com/JeffBezanson/numal).
 
 There's a set of examples that show how to use some classes contained in the library. The examples
-can be found
+can be found in:
 
     src/main/java
 
