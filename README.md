@@ -13,7 +13,8 @@ using an offset. Other matrix methods were added as well.
 The library also uses code translated from [SciPy](https://scipy.org/) and [NumPy](https://numpy.org/). 
 Pleas see [SciPy](https://github.com/StaticBeagle/ETK4J/blob/master/SciPy).
 
-Last but not least, this project includes code that was translated from [numal](https://github.com/JeffBezanson/numal).
+Last but not least, this project includes code that was translated from [numal](https://github.com/JeffBezanson/numal),
+and also from [Math.NET](https://www.mathdotnet.com/) please see [Math.NET](https://github.com/StaticBeagle/ETK4J/blob/master/Math.NET.txt).
 
 There's a set of examples that show how to use some classes contained in the library. The examples
 can be found in:
