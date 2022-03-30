@@ -40,6 +40,7 @@ public class Matrix {
      *         7 8 9
      *     The column packed data will be [1, 4, 7, 2, 5, 8, 3, 6, 9]
      * </pre>
+     * No checks are done to ensure that the data is not null so proceed with caution.
      * @param data The column packed data.
      * @param rows The number of rows of the {@code Matrix}.
      */
@@ -65,9 +66,19 @@ public class Matrix {
      * @param data The 2d array of values used to populate the {@code Matrix} internal storage.
      */
     public Matrix(double[][] data) {
-        rows = data.length;
-        cols = data[0].length;
-        this.data = DoubleArrays.flatten(data);
+        if(data.length == 0) {
+            rows = 0;
+            cols = 0;
+            this.data = new double[0];
+        } else if(data == null) {
+            rows = 0;
+            cols = 0;
+            this.data = null;
+        } else {
+            rows = data.length;
+            cols = data[0].length;
+            this.data = DoubleArrays.flatten(data);
+        }
     }
 
     /***
@@ -79,6 +90,7 @@ public class Matrix {
      *         7 8 9
      *     The row packed data will be [1, 2, 3, 4, 5, 6, 7, 8, 9]
      * </pre>
+     * No checks are done to ensure that the data is not null so proceed with caution.
      * @param data The row packed data.
      * @param rows The number of rows of the {@code Matrix}.
      * @param cols The number of columns of the {@code Matrix}.
@@ -999,6 +1011,9 @@ public class Matrix {
 
     @Override
     public String toString() {
+        if(isEmpty()) {
+            return "[]";
+        }
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < rows * cols; ++i) {
             if (i > 0 && i % cols == 0) {

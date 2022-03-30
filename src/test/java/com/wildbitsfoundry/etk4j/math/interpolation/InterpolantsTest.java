@@ -7,8 +7,6 @@ import static org.junit.Assert.assertEquals;
 
 public class InterpolantsTest {
 
-	// TODO test derivatives and definite/indefinite integrals
-
 	@Test
 	public void testLinear() {
 		double x = linear(1, 2, 1, 2, 1.5);

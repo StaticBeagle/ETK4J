@@ -616,4 +616,40 @@ public class StateSpaceTest {
             }
         }
     }
+
+    @Test
+    public void testToTransferFunctionNormalize() {
+        double[][] A = null;
+        double[][] B = null;
+        double[][] C = {{1, 2, 0}, {0, 1, 0}, {0, 0, 1}};
+        double[][] D = {{0, 0, 1}, {2, 3, 4}, {5, 6, 7}};
+
+        StateSpace ss = new StateSpace(A, B, C, D);
+        TransferFunction[] tfs = ss.toTransferFunction(0);
+        double[][] numerators = {{0, 0, 0, 0}, {2, 0, 0, 0}, {5, 0, 0, 0}};
+        double[] denominator = {1, 0, 0, 0};
+
+        for (int j = 0; j < tfs.length; ++j) {
+            assertArrayEquals(numerators[j], tfs[j].getNumeratorCoefficients(), 1e-12);
+            assertArrayEquals(denominator, tfs[j].getDenominatorCoefficients(), 1e-12);
+        }
+    }
+
+    @Test
+    public void testToTransferFunctionMatricesWithNoColumns() {
+//        double[][] A = new double[1][0];
+//        double[][] B = new double[1][0];
+//        double[][] C = {{1, 2, 0}, {0, 1, 0}, {0, 0, 1}};
+//        double[][] D = {{0, 0, 1}, {2, 3, 4}, {5, 6, 7}};
+//
+//        StateSpace ss = new StateSpace(A, B, C, D);
+//        TransferFunction[] tfs = ss.toTransferFunction(0);
+//        double[][] numerators = {{0, 0, 0, 0}, {2, 0, 0, 0}, {5, 0, 0, 0}};
+//        double[] denominator = {1, 0, 0, 0};
+//
+//        for (int j = 0; j < tfs.length; ++j) {
+//            assertArrayEquals(numerators[j], tfs[j].getNumeratorCoefficients(), 1e-12);
+//            assertArrayEquals(denominator, tfs[j].getDenominatorCoefficients(), 1e-12);
+//        }
+    }
 }

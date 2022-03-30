@@ -36,10 +36,10 @@ public class StateSpace extends LinearTimeInvariantSystem {
      * @param D The feed through matrix in array form.
      */
     public StateSpace(double[][] A, double[][] B, double[][] C, double[][] D) {
-        this.A = new Matrix(A);
-        this.B = new Matrix(B);
-        this.C = new Matrix(C);
-        this.D = new Matrix(D);
+        this.A = A == null ? null : new Matrix(A);
+        this.B = B == null ? null : new Matrix(B);
+        this.C = C == null ? null : new Matrix(C);
+        this.D = D == null ? null : new Matrix(D);
     }
 
     /**
@@ -50,10 +50,10 @@ public class StateSpace extends LinearTimeInvariantSystem {
      * @param D The feed through matrix.
      */
     public StateSpace(Matrix A, Matrix B, Matrix C, Matrix D) {
-        this.A = new Matrix(A);
-        this.B = new Matrix(B);
-        this.C = new Matrix(C);
-        this.D = new Matrix(D);
+        this.A = A == null ? null : new Matrix(A);
+        this.B = B == null ? null : new Matrix(B);
+        this.C = C == null ? null : new Matrix(C);
+        this.D = D == null ? null : new Matrix(D);
     }
 
     /**
@@ -109,15 +109,19 @@ public class StateSpace extends LinearTimeInvariantSystem {
      * @return An array of Transfer Functions, one transfer function per each output of the State Space system.
      */
     public TransferFunction[] toTransferFunction(int input) {
-        //TODO normalizeABCD
+        StateSpace ss = normalize(this);
+        Matrix A = ss.A;
+        Matrix B = ss.B;
+        Matrix C = ss.C;
+        Matrix D = ss.D;
         int nin = D.getColumnCount();
         int nout = D.getRowCount();
         if(input >= nin) {
             throw new IllegalArgumentException("System does not have the input specified.");
         }
         // make SIMO from possibly MIMO system.
-        Matrix Bb = B.subMatrix(0, B.getRowCount() - 1, input, input);
-        Matrix Dd = D.subMatrix(0, D.getRowCount() - 1, input, input);
+        B = B.subMatrix(0, B.getRowCount() - 1, input, input);
+        D = D.subMatrix(0, D.getRowCount() - 1, input, input);
 
         double[][] num;
         double[] den;
@@ -127,9 +131,8 @@ public class StateSpace extends LinearTimeInvariantSystem {
         }
         den = A.poly();
 
-        // TODO test this
-        if(Bb.getRowCount() * Bb.getColumnCount() == 0 && C.getRowCount() * C.getColumnCount() == 0) {
-            if(Dd.getRowCount() * Dd.getColumnCount() == 0 && A.getRowCount() * A.getColumnCount() == 0) {
+        if(B.getRowCount() * B.getColumnCount() == 0 && C.getRowCount() * C.getColumnCount() == 0) {
+            if(D.getRowCount() * D.getColumnCount() == 0 && A.getRowCount() * A.getColumnCount() == 0) {
                 den = new double[0];
             }
             return new TransferFunction[] { new TransferFunction(D.getArray(), den)};
@@ -140,12 +143,97 @@ public class StateSpace extends LinearTimeInvariantSystem {
         TransferFunction[] tfs = new TransferFunction[nout];
         for(int k = 0; k < nout; ++k) {
             double[] Ck = C.getRow(k);
-            double Dk = Dd.get(k, 0);
-            num[k] = A.subtract(new Matrix(dot(Bb.getArray(), Ck))).poly();
+            double Dk = D.get(k, 0);
+            num[k] = A.subtract(new Matrix(dot(B.getArray(), Ck))).poly();
             DoubleArrays.addElementWiseInPlace(num[k], DoubleArrays.multiplyElementWise(den, Dk - 1));
             tfs[k] = new TransferFunction(num[k], den);
         }
         return tfs;
+    }
+
+    /*
+    Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
+    All rights reserved. See https://github.com/StaticBeagle/ETK4J/blob/master/SciPy.
+     */
+    private StateSpace normalize(StateSpace ss) {
+        StateSpace result = new StateSpace(ss.A, ss.B, ss.C, ss.D);
+        Integer[] tmp = shapeOrNull(result.A);
+        Integer Ma = tmp[0];
+        Integer Na = tmp[1];
+
+        tmp = shapeOrNull(result.B);
+        Integer Mb = tmp[0];
+        Integer Nb = tmp[1];
+
+        tmp = shapeOrNull(result.C);
+        Integer Mc = tmp[0];
+        Integer Nc = tmp[1];
+
+        tmp = shapeOrNull(result.D);
+        Integer Md = tmp[0];
+        Integer Nd = tmp[1];
+
+        Integer p = choiceNotNull(Ma, Mb, Nc);
+        Integer q = choiceNotNull(Nb, Nd);
+        Integer r = choiceNotNull(Mc, Md);
+        if(p == null || q == null || r == null) {
+            throw new RuntimeException("Not enough information on the system.");
+        }
+
+        if(result.A == null) {
+            result.A = Matrix.empty();
+        }
+        if(result.B == null) {
+            result.B = Matrix.empty();
+        }
+        if(result.C == null) {
+            result.C = Matrix.empty();
+        }
+        if(result.D == null) {
+            result.D = Matrix.empty();
+        }
+        result.A = restore(result.A, p, p);
+        result.B = restore(result.B, p, q);
+        result.C = restore(result.C, r, p);
+        result.D = restore(result.D, r, q);
+
+        return result;
+    }
+
+    /*
+    Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
+    All rights reserved. See https://github.com/StaticBeagle/ETK4J/blob/master/SciPy.
+     */
+    private Integer[] shapeOrNull(Matrix m) {
+        return m != null ? new Integer[] {m.getRowCount(), m.getColumnCount()} : new Integer[2];
+    }
+
+    /*
+    Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
+    All rights reserved. See https://github.com/StaticBeagle/ETK4J/blob/master/SciPy.
+     */
+    private Integer choiceNotNull(Integer ...params) {
+        for(Integer i : params) {
+            if(i != null) {
+                return i;
+            }
+        }
+        return null;
+    }
+
+    /*
+    Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
+    All rights reserved. See https://github.com/StaticBeagle/ETK4J/blob/master/SciPy.
+     */
+    private Matrix restore(Matrix m, int rows, int cols) {
+        if(m.isEmpty()) {
+            return new Matrix(rows, cols);
+        } else {
+            if(m.getRowCount() != rows && m.getColumnCount() != cols) {
+                throw new RuntimeException("The input arrays have incompatible shapes.");
+            }
+            return m;
+        }
     }
 
     private static double[][] dot(double[] a, double[] b) {

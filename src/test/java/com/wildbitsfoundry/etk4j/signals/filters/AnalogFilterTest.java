@@ -1,10 +1,13 @@
 package com.wildbitsfoundry.etk4j.signals.filters;
 
-import static org.junit.Assert.assertArrayEquals;
-
+import com.wildbitsfoundry.etk4j.control.ZeroPoleGain;
+import com.wildbitsfoundry.etk4j.math.complex.Complex;
+import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 import org.junit.Test;
 
 import com.wildbitsfoundry.etk4j.control.TransferFunction;
+
+import static org.junit.Assert.*;
 
 public class AnalogFilterTest {
 
@@ -15,8 +18,7 @@ public class AnalogFilterTest {
         final HighPassSpecs hpSpecs = new HighPassSpecs();
         final BandpassSpecs bpSpecs = new BandpassSpecs();
         final BandStopSpecs bsSpecs = new BandStopSpecs();
-        // TODO make sure that the filter throws if any of the input parameters are negative
-        // This needs to be documented as well as a javadoc. Also that rp and rs are in db
+
         final double passBandRipple = -20.0 * Math.log10(1.0 / Math.sqrt(2.0));
         lpSpecs.setPassBandRipple(passBandRipple);
         lpSpecs.setStopBandAttenuation(70.0);
@@ -286,5 +288,47 @@ public class AnalogFilterTest {
         assertArrayEquals(new double[]{1.0, 1.280434349177472E8, 1.6542648052522944E17, 1.5411492224191265E25,
                 9.968017257598169E33, 6.1029509207797396E41, 2.5941518970044378E50, 7.95138667886433E57,
                 2.4591257855999993E66}, ba.getDenominator().getCoefficients(), 1e-12);
+    }
+
+    @Test
+    public void testBesselapPhaseNormalized() {
+        ZeroPoleGain zpk = Bessel.besselapPhaseNormalized(4);
+        System.out.println(zpk);
+        Complex p1 = new Complex(-0.6572111716718828, 0.8301614350048732);
+        Complex p2 = new Complex(-0.904758796788245, 0.2709187330038743);
+        Complex p3 = p2.conj();
+        Complex p4 = p1.conj();
+
+        assertTrue(zpk.getZeros().length == 0);
+        assertArrayEquals(new Complex[] {p1, p2, p3, p4}, zpk.getPoles());
+        assertEquals(1.0, zpk.getGain(), 1e-12);
+    }
+
+    @Test
+    public void testBesselapMagnitudeNormalized() {
+        ZeroPoleGain zpk = Bessel.besselapMagnitudeNormalized(4);
+        System.out.println(zpk);
+        Complex p1 = new Complex(-0.9952087643502732, 1.2571057394546656);
+        Complex p2 = new Complex(-1.3700678305514442, 0.4102497174937515);
+        Complex p3 = p2.conj();
+        Complex p4 = p1.conj();
+
+        assertTrue(zpk.getZeros().length == 0);
+        assertArrayEquals(new Complex[] {p1, p2, p3, p4}, zpk.getPoles());
+        assertEquals(5.258199010244166, zpk.getGain(), 1e-12);
+    }
+
+    @Test
+    public void testBesselapDelayNormalized() {
+        ZeroPoleGain zpk = Bessel.besselapDelayNormalized(4);
+        System.out.println(zpk);
+        Complex p1 = new Complex(-2.1037893971796278, 2.6574180418567526);
+        Complex p2 = new Complex(-2.8962106028203727, 0.8672341289345028);
+        Complex p3 = p2.conj();
+        Complex p4 = p1.conj();
+
+        assertTrue(zpk.getZeros().length == 0);
+        assertArrayEquals(new Complex[] {p1, p2, p3, p4}, zpk.getPoles());
+        assertEquals(105, zpk.getGain(), 1e-12);
     }
 }

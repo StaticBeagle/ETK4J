@@ -249,7 +249,7 @@ public class MatrixTest {
             if (B.get(B.getRowCount() - 1,
                     B.getColumnCount() - 1) != avals[B.getRowCount() - 1][B.getColumnCount() - 1]) {
                 errorCount = try_failure(errorCount, "get(int,int)... ",
-                        "Matrix entry (i,j) not successfully retreived");
+                        "Matrix entry (i,j) not successfully retrieved");
             } else {
                 try_success("get(int,int)... ", "");
             }
@@ -280,7 +280,7 @@ public class MatrixTest {
                 try_success("subMatrix(int,int,int,int)... ", "");
             } catch (java.lang.RuntimeException e) {
                 errorCount = try_failure(errorCount, "subMatrix(int,int,int,int)... ",
-                        "submatrix not successfully retreived");
+                        "sub-matrix not successfully retrieved");
             }
         } catch (java.lang.ArrayIndexOutOfBoundsException e) {
             errorCount = try_failure(errorCount, "subMatrix(int,int,int,int)... ",
@@ -310,7 +310,7 @@ public class MatrixTest {
                 try_success("subMatrix(int,int,int[])... ", "");
             } catch (java.lang.RuntimeException e) {
                 errorCount = try_failure(errorCount, "subMatrix(int,int,int[])... ",
-                        "submatrix not successfully retreived");
+                        "sub-matrix not successfully retrieved");
             }
         } catch (java.lang.ArrayIndexOutOfBoundsException e) {
             errorCount = try_failure(errorCount, "subMatrix(int,int,int[])... ",
@@ -339,7 +339,7 @@ public class MatrixTest {
                 try_success("subMatrix(int[],int,int)... ", "");
             } catch (java.lang.RuntimeException e) {
                 errorCount = try_failure(errorCount, "subMatrix(int[],int,int)... ",
-                        "submatrix not successfully retreived");
+                        "sub-matrix not successfully retrieved");
             }
         } catch (java.lang.ArrayIndexOutOfBoundsException e) {
             errorCount = try_failure(errorCount, "subMatrix(int[],int,int)... ",
@@ -368,7 +368,7 @@ public class MatrixTest {
                 try_success("subMatrix(int[],int[])... ", "");
             } catch (java.lang.RuntimeException e) {
                 errorCount = try_failure(errorCount, "subMatrix(int[],int[])... ",
-                        "submatrix not successfully retreived");
+                        "sub-matrix not successfully retrieved");
             }
         } catch (java.lang.ArrayIndexOutOfBoundsException e) {
             errorCount = try_failure(errorCount, "subMatrix(int[],int[])... ",
@@ -432,7 +432,7 @@ public class MatrixTest {
                 try_success("setMatrix(int,int,int,int,Matrix)... ", "");
             } catch (java.lang.RuntimeException e) {
                 errorCount = try_failure(errorCount, "setMatrix(int,int,int,int,Matrix)... ",
-                        "submatrix not successfully set");
+                        "sub-matrix not successfully set");
             }
             B.setMatrix(ib, ie, jb, je, SUB);
         } catch (java.lang.ArrayIndexOutOfBoundsException e1) {
@@ -462,7 +462,7 @@ public class MatrixTest {
                 try_success("setMatrix(int,int,int[],Matrix)... ", "");
             } catch (java.lang.RuntimeException e) {
                 errorCount = try_failure(errorCount, "setMatrix(int,int,int[],Matrix)... ",
-                        "submatrix not successfully set");
+                        "sub-matrix not successfully set");
             }
             B.setMatrix(ib, ie, jb, je, SUB);
         } catch (java.lang.ArrayIndexOutOfBoundsException e1) {
@@ -492,7 +492,7 @@ public class MatrixTest {
                 try_success("setMatrix(int[],int,int,Matrix)... ", "");
             } catch (java.lang.RuntimeException e) {
                 errorCount = try_failure(errorCount, "setMatrix(int[],int,int,Matrix)... ",
-                        "submatrix not successfully set");
+                        "sub-matrix not successfully set");
             }
             B.setMatrix(ib, ie, jb, je, SUB);
         } catch (java.lang.ArrayIndexOutOfBoundsException e1) {
@@ -522,7 +522,7 @@ public class MatrixTest {
                 try_success("setMatrix(int[],int[],Matrix)... ", "");
             } catch (java.lang.RuntimeException e) {
                 errorCount = try_failure(errorCount, "setMatrix(int[],int[],Matrix)... ",
-                        "submatrix not successfully set");
+                        "sub-matrix not successfully set");
             }
         } catch (java.lang.ArrayIndexOutOfBoundsException e1) {
             errorCount = try_failure(errorCount, "setMatrix(int[],int[],Matrix)... ",
@@ -912,8 +912,8 @@ public class MatrixTest {
      **/
 
     private static void print(String s) {
-        // Enable to see test output
-        // System.out.print(s);
+//        Enable to see test output
+//        System.out.print(s);
     }
 
     /**

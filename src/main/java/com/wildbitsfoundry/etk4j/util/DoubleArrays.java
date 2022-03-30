@@ -98,18 +98,6 @@ public final class DoubleArrays {
         return result;
     }
 
-    public static double[] add(double[] a, double[] b) {
-        if (a.length != b.length) {
-            throw new IllegalArgumentException("a and b dimensions must match");
-        }
-        final int length = a.length;
-        double[] result = new double[length];
-        for (int i = 0; i < length; ++i) {
-            result[i] = a[i] + b[i];
-        }
-        return result;
-    }
-
     public static double[] subtract(double[] a, double[] b) {
         double[] result = Arrays.copyOf(a, a.length);
         subtractElementWiseInPlace(result, b);
@@ -166,9 +154,6 @@ public final class DoubleArrays {
         return result;
     }
 
-    // TODO these element-wise functions can be rewritten without the elementWise
-    // I think the add function overlaps
-    // Maybe intead of add in place, add equals?
     public static double[] addElementWise(double[] a, double b) {
         double[] result = Arrays.copyOf(a, a.length);
         addElementWiseInPlace(result, b);
@@ -189,7 +174,7 @@ public final class DoubleArrays {
 
     public static void addElementWiseInPlace(double[] a, double[] b) {
         if (a.length != b.length) {
-            throw new IllegalArgumentException("a and b dimensions must match");
+            throw new IllegalArgumentException("a and b dimensions must match.");
         }
         for (int i = 0; i < a.length; ++i) {
             a[i] += b[i];
@@ -593,14 +578,14 @@ public final class DoubleArrays {
     }
 
     public static double[] gradient(double[] a, double[] h) {
-        // TODO
-        // check bounds
-        // check that arrays have the same size
+        if(a.length != h.length) {
+            throw new IllegalArgumentException("a and h dimensions must match.");
+        }
 
         double[] grad = new double[a.length];
         final int end = a.length - 1;
-        grad[0] = (a[1] - a[0]) / (h[1] - h[0]); // once sided difference
-        grad[end] = (a[end] - a[end - 1]) / (h[end] - h[end - 1]); // one sided difference
+        grad[0] = (a[1] - a[0]) / (h[1] - h[0]); // one-sided difference
+        grad[end] = (a[end] - a[end - 1]) / (h[end] - h[end - 1]); // one-sided difference
 
         // central difference
         for (int i = 1; i < end; ++i) {
@@ -717,8 +702,6 @@ public final class DoubleArrays {
         return result;
     }
 
-    // TODO concat and stack operations in place?
-
     // https://stackoverflow.com/a/17634025/6383857
     public static double[][] transpose(double[][] a) {
         // empty or unset array, nothing do to here
@@ -761,7 +744,7 @@ public final class DoubleArrays {
         double[] aaaa = {0, 1, 1, 0, 2, 3, 5, 0, 8, 13, 21};
         System.out.println(argMin(aaaa));
 
-        System.out.println(Arrays.toString(add(a, b)));
+        //System.out.println(Arrays.toString(add(a, b)));
         System.out.println(Arrays.toString(addElementWise(a, b)));
 
         System.out.println(Arrays.toString(convolution(aaa, aaaa)));

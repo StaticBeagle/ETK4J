@@ -19,9 +19,8 @@ import java.util.List;
 import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkXYDimensions;
 
 /**
- * //TODO
- *
- * @author Marcos L. Lopez-Rivera
+ * The {@code Polynomial} class represents a polynomial {@code P(x) = c<sub>0</sub>x<sup>n</sup> +
+ * c<sub>1</sub>x<sup>n - 1</sup> + ... + c<sub>n</sub>x<sup>0</sup>}.
  */
 public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction, DifferentiableFunction,
         IntegrableFunction {

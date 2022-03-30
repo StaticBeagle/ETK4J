@@ -109,7 +109,7 @@ public abstract class LinearTimeInvariantSystem {
                     double[][] Ad = expMT.subMatrix(0, noStates - 1, 0, noStates - 1).getAs2dArray();
                     double[][] Bd = expMT.subMatrix(noStates, expMT.getRowCount() - 1, 0, noStates - 1).getAs2dArray();
                     for (int i = 1; i < noSteps; ++i) {
-                        xOut[i] = DoubleArrays.add(dot(xOut[i - 1], Ad), dot(U[i - 1], Bd));
+                        xOut[i] = DoubleArrays.addElementWise(dot(xOut[i - 1], Ad), dot(U[i - 1], Bd));
                     }
                     break;
                 }
@@ -136,7 +136,7 @@ public abstract class LinearTimeInvariantSystem {
                         DoubleArrays.subtractElementWiseInPlace(Bd0[i], Bd1[i]);
                     }
                     for (int i = 1; i < noSteps; ++i) {
-                        xOut[i] = DoubleArrays.add(dot(xOut[i - 1], Ad), dot(U[i - 1], Bd0));
+                        xOut[i] = DoubleArrays.addElementWise(dot(xOut[i - 1], Ad), dot(U[i - 1], Bd0));
                         DoubleArrays.addElementWiseInPlace(xOut[i], dot(U[i], Bd1));
                     }
                     break;
@@ -444,7 +444,7 @@ public abstract class LinearTimeInvariantSystem {
      * Helper method to find the "interesting frequencies" where the system is exhibiting change.
      *
      * @param numberOfPoints The number of points to calculate the frequency at.
-     * @return
+     * @return the frequencies where cool things are happening.
      */
     private double[] findFrequencies(int numberOfPoints) {
         ZeroPoleGain zpk = this.toZeroPoleGain();

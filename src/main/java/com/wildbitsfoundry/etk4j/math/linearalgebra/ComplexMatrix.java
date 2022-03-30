@@ -136,7 +136,7 @@ public class ComplexMatrix {
 
     // region arithmetic operations
     public ComplexMatrix add(ComplexMatrix m) {
-        //checkMatrixDimensions(m);
+        checkMatrixDimensions(m);
         Complex[] result = new Complex[this.rows * this.cols];
         for (int i = 0; i < this.rows * this.cols; ++i) {
             result[i] = this.data[i].add(m.data[i]);
@@ -144,18 +144,18 @@ public class ComplexMatrix {
         return new ComplexMatrix(result, rows, cols);
     }
 
-    //TODO
-//    public void addEquals(Matrix m) {
-//        //checkMatrixDimensions(m);
-//        final int length = rows * cols;
-//        for (int i = 0; i < length; ++i) {
-//            data[i] += m.data[i];
-//        }
-//    }
+    public void addEquals(Matrix m) {
+        double[] mData = m.getArray();
+        checkMatrixDimensions(m);
+        final int length = rows * cols;
+        for (int i = 0; i < length; ++i) {
+            data[i].addEquals(mData[i]);
+        }
+    }
 
     public ComplexMatrix subtract(Matrix m) {
         double[] data = m.getArray();
-        m.checkMatrixDimensions(m); // TODO make this method static and move it to matrices. It's not doing anything right now
+        checkMatrixDimensions(m);
         Complex[] result = new Complex[this.rows * this.cols];
         for (int i = 0; i < this.rows * this.cols; ++i) {
             result[i] = this.data[i].subtract(data[i]);
@@ -257,6 +257,24 @@ public class ComplexMatrix {
         }
         sb.setLength(sb.length() - 1);
         return sb.toString();
+    }
+
+    /**
+     * Check if size(A) == size(B)
+     **/
+    void checkMatrixDimensions(ComplexMatrix B) {
+        if (B.rows != rows || B.cols != cols) {
+            throw new IllegalArgumentException("Matrix dimensions must agree.");
+        }
+    }
+
+    /**
+     * Check if size(A) == size(B)
+     **/
+    void checkMatrixDimensions(Matrix B) {
+        if (B.getRowCount() != rows || B.getColumnCount() != cols) {
+            throw new IllegalArgumentException("Matrix dimensions must agree.");
+        }
     }
 
     public static void main(String[] args) {

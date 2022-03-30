@@ -565,9 +565,16 @@ public class TransferFunction extends LinearTimeInvariantSystem {
         return m;
     }
 
-    /** TODO
-     * Substitute
-     * @param d
+    /**
+     * Substitute in place. Substitutes the complex variable s by s * d.
+     * For example:
+     * <pre>
+     *     H(s) = s / (s^2 + s + 1)
+     *     Let s = s * d
+     *     H(s * d) = (s * d) / (s^2 * d^2 + s * d + 1)
+     * </pre>
+     * This operation modifies the coefficients of this transfer function.
+     * @param d The value to substitute into H(s * d).
      */
     public void substituteInPlace(double d) {
         rf.substituteInPlace(d);

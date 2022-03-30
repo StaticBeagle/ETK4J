@@ -44,8 +44,26 @@ public class Bessel extends AnalogFilter {
         MAGNITUDE
     }
 
+    /*
+    Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
+    All rights reserved. See https://github.com/StaticBeagle/ETK4J/blob/master/SciPy.
+     */
+
+    /**
+     * Bessel analog low pass filter prototype.This method is an alias for {@link Bessel#besselapPhaseNormalized(int)}.
+     * The filter is normalized such that the phase response reaches its
+     * midpoint at an angular (e.g., rad/s) cutoff frequency of 1. This
+     * happens for both low-pass and high-pass filters, so this is the
+     * "phase-matched" case. [6]
+     * The magnitude response asymptotes are the same as a Butterworth
+     * filter of the same order with a cutoff of `Wn`.
+     * This is the default, and matches MATLAB's implementation.
+     * Port from scipy.
+     *
+     * @param n The order of the filter.
+     */
     public static ZeroPoleGain besselap(int n) {
-        return besselap(n, FrequencyNormalization.PHASE);
+        return besselapPhaseNormalized(n);
     }
 
     /*
@@ -55,42 +73,17 @@ public class Bessel extends AnalogFilter {
 
     /**
      * Bessel analog low pass filter prototype.
-     * Port from scipy
+     * The filter is normalized such that the phase response reaches its
+     * midpoint at an angular (e.g., rad/s) cutoff frequency of 1. This
+     * happens for both low-pass and high-pass filters, so this is the
+     * "phase-matched" case. [6]
+     * The magnitude response asymptotes are the same as a Butterworth
+     * filter of the same order with a cutoff of `Wn`.
+     * This is the default, and matches MATLAB's implementation.
+     * Port from scipy.
      *
-     * @param n    The order of the filter.
-     * @param norm The {@link FrequencyNormalization}.
+     * @param n The order of the filter.
      */
-    public static ZeroPoleGain besselap(int n, FrequencyNormalization norm) { // change norm to enum
-        if (n == 0) {
-            return new ZeroPoleGain(new Complex[]{}, new Complex[]{}, 1.0);
-        }
-        Complex[] zeros = {};
-        Complex[] poles = Arrays.stream(besselZeros(n)).map(Complex::invert).toArray(Complex[]::new);
-        double k = 1.0;
-
-        double aLast = Math.floor(fallingFactorial(2 * n, n) / Math.pow(2, n));
-        switch (norm) {
-            case DELAY:
-                k = aLast;
-                break;
-            case MAGNITUDE:
-                k = aLast;
-                double normFactor = normFactor(poles, k, 1.0 / Math.sqrt(2.0));
-                for (int i = 0; i < n; ++i) {
-                    poles[i].divideEquals(normFactor);
-                }
-                k = Math.pow(normFactor, -n) * aLast;
-                break;
-            case PHASE:
-                for (int i = 0; i < n; ++i) {
-                    poles[i].multiplyEquals(Math.pow(10, -Math.log10(aLast) / n));
-                }
-                break;
-        }
-        return new ZeroPoleGain(zeros, poles, k);
-    }
-
-    // TODO test these implementations and remove the enum
     public static ZeroPoleGain besselapPhaseNormalized(int n) {
         if (n == 0) {
             return new ZeroPoleGain(new Complex[]{}, new Complex[]{}, 1.0);
@@ -106,6 +99,19 @@ public class Bessel extends AnalogFilter {
         return new ZeroPoleGain(zeros, poles, k);
     }
 
+    /*
+    Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
+    All rights reserved. See https://github.com/StaticBeagle/ETK4J/blob/master/SciPy.
+     */
+
+    /**
+     * Bessel analog low pass filter prototype.
+     * The filter is normalized such that the group delay in the passband
+     * is 1 (e.g., 1 second). This is the "natural" type obtained by
+     * solving Bessel polynomials.
+     *
+     * @param n The order of the filter.
+     */
     public static ZeroPoleGain besselapDelayNormalized(int n) {
         if (n == 0) {
             return new ZeroPoleGain(new Complex[]{}, new Complex[]{}, 1.0);
@@ -116,7 +122,20 @@ public class Bessel extends AnalogFilter {
         return new ZeroPoleGain(zeros, poles, aLast);
     }
 
-    public static ZeroPoleGain besselapMagnitudeNormalized(int n, double magDrop) {
+    /*
+    Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
+    All rights reserved. See https://github.com/StaticBeagle/ETK4J/blob/master/SciPy.
+     */
+
+    /**
+     * Bessel analog low pass filter prototype.
+     * The filter is normalized such that the gain magnitude is -3 dB at
+     * angular frequency 1. This is called "frequency normalization" by
+     * Bond. [1]
+     *
+     * @param n The order of the filter.
+     */
+    public static ZeroPoleGain besselapMagnitudeNormalized(int n) {
         if (n == 0) {
             return new ZeroPoleGain(new Complex[]{}, new Complex[]{}, 1.0);
         }
@@ -126,7 +145,7 @@ public class Bessel extends AnalogFilter {
         double aLast = Math.floor(fallingFactorial(2 * n, n) / Math.pow(2, n));
         double k = aLast;
         // 1.0 / Math.sqrt(2.0) = -3 db which is equal to 10 ^ (-3.0 / 20.0)
-        double normFactor = normFactor(poles, k, magDrop);
+        double normFactor = normFactor(poles, k, 1.0 / Math.sqrt(2.0));
         for (int i = 0; i < n; ++i) {
             poles[i].divideEquals(normFactor);
         }
@@ -136,7 +155,8 @@ public class Bessel extends AnalogFilter {
 
     /**
      * Low pass filter realization.
-     * @param n The order of the filter.
+     *
+     * @param n  The order of the filter.
      * @param wn The cutoff frequency of the filter.
      * @return A {@link TransferFunction} representation of the filter. {@link Bessel#newLowPassZPK(int, double)},
      * is more numerically accurate than converting the zeros, poles, and gain into a {@link TransferFunction} so if the
@@ -151,7 +171,8 @@ public class Bessel extends AnalogFilter {
 
     /**
      * Low pass filter realization.
-     * @param n The order of the filter.
+     *
+     * @param n  The order of the filter.
      * @param wn The cutoff frequency of the filter.
      * @return A {@link ZeroPoleGain} representation of the filter.
      */
@@ -162,7 +183,8 @@ public class Bessel extends AnalogFilter {
 
     /**
      * High pass filter realization.
-     * @param n The order of the filter.
+     *
+     * @param n  The order of the filter.
      * @param wn The cutoff frequency of the filter.
      * @return A {@link TransferFunction} representation of the filter. {@link Bessel#newHighPassZPK(int, double)},
      * is more numerically accurate than converting the zeros, poles, and gain into a {@link TransferFunction} so if the
@@ -177,7 +199,8 @@ public class Bessel extends AnalogFilter {
 
     /**
      * High pass filter realization.
-     * @param n The order of the filter.
+     *
+     * @param n  The order of the filter.
      * @param wn The cutoff frequency of the filter.
      * @return A {@link ZeroPoleGain} representation of the filter.
      */
@@ -189,7 +212,8 @@ public class Bessel extends AnalogFilter {
 
     /**
      * Bandpass filter realization.
-     * @param n The order of the filter.
+     *
+     * @param n   The order of the filter.
      * @param wp1 The lower cutoff frequency of the filter.
      * @param wp2 The upper cutoff frequency of the filter.
      * @return A {@link TransferFunction} representation of the filter. {@link Bessel#newBandpassZPK(int, double, double)},
@@ -207,7 +231,8 @@ public class Bessel extends AnalogFilter {
 
     /**
      * Bandpass filter realization.
-     * @param n The order of the filter.
+     *
+     * @param n   The order of the filter.
      * @param wp1 The lower cutoff frequency of the filter.
      * @param wp2 The upper cutoff frequency of the filter.
      * @return A {@link ZeroPoleGain} representation of the filter.
@@ -222,7 +247,8 @@ public class Bessel extends AnalogFilter {
 
     /**
      * Band stop filter realization.
-     * @param n The order of the filter.
+     *
+     * @param n   The order of the filter.
      * @param wp1 The lower cutoff frequency of the filter.
      * @param wp2 The upper cutoff frequency of the filter.
      * @return A {@link TransferFunction} representation of the filter. {@link Bessel#newBandStopZPK(int, double, double)},
@@ -240,7 +266,8 @@ public class Bessel extends AnalogFilter {
 
     /**
      * Band stop filter realization.
-     * @param n The order of the filter.
+     *
+     * @param n   The order of the filter.
      * @param wp1 The lower cutoff frequency of the filter.
      * @param wp2 The upper cutoff frequency of the filter.
      * @return A {@link ZeroPoleGain} representation of the filter.

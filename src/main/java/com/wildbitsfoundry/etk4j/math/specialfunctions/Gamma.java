@@ -5,8 +5,6 @@ public final class Gamma {
     private Gamma() {
     }
 
-    // TODO test
-
     /**
      * Gamma function
      * @param x Argument at which to evaluate the function.
@@ -46,8 +44,6 @@ public final class Gamma {
         }
         return (inv ? f / g : g);
     }
-
-    // TODO test
 
     /**
      * Reciprocal of the gamma function.
@@ -90,7 +86,6 @@ public final class Gamma {
         return odd[0] * x + even[0];
     }
 
-    // TODO test
     /**
      * Natural logarithm of the gamma function.
      * @param x Argument at which to evaluate the function. x must be >= 0.
