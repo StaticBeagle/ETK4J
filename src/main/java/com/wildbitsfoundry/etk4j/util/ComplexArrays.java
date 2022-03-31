@@ -13,6 +13,13 @@ public final class ComplexArrays {
 
     }
 
+    /**
+     * Deep copy of array.
+     *
+     * @param a The array to copy.
+     * @return The deep copy i.e. new Complex values created from the real and imaginary part of the corresponding
+     * Complex value in the input array.
+     */
     public static Complex[] deepCopy(Complex[] a) {
         final int length = a.length;
         Complex[] result = new Complex[length];
@@ -22,7 +29,14 @@ public final class ComplexArrays {
         return result;
     }
 
-    public static Complex[] convolution(Complex[] a, Complex[] b) {
+    /**
+     * Convolve two arrays.
+     *
+     * @param a The left-hand array.
+     * @param b The right-hand array.
+     * @return The convolution of {@code a} and {@code b}.
+     */
+    public static Complex[] convolve(Complex[] a, Complex[] b) {
         Complex[] result = new Complex[a.length + b.length - 1];
         for (int i = 0; i < result.length; ++i) {
             result[i] = new Complex();
@@ -35,36 +49,11 @@ public final class ComplexArrays {
 
     static int MOD = 998244353;
 
-    // Function to generate a convolution
-// array of two given arrays
-    public static void findConvolution(int[] a, int[] b) {
-
-        // Stores the size of arrays
-        int n = a.length, m = b.length;
-
-        // Stores the final array
-        int[] c = new int[(n + m - 1)];
-
-        // Traverse the two given arrays
-        for (int i = 0; i < n; ++i) {
-            for (int j = 0; j < m; ++j) {
-
-                // Update the convolution array
-                c[i + j] += (a[i] * b[j]) % MOD;
-            }
-        }
-
-        // Print the convolution array c[]
-        for (int k = 0; k < c.length; ++k) {
-            c[k] %= MOD;
-            System.out.print(c[k] + " ");
-        }
-    }
-
-    /***
-     * Element wise
-     * @param a
-     * @return
+    /**
+     * Real part of a Complex array element wise.
+     *
+     * @param a The input array.
+     * @return An array of doubles containing the real part of each Complex value of the input array.
      */
     public static double[] real(Complex[] a) {
         double[] result = new double[a.length];
@@ -74,6 +63,13 @@ public final class ComplexArrays {
         return result;
     }
 
+    /**
+     * Create a new Complex array from an array of real values.
+     *
+     * @param a The input array.
+     * @return An array of Complex values with real part equal to the values of the input array and imaginary part
+     * equal to zero.
+     */
     public static Complex[] fromReal(double[] a) {
         Complex[] result = new Complex[a.length];
         for (int i = 0; i < a.length; ++i) {
@@ -82,6 +78,12 @@ public final class ComplexArrays {
         return result;
     }
 
+    /**
+     * Imaginary part of a Complex array element wise.
+     *
+     * @param a The input array.
+     * @return An array of doubles containing the imaginary part of each Complex value of the input array.
+     */
     public static double[] imag(Complex[] a) {
         double[] result = new double[a.length];
         for (int i = 0; i < a.length; ++i) {
@@ -90,6 +92,13 @@ public final class ComplexArrays {
         return result;
     }
 
+    /**
+     * Create a new Complex array from an array of real values.
+     *
+     * @param a The input array.
+     * @return An array of Complex values with imaginary part equal to the values of the input array and real part
+     * equal to zero.
+     */
     public static Complex[] fromImaginary(double[] a) {
         Complex[] result = new Complex[a.length];
         for (int i = 0; i < a.length; ++i) {
@@ -98,6 +107,14 @@ public final class ComplexArrays {
         return result;
     }
 
+    /**
+     * Convert and array representing the real part of an array of Complex number and another array representing the
+     * imaginary part of an array of Complex into an array of Complex numbers.
+     *
+     * @param real The real part of the array of Complex to be created.
+     * @param imag The imaginary part of the array of Complex to be created.
+     * @return {@code {new Complex(real[i], imag[i], ..., new Complex(real[n], imag[n]}}.
+     */
     public static Complex[] zip(double[] real, double[] imag) {
         checkXYDimensions(real, imag);
         final int length = real.length;
@@ -108,6 +125,12 @@ public final class ComplexArrays {
         return c;
     }
 
+    /**
+     * Mean of the array.
+     *
+     * @param a The input array.
+     * @return The mean of the input array.
+     */
     public static Complex mean(Complex[] a) {
         double realMean = 0.0;
         double imagMean = 0.0;
@@ -119,6 +142,12 @@ public final class ComplexArrays {
         return new Complex(realMean / a.length, imagMean / a.length);
     }
 
+    /**
+     * Creates and array of {@code n} 0 + j0.
+     *
+     * @param length The length of the array of ones.
+     * @return An array containing {@code n} Complex(0, 0).
+     */
     public static Complex[] zeros(int length) {
         if (length < 0) {
             throw new IllegalArgumentException("dim must be greater than zero.");
@@ -130,6 +159,19 @@ public final class ComplexArrays {
         return result;
     }
 
+    /**
+     * Converts (flattens) a 2d array into a 1d array by copying
+     * every row of the 2d array into the 1d array.
+     * <pre>
+     * let a = {{1, 2, 3}, {4, 5, 6}};
+     * thus flatten(a) returns:
+     * {1, 2, 3, 4, 5, 6}
+     * </pre>
+     *
+     * @param a array to flatten
+     * @return a new row-packed 1d array
+     * @throws IllegalArgumentException if the input array a is jagged (i.e. not all rows have the same length)
+     */
     public static Complex[] flatten(Complex[][] a) {
         int rows = a.length;
         int cols = a[0].length;
@@ -144,31 +186,46 @@ public final class ComplexArrays {
     }
 
     // region arithmetic operations
-    public static Complex[] addElementWise(Complex[] a, Complex b, int start, int end) {
-        Complex[] result = new Complex[end - start];
-        for (int i = start, k = 0; i < end; ++i, ++k) {
-            result[k] = a[i].add(b);
+
+    /**
+     * Add a Complex value to an array of Complex values, element wise.
+     *
+     * @param a The input array.
+     * @param b The Complex value to be added.
+     * @return {@code a + b}.
+     **/
+    public static Complex[] addElementWise(Complex[] a, Complex b) {
+        Complex[] result = new Complex[a.length];
+        for (int i = 0; i < a.length; ++i) {
+            result[i] = a[i].add(b);
         }
         return result;
     }
 
-    public static Complex[] addElementWise(Complex[] a, Complex b) {
-        return addElementWise(a, b, 0, a.length);
-    }
-
+    /**
+     * Add two Complex arrays.
+     * @param a The left-hard array.
+     * @param b The right-hand array.
+     * @return {@code a + b}.
+     */
     public static Complex[] addElementWise(Complex[] a, Complex[] b) {
         int aLength = a.length;
         int bLength = b.length;
-        if(aLength != bLength) {
+        if (aLength != bLength) {
             throw new IllegalArgumentException("Array dimensions must match.");
         }
         Complex[] result = new Complex[aLength];
-        for(int i = 0; i < aLength; ++i) {
+        for (int i = 0; i < aLength; ++i) {
             result[i] = a[i].add(b[i]);
         }
         return result;
     }
 
+    /**
+     * Sum all the elements of the array element wise.
+     * @param a The input array.
+     * @return {@code sum(a)}.
+     */
     public static Complex sum(Complex[] a) {
         final int length = a.length;
         Complex sum = new Complex();
@@ -178,47 +235,52 @@ public final class ComplexArrays {
         return sum;
     }
 
-    public static double[] multiplyElementWise(double[] a, double d) {
-        double[] result = new double[a.length];
+    /**
+     * Multiply and array of Complex values times a Complex value.
+     * @param a The input array.
+     * @param c The Complex value to multiply.
+     * @return {@code a * b}
+     */
+    public static Complex[] multiplyElementWise(double[] a, Complex c) {
+        Complex[] result = new Complex[a.length];
+        for (int i = 0; i < a.length; ++i) {
+            result[i] = c.multiply(a[i]);
+        }
+        return result;
+    }
+
+    /**
+     * Multiply and array of Complex values times a real value.
+     * @param a The input array.
+     * @param d The real value to multiply.
+     * @return {@code a * b}
+     */
+    public static Complex[] multiplyElementWise(Complex[] a, double d) {
+        Complex[] result = ComplexArrays.deepCopy(a);
         multiplyElementWiseInPlace(result, d);
         return result;
     }
 
-
-    public static void multiplyElementWiseInPlace(double[] a, double d) {
-        for (int i = 0; i < a.length; ++i) {
-            a[i] *= d;
-        }
-    }
-
-    public static Complex[] multiplyElementWise(double[] a, Complex s) {
-        Complex[] result = new Complex[a.length];
-        for(int i = 0; i < a.length; ++i) {
-            result[i] = s.multiply(a[i]);
-        }
-        return result;
-    }
-
-    public static Complex[] multiplyElementWise(Complex[] a, double c) {
-        Complex[] result = new Complex[a.length];
-        multiplyElementWiseInPlace(result, c);
-        return result;
-    }
-
+    /**
+     * Multiply and array of Complex values times a real value in place. The result of the multiplication is stored in
+     * the input array a.
+     * @param a The input array.
+     * @param d The real value to multiply.
+     * @return {@code a * b}
+     */
     public static void multiplyElementWiseInPlace(Complex[] a, double d) {
         for (int i = 0; i < a.length; ++i) {
             a[i].multiplyEquals(d);
         }
     }
 
-    public static void divideInPlace(double d, Complex[] a) {
-        for (int i = 0; i < a.length; ++i) {
-            a[i].invertEquals();
-            a[i].multiplyEquals(d);
-        }
-    }
-
-    public static Complex[] divide(double d, Complex[] a) {
+    /**
+     * Divides a real number by an array of Complex number element wise.
+     * @param d The left-hand double value.
+     * @param a The right-hand array of Complex values.
+     * @return {@code d / a}.
+     */
+    public static Complex[] divideElementWise(double d, Complex[] a) {
         Complex[] result = new Complex[a.length];
         for (int i = 0; i < a.length; ++i) {
             result[i] = a[i].invert().multiply(d);
@@ -226,6 +288,12 @@ public final class ComplexArrays {
         return result;
     }
 
+    /**
+     * Array concatenation.
+     * @param a The left-hand array.
+     * @param b The right-hand array.
+     * @return {@code {a, b}}
+     */
     public static Complex[] concatenate(Complex[] a, Complex[] b) {
         int aLength = a.length;
         int bLength = b.length;
@@ -235,6 +303,11 @@ public final class ComplexArrays {
         return result;
     }
 
+    /**
+     * Array product.
+     * @param a The input array.
+     * @return The product of multiplying all the elements in the array.
+     */
     public static Complex product(Complex[] a) {
         Complex prod = Complex.fromReal(1.0);
         for (int i = 0; i < a.length; ++i) {
@@ -243,21 +316,14 @@ public final class ComplexArrays {
         return prod;
     }
 
-    public static Complex[] multiply(Complex[] a, double d) {
-        Complex[] result = new Complex[a.length];
-        for (int i = 0; i < a.length; ++i) {
-            result[i] = a[i].multiply(d);
-        }
-        return result;
-    }
-
-    public static int[] argSort(Complex[] a) {
-        Integer[] indexes = IntStream.range(0, a.length).boxed().toArray(Integer[]::new);
-        Arrays.sort(indexes, Comparator.comparing(i -> a[i]));
-        return Arrays.stream(indexes).mapToInt(Integer::intValue).toArray();
-    }
-
-    public static Complex[] subtract(Complex[] a, Complex c) {
+    /**
+     * Subtract a Complex value from an array of Complex values element wise.
+     *
+     * @param a The left-hand array.
+     * @param c The right-hand Complex value to be subtracted.
+     * @return {@code a - b}.
+     **/
+    public static Complex[] subtractElementWise(Complex[] a, Complex c) {
         Complex[] result = new Complex[a.length];
         for (int i = 0; i < a.length; ++i) {
             result[i] = a[i].subtract(c);
@@ -265,7 +331,14 @@ public final class ComplexArrays {
         return result;
     }
 
-    public static Complex[] subtract(Complex[] a, double d) {
+    /**
+     * Subtract a real value from an array of Complex values element wise.
+     *
+     * @param a The left-hand array.
+     * @param d The right-hand real value to be subtracted.
+     * @return {@code a - b}.
+     **/
+    public static Complex[] subtractElementWise(Complex[] a, double d) {
         Complex[] result = new Complex[a.length];
         for (int i = 0; i < a.length; ++i) {
             result[i] = a[i].subtract(d);
@@ -273,12 +346,11 @@ public final class ComplexArrays {
         return result;
     }
 
-    public static Complex[] subtract(Complex c, Complex[] a) {
+    public static Complex[] subtractElementWise(Complex c, Complex[] a) {
         Complex[] result = new Complex[a.length];
         for (int i = 0; i < a.length; ++i) {
             result[i] = c.subtract(a[i]);
         }
         return result;
     }
-
 }

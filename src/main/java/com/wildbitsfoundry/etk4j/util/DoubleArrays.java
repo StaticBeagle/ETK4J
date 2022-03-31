@@ -98,13 +98,25 @@ public final class DoubleArrays {
         return result;
     }
 
-    public static double[] subtract(double[] a, double[] b) {
+    /**
+     * Subtract two arrays element wise.
+     * @param a The left-hand array.
+     * @param b The right-hand array.
+     * @return {@code a - b}.
+     */
+    public static double[] subtractElementWise(double[] a, double[] b) {
         double[] result = Arrays.copyOf(a, a.length);
         subtractElementWiseInPlace(result, b);
         return result;
     }
 
-    public static double[] subtract(double a, double[] b) {
+    /**
+     * Subtract an array element wise from a scalar.
+     * @param a The scalar argument.
+     * @param b The array to subtract.
+     * @return {@code a - b}.
+     */
+    public static double[] subtractElementWise(double a, double[] b) {
         final int length = b.length;
         double[] result = new double[length];
         for (int i = 0; i < length; ++i) {
@@ -113,7 +125,13 @@ public final class DoubleArrays {
         return result;
     }
 
-    public static double[] subtract(double[] a, double b) {
+    /**
+     * Subtract a scalar element wise from array a.
+     * @param a The left-hand array.
+     * @param b The scalar to subtract.
+     * @return {@code a - b}.
+     */
+    public static double[] subtractElementWise(double[] a, double b) {
         final int length = a.length;
         double[] result = new double[length];
         for (int i = 0; i < length; ++i) {
@@ -122,6 +140,11 @@ public final class DoubleArrays {
         return result;
     }
 
+    /**
+     * Subtract two arrays element wise in place. The result of the subtraction is stored in array {@code a}.
+     * @param a The left-hand array.
+     * @param b The right-hand array.
+     */
     public static void subtractElementWiseInPlace(double[] a, double[] b) {
         if (a.length != b.length) {
             throw new IllegalArgumentException("a and b dimensions must match.");
@@ -131,15 +154,14 @@ public final class DoubleArrays {
         }
     }
 
-    public static double[] abs(double[] a) {
-        double[] result = new double[a.length];
-        for(int i = 0; i < a.length; ++i) {
-            result[i] = Math.abs(a[i]);
-        }
-        return result;
-    }
 
-    public static double[] convolution(double[] a, double[] b) {
+    /**
+     * Convolve two arrays.
+     * @param a The left-hand array.
+     * @param b The right-hand array.
+     * @return The convolution of {@code a} and {@code b}.
+     */
+    public static double[] convolve(double[] a, double[] b) {
         final int n = a.length;
         final int m = b.length;
 
@@ -154,24 +176,48 @@ public final class DoubleArrays {
         return result;
     }
 
+    /**
+     * Add an array and a scalar element wise.
+     * @param a The array to multiply.
+     * @param b The scalar.
+     * @return {@code a + b}.
+     */
     public static double[] addElementWise(double[] a, double b) {
         double[] result = Arrays.copyOf(a, a.length);
         addElementWiseInPlace(result, b);
         return result;
     }
 
+    /**
+     * Add two arrays element wise.
+     * @param a The left-hand array.
+     * @param b The right-hand array.
+     * @return {@code a + b}.
+     */
     public static double[] addElementWise(double[] a, double[] b) {
         double[] result = Arrays.copyOf(a, a.length);
         addElementWiseInPlace(result, b);
         return result;
     }
 
+    /**
+     * Add an array and a scalar element wise in place. The result of the addition is stored in array a.
+     * @param a The array to multiply.
+     * @param b The scalar.
+     * @return {@code a + b}.
+     */
     public static void addElementWiseInPlace(double[] a, double b) {
         for (int i = 0; i < a.length; ++i) {
             a[i] += b;
         }
     }
 
+    /**
+     * Add two arrays element wise in place. The result of the addition is stored in array a.
+     * @param a The left-hand array.
+     * @param b The right-hand array.
+     * @return {@code a + b}.
+     */
     public static void addElementWiseInPlace(double[] a, double[] b) {
         if (a.length != b.length) {
             throw new IllegalArgumentException("a and b dimensions must match.");
@@ -181,12 +227,25 @@ public final class DoubleArrays {
         }
     }
 
+
+    /**
+     * Multiply two and array a scalar element wise.
+     * @param a The array to multiply.
+     * @param d The scalar to multiply.
+     * @return {@code a * b}.
+     */
     public static double[] multiplyElementWise(double[] a, double d) {
         double[] result = Arrays.copyOf(a, a.length);
         multiplyElementWiseInPlace(result, d);
         return result;
     }
 
+    /**
+     * Multiply two and array a scalar element wise in place. The result of the multiplication is stored in array a.
+     * @param a The array to multiply.
+     * @param d The scalar to multiply.
+     * @return {@code a * b}.
+     */
     public static void multiplyElementWiseInPlace(double[] a, double d) {
         final int length = a.length;
         for (int i = 0; i < length; ++i) {
@@ -194,19 +253,27 @@ public final class DoubleArrays {
         }
     }
 
+    /**
+     * Multiply two arrays element wise.
+     * @param a The left-hand array.
+     * @param b The right-hand array.
+     * @return {@code a * b}.
+     */
     public static double[] multiplyElementWise(double[] a, double[] b) {
-        if (a.length != b.length) {
-            throw new IllegalArgumentException("a and b dimensions must match");
-        }
-
         double[] result = Arrays.copyOf(a, a.length);
         multiplyElementWiseInPlace(result, b);
         return result;
     }
 
+    /**
+     * Multiply two arrays element wise in place. The result of the multiplication is stored in array a.
+     * @param a The left-hand array.
+     * @param b The right-hand array.
+     * @return {@code a * b}.
+     */
     public static void multiplyElementWiseInPlace(double[] a, double[] b) {
         if (a.length != b.length) {
-            throw new IllegalArgumentException("a and b dimensions must match");
+            throw new IllegalArgumentException("a and b dimensions must match.");
         }
         final int length = a.length;
         for (int i = 0; i < length; ++i) {
@@ -214,19 +281,27 @@ public final class DoubleArrays {
         }
     }
 
+    /**
+     * Array division element wise.
+     * @param a The left-hand array.
+     * @param b The right-hand array.
+     * @return {@code a / b}.
+     */
     public static double[] divideElementWise(double[] a, double[] b) {
-        if (a.length != b.length) {
-            throw new IllegalArgumentException("a and b dimensions must match");
-        }
-
         double[] result = Arrays.copyOf(a, a.length);
         divideElementWiseInPlace(result, b);
         return result;
     }
 
+    /**
+     * Array division element wise in place. The result of the division is stored in array a.
+     * @param a The left-hand array.
+     * @param b The right-hand array.
+     * @return {@code a / b}.
+     */
     public static void divideElementWiseInPlace(double[] a, double[] b) {
         if (a.length != b.length) {
-            throw new IllegalArgumentException("a and b dimensions must match");
+            throw new IllegalArgumentException("a and b dimensions must match.");
         }
 
         final int length = a.length;
@@ -235,6 +310,11 @@ public final class DoubleArrays {
         }
     }
 
+    /**
+     * Maximum value in the array.
+     * @param a The array whose maximum has to be found.
+     * @return {@code max(a)}
+     */
     public static double max(double... a) {
         double max = a[0];
         for (int i = 1; i < a.length; ++i) {
@@ -245,6 +325,11 @@ public final class DoubleArrays {
         return max;
     }
 
+    /**
+     * Minimum value in the array.
+     * @param a The array whose minimum has to be found.
+     * @return {@code min(a)}
+     */
     public static double min(double... a) {
         double min = a[0];
         for (int i = 1; i < a.length; ++i) {
@@ -255,6 +340,11 @@ public final class DoubleArrays {
         return min;
     }
 
+    /**
+     * Index of minimum value.
+     * @param a The array whose index of minimum value has to be found.
+     * @return The index at which the minimum of array {@code a} occurs.
+     */
     public static int argMin(double[] a) {
         int index = 0;
         double min = a[0];
@@ -267,12 +357,22 @@ public final class DoubleArrays {
         return index;
     }
 
+    /**
+     * Returns the indices that would sort an array.
+     * @param a The input array.
+     * @return The indexes that would sort the array {@code a}.
+     */
     public static int[] argSort(double[] a) {
         Integer[] indexes = IntStream.range(0, a.length).boxed().toArray(Integer[]::new);
         Arrays.sort(indexes, Comparator.comparing(i -> a[i]));
         return Arrays.stream(indexes).mapToInt(Integer::intValue).toArray();
     }
 
+    /**
+     * Norm one of array.
+     * @param a The array whose norm needs to be found.
+     * @return {@code sum(abs(a))}.
+     */
     public static double norm1(double[] a) {
         double norm = 0.0;
         for (int i = 0; i < a.length; ++i) {
@@ -281,6 +381,11 @@ public final class DoubleArrays {
         return norm;
     }
 
+    /**
+     * Norm two of array.
+     * @param a The array whose norm needs to be found.
+     * @return {@code sum(abs(a)<sup>2</sup>)<sup>1/2</sup>}.
+     */
     public static double norm2(double[] a) {
         double max = normInf(a);
         if (max == 0.0) {
@@ -294,6 +399,11 @@ public final class DoubleArrays {
         return Math.sqrt(norm) * max;
     }
 
+    /**
+     * Infinite norm of array.
+     * @param a The array whose norm needs to be found.
+     * @return {@code max(abs(a))}.
+     */
     public static double normInf(double[] a) {
         double max = Math.abs(a[0]);
         for (int i = 1; i < a.length; ++i) {
@@ -305,6 +415,11 @@ public final class DoubleArrays {
         return max;
     }
 
+    /**
+     * Negative Infinite norm of array.
+     * @param a The array whose norm needs to be found.
+     * @return {@code min(abs(a))}.
+     */
     public static double normNegInf(double[] a) {
         double min = Math.abs(a[0]);
         for (int i = 1; i < a.length; ++i) {
@@ -317,17 +432,11 @@ public final class DoubleArrays {
     }
 
     /***
-     * Euclidean distance between two arrays
+     * Euclidean distance between two arrays.
      *
-     * @param a
-     *            - first array
-     * @param b
-     *            - second array
-     * @return
-     *
-     *         <pre>
-     *         sqrt(sum((a[i] - b[i])<sup>2</sup>))
-     *         </pre>
+     * @param a The left-hand array.
+     * @param b The right-hand array.
+     * @return {@code sqrt(sum((a[i] - b[i])<sup>2</sup>))}
      */
     public static double distance(double[] a, double[] b) {
         double norm = 0.0;
@@ -361,6 +470,12 @@ public final class DoubleArrays {
         return c;
     }
 
+    /**
+     * Array concatenation.
+     * @param a The left-hand array.
+     * @param b The right-hand array.
+     * @return {@code {a, b}}
+     */
     public static double[] concatenate(double[] a, double[] b) {
         int aLength = a.length;
         int bLength = b.length;
@@ -370,6 +485,12 @@ public final class DoubleArrays {
         return result;
     }
 
+    /**
+     * Concatenate series of arrays.
+     * @param a The left-hand array.
+     * @param rest The rest of the arrays to concatenate.
+     * @return {@code {a, rest[0], rest[1], ... , rest[n}}
+     */
     public static double[] concatenateAll(double[] a, double[]... rest) {
         int totalLength = a.length;
         for (double[] array : rest) {
@@ -384,42 +505,12 @@ public final class DoubleArrays {
         return result;
     }
 
-    public static double[][] concatenate(double[][] a, double[][] b) {
-        if(a.length != b.length) {
-            throw new IllegalArgumentException("Both arrays must have the same number of rows.");
-        }
-        double[][] result = new double[a.length][];
-        for(int i = 0; i < a.length; ++i) {
-            result[i] = concatenate(a[i], b[i]);
-        }
-        return result;
-    }
-
-    public static double[][] stack(double[] a, double[] b) {
-        double[][] result = new double[2][];
-        result[0] = Arrays.copyOf(a, a.length);
-        result[1] = Arrays.copyOf(b, b.length);
-        return result;
-    }
-
-    public static double[][] stack(double[][] a, double[] b) {
-        double[][] result = new double[a.length + 1][];
-        for(int i = 0; i < a.length - 1; ++i) {
-            result[i] = Arrays.copyOf(a[i], a[i].length);
-        }
-        result[result.length - 1] = Arrays.copyOf(b, b.length);
-        return result;
-    }
-
-    public static double[][] stack(double[] a, double[][] b) {
-        double[][] result = new double[b.length + 1][];
-        result[0] = Arrays.copyOf(a, a.length);
-        for(int i = 1; i < a.length; ++i) {
-            result[i] = Arrays.copyOf(b[i], b[i].length);
-        }
-        return result;
-    }
-
+    /**
+     * Repeat an array.
+     * @param a The array to repeat.
+     * @param n The number of times to repeat the array.
+     * @return The input array repeated {@code n} times.
+     */
     public static double[] repeat(double[] a, int n) {
         final int length = a.length;
         double[] result = new double[length * n];
@@ -429,6 +520,11 @@ public final class DoubleArrays {
         return result;
     }
 
+    /**
+     * Reverse and array.
+     * @param a The array to reverse.
+     * @return The input array reversed.
+     */
     public static double[] reverse(double[] a) {
         final int length = a.length;
         double[] result = new double[a.length];
@@ -439,6 +535,11 @@ public final class DoubleArrays {
         return result;
     }
 
+    /**
+     * The sum of all the elements in the array.
+     * @param a The array whose sum needs to be found.
+     * @return {@code sum(a)}.
+     */
     public static double sum(double[] a) {
         final int length = a.length;
         double result = 0;
@@ -448,6 +549,11 @@ public final class DoubleArrays {
         return result;
     }
 
+    /**
+     * The sum of the square of all the elements in the array.
+     * @param a The array whose sum of all squares needs to be found.
+     * @return {@code sum(a)}
+     */
     public static double sumSquares(double[] a) {
         final int length = a.length;
         double result = 0;
@@ -457,6 +563,11 @@ public final class DoubleArrays {
         return result;
     }
 
+    /**
+     * Cumulative sum.
+     * @param a The array whose cumulative sum needs to found.
+     * @return The cumulative sum of a.
+     */
     public static double[] cumulativeSum(double[] a) {
         final int length = a.length;
         double[] result = new double[length];
@@ -467,11 +578,21 @@ public final class DoubleArrays {
         return result;
     }
 
+    /**
+     * Root Mean Square.
+     * @param a The array whose RMS value needs to be found.
+     * @return {@code rms(a)}.
+     */
     public static double rms(double[] a) {
         final int N = a.length;
         return norm2(a) / Math.sqrt(N);
     }
 
+    /**
+     * Is array ascending.
+     * @param a The input array.
+     * @return {@cde true} if all the elements in the array are sorted in ascending order, {@code false} otherwise.
+     */
     public static boolean isAscending(double[] a) {
         final int n = a.length;
         for (int i = 0; i < n - 1; ++i) {
@@ -508,6 +629,11 @@ public final class DoubleArrays {
         return result;
     }
 
+    /**
+     * Mean of the array.
+     * @param y The input array.
+     * @return The mean of the input array.
+     */
     public static double mean(double[] y) {
         final int n = y.length;
         double sum = 0.0;
@@ -515,20 +641,6 @@ public final class DoubleArrays {
             sum += y[i];
         }
         return sum / n;
-    }
-
-    public static double[] scaleRange(double[] a, double curMin, double curMax, double newMin, double newMax) {
-        double[] result = new double[a.length];
-        scaleRangeInPlace(result, curMax, curMin, newMax, newMin);
-        return result;
-    }
-
-    public static void scaleRangeInPlace(double[] a, double curMin, double curMax, double newMin, double newMax) {
-        final int length = a.length;
-        double delta = (newMax - newMin) / (curMax - curMin);
-        for (int i = 0; i < length; ++i) {
-            a[i] = delta * (a[i] - curMin) + curMin;
-        }
     }
 
     /**
@@ -545,15 +657,11 @@ public final class DoubleArrays {
         return result;
     }
 
-    public static boolean equals(double[] a, double d) {
-        for (double val : a) {
-            if (d != val) {
-                return false;
-            }
-        }
-        return true;
-    }
-
+    /**
+     * Differences between adjacent elements in the array.
+     * @param a The input array.
+     * @return The difference between adjacent elements in the array.
+     */
     public static double[] difference(double[] a) {
         double[] result = new double[a.length - 1];
         for(int i = 0; i < result.length; ++i) {
@@ -562,13 +670,16 @@ public final class DoubleArrays {
         return result;
     }
 
+    /**
+     * Numerical gradient of an array. The spacing between the elements is assumed to be one.
+     * @param a The input array.
+     * @return The numerical gradient of the array.
+     */
     public static double[] gradient(double[] a) {
-        // check bounds
-
         double[] grad = new double[a.length];
         final int end = a.length - 1;
-        grad[0] = a[1] - a[0]; // once sided difference
-        grad[end] = a[end] - a[end - 1]; // once sided difference
+        grad[0] = a[1] - a[0]; // one-sided difference
+        grad[end] = a[end] - a[end - 1]; // one-sided difference
 
         // central difference
         for (int i = 1; i < end; ++i) {
@@ -577,6 +688,12 @@ public final class DoubleArrays {
         return grad;
     }
 
+    /**
+     * Numerical gradient of an array.
+     * @param a The input array.
+     * @param h The spacing between each value in {@code a}.
+     * @return The numerical gradient of the array.
+     */
     public static double[] gradient(double[] a, double[] h) {
         if(a.length != h.length) {
             throw new IllegalArgumentException("a and h dimensions must match.");
@@ -592,33 +709,6 @@ public final class DoubleArrays {
             grad[i] = (a[i + 1] - a[i - 1]) / (h[i + 1] - h[i - 1]);
         }
         return grad;
-    }
-
-    public static double[] expand(double[] a, int newSize) {
-        return resize(a, newSize, (double) a.length / (newSize + 1));
-    }
-
-    public static double[] shrink(double[] a, int newSize) {
-        return resize(a, newSize, (double) a.length / (newSize - 1));
-    }
-
-    private static double[] resize(double[] a, int newSize, double step) {
-        final int length = a.length;
-
-        double[] x = new double[length];
-        for (int i = 0; i < length; ++i) {
-            x[i] = i;
-        }
-        CubicSpline sp = CubicSpline.newNotAKnotSpline(x, a);
-
-        double[] result = new double[newSize];
-        double xi = x[0];
-        for (int i = 0; i < newSize - 1; ++i) {
-            result[i] = sp.evaluateAt(xi);
-            xi += step;
-        }
-        result[newSize - 1] = a[length - 1];
-        return result;
     }
 
     /**
@@ -669,6 +759,14 @@ public final class DoubleArrays {
         return prod;
     }
 
+    /**
+     * Checks if all elements of the array are close numerically to a given target.
+     *
+     * @param a The input array.
+     * @param target The target value.
+     * @return {@code true} if all the values in the array are close to the given target, {@code false} otherwise.
+     * @see MathETK#isClose(double, double) isClose(double, double).
+     */
     public static boolean allClose(double[] a, double target) {
         for(int i = 0; i < a.length; ++i) {
             if(!MathETK.isClose(a[i], target)) {
@@ -678,6 +776,16 @@ public final class DoubleArrays {
         return true;
     }
 
+    /**
+     * Checks if all elements of the array are close numerically to a given target.
+     *
+     * @param a The input array.
+     * @param target The target value.
+     * @param absTol The absolute tolerance.
+     * @param relTol The relative tolerance.
+     * @return {@code true} if all the values in the array are close to the given target, {@code false} otherwise.
+     * @see MathETK#isClose(double, double, double, double) isClose(double, double, double, double).
+     */
     public static boolean allClose(double[] a, double target, double absTol, double relTol) {
         for(int i = 0; i < a.length; ++i) {
             if(!MathETK.isClose(a[i], target, absTol, relTol)) {
@@ -687,6 +795,15 @@ public final class DoubleArrays {
         return true;
     }
 
+    /**
+     * Checks if all elements of the array are close numerically to a given target.
+     *
+     * @param a The input array.
+     * @param target The target value.
+     * @param absTol The absolute tolerance.
+     * @return {@code true} if all the values in the array are close to the given target, {@code false} otherwise.
+     * @see MathETK#isClose(double, double, double) isClose(double, double, double).
+     */
     public static boolean allClose(double[] a, double target, double absTol) {
         for(int i = 0; i < a.length; ++i) {
             if(!MathETK.isClose(a[i], target, absTol)) {
@@ -696,13 +813,23 @@ public final class DoubleArrays {
         return true;
     }
 
+    /**
+     * Creates and array of {@code n} ones.
+     * @param n The length of the array of ones.
+     * @return An array containing {@code n} double ones.
+     */
     public static double[] ones(int n) {
         double[] result = new double[n];
         Arrays.fill(result, 1.0);
         return result;
     }
 
-    // https://stackoverflow.com/a/17634025/6383857
+    /**
+     * Transpose a 2d array.
+     * @param a The array to transpose.
+     * @return The transposed array.
+     * @see <a href="https://stackoverflow.com/a/17634025/6383857">Transpose 2d array</a>
+     */
     public static double[][] transpose(double[][] a) {
         // empty or unset array, nothing do to here
         if (a == null || a.length == 0)
@@ -719,36 +846,5 @@ public final class DoubleArrays {
             }
         }
         return result;
-    }
-
-    public static void main(String[] args) {
-
-        System.out.println(min(2,9,1,5));
-        double[] a = {1, 2, 3};
-        double[] b = {4, 5, 6};
-
-        System.out.println(Arrays.toString(kronecker(a, b)));
-
-        double[][] aa = {{1, 2}, {3, 4}};
-        double[] bb = {5, 6};
-        //System.out.println(Arrays.toString(dot(bb, aa)));
-
-        //System.out.println(Arrays.toString(dot(aa, bb)));
-
-        System.out.println(product(a));
-
-        // TODO unit tests
-        double[] aaa = {1, 1, 2, 3, 5, 8, 13, 21};
-        System.out.println(Arrays.toString(difference(aaa)));
-
-        double[] aaaa = {0, 1, 1, 0, 2, 3, 5, 0, 8, 13, 21};
-        System.out.println(argMin(aaaa));
-
-        //System.out.println(Arrays.toString(add(a, b)));
-        System.out.println(Arrays.toString(addElementWise(a, b)));
-
-        System.out.println(Arrays.toString(convolution(aaa, aaaa)));
-
-        System.out.println(Arrays.toString(convolution(aaa, bb)));
     }
 }

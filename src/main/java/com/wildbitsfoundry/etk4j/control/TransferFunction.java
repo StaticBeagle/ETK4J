@@ -331,7 +331,7 @@ public class TransferFunction extends LinearTimeInvariantSystem {
      * @return [norm0, norm1, .... normn]
      */
     private static double[] norm(Complex[] a) {
-        Complex[] mag = ComplexArrays.convolution(a, Arrays.stream(a).map(Complex::conj).toArray(Complex[]::new));
+        Complex[] mag = ComplexArrays.convolve(a, Arrays.stream(a).map(Complex::conj).toArray(Complex[]::new));
         double[] coefficients = new double[mag.length];
         for (int i = 0; i < mag.length; ++i) {
             coefficients[i] = mag[i].real();
@@ -514,8 +514,8 @@ public class TransferFunction extends LinearTimeInvariantSystem {
         Complex[] num = evaluateAtjw(rf.getNumerator().getCoefficients());
         Complex[] den = evaluateAtjw(rf.getDenominator().getCoefficients());
 
-        double[] convLHS = DoubleArrays.convolution(ComplexArrays.imag(num), ComplexArrays.real(den));
-        double[] convRHS = DoubleArrays.convolution(ComplexArrays.real(num), ComplexArrays.imag(den));
+        double[] convLHS = DoubleArrays.convolve(ComplexArrays.imag(num), ComplexArrays.real(den));
+        double[] convRHS = DoubleArrays.convolve(ComplexArrays.real(num), ComplexArrays.imag(den));
 
         Polynomial a = new Polynomial(convLHS);
         Polynomial b = new Polynomial(convRHS);
@@ -654,7 +654,7 @@ public class TransferFunction extends LinearTimeInvariantSystem {
         double[][] B = Matrix.identity(k - 1, 1).getAs2dArray();
         double[][] C = new double[1][];
         double[][] outer = DoubleArrays.outer(new double[]{numPadded[0]}, Arrays.copyOfRange(den, 1, den.length));
-        C[0] = DoubleArrays.subtract(Arrays.copyOfRange(numPadded, 1, numPadded.length), outer[0]);
+        C[0] = DoubleArrays.subtractElementWise(Arrays.copyOfRange(numPadded, 1, numPadded.length), outer[0]);
         return new StateSpace(A, B, C, D);
     }
 

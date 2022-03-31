@@ -109,8 +109,8 @@ public final class Filters {
         double k = zpk.getGain();
         int degree = getRelativeDegree(zeros, poles);
 
-        Complex[] zhp = ComplexArrays.divide(w0, zeros);
-        Complex[] php = ComplexArrays.divide(w0, poles);
+        Complex[] zhp = ComplexArrays.divideElementWise(w0, zeros);
+        Complex[] php = ComplexArrays.divideElementWise(w0, poles);
 
         zhp = ComplexArrays.concatenate(zhp, ComplexArrays.zeros(degree));
 
@@ -170,8 +170,8 @@ public final class Filters {
         Complex[] zeros = zpk.getZeros();
         Complex[] poles = zpk.getPoles();
         double k = zpk.getGain();
-        Complex[] zlp = ComplexArrays.multiply(zeros, bw * 0.5);
-        Complex[] plp = ComplexArrays.multiply(poles, bw * 0.5);
+        Complex[] zlp = ComplexArrays.multiplyElementWise(zeros, bw * 0.5);
+        Complex[] plp = ComplexArrays.multiplyElementWise(poles, bw * 0.5);
 
         int degree = getRelativeDegree(zeros, poles);
 
@@ -252,8 +252,8 @@ public final class Filters {
 
         int degree = getRelativeDegree(zeros, poles);
 
-        Complex[] zhp = ComplexArrays.divide(bw * 0.5, zeros);
-        Complex[] php = ComplexArrays.divide(bw * 0.5, poles);
+        Complex[] zhp = ComplexArrays.divideElementWise(bw * 0.5, zeros);
+        Complex[] php = ComplexArrays.divideElementWise(bw * 0.5, poles);
 
         Complex[] left = new Complex[zhp.length];
         Complex[] right = new Complex[zhp.length];

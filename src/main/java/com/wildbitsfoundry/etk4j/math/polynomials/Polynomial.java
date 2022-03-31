@@ -148,11 +148,11 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
      * @return Pnew(x) = P(x) * poly
      */
     public Polynomial multiply(final Polynomial p) {
-        return new Polynomial(DoubleArrays.convolution(coefficients, p.coefficients));
+        return new Polynomial(DoubleArrays.convolve(coefficients, p.coefficients));
     }
 
     public Polynomial multiply(double... coefs) {
-        return new Polynomial(DoubleArrays.convolution(coefficients, coefs));
+        return new Polynomial(DoubleArrays.convolve(coefficients, coefs));
     }
 
     /***
@@ -162,7 +162,7 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
      *            Another polynomial
      */
     public void multiplyEquals(final Polynomial p) {
-        coefficients = DoubleArrays.convolution(coefficients, p.coefficients);
+        coefficients = DoubleArrays.convolve(coefficients, p.coefficients);
         roots = null;
     }
 
@@ -173,7 +173,7 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
      *            Another polynomial
      */
     public void multiplyEquals(double... coefs) {
-        coefficients = DoubleArrays.convolution(coefficients, coefs);
+        coefficients = DoubleArrays.convolve(coefficients, coefs);
         roots = null;
     }
 
@@ -475,7 +475,7 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
         }
         double[] tmp = Arrays.copyOf(coefficients, coefficients.length);
         while (--n > 0) {
-            tmp = DoubleArrays.convolution(tmp, coefficients);
+            tmp = DoubleArrays.convolve(tmp, coefficients);
         }
         return new Polynomial(tmp);
     }
@@ -609,6 +609,6 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
      * polyfromroots</a>
      */
     public static Complex polyvalFromRoots(Complex[] roots, Complex x) {
-        return ComplexArrays.product(ComplexArrays.subtract(x, roots));
+        return ComplexArrays.product(ComplexArrays.subtractElementWise(x, roots));
     }
 }

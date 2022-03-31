@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.wildbitsfoundry</groupId>
     <artifactId>ETK4J</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.9.0-SNAPSHOT</version>
     <name>Engineering Toolkit for Java</name>
     <description>Tools and implementation of mathematical methods or backing math for engineering problems and
         applications.

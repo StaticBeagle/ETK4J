@@ -293,7 +293,6 @@ public class AnalogFilterTest {
     @Test
     public void testBesselapPhaseNormalized() {
         ZeroPoleGain zpk = Bessel.besselapPhaseNormalized(4);
-        System.out.println(zpk);
         Complex p1 = new Complex(-0.6572111716718828, 0.8301614350048732);
         Complex p2 = new Complex(-0.904758796788245, 0.2709187330038743);
         Complex p3 = p2.conj();
@@ -307,7 +306,6 @@ public class AnalogFilterTest {
     @Test
     public void testBesselapMagnitudeNormalized() {
         ZeroPoleGain zpk = Bessel.besselapMagnitudeNormalized(4);
-        System.out.println(zpk);
         Complex p1 = new Complex(-0.9952087643502732, 1.2571057394546656);
         Complex p2 = new Complex(-1.3700678305514442, 0.4102497174937515);
         Complex p3 = p2.conj();
@@ -321,7 +319,6 @@ public class AnalogFilterTest {
     @Test
     public void testBesselapDelayNormalized() {
         ZeroPoleGain zpk = Bessel.besselapDelayNormalized(4);
-        System.out.println(zpk);
         Complex p1 = new Complex(-2.1037893971796278, 2.6574180418567526);
         Complex p2 = new Complex(-2.8962106028203727, 0.8672341289345028);
         Complex p3 = p2.conj();
