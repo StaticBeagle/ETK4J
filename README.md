@@ -1,5 +1,5 @@
 # ETK4J
-##Engineering Toolkit for Java
+#Engineering Toolkit for Java
 
 The purpose of this project is to create a library that can be used to prototype solutions to engineering problems. One 
 of the main goals of the library is to be a 100% in Java. Some algorithms in the library are not state-of-the-art, but 
