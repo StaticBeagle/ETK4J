@@ -293,39 +293,87 @@ public class AnalogFilterTest {
     @Test
     public void testBesselapPhaseNormalized() {
         ZeroPoleGain zpk = Bessel.besselapPhaseNormalized(4);
-        Complex p1 = new Complex(-0.6572111716718828, 0.8301614350048732);
-        Complex p2 = new Complex(-0.904758796788245, 0.2709187330038743);
-        Complex p3 = p2.conj();
-        Complex p4 = p1.conj();
+        double p1Real = -0.6572111716718828;
+        double p1Imag = 0.8301614350048732;
+        double p2Real = -0.904758796788245;
+        double p2Imag = 0.2709187330038743;
+        double p3Real = p2Real;
+        double p3Imag = -p2Imag;
+        double p4Real = p1Real;
+        double p4Imag = -p1Imag;
+
+        Complex[] poles = zpk.getPoles();
+        assertEquals(p1Real, poles[0].real(), 1e-12);
+        assertEquals(p1Imag, poles[0].imag(), 1e-12);
+
+        assertEquals(p2Real, poles[1].real(), 1e-12);
+        assertEquals(p2Imag, poles[1].imag(), 1e-12);
+
+        assertEquals(p3Real, poles[2].real(), 1e-12);
+        assertEquals(p3Imag, poles[2].imag(), 1e-12);
+
+        assertEquals(p4Real, poles[3].real(), 1e-12);
+        assertEquals(p4Imag, poles[3].imag(), 1e-12);
 
         assertTrue(zpk.getZeros().length == 0);
-        assertArrayEquals(new Complex[] {p1, p2, p3, p4}, zpk.getPoles());
         assertEquals(1.0, zpk.getGain(), 1e-12);
     }
 
     @Test
     public void testBesselapMagnitudeNormalized() {
         ZeroPoleGain zpk = Bessel.besselapMagnitudeNormalized(4);
-        Complex p1 = new Complex(-0.9952087643502732, 1.2571057394546656);
-        Complex p2 = new Complex(-1.3700678305514442, 0.4102497174937515);
-        Complex p3 = p2.conj();
-        Complex p4 = p1.conj();
+        double p1Real = -0.9952087643502732;
+        double p1Imag = 1.2571057394546656;
+        double p2Real = -1.3700678305514442;
+        double p2Imag = 0.4102497174937515;
+        double p3Real = p2Real;
+        double p3Imag = -p2Imag;
+        double p4Real = p1Real;
+        double p4Imag = -p1Imag;
+
+        Complex[] poles = zpk.getPoles();
+        assertEquals(p1Real, poles[0].real(), 1e-12);
+        assertEquals(p1Imag, poles[0].imag(), 1e-12);
+
+        assertEquals(p2Real, poles[1].real(), 1e-12);
+        assertEquals(p2Imag, poles[1].imag(), 1e-12);
+
+        assertEquals(p3Real, poles[2].real(), 1e-12);
+        assertEquals(p3Imag, poles[2].imag(), 1e-12);
+
+        assertEquals(p4Real, poles[3].real(), 1e-12);
+        assertEquals(p4Imag, poles[3].imag(), 1e-12);
 
         assertTrue(zpk.getZeros().length == 0);
-        assertArrayEquals(new Complex[] {p1, p2, p3, p4}, zpk.getPoles());
         assertEquals(5.258199010244166, zpk.getGain(), 1e-12);
     }
 
     @Test
     public void testBesselapDelayNormalized() {
         ZeroPoleGain zpk = Bessel.besselapDelayNormalized(4);
-        Complex p1 = new Complex(-2.1037893971796278, 2.6574180418567526);
-        Complex p2 = new Complex(-2.8962106028203727, 0.8672341289345028);
-        Complex p3 = p2.conj();
-        Complex p4 = p1.conj();
+        double p1Real = -2.1037893971796278;
+        double p1Imag = 2.6574180418567526;
+        double p2Real = -2.8962106028203727;
+        double p2Imag = 0.8672341289345028;
+        double p3Real = p2Real;
+        double p3Imag = -p2Imag;
+        double p4Real = p1Real;
+        double p4Imag = -p1Imag;
+
+        Complex[] poles = zpk.getPoles();
+        assertEquals(p1Real, poles[0].real(), 1e-12);
+        assertEquals(p1Imag, poles[0].imag(), 1e-12);
+
+        assertEquals(p2Real, poles[1].real(), 1e-12);
+        assertEquals(p2Imag, poles[1].imag(), 1e-12);
+
+        assertEquals(p3Real, poles[2].real(), 1e-12);
+        assertEquals(p3Imag, poles[2].imag(), 1e-12);
+
+        assertEquals(p4Real, poles[3].real(), 1e-12);
+        assertEquals(p4Imag, poles[3].imag(), 1e-12);
 
         assertTrue(zpk.getZeros().length == 0);
-        assertArrayEquals(new Complex[] {p1, p2, p3, p4}, zpk.getPoles());
         assertEquals(105, zpk.getGain(), 1e-12);
     }
 }
