@@ -17,6 +17,9 @@ Please see [SciPy](https://github.com/StaticBeagle/ETK4J/blob/master/SciPy).
 Last but not least, this project includes code that was translated from [numal](https://github.com/JeffBezanson/numal),
 and also from [Math.NET](https://www.mathdotnet.com/) please see [Math.NET](https://github.com/StaticBeagle/ETK4J/blob/master/Math.NET.txt).
 
+Some parts of the library do not follow Java naming conventions and the main reason for this is to align with the more familiar Matlab and NumPy syntax.
+Arrays are mainly used throughout the library in order to use native doubles but the use of `List`s is encouraged. 
+
 There's a set of examples that show how to use some classes contained in the library. The examples
 can be found in:
 
