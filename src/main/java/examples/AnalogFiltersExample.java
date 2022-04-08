@@ -15,8 +15,8 @@ public class AnalogFiltersExample {
         LowPassSpecs lpSpecs = new LowPassSpecs();
         lpSpecs.setPassBandRipple(1.5); // 1.5 dB gain/ripple refer to note
         lpSpecs.setStopBandAttenuation(60.0); // 60 dB at the stop band
-        lpSpecs.setPassBandFrequency(2500); // 2500 Hz cutoff frequency
-        lpSpecs.setStopBandFrequency(10000); // 10000 Hz stop band frequency
+        lpSpecs.setPassBandFrequency(2500); // 2500 rad/s cutoff frequency
+        lpSpecs.setStopBandFrequency(10000); // 10000 rad/s stop band frequency
 
         buildLowPassFilters(lpSpecs);
 
@@ -24,8 +24,8 @@ public class AnalogFiltersExample {
         HighPassSpecs hpSpecs = new HighPassSpecs();
         hpSpecs.setPassBandRipple(0.2); // 0.2 dB gain/ripple refer to note
         hpSpecs.setStopBandAttenuation(60.0); // 60 dB at the stop band
-        hpSpecs.setPassBandFrequency(12); // 12 Hz cutoff frequency
-        hpSpecs.setStopBandFrequency(0.2); // 0.2 Hz stop band frequency
+        hpSpecs.setPassBandFrequency(12); // 12 rad/s cutoff frequency
+        hpSpecs.setStopBandFrequency(0.2); // 0.2 rad/s stop band frequency
 
         buildHighPassFilters(hpSpecs);
 
@@ -37,10 +37,10 @@ public class AnalogFiltersExample {
         // with UpperStopBandFrequency.
         // In a frequency spectrum, the order of the frequencies will be:
         // LowerStopBandFrequency < LowerPassBandFrequency < UpperPassBandFrequency < UpperStopBandFrequency
-        bpSpecs.setLowerPassBandFrequency(190.0); // 190 Hz lower pass band frequency
-        bpSpecs.setUpperPassBandFrequency(210.0); // 210 Hz upper pass band frequency
-        bpSpecs.setLowerStopBandFrequency(180.0); // 180 Hz lower stop band frequency
-        bpSpecs.setUpperStopBandFrequency(220.0); // 220 Hz upper stop band frequency
+        bpSpecs.setLowerPassBandFrequency(190.0); // 190 rad/s lower pass band frequency
+        bpSpecs.setUpperPassBandFrequency(210.0); // 210 rad/s upper pass band frequency
+        bpSpecs.setLowerStopBandFrequency(180.0); // 180 rad/s lower stop band frequency
+        bpSpecs.setUpperStopBandFrequency(220.0); // 220 rad/s upper stop band frequency
         bpSpecs.setPassBandRipple(0.2); // 0.2 dB gain/ripple refer to note
         bpSpecs.setStopBandAttenuation(20.0); // 20 dB attenuation in the stop band
 
@@ -56,10 +56,10 @@ public class AnalogFiltersExample {
         // in the pass band can be set with the PassBandRipple parameter.
         // In a frequency spectrum, the order of the frequencies will be:
         // LowerPassBandFrequency < LowerStopBandFrequency < UpperStopBandFrequency < UpperPassBandFrequency
-        bsSpecs.setLowerPassBandFrequency(3.6e3); // 3600 Hz lower pass band frequency
-        bsSpecs.setUpperPassBandFrequency(9.1e3); // 9100 Hz lower pass band frequency
-        bsSpecs.setLowerStopBandFrequency(5.45e3); // 5450 Hz lower stop band frequency
-        bsSpecs.setUpperStopBandFrequency(5.90e3); // 5900 Hz upper stop band frequency
+        bsSpecs.setLowerPassBandFrequency(3.6e3); // 3600 rad/s lower pass band frequency
+        bsSpecs.setUpperPassBandFrequency(9.1e3); // 9100 rad/s lower pass band frequency
+        bsSpecs.setLowerStopBandFrequency(5.45e3); // 5450 rad/s lower stop band frequency
+        bsSpecs.setUpperStopBandFrequency(5.90e3); // 5900 rad/s upper stop band frequency
         bsSpecs.setPassBandRipple(0.5); // 1.5 dB gain/ripple refer to note
         bsSpecs.setStopBandAttenuation(38.0); // 38 db attenuation at the notch
 
