@@ -1,5 +1,7 @@
 package com.wildbitsfoundry.etk4j.math.optimize.minimizers;
 
+import com.wildbitsfoundry.etk4j.math.optimize.OptimizerStatusType;
+
 import java.util.function.BiFunction;
 
 /*
@@ -139,6 +141,7 @@ public class Brent {
             if (num >= maxNumberOfIterations) {
                 MinimizerResults<Double> minResults = new MinimizerResults<>();
                 minResults.setMinimizerStatus("Maximum number of iterations exceeded");
+                minResults.setOptimizerStatusType(OptimizerStatusType.MAXIMUM_NUMBER_OF_ITERATIONS_EXCEEDED);
                 minResults.setHasConverged(false);
                 minResults.setValue(xf);
                 minResults.setFunctionValue(fx);
@@ -150,6 +153,7 @@ public class Brent {
         if (Double.isNaN(xf) || Double.isNaN(fx) || Double.isNaN(fu)) {
             MinimizerResults<Double> minResults = new MinimizerResults<>();
             minResults.setMinimizerStatus("The minimum found was Double.NaN");
+            minResults.setOptimizerStatusType(OptimizerStatusType.VALUE_FOUND_WAS_NAN);
             minResults.setHasConverged(false);
             minResults.setValue(Double.NaN);
             minResults.setValue(Double.NaN);
@@ -158,6 +162,7 @@ public class Brent {
         }
         MinimizerResults<Double> minResults = new MinimizerResults<>();
         minResults.setMinimizerStatus("Converged");
+        minResults.setOptimizerStatusType(OptimizerStatusType.CONVERGED);
         minResults.setHasConverged(true);
         minResults.setValue(xf);
         minResults.setFunctionValue(fx);

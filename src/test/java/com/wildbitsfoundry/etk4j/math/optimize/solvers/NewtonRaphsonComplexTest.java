@@ -1,6 +1,7 @@
 package com.wildbitsfoundry.etk4j.math.optimize.solvers;
 
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
+import com.wildbitsfoundry.etk4j.math.optimize.OptimizerStatusType;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -20,6 +21,7 @@ public class NewtonRaphsonComplexTest {
         assertEquals(Complex.fromImaginary(-1.0).imag(), nr.getValue().imag(), 1e-12);
         assertEquals(9, nr.getNumberOfIterations());
         assertEquals("Converged", nr.getSolverStatus());
+        assertEquals(OptimizerStatusType.CONVERGED, nr.getOptimizerStatusType());
         assertEquals(2.472314700550465E-15, nr.getError(), 1e-12);
         assertTrue(nr.hasConverged());
     }
@@ -34,6 +36,7 @@ public class NewtonRaphsonComplexTest {
         assertEquals(Complex.fromImaginary(-1.0).imag(), nr.getValue().imag(), 1e-12);
         assertEquals(6, nr.getNumberOfIterations());
         assertEquals("Converged", nr.getSolverStatus());
+        assertEquals(OptimizerStatusType.CONVERGED, nr.getOptimizerStatusType());
         assertEquals(1.3892028701619707E-14, nr.getError(), 1e-12);
         assertTrue(nr.hasConverged());
     }
@@ -46,6 +49,7 @@ public class NewtonRaphsonComplexTest {
         assertEquals(Complex.fromImaginary(-1.0).imag(), nr.getValue().imag(), 1e-12);
         assertEquals(12, nr.getNumberOfIterations());
         assertEquals("Converged", nr.getSolverStatus());
+        assertEquals(OptimizerStatusType.CONVERGED, nr.getOptimizerStatusType());
         assertEquals(8.19014815240895E-9, nr.getError(), 1e-12);
         assertTrue(nr.hasConverged());
     }
@@ -59,6 +63,7 @@ public class NewtonRaphsonComplexTest {
         assertEquals(Complex.fromImaginary(-1.0).imag(), nr.getValue().imag(), 1e-12);
         assertEquals(12, nr.getNumberOfIterations());
         assertEquals("Converged", nr.getSolverStatus());
+        assertEquals(OptimizerStatusType.CONVERGED, nr.getOptimizerStatusType());
         assertEquals(2.309006245526933E-9, nr.getError(), 1e-12);
         assertTrue(nr.hasConverged());
     }

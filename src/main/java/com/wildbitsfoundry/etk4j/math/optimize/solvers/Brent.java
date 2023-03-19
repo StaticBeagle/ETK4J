@@ -2,6 +2,7 @@ package com.wildbitsfoundry.etk4j.math.optimize.solvers;
 
 import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
 import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
+import com.wildbitsfoundry.etk4j.math.optimize.OptimizerStatusType;
 
 /**
  * The {@code Brent}'s class contains the Brent's root finding algorithm.
@@ -87,6 +88,7 @@ public class Brent {
             double error = Math.abs(Double.NaN);
             SolverResults<Double> solverResults = new SolverResults<>();
             solverResults.setSolverStatus("Root is not bracketed.");
+            solverResults.setOptimizerStatusType(OptimizerStatusType.ROOT_IS_NOT_BRACKETED);
             solverResults.setHasConverged(false);
             solverResults.setError(error);
             solverResults.setValue(xcur);
@@ -97,6 +99,7 @@ public class Brent {
             double error = 0.0;
             SolverResults<Double> solverResults = new SolverResults<>();
             solverResults.setSolverStatus("Converged");
+            solverResults.setOptimizerStatusType(OptimizerStatusType.CONVERGED);
             solverResults.setHasConverged(true);
             solverResults.setError(error);
             solverResults.setValue(xpre);
@@ -107,6 +110,7 @@ public class Brent {
             double error = 0.0;
             SolverResults<Double> solverResults = new SolverResults<>();
             solverResults.setSolverStatus("Converged");
+            solverResults.setOptimizerStatusType(OptimizerStatusType.CONVERGED);
             solverResults.setHasConverged(true);
             solverResults.setError(error);
             solverResults.setValue(xcur);
@@ -139,6 +143,7 @@ public class Brent {
                 double error = Math.abs(xcur - xpre);
                 SolverResults<Double> solverResults = new SolverResults<>();
                 solverResults.setSolverStatus("Converged");
+                solverResults.setOptimizerStatusType(OptimizerStatusType.CONVERGED);
                 solverResults.setHasConverged(true);
                 solverResults.setError(error);
                 solverResults.setValue(xcur);
@@ -185,6 +190,7 @@ public class Brent {
         double error = Math.abs(xcur - xpre);
         SolverResults<Double> solverResults = new SolverResults<>();
         solverResults.setSolverStatus("Maximum number of iterations exceeded");
+        solverResults.setOptimizerStatusType(OptimizerStatusType.MAXIMUM_NUMBER_OF_ITERATIONS_EXCEEDED);
         solverResults.setHasConverged(false);
         solverResults.setError(error);
         solverResults.setValue(xcur);

@@ -1,6 +1,7 @@
 package com.wildbitsfoundry.etk4j.math.optimize.solvers;
 
 import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
+import com.wildbitsfoundry.etk4j.math.optimize.OptimizerStatusType;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -17,6 +18,7 @@ public class RidderTest {
         assertEquals(-1.0, r.getValue(), 1e-12);
         assertEquals(10, r.getNumberOfIterations());
         assertEquals("Converged", r.getSolverStatus());
+        assertEquals(OptimizerStatusType.CONVERGED, r.getOptimizerStatusType());
         assertEquals(2.968403300940281E-12, r.getError(), 1e-12);
         assertTrue(r.hasConverged());
     }
@@ -31,6 +33,7 @@ public class RidderTest {
         assertEquals(-0.999999999997031, r.getValue(), 1e-12);
         assertEquals(10, r.getNumberOfIterations());
         assertEquals("Maximum number of iterations exceeded", r.getSolverStatus());
+        assertEquals(OptimizerStatusType.MAXIMUM_NUMBER_OF_ITERATIONS_EXCEEDED, r.getOptimizerStatusType());
         assertEquals(7.21692272609431E-9, r.getError(), 1e-12);
         assertFalse(r.hasConverged());
     }

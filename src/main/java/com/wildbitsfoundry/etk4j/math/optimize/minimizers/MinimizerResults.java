@@ -1,11 +1,14 @@
 package com.wildbitsfoundry.etk4j.math.optimize.minimizers;
 
+import com.wildbitsfoundry.etk4j.math.optimize.OptimizerStatusType;
+
 public class MinimizerResults<T> {
     private T value;
     private T functionValue;
     private int numberOfIterations;
     private String minimizerStatus;
     private boolean converged;
+    private OptimizerStatusType optimizerStatusType;
 
     public T getValue() {
         return value;
@@ -37,6 +40,14 @@ public class MinimizerResults<T> {
 
     void setMinimizerStatus(String minimizerStatus) {
         this.minimizerStatus = minimizerStatus;
+    }
+
+    public OptimizerStatusType getOptimizerStatusType() {
+        return optimizerStatusType;
+    }
+
+    public void setOptimizerStatusType(OptimizerStatusType optimizerStatusType) {
+        this.optimizerStatusType = optimizerStatusType;
     }
 
     public boolean hasConverged() {

@@ -1,5 +1,6 @@
 package com.wildbitsfoundry.etk4j.math.optimize.solvers;
 
+import com.wildbitsfoundry.etk4j.math.optimize.OptimizerStatusType;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -18,6 +19,7 @@ public class NewtonRaphsonTest {
         assertEquals(-1.0, nr.getValue(), 1e-12);
         assertEquals(12, nr.getNumberOfIterations());
         assertEquals("Converged", nr.getSolverStatus());
+        assertEquals(OptimizerStatusType.CONVERGED, nr.getOptimizerStatusType());
         assertEquals(1.1102230246251565E-14, nr.getError(), 1e-12);
         assertTrue(nr.hasConverged());
     }
@@ -31,6 +33,7 @@ public class NewtonRaphsonTest {
         assertEquals(-1.0, nr.getValue(), 1e-12);
         assertEquals(9, nr.getNumberOfIterations());
         assertEquals("Converged", nr.getSolverStatus());
+        assertEquals(OptimizerStatusType.CONVERGED, nr.getOptimizerStatusType());
         assertEquals(0.0, nr.getError(), 1e-12);
         assertTrue(nr.hasConverged());
     }
@@ -42,6 +45,7 @@ public class NewtonRaphsonTest {
         assertEquals(-1.0000000000000002, nr.getValue(), 1e-12);
         assertEquals(16, nr.getNumberOfIterations());
         assertEquals("Converged", nr.getSolverStatus());
+        assertEquals(OptimizerStatusType.CONVERGED, nr.getOptimizerStatusType());
         assertEquals(2.2784485453897219E-7, nr.getError(), 1e-12);
         assertTrue(nr.hasConverged());
     }
@@ -54,6 +58,7 @@ public class NewtonRaphsonTest {
         assertEquals(-1.0, nr.getValue(), 1e-12);
         assertEquals(16, nr.getNumberOfIterations());
         assertEquals("Converged", nr.getSolverStatus());
+        assertEquals(OptimizerStatusType.CONVERGED, nr.getOptimizerStatusType());
         assertEquals(1.335008938951887E-7, nr.getError(), 1e-12);
         assertTrue(nr.hasConverged());
     }

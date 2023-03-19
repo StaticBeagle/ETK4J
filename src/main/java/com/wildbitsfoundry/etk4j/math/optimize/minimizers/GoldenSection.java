@@ -1,5 +1,7 @@
 package com.wildbitsfoundry.etk4j.math.optimize.minimizers;
 
+import com.wildbitsfoundry.etk4j.math.optimize.OptimizerStatusType;
+
 import java.util.function.BiFunction;
 
 public final class GoldenSection {
@@ -58,6 +60,7 @@ public final class GoldenSection {
             if(fx1 < fx2) {
                 MinimizerResults<Double> minResults = new MinimizerResults<>();
                 minResults.setMinimizerStatus("Maximum number of iterations exceeded");
+                minResults.setOptimizerStatusType(OptimizerStatusType.MAXIMUM_NUMBER_OF_ITERATIONS_EXCEEDED);
                 minResults.setHasConverged(false);
                 minResults.setValue(x1);
                 minResults.setFunctionValue(fx1);
@@ -66,6 +69,7 @@ public final class GoldenSection {
             }
             MinimizerResults<Double> minResults = new MinimizerResults<>();
             minResults.setMinimizerStatus("Maximum number of iterations exceeded");
+            minResults.setOptimizerStatusType(OptimizerStatusType.MAXIMUM_NUMBER_OF_ITERATIONS_EXCEEDED);
             minResults.setHasConverged(false);
             minResults.setValue(x2);
             minResults.setFunctionValue(fx2);
@@ -75,6 +79,7 @@ public final class GoldenSection {
         if (fx1 < fx2) {
             MinimizerResults<Double> minResults = new MinimizerResults<>();
             minResults.setMinimizerStatus("Converged");
+            minResults.setOptimizerStatusType(OptimizerStatusType.CONVERGED);
             minResults.setHasConverged(true);
             minResults.setValue(x1);
             minResults.setFunctionValue(fx1);
@@ -83,6 +88,7 @@ public final class GoldenSection {
         }
         MinimizerResults<Double> minResults = new MinimizerResults<>();
         minResults.setMinimizerStatus("Converged");
+        minResults.setOptimizerStatusType(OptimizerStatusType.CONVERGED);
         minResults.setHasConverged(true);
         minResults.setValue(x2);
         minResults.setFunctionValue(fx2);

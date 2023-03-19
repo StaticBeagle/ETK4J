@@ -1,6 +1,7 @@
 package com.wildbitsfoundry.etk4j.math.optimize.solvers;
 
 import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
+import com.wildbitsfoundry.etk4j.math.optimize.OptimizerStatusType;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -17,6 +18,7 @@ public class BrentTest {
         assertEquals(-0.9999999998117516, b.getValue(), 1e-12);
         assertEquals(10, b.getNumberOfIterations());
         assertEquals("Converged", b.getSolverStatus());
+        assertEquals(OptimizerStatusType.CONVERGED, b.getOptimizerStatusType());
         assertEquals(5.000008185263027E-10, b.getError(), 1e-12);
         assertTrue(b.hasConverged());
     }
@@ -31,6 +33,7 @@ public class BrentTest {
         assertEquals(-1.0000000003117524, b.getValue(), 1e-12);
         assertEquals(10, b.getNumberOfIterations());
         assertEquals("Maximum number of iterations exceeded", b.getSolverStatus());
+        assertEquals(OptimizerStatusType.MAXIMUM_NUMBER_OF_ITERATIONS_EXCEEDED, b.getOptimizerStatusType());
         assertEquals(5.000008185263027E-10, b.getError(), 1e-12);
         assertFalse(b.hasConverged());
     }
