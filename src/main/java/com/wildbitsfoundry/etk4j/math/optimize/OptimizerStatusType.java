@@ -1,0 +1,11 @@
+package com.wildbitsfoundry.etk4j.math.optimize;
+
+public enum OptimizerStatusType {
+    MAXIMUM_NUMBER_OF_ITERATIONS_EXCEEDED,
+    VALUE_FOUND_WAS_NAN,
+    CONVERGED,
+    ROOT_IS_NOT_BRACKETED,
+    DERIVATIVE_WAS_ZERO,
+    SECOND_INITIAL_GUESS_WAS_EQUAL_TO_FIRST_INITIAL_GUESS,
+    TOLERANCE_WAS_REACHED
+}

@@ -3,6 +3,7 @@ package com.wildbitsfoundry.etk4j.math.optimize.solvers;
 import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.functions.ComplexUnivariateFunction;
+import com.wildbitsfoundry.etk4j.math.optimize.OptimizerStatusType;
 
 /*
 Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
@@ -120,6 +121,7 @@ public final class NewtonRaphsonComplex {
                     double error = xFinal.subtract(xCurrent).abs();
                     SolverResults<Complex> solverResults = new SolverResults<>();
                     solverResults.setSolverStatus("Converged");
+                    solverResults.setOptimizerStatusType(OptimizerStatusType.CONVERGED);
                     solverResults.setHasConverged(true);
                     solverResults.setError(error);
                     solverResults.setValue(xFinal);
@@ -131,6 +133,7 @@ public final class NewtonRaphsonComplex {
                     double error = xFinal.subtract(xCurrent).abs();
                     SolverResults<Complex> solverResults = new SolverResults<>();
                     solverResults.setSolverStatus("Derivative was zero");
+                    solverResults.setOptimizerStatusType(OptimizerStatusType.DERIVATIVE_WAS_ZERO);
                     solverResults.setHasConverged(false);
                     solverResults.setError(error);
                     solverResults.setValue(xFinal);
@@ -152,6 +155,7 @@ public final class NewtonRaphsonComplex {
                     double error = xFinal.subtract(xCurrent).abs();
                     SolverResults<Complex> solverResults = new SolverResults<>();
                     solverResults.setSolverStatus("Converged");
+                    solverResults.setOptimizerStatusType(OptimizerStatusType.CONVERGED);
                     solverResults.setHasConverged(true);
                     solverResults.setError(error);
                     solverResults.setValue(xFinal);
@@ -167,6 +171,7 @@ public final class NewtonRaphsonComplex {
                     double error = xFinal.subtract(xCurrent).abs();
                     SolverResults<Complex> solverResults = new SolverResults<>();
                     solverResults.setSolverStatus("Second initial guess was equal to first initial guess");
+                    solverResults.setOptimizerStatusType(OptimizerStatusType.SECOND_INITIAL_GUESS_WAS_EQUAL_TO_FIRST_INITIAL_GUESS);
                     solverResults.setHasConverged(false);
                     solverResults.setError(error);
                     solverResults.setValue(xFinal);
@@ -196,6 +201,7 @@ public final class NewtonRaphsonComplex {
                         double error = xFinal.subtract(xCurrent).abs();
                         SolverResults<Complex> solverResults = new SolverResults<>();
                         solverResults.setSolverStatus("Tolerance was reached");
+                        solverResults.setOptimizerStatusType(OptimizerStatusType.TOLERANCE_WAS_REACHED);
                         solverResults.setHasConverged(false);
                         solverResults.setError(error);
                         solverResults.setValue(xFinal);
@@ -206,6 +212,7 @@ public final class NewtonRaphsonComplex {
                     double error = xFinal.subtract(xCurrent).abs();
                     SolverResults<Complex> solverResults = new SolverResults<>();
                     solverResults.setSolverStatus("Converged");
+                    solverResults.setOptimizerStatusType(OptimizerStatusType.CONVERGED);
                     solverResults.setHasConverged(true);
                     solverResults.setError(error);
                     solverResults.setValue(x);
@@ -222,6 +229,7 @@ public final class NewtonRaphsonComplex {
                     double error = xFinal.subtract(xCurrent).abs();
                     SolverResults<Complex> solverResults = new SolverResults<>();
                     solverResults.setSolverStatus("Converged");
+                    solverResults.setOptimizerStatusType(OptimizerStatusType.CONVERGED);
                     solverResults.setHasConverged(true);
                     solverResults.setError(error);
                     solverResults.setValue(x);
@@ -237,6 +245,7 @@ public final class NewtonRaphsonComplex {
         double error = xFinal.subtract(xCurrent).abs();
         SolverResults<Complex> solverResults = new SolverResults<>();
         solverResults.setSolverStatus("Maximum number of iterations exceeded");
+        solverResults.setOptimizerStatusType(OptimizerStatusType.MAXIMUM_NUMBER_OF_ITERATIONS_EXCEEDED);
         solverResults.setHasConverged(false);
         solverResults.setError(error);
         solverResults.setValue(xFinal);

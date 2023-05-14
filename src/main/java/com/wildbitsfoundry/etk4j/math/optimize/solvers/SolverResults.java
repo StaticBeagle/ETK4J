@@ -1,11 +1,14 @@
 package com.wildbitsfoundry.etk4j.math.optimize.solvers;
 
+import com.wildbitsfoundry.etk4j.math.optimize.OptimizerStatusType;
+
 public class SolverResults<T> {
 	private T value;
 	private int numberOfIterations;
 	private String solverStatus;
 	private double error;
 	private boolean converged;
+	private OptimizerStatusType optimizerStatusType;
 
 	public T getValue() {
 		return value;
@@ -29,6 +32,14 @@ public class SolverResults<T> {
 
 	void setSolverStatus(String solverStatus) {
 		this.solverStatus = solverStatus;
+	}
+
+	public OptimizerStatusType getOptimizerStatusType() {
+		return optimizerStatusType;
+	}
+
+	public void setOptimizerStatusType(OptimizerStatusType optimizerStatusType) {
+		this.optimizerStatusType = optimizerStatusType;
 	}
 
 	public double getError() {

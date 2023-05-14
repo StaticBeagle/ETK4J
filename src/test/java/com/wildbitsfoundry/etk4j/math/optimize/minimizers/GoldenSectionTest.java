@@ -1,5 +1,6 @@
 package com.wildbitsfoundry.etk4j.math.optimize.minimizers;
 
+import com.wildbitsfoundry.etk4j.math.optimize.OptimizerStatusType;
 import org.junit.Test;
 
 import java.util.function.BiFunction;
@@ -19,6 +20,7 @@ public class GoldenSectionTest {
         assertEquals(-17098.499630858736, b.getFunctionValue(), 1e-12);
         assertEquals(47, b.getNumberOfIterations());
         assertEquals("Converged", b.getMinimizerStatus());
+        assertEquals(OptimizerStatusType.CONVERGED, b.getOptimizerStatusType());
         assertTrue(b.hasConverged());
     }
 
@@ -33,6 +35,7 @@ public class GoldenSectionTest {
         assertEquals(-17098.35742944805, b.getFunctionValue(), 1e-12);
         assertEquals(10, b.getNumberOfIterations());
         assertEquals("Maximum number of iterations exceeded", b.getMinimizerStatus());
+        assertEquals(OptimizerStatusType.MAXIMUM_NUMBER_OF_ITERATIONS_EXCEEDED, b.getOptimizerStatusType());
         assertFalse(b.hasConverged());
     }
 }
