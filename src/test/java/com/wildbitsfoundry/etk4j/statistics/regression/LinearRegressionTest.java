@@ -52,5 +52,4 @@ public class LinearRegressionTest {
 	public void testSSR() {
 		assertEquals(36.60408333333334, lr.SSR(), 1e-12);
 	}
-
 }

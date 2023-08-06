@@ -39,7 +39,7 @@ abstract class UnivariateRegression {
 
 	/**
 	 * R (a.k.a. Correlation).
-	 * @return The computed {@code R-squared}.
+	 * @return The computed {@code R}.
 	 */
 	public double R() {
 		return Math.sqrt(this.R2());
