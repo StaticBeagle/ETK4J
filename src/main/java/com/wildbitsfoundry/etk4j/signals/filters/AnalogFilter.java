@@ -4,7 +4,7 @@ import com.wildbitsfoundry.etk4j.math.optimize.minimizers.Brent;
 
 import java.util.Arrays;
 
-public class AnalogFilter {
+class AnalogFilter {
 
     protected static LowPassResults lowPassFilterOrder(LowPassSpecs specs, FilterOrderCalculationStrategy strategy) {
         double wp = specs.getPassBandFrequency();

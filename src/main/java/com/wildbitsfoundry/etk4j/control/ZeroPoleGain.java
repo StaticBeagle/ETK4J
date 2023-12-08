@@ -3,6 +3,8 @@ package com.wildbitsfoundry.etk4j.control;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
 
+import java.util.Arrays;
+
 import static com.wildbitsfoundry.etk4j.util.ComplexArrays.deepCopy;
 
 /**
@@ -89,5 +91,19 @@ public class ZeroPoleGain extends LinearTimeInvariantSystem {
         num.divideEquals(den);
         num.multiplyEquals(gain);
         return num;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Zeros: ")
+                .append(Arrays.asList(zeros))
+                .append(System.lineSeparator())
+                .append("Poles: ")
+                .append(Arrays.asList(poles))
+                .append(System.lineSeparator())
+                .append("Gain: ")
+                .append(gain);
+        return sb.toString();
     }
 }

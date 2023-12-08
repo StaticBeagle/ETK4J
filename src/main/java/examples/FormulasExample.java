@@ -4,7 +4,7 @@ import static com.wildbitsfoundry.etk4j.math.Formulas.quadraticFormula;
 
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 
-public class FourmulasExample {
+public class FormulasExample {
 	
 	public static void main(String[] args) {
 		double a = 1.0;
