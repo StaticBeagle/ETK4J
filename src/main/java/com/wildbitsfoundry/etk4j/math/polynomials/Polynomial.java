@@ -8,7 +8,7 @@ import com.wildbitsfoundry.etk4j.math.functions.DifferentiableFunction;
 import com.wildbitsfoundry.etk4j.math.functions.IntegrableFunction;
 import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.EigenvalueDecomposition;
-import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
+import com.wildbitsfoundry.etk4j.math.linearalgebra.MatrixDense;
 import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 
@@ -354,7 +354,7 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
                 default:
                     // Use generalized eigenvalue decomposition to find the roots
                     roots = new Complex[N];
-                    Matrix c = Matrix.companion(coefficients, N);
+                    MatrixDense c = MatrixDense.companion(coefficients, N);
                     EigenvalueDecomposition evd = c.eig();
                     double[] realEig = evd.getRealEigenvalues();
                     double[] imagEig = evd.getImagEigenvalues();
@@ -503,10 +503,10 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
         checkXYDimensions(x, y);
         int dim = x.length;
         // Building the coefficient matrix
-        Matrix A = Matrix.vandermonde(x, dim, n + 1);
+        MatrixDense A = MatrixDense.vandermonde(x, dim, n + 1);
         // Building the solution vector
-        Matrix b = new Matrix(y, dim);
-        Matrix c = A.solve(b);
+        MatrixDense b = new MatrixDense(y, dim);
+        MatrixDense c = A.solve(b);
 
         double[] coeffs = new double[n + 1];
         for (int i = 0; i <= n; i++) {

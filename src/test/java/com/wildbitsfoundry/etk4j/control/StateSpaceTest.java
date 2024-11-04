@@ -1,8 +1,7 @@
 package com.wildbitsfoundry.etk4j.control;
 
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
-import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
-import com.wildbitsfoundry.etk4j.util.ComplexArrays;
+import com.wildbitsfoundry.etk4j.math.linearalgebra.MatrixDense;
 import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 import org.junit.Test;
 
@@ -58,18 +57,18 @@ public class StateSpaceTest {
                 2.985588705785755, 2.9864589783431175, 2.987277590856656, 2.9880475409027722, 2.9887716575404877,
                 2.98945261035007, 2.9900929180229268, 2.9906949565219074, 2.9912609668306436, 2.99179306231};
 
-        Matrix A = new Matrix(new double[][]{
+        MatrixDense A = new MatrixDense(new double[][]{
                 {-2.0, -1.0},
                 {1.0, 0.0}
         });
-        Matrix B = new Matrix(new double[][]{
+        MatrixDense B = new MatrixDense(new double[][]{
                 {1.0},
                 {0.0}
         });
-        Matrix C = new Matrix(new double[][]{
+        MatrixDense C = new MatrixDense(new double[][]{
                 {1.0, 2.0}
         });
-        Matrix D = new Matrix(new double[][]{
+        MatrixDense D = new MatrixDense(new double[][]{
                 {1.0}
         });
 
@@ -125,18 +124,18 @@ public class StateSpaceTest {
                 3.0126882046886108, 3.011935559208923, 3.0112265439352606, 3.0105587094498296, 3.00992973743205,
                 3.0093374341744266, 3.008779724372767, 3.008254645183512, 3.0077603405406435, 3.007295055724426};
 
-        Matrix A = new Matrix(new double[][]{
+        MatrixDense A = new MatrixDense(new double[][]{
                 {-2.0, -1.0},
                 {1.0, 0.0}
         });
-        Matrix B = new Matrix(new double[][]{
+        MatrixDense B = new MatrixDense(new double[][]{
                 {1.0},
                 {0.0}
         });
-        Matrix C = new Matrix(new double[][]{
+        MatrixDense C = new MatrixDense(new double[][]{
                 {1.0, 2.0}
         });
-        Matrix D = new Matrix(new double[][]{
+        MatrixDense D = new MatrixDense(new double[][]{
                 {1.0}
         });
 
@@ -242,22 +241,22 @@ public class StateSpaceTest {
                 }
         };
 
-        Matrix A = new Matrix(new double[][]{
+        MatrixDense A = new MatrixDense(new double[][]{
                 {-1.5, -0.2, 1.0},
                 {-0.2, -1.7, 0.6},
                 {1.0, 0.6, -1.4}
         });
-        Matrix B = new Matrix(new double[][]{
+        MatrixDense B = new MatrixDense(new double[][]{
                 {1.5, 0.6},
                 {-1.8, 1.0},
                 {0.0, 0.0}
         });
-        Matrix C = new Matrix(new double[][]{
+        MatrixDense C = new MatrixDense(new double[][]{
                 {-0.0, -0.5, -0.1},
                 {0.35, -0.1, -0.15},
                 {0.65, 0.0, 0.6}
         });
-        Matrix D = new Matrix(new double[][]{
+        MatrixDense D = new MatrixDense(new double[][]{
                 {0.5, 0.0},
                 {0.05, 0.75},
                 {0.0, 0.0}
@@ -378,22 +377,22 @@ public class StateSpaceTest {
                 }
         };
 
-        Matrix A = new Matrix(new double[][]{
+        MatrixDense A = new MatrixDense(new double[][]{
                 {-1.5, -0.2, 1.0},
                 {-0.2, -1.7, 0.6},
                 {1.0, 0.6, -1.4}
         });
-        Matrix B = new Matrix(new double[][]{
+        MatrixDense B = new MatrixDense(new double[][]{
                 {1.5, 0.6},
                 {-1.8, 1.0},
                 {0.0, 0.0}
         });
-        Matrix C = new Matrix(new double[][]{
+        MatrixDense C = new MatrixDense(new double[][]{
                 {-0.0, -0.5, -0.1},
                 {0.35, -0.1, -0.15},
                 {0.65, 0.0, 0.6}
         });
-        Matrix D = new Matrix(new double[][]{
+        MatrixDense D = new MatrixDense(new double[][]{
                 {0.5, 0.0},
                 {0.05, 0.75},
                 {0.0, 0.0}

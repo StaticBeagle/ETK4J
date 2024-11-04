@@ -1,6 +1,6 @@
 package com.wildbitsfoundry.etk4j.statistics.regression;
 
-import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
+import com.wildbitsfoundry.etk4j.math.linearalgebra.MatrixDense;
 
 /**
  * The {@code LogarithmicRegression} class implements a logarithmic fit in the least square sense for a given set of
@@ -19,6 +19,6 @@ public class LogarithmicRegression extends UnivariateRegression {
 			X[i][0] = 1.0;
 			X[i][1] = Math.log(x[i]);
 		}
-		this.doRegression(new Matrix(X), x, y);
+		this.doRegression(new MatrixDense(X), x, y);
 	}
 }

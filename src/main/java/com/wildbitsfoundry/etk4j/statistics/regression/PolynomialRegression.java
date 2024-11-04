@@ -1,6 +1,6 @@
 package com.wildbitsfoundry.etk4j.statistics.regression;
 
-import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
+import com.wildbitsfoundry.etk4j.math.linearalgebra.MatrixDense;
 
 import java.util.Arrays;
 
@@ -15,7 +15,7 @@ public class PolynomialRegression extends UnivariateRegression {
             throw new IllegalArgumentException("x and y dimensions must match.");
         }
         int rows = x.length;
-        Matrix X = Matrix.vandermonde(x, rows, n + 1);
+        MatrixDense X = MatrixDense.vandermonde(x, rows, n + 1);
         this.doRegression(X, x, y);
     }
 

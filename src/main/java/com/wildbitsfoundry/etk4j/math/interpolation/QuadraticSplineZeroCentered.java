@@ -1,6 +1,6 @@
 package com.wildbitsfoundry.etk4j.math.interpolation;
 
-import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
+import com.wildbitsfoundry.etk4j.math.linearalgebra.MatrixDense;
 
 import java.util.Arrays;
 
@@ -11,7 +11,7 @@ public class QuadraticSplineZeroCentered extends Spline {
     protected QuadraticSplineZeroCentered(double[] x, double[] y) {
         super(x, 3);
         int dim = x.length - 1;
-        Matrix X = new Matrix(3 * dim, 3 * dim);
+        MatrixDense X = new MatrixDense(3 * dim, 3 * dim);
         for (int i = 0; i < dim; ++i) {
             X.set(2 * (i + 1) - 2, 3 * i + 2, 1.0);
             X.set(2 * (i + 1) - 1, 3 * i + 2, 1.0);
@@ -27,7 +27,7 @@ public class QuadraticSplineZeroCentered extends Spline {
             X.set(2 * dim + i, 3 * i + 3, -2 * x[i + 1]);
         }
         X.set(3 * dim - 1, 0, 1.0);
-        Matrix b = new Matrix(3 * dim, 1);
+        MatrixDense b = new MatrixDense(3 * dim, 1);
 
         b.set(0, 0, y[0]);
         for (int i = 1; i < 2 * dim; ++i) {

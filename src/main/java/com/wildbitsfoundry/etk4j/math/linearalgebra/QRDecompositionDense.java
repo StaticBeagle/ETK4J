@@ -2,14 +2,14 @@ package com.wildbitsfoundry.etk4j.math.linearalgebra;
 
 import com.wildbitsfoundry.etk4j.math.MathETK;
 
-public class QRDecomposition {
+public class QRDecompositionDense {
 	protected double[] _data;
 	protected final int _rows;
 	protected final int _cols;
 
 	protected double[] _rdiag;
 
-	public QRDecomposition(Matrix matrix) {
+	public QRDecompositionDense(MatrixDense matrix) {
 		final int rows = matrix.getRowCount();
 		final int cols = matrix.getColumnCount();
 		double[] data = matrix.getArrayCopy();
@@ -75,8 +75,8 @@ public class QRDecomposition {
 	 * @return Lower trapezoidal matrix whose columns define the reflections
 	 */
 
-	public Matrix getH() {
-		Matrix X = new Matrix(_rows, _cols);
+	public MatrixDense getH() {
+		MatrixDense X = new MatrixDense(_rows, _cols);
 		double[] H = X.getArray();
 		for (int i = 0; i < _rows; i++) {
 			for (int j = 0; j < _cols; j++) {
@@ -96,8 +96,8 @@ public class QRDecomposition {
 	 * @return R
 	 */
 
-	public Matrix getR() {
-		Matrix X = new Matrix(_cols, _cols);
+	public MatrixDense getR() {
+		MatrixDense X = new MatrixDense(_cols, _cols);
 		double[] R = X.getArray();
 		for (int i = 0; i < _cols; i++) {
 			for (int j = 0; j < _cols; j++) {
@@ -119,8 +119,8 @@ public class QRDecomposition {
 	 * @return R
 	 */
 
-	public Matrix getRT() {
-		Matrix X = new Matrix(_cols, _cols);
+	public MatrixDense getRT() {
+		MatrixDense X = new MatrixDense(_cols, _cols);
 		double[] R = X.getArray();
 		for (int j = 0; j < _cols; ++j) {
 			for (int i = 0; i < _cols; ++i) {
@@ -142,8 +142,8 @@ public class QRDecomposition {
 	 * @return Q
 	 */
 
-	public Matrix getQThin() {
-		Matrix X = new Matrix(_rows, _cols);
+	public MatrixDense getQThin() {
+		MatrixDense X = new MatrixDense(_rows, _cols);
 		double[] Q = X.getArray();
 		for (int k = _cols - 1; k >= 0; k--) {
 			for (int i = 0; i < _rows; i++) {
@@ -171,9 +171,9 @@ public class QRDecomposition {
 	 * 
 	 * @return Q
 	 */
-	public Matrix getQ() {
+	public MatrixDense getQ() {
 		// Compute Q = Q * I
-		Matrix Q = Matrix.identity(_rows, _rows);
+		MatrixDense Q = MatrixDense.identity(_rows, _rows);
 		double[] X = Q.getArray();
 		int mr = Math.min(_rows, _cols);
 		for (int k = mr - 1; k >= 0; --k) {
@@ -191,7 +191,7 @@ public class QRDecomposition {
 		return Q;
 	}
 	
-	public Matrix QmultiplyX(Matrix X) {
+	public MatrixDense QmultiplyX(MatrixDense X) {
 		int nx = X.getColumnCount();
 		double[] Q = X.getArray();
 		int mr = Math.min(_rows, _cols);
@@ -207,7 +207,7 @@ public class QRDecomposition {
 				}
 			}
 		}
-		return new Matrix(Q, X.getRowCount(), X.getColumnCount());
+		return new MatrixDense(Q, X.getRowCount(), X.getColumnCount());
 	}
 	
 	/**
@@ -215,9 +215,9 @@ public class QRDecomposition {
 	 * 
 	 * @return transpose(Q)
 	 */
-	public Matrix getQT() {
+	public MatrixDense getQT() {
 		// Compute Q = Q * I
-		Matrix Q = Matrix.identity(_rows, _rows);
+		MatrixDense Q = MatrixDense.identity(_rows, _rows);
 		double[] X = Q.getArray();
 		int mr = Math.min(_rows, _cols);
 		for (int k = 0; k < mr; ++k) {
@@ -247,7 +247,7 @@ public class QRDecomposition {
 	 *                Matrix is rank deficient.
 	 */
 
-	public Matrix solve(Matrix B) {
+	public MatrixDense solve(MatrixDense B) {
 		if (B.getRowCount() != _rows) {
 			throw new IllegalArgumentException("Matrix row dimensions must agree.");
 		}
@@ -283,7 +283,7 @@ public class QRDecomposition {
 				}
 			}
 		}
-		return (new Matrix(X, _cols, nx).subMatrix(0, _cols - 1, 0, nx - 1));
+		return (new MatrixDense(X, _cols, nx).subMatrix(0, _cols - 1, 0, nx - 1));
 	}
 	
 //	public Matrix solveTranspose(Matrix B) {

@@ -59,7 +59,7 @@ public class SingularValueDecomposition {
 	 *            Rectangular matrix
 	 */
 
-	public SingularValueDecomposition(Matrix Arg) {
+	public SingularValueDecomposition(MatrixDense Arg) {
 
 		// Derived from LINPACK code.
 		// Initialize.
@@ -494,8 +494,8 @@ public class SingularValueDecomposition {
 	 * @return U
 	 */
 
-	public Matrix getU() {
-		return new Matrix(DoubleArrays.flatten(U), _rows, Math.min(_rows + 1, _cols));
+	public MatrixDense getU() {
+		return new MatrixDense(DoubleArrays.flatten(U), _rows, Math.min(_rows + 1, _cols));
 	}
 
 	/**
@@ -504,8 +504,8 @@ public class SingularValueDecomposition {
 	 * @return V
 	 */
 
-	public Matrix getV() {
-		return new Matrix(DoubleArrays.flatten(V), _cols, _cols);
+	public MatrixDense getV() {
+		return new MatrixDense(DoubleArrays.flatten(V), _cols, _cols);
 	}
 
 	/**
@@ -524,9 +524,9 @@ public class SingularValueDecomposition {
 	 * @return S
 	 */
 
-	public Matrix getS() {
+	public MatrixDense getS() {
 		final int n = _cols;
-		Matrix X = new Matrix(n, n);
+		MatrixDense X = new MatrixDense(n, n);
 		double[] S = X.getArray();
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < n; j++) {

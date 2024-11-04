@@ -13,7 +13,7 @@ import com.wildbitsfoundry.etk4j.util.DoubleArrays;
  * isSPD() method.
  */
 
-public class CholeskyDecomposition {
+public class CholeskyDecompositionDense {
 
 	/*
 	 * ------------------------ Class variables ------------------------
@@ -52,7 +52,7 @@ public class CholeskyDecomposition {
 	 *            Square, symmetric matrix.
 	 */
 
-	public CholeskyDecomposition(Matrix Arg) {
+	public CholeskyDecompositionDense(MatrixDense Arg) {
 
 		// Initialize.
 		double[] A = Arg.getArray();
@@ -147,8 +147,8 @@ public class CholeskyDecomposition {
 	 * @return L
 	 */
 
-	public Matrix getL() {
-		return new Matrix(DoubleArrays.flatten(L), _n, _n);
+	public MatrixDense getL() {
+		return new MatrixDense(DoubleArrays.flatten(L), _n, _n);
 	}
 
 	/**
@@ -163,7 +163,7 @@ public class CholeskyDecomposition {
 	 *                Matrix is not symmetric positive definite.
 	 */
 
-	public Matrix solve(Matrix B) {
+	public MatrixDense solve(MatrixDense B) {
 		final int n = _n;
 		if (B.getRowCount() != n) {
 			throw new IllegalArgumentException("Matrix row dimensions must agree.");
@@ -196,6 +196,6 @@ public class CholeskyDecomposition {
 			}
 		}
 
-		return new Matrix(X, n, nx);
+		return new MatrixDense(X, n, nx);
 	}
 }

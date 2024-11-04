@@ -863,7 +863,7 @@ public class EigenvalueDecomposition {
 	 * ------------------------ Constructor ------------------------
 	 */
 	
-	public EigenvalueDecomposition(Matrix mat) {
+	public EigenvalueDecomposition(MatrixDense mat) {
 		this(mat, true);
 	}
 
@@ -875,7 +875,7 @@ public class EigenvalueDecomposition {
 	 *            Square matrix
 	 */
 
-	public EigenvalueDecomposition(Matrix Arg, boolean balance) {
+	public EigenvalueDecomposition(MatrixDense Arg, boolean balance) {
 		double[] A = Arg.getArray();
 		_dim = Arg.getColumnCount();
 		issymmetric = true;
@@ -933,8 +933,8 @@ public class EigenvalueDecomposition {
 	 * @return V
 	 */
 
-	public Matrix getV() {
-		return new Matrix(V, _dim, _dim);
+	public MatrixDense getV() {
+		return new MatrixDense(V, _dim, _dim);
 	}
 
 	/**
@@ -963,8 +963,8 @@ public class EigenvalueDecomposition {
 	 * @return D
 	 */
 
-	public Matrix getD() {
-		Matrix X = new Matrix(_dim, _dim);
+	public MatrixDense getD() {
+		MatrixDense X = new MatrixDense(_dim, _dim);
 		double[] D = X.getArray();
 		for (int i = 0; i < _dim; i++) {
 			for (int j = 0; j < _dim; j++) {

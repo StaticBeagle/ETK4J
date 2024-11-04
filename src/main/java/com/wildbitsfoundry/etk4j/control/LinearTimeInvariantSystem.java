@@ -3,7 +3,7 @@ package com.wildbitsfoundry.etk4j.control;
 import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.EigenvalueDecomposition;
-import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
+import com.wildbitsfoundry.etk4j.math.linearalgebra.MatrixDense;
 import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 
@@ -59,10 +59,10 @@ public abstract class LinearTimeInvariantSystem {
             throw new IllegalArgumentException("The time array must have at least one element.");
         }
 
-        Matrix A = ss.getA();
-        Matrix B = ss.getB();
-        Matrix C = ss.getC();
-        Matrix D = ss.getD();
+        MatrixDense A = ss.getA();
+        MatrixDense B = ss.getB();
+        MatrixDense C = ss.getC();
+        MatrixDense D = ss.getD();
 
         final int noStates = A.getRowCount();
         final int noInputs = B.getColumnCount();
@@ -105,7 +105,7 @@ public abstract class LinearTimeInvariantSystem {
                         M[i] = new double[noStates + noInputs];
                     }
 
-                    Matrix expMT = new Matrix(M).transpose().expm();
+                    MatrixDense expMT = new MatrixDense(M).transpose().expm();
                     double[][] Ad = expMT.subMatrix(0, noStates - 1, 0, noStates - 1).getAs2dArray();
                     double[][] Bd = expMT.subMatrix(noStates, expMT.getRowCount() - 1, 0, noStates - 1).getAs2dArray();
                     for (int i = 1; i < noSteps; ++i) {
@@ -120,7 +120,7 @@ public abstract class LinearTimeInvariantSystem {
                     for (int i = 0; i < noStates; ++i) {
                         M[i] = DoubleArrays.concatenateAll(A.getRow(i), B.getRow(i), new double[noInputs]);
                     }
-                    double[][] identity = Matrix.identity(noInputs).getAs2dArray();
+                    double[][] identity = MatrixDense.identity(noInputs).getAs2dArray();
                     for (int i = noStates, j = 0; i < noStates + noInputs; ++i, ++j) {
                         M[i] = DoubleArrays.concatenate(new double[noStates + noInputs], identity[j]);
                     }
@@ -128,7 +128,7 @@ public abstract class LinearTimeInvariantSystem {
                         M[i] = new double[noStates + 2 * noInputs];
                     }
 
-                    Matrix expMT = new Matrix(M).transpose().expm();
+                    MatrixDense expMT = new MatrixDense(M).transpose().expm();
                     double[][] Ad = expMT.subMatrix(0, noStates - 1, 0, noStates - 1).getAs2dArray();
                     double[][] Bd1 = expMT.subMatrix(noStates + noInputs, expMT.getRowCount() - 1, 0, noStates - 1).getAs2dArray();
                     double[][] Bd0 = expMT.subMatrix(noStates, noStates + noInputs - 1, 0, noStates - 1).getAs2dArray();
@@ -159,8 +159,8 @@ public abstract class LinearTimeInvariantSystem {
         if (a.length != b.length) {
             throw new IllegalArgumentException("The number of elements in a must match the number of rows in b.");
         }
-        Matrix A = new Matrix(a, 1);
-        A.multiplyEquals(new Matrix(b));
+        MatrixDense A = new MatrixDense(a, 1);
+        A.multiplyEquals(new MatrixDense(b));
         return A.getArray();
     }
 
@@ -241,7 +241,7 @@ public abstract class LinearTimeInvariantSystem {
      * Helper function to support all the step overloads.
      *
      * @param time              The time vector. Can be null then
-     *                          {@link #generateDefaultResponseTimes(Matrix, int)} will be used
+     *                          {@link #generateDefaultResponseTimes(MatrixDense, int)} will be used
      * @param initialConditions Initial conditions of the system.
      * @param numberOfPoints    Number of points to be used in case the time vector is null.
      * @return The StepReponse of the system.
@@ -267,7 +267,7 @@ public abstract class LinearTimeInvariantSystem {
      * @param numberOfPoints The number of points to generate.
      * @return The default response times.
      */
-    protected static double[] generateDefaultResponseTimes(Matrix A, int numberOfPoints) {
+    protected static double[] generateDefaultResponseTimes(MatrixDense A, int numberOfPoints) {
         EigenvalueDecomposition eig = A.eig();
         double[] realEig = eig.getRealEigenvalues();
         for (int i = 0; i < realEig.length; ++i) {
