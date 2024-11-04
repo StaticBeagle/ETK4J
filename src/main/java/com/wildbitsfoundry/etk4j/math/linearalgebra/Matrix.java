@@ -111,7 +111,7 @@ public abstract class Matrix {
      * @return The {@link LUDecompositionDense} of the {@code Matrix}.
      * @see <a href="https://en.wikipedia.org/wiki/LU_decomposition">LU Decomposition</a>
      */
-    public abstract LUDecomposition LU();
+    public abstract LUDecomposition<?> LU();
 
     /**
      * QR decomposition of the {@code Matrix}.

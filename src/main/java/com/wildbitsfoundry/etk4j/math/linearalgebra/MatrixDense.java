@@ -63,14 +63,14 @@ public class MatrixDense extends Matrix {
      * @param data The 2d array of values used to populate the {@code Matrix} internal storage.
      */
     public MatrixDense(double[][] data) {
-        if(data.length == 0) {
-            rows = 0;
-            cols = 0;
-            this.data = new double[0];
-        } else if(data == null) {
+        if(data == null) {
             rows = 0;
             cols = 0;
             this.data = null;
+        } else if(data.length == 0) {
+            rows = 0;
+            cols = 0;
+            this.data = new double[0];
         } else {
             rows = data.length;
             cols = data[0].length;
@@ -1181,9 +1181,7 @@ public class MatrixDense extends Matrix {
     public double[] getRow(int row) {
         double[] result = new double[cols];
         int rowIndex = row * cols;
-        for (int j = 0; j < cols; ++j) {
-            result[j] = data[rowIndex + j];
-        }
+        System.arraycopy(data, rowIndex + 0, result, 0, cols);
         return result;
     }
 
