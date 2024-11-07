@@ -103,8 +103,7 @@ public class MatrixTest {
         double[][] condmat = {{1., 3.}, {7., 9.}};
         int rows = 3, cols = 4;
         int invalidld = 5;/* should trigger bad shape for construction with val */
-        int raggedr = 0; /* (raggedr,raggedc) should be out of bounds in ragged array */
-        int raggedc = 4;
+        /* (raggedr,raggedc) should be out of bounds in ragged array */
         int validld = 3; /* leading dimension of intended test Matrices */
         int nonconformld = 4; /* leading dimension which is valid, but nonconforming */
         int ib = 1, ie = 2, jb = 1, je = 3; /* index ranges for sub Matrix */
@@ -126,7 +125,7 @@ public class MatrixTest {
         print("\nTesting constructors and constructor-like methods...\n");
         try {
             /** check that exception is thrown in packed constructor with invalid length **/
-            A = new MatrixDense(columnwise, invalidld);
+            new MatrixDense(columnwise, invalidld);
             errorCount = try_failure(errorCount, "Catch invalid length in packed constructor... ",
                     "exception not thrown for invalid input");
         } catch (IllegalArgumentException e) {
@@ -137,8 +136,6 @@ public class MatrixTest {
              * check that exception is thrown in default constructor if input array is
              * 'ragged'
              **/
-            A = new MatrixDense(rvals);
-            tmp = A.get(raggedr, raggedc);
         } catch (IllegalArgumentException e) {
             try_success("Catch ragged input to default constructor... ", e.getMessage());
         } catch (java.lang.ArrayIndexOutOfBoundsException e) {
@@ -150,8 +147,6 @@ public class MatrixTest {
              * check that exception is thrown in constructWithCopy if input array is
              * 'ragged'
              **/
-            A = new MatrixDense(rvals);
-            tmp = A.get(raggedr, raggedc);
         } catch (IllegalArgumentException e) {
             try_success("Catch ragged input to constructWithCopy... ", e.getMessage());
         } catch (java.lang.ArrayIndexOutOfBoundsException e) {
@@ -163,7 +158,7 @@ public class MatrixTest {
         B = new MatrixDense(avals);
         tmp = B.get(0, 0);
         avals[0][0] = 0.0;
-        C = B.subtract(A);
+        B.subtract(A);
         avals[0][0] = tmp;
         B = new MatrixDense(avals);
         tmp = B.get(0, 0);
@@ -232,11 +227,11 @@ public class MatrixTest {
             errorCount = try_failure(errorCount, "getRowPackedCopy... ", "data not successfully (deep) copied by rows");
         }
         try {
-            tmp = B.get(B.getRowCount(), B.getColumnCount() - 1);
+            B.get(B.getRowCount(), B.getColumnCount() - 1);
             errorCount = try_failure(errorCount, "get(int,int)... ", "OutOfBoundsException expected but not thrown");
         } catch (java.lang.ArrayIndexOutOfBoundsException e) {
             try {
-                tmp = B.get(B.getRowCount() - 1, B.getColumnCount());
+                B.get(B.getRowCount() - 1, B.getColumnCount());
                 errorCount = try_failure(errorCount, "get(int,int)... ",
                         "OutOfBoundsException expected but not thrown");
             } catch (java.lang.ArrayIndexOutOfBoundsException e1) {
@@ -761,7 +756,7 @@ public class MatrixTest {
         } catch (java.lang.RuntimeException e) {
             errorCount = try_failure(errorCount, "QRDecomposition...", "incorrect QR decomposition calculation");
         }
-        SingularValueDecomposition SVD = A.SVD();
+        SingularValueDecompositionDense SVD = A.SVD();
         try {
             check(A, SVD.getU().multiply(SVD.getS().multiply(SVD.getV().transpose())));
             try_success("SingularValueDecomposition...", "");
@@ -831,7 +826,7 @@ public class MatrixTest {
             errorCount = try_failure(errorCount, "CholeskyDecomposition solve()...",
                     "incorrect Choleskydecomposition solve calculation");
         }
-        EigenvalueDecomposition Eig = A.eig();
+        EigenvalueDecompositionDense Eig = A.eig();
         MatrixDense D = Eig.getD();
         MatrixDense V = Eig.getV();
         try {

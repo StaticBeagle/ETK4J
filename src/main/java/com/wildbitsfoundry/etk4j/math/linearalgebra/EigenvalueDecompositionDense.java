@@ -19,7 +19,7 @@ import com.wildbitsfoundry.etk4j.math.MathETK;
  * validity of the equation A = V*D*inverse(V) depends upon V.cond().
  **/
 
-public class EigenvalueDecomposition {
+public class EigenvalueDecompositionDense {
 
 	/*
 	 * ------------------------ Class variables ------------------------
@@ -863,7 +863,7 @@ public class EigenvalueDecomposition {
 	 * ------------------------ Constructor ------------------------
 	 */
 	
-	public EigenvalueDecomposition(MatrixDense mat) {
+	public EigenvalueDecompositionDense(MatrixDense mat) {
 		this(mat, true);
 	}
 
@@ -875,7 +875,7 @@ public class EigenvalueDecomposition {
 	 *            Square matrix
 	 */
 
-	public EigenvalueDecomposition(MatrixDense Arg, boolean balance) {
+	public EigenvalueDecompositionDense(MatrixDense Arg, boolean balance) {
 		double[] A = Arg.getArray();
 		_dim = Arg.getColumnCount();
 		issymmetric = true;

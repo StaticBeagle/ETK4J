@@ -4,7 +4,7 @@ import com.wildbitsfoundry.etk4j.math.complex.Complex;
 
 import java.util.Arrays;
 
-public class ComplexLUDecomposition {
+public class ComplexLUDecompositionDense {
 	protected Complex[] _data;
 	protected final int _rows;
 	protected final int _cols;
@@ -12,7 +12,7 @@ public class ComplexLUDecomposition {
 	protected int _pivotsign = 1;
 	protected int[] _pivot;
 
-	public ComplexLUDecomposition(ComplexMatrixDense matrix) {
+	public ComplexLUDecompositionDense(ComplexMatrixDense matrix) {
 		final int rows = matrix.getRowCount();
 		final int cols = matrix.getColumnCount();
 		Complex[] data = matrix.getArrayCopy();

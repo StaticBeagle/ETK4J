@@ -18,7 +18,7 @@ import com.wildbitsfoundry.etk4j.util.DoubleArrays;
  * computed from this decomposition.
  */
 
-public class SingularValueDecomposition {
+public class SingularValueDecompositionDense {
 
 	/*
 	 * ------------------------ Class variables ------------------------
@@ -59,7 +59,7 @@ public class SingularValueDecomposition {
 	 *            Rectangular matrix
 	 */
 
-	public SingularValueDecomposition(MatrixDense Arg) {
+	public SingularValueDecompositionDense(MatrixDense Arg) {
 
 		// Derived from LINPACK code.
 		// Initialize.

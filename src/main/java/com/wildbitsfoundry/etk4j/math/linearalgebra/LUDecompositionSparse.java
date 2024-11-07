@@ -16,8 +16,8 @@ public class LUDecompositionSparse extends LUDecomposition<MatrixSparse> {
     private double[] x = new double[0];
 
     private void initialize(MatrixSparse A) {
-        int m = A.numRows;
-        int n = A.numCols;
+        int m = A.rows;
+        int n = A.cols;
         int o = Math.min(m, n);
         this.L.reshape(m, m, 4 * A.nz_length + o);
         this.L.nz_length = 0;
@@ -42,8 +42,8 @@ public class LUDecompositionSparse extends LUDecomposition<MatrixSparse> {
     private boolean singular;
 
     private boolean performLU(MatrixSparse A) {
-        int m = A.numRows;
-        int n = A.numCols;
+        int m = A.rows;
+        int n = A.cols;
         int[] w = adjust(this.gw, m * 2, m);
 
         int k;
@@ -132,30 +132,33 @@ public class LUDecompositionSparse extends LUDecomposition<MatrixSparse> {
     }
 
     @Override
-    public MatrixSparse solve(double[] B) {
-        if (B.length != this.rows) {
-            int var10002 = B.length;
+    public MatrixSparse solve(double[] b) {
+        if (b.length != this.rows) {
+            int var10002 = b.length;
             throw new IllegalArgumentException("Unexpected number of rows in B based on shape of A. Found=" + var10002 + " Expected=" + this.rows);
         }
 
-        double[] x = adjust(this.gx, B.length);
-        double[] b = adjust(this.gb, B.length);
+        double[] x = adjust(this.gx, b.length);
+        double[] rhs = adjust(this.gb, b.length);
         MatrixSparse L = this.L;
         MatrixSparse U = this.U;
 
-        System.arraycopy(B, 0, b, 0, B.length);
+        System.arraycopy(b, 0, rhs, 0, b.length);
 
-        permuteInv(pinv, b, x, B.length);
+        permuteInv(pinv, rhs, x, b.length);
 
         solveL(L, x);
         solveU(U, x);
 
-        System.arraycopy(x, 0, B, 0, B.length);
-        return null; // TODO change this to use B
+        double[][] xmat = new double[b.length][1];
+        for(int i = 0; i < b.length; i++) {
+            xmat[i][0] = x[i];
+        }
+        return MatrixSparse.convert(xmat, 0);
     }
 
-    public static int solveColB(MatrixSparse G, boolean lower, MatrixSparse B, int colB, double[] x, int[] pinv, IGrowArray g_xi, int[] w) {
-        int X_rows = G.numCols;
+    private static int solveColB(MatrixSparse G, boolean lower, MatrixSparse B, int colB, double[] x, int[] pinv, IGrowArray g_xi, int[] w) {
+        int X_rows = G.cols;
         int[] xi = adjust(g_xi, X_rows);
         int top = searchNzRowsInX(G, B, colB, pinv, xi, w);
 
@@ -199,10 +202,10 @@ public class LUDecompositionSparse extends LUDecomposition<MatrixSparse> {
         return top;
     }
 
-    public static int searchNzRowsInX(MatrixSparse G, MatrixSparse B, int colB, int[] pinv, int[] xi, int[] w) {
-        int X_rows = G.numCols;
+    private static int searchNzRowsInX(MatrixSparse G, MatrixSparse B, int colB, int[] pinv, int[] xi, int[] w) {
+        int X_rows = G.cols;
         if (xi.length < X_rows) {
-            throw new IllegalArgumentException("xi must be at least G.numCols=" + G.numCols);
+            throw new IllegalArgumentException("xi must be at least G.numCols=" + G.cols);
         } else if (w.length < 2 * X_rows) {
             throw new IllegalArgumentException("w must be at least 2*G.numCols in length (2*number of rows in X) and first N elements must be zero");
         } else {
@@ -227,7 +230,7 @@ public class LUDecompositionSparse extends LUDecomposition<MatrixSparse> {
     }
 
     private static int searchNzRowsInX_DFS(int rowB, MatrixSparse G, int top, int[] pinv, int[] xi, int[] w) {
-        int N = G.numCols;
+        int N = G.cols;
         int head = 0;
         xi[head] = rowB;
 
@@ -264,8 +267,8 @@ public class LUDecompositionSparse extends LUDecomposition<MatrixSparse> {
         return top;
     }
 
-    public static void solveL(MatrixSparse L, double[] x) {
-        int N = L.numCols;
+    private static void solveL(MatrixSparse L, double[] x) {
+        int N = L.cols;
         int idx0 = L.col_idx[0];
 
         for (int col = 0; col < N; ++col) {
@@ -282,8 +285,8 @@ public class LUDecompositionSparse extends LUDecomposition<MatrixSparse> {
 
     }
 
-    public static void solveU(MatrixSparse U, double[] x) {
-        int N = U.numCols;
+    private static void solveU(MatrixSparse U, double[] x) {
+        int N = U.cols;
         int idx1 = U.col_idx[N];
 
         for (int col = N - 1; col >= 0; --col) {
@@ -300,13 +303,13 @@ public class LUDecompositionSparse extends LUDecomposition<MatrixSparse> {
 
     }
 
-    public static int[] adjust(IGrowArray gwork, int desired, int zeroToM) {
+    private static int[] adjust(IGrowArray gwork, int desired, int zeroToM) {
         int[] w = adjust(gwork, desired);
         Arrays.fill(w, 0, zeroToM, 0);
         return w;
     }
 
-    public static int[] adjust(IGrowArray gwork, int desired) {
+    private static int[] adjust(IGrowArray gwork, int desired) {
         if (gwork == null) {
             gwork = new IGrowArray();
         }
@@ -316,7 +319,7 @@ public class LUDecompositionSparse extends LUDecomposition<MatrixSparse> {
     }
 
 
-    public static double[] adjust(DGrowArray gwork, int desired) {
+    private static double[] adjust(DGrowArray gwork, int desired) {
         if (gwork == null) {
             gwork = new DGrowArray();
         }
@@ -325,7 +328,7 @@ public class LUDecompositionSparse extends LUDecomposition<MatrixSparse> {
         return gwork.data;
     }
 
-    public static void permuteInv(int[] perm, double[] input, double[] output, int N) {
+    private static void permuteInv(int[] perm, double[] input, double[] output, int N) {
         for (int k = 0; k < N; ++k) {
             output[perm[k]] = input[k];
         }

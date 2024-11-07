@@ -2,16 +2,12 @@ package com.wildbitsfoundry.etk4j.math.linearalgebra;
 
 import com.wildbitsfoundry.etk4j.math.MathETK;
 
-public class QRDecompositionDense {
+public class QRDecompositionDense extends QRDecomposition<MatrixDense> {
 	protected double[] _data;
-	protected final int _rows;
-	protected final int _cols;
-
 	protected double[] _rdiag;
 
 	public QRDecompositionDense(MatrixDense matrix) {
-		final int rows = matrix.getRowCount();
-		final int cols = matrix.getColumnCount();
+		super(matrix);
 		double[] data = matrix.getArrayCopy();
 		_rdiag = new double[cols];
 
@@ -47,8 +43,6 @@ public class QRDecompositionDense {
 			_rdiag[k] = -nrm;
 		}
 		_data = data;
-		_rows = rows;
-		_cols = cols;
 	}
 
 	/*
@@ -62,7 +56,7 @@ public class QRDecompositionDense {
 	 */
 
 	public boolean isFullRank() {
-		for (int j = 0; j < _cols; j++) {
+		for (int j = 0; j < cols; j++) {
 			if (_rdiag[j] == 0.0)
 				return false;
 		}
@@ -76,14 +70,14 @@ public class QRDecompositionDense {
 	 */
 
 	public MatrixDense getH() {
-		MatrixDense X = new MatrixDense(_rows, _cols);
+		MatrixDense X = new MatrixDense(rows, cols);
 		double[] H = X.getArray();
-		for (int i = 0; i < _rows; i++) {
-			for (int j = 0; j < _cols; j++) {
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
 				if (i >= j) {
-					H[i * _cols + j] = _data[i * _cols + j];
+					H[i * cols + j] = _data[i * cols + j];
 				} else {
-					H[i * _cols + j] = 0.0;
+					H[i * cols + j] = 0.0;
 				}
 			}
 		}
@@ -97,16 +91,16 @@ public class QRDecompositionDense {
 	 */
 
 	public MatrixDense getR() {
-		MatrixDense X = new MatrixDense(_cols, _cols);
+		MatrixDense X = new MatrixDense(cols, cols);
 		double[] R = X.getArray();
-		for (int i = 0; i < _cols; i++) {
-			for (int j = 0; j < _cols; j++) {
+		for (int i = 0; i < cols; i++) {
+			for (int j = 0; j < cols; j++) {
 				if (i < j) {
-					R[i * _cols + j] = _data[i * _cols + j];
+					R[i * cols + j] = _data[i * cols + j];
 				} else if (i == j) {
-					R[i * _cols + j] = _rdiag[i];
+					R[i * cols + j] = _rdiag[i];
 				} else {
-					R[i * _cols + j] = 0.0;
+					R[i * cols + j] = 0.0;
 				}
 			}
 		}
@@ -120,16 +114,16 @@ public class QRDecompositionDense {
 	 */
 
 	public MatrixDense getRT() {
-		MatrixDense X = new MatrixDense(_cols, _cols);
+		MatrixDense X = new MatrixDense(cols, cols);
 		double[] R = X.getArray();
-		for (int j = 0; j < _cols; ++j) {
-			for (int i = 0; i < _cols; ++i) {
+		for (int j = 0; j < cols; ++j) {
+			for (int i = 0; i < cols; ++i) {
 				if (i > j) {
-					R[i * _cols + j] = _data[j * _cols + i];
+					R[i * cols + j] = _data[j * cols + i];
 				} else if (i == j) {
-					R[i * _cols + j] = _rdiag[i];
+					R[i * cols + j] = _rdiag[i];
 				} else {
-					R[i * _cols + j] = 0.0;
+					R[i * cols + j] = 0.0;
 				}
 			}
 		}
@@ -143,22 +137,22 @@ public class QRDecompositionDense {
 	 */
 
 	public MatrixDense getQThin() {
-		MatrixDense X = new MatrixDense(_rows, _cols);
+		MatrixDense X = new MatrixDense(rows, cols);
 		double[] Q = X.getArray();
-		for (int k = _cols - 1; k >= 0; k--) {
-			for (int i = 0; i < _rows; i++) {
-				Q[i * _cols + k] = 0.0;
+		for (int k = cols - 1; k >= 0; k--) {
+			for (int i = 0; i < rows; i++) {
+				Q[i * cols + k] = 0.0;
 			}
-			Q[k * _cols + k] = 1.0;
-			for (int j = k; j < _cols; j++) {
-				if (_data[k * _cols + k] != 0) {
+			Q[k * cols + k] = 1.0;
+			for (int j = k; j < cols; j++) {
+				if (_data[k * cols + k] != 0) {
 					double s = 0.0;
-					for (int i = k; i < _rows; i++) {
-						s += _data[i * _cols + k] * Q[i * _cols + j];
+					for (int i = k; i < rows; i++) {
+						s += _data[i * cols + k] * Q[i * cols + j];
 					}
-					s = -s / _data[k * _cols + k];
-					for (int i = k; i < _rows; i++) {
-						Q[i * _cols + j] += s * _data[i * _cols + k];
+					s = -s / _data[k * cols + k];
+					for (int i = k; i < rows; i++) {
+						Q[i * cols + j] += s * _data[i * cols + k];
 					}
 				}
 			}
@@ -173,18 +167,18 @@ public class QRDecompositionDense {
 	 */
 	public MatrixDense getQ() {
 		// Compute Q = Q * I
-		MatrixDense Q = MatrixDense.identity(_rows, _rows);
+		MatrixDense Q = MatrixDense.identity(rows, rows);
 		double[] X = Q.getArray();
-		int mr = Math.min(_rows, _cols);
+		int mr = Math.min(rows, cols);
 		for (int k = mr - 1; k >= 0; --k) {
-			for (int j = _rows - 1; j >= 0; --j) {
+			for (int j = rows - 1; j >= 0; --j) {
 				double s = 0.0;
-				for (int i = k; i < _rows; i++) {
-					s += _data[i * _cols + k] * X[i * _rows + j];
+				for (int i = k; i < rows; i++) {
+					s += _data[i * cols + k] * X[i * rows + j];
 				}
-				s = -s / _data[k * _cols + k];
-				for (int i = k; i < _rows; i++) {
-					X[i * _rows + j] += s * _data[i * _cols + k];
+				s = -s / _data[k * cols + k];
+				for (int i = k; i < rows; i++) {
+					X[i * rows + j] += s * _data[i * cols + k];
 				}
 			}
 		}
@@ -194,16 +188,16 @@ public class QRDecompositionDense {
 	public MatrixDense QmultiplyX(MatrixDense X) {
 		int nx = X.getColumnCount();
 		double[] Q = X.getArray();
-		int mr = Math.min(_rows, _cols);
+		int mr = Math.min(rows, cols);
 		for (int k = mr - 1; k >= 0; --k) {
 			for (int j = nx - 1; j >= 0; --j) {
 				double s = 0.0;
-				for (int i = k; i < _rows; i++) {
-					s += _data[i * _cols + k] * Q[i * nx + j];
+				for (int i = k; i < rows; i++) {
+					s += _data[i * cols + k] * Q[i * nx + j];
 				}
-				s = -s / _data[k * _cols + k];
-				for (int i = k; i < _rows; i++) {
-					Q[i * nx + j] += s * _data[i * _cols + k];
+				s = -s / _data[k * cols + k];
+				for (int i = k; i < rows; i++) {
+					Q[i * nx + j] += s * _data[i * cols + k];
 				}
 			}
 		}
@@ -217,18 +211,18 @@ public class QRDecompositionDense {
 	 */
 	public MatrixDense getQT() {
 		// Compute Q = Q * I
-		MatrixDense Q = MatrixDense.identity(_rows, _rows);
+		MatrixDense Q = MatrixDense.identity(rows, rows);
 		double[] X = Q.getArray();
-		int mr = Math.min(_rows, _cols);
+		int mr = Math.min(rows, cols);
 		for (int k = 0; k < mr; ++k) {
-			for (int j = 0; j < _rows; ++j) {
+			for (int j = 0; j < rows; ++j) {
 				double s = 0.0;
-				for (int i = k; i < _rows; i++) {
-					s += _data[i * _cols + k] * X[i * _rows + j];
+				for (int i = k; i < rows; i++) {
+					s += _data[i * cols + k] * X[i * rows + j];
 				}
-				s = -s / _data[k * _cols + k];
-				for (int i = k; i < _rows; i++) {
-					X[i * _rows + j] += s * _data[i * _cols + k];
+				s = -s / _data[k * cols + k];
+				for (int i = k; i < rows; i++) {
+					X[i * rows + j] += s * _data[i * cols + k];
 				}
 			}
 		}
@@ -248,7 +242,7 @@ public class QRDecompositionDense {
 	 */
 
 	public MatrixDense solve(MatrixDense B) {
-		if (B.getRowCount() != _rows) {
+		if (B.getRowCount() != rows) {
 			throw new IllegalArgumentException("Matrix row dimensions must agree.");
 		}
 		if (!this.isFullRank()) {
@@ -260,34 +254,34 @@ public class QRDecompositionDense {
 		double[] X = B.getArrayCopy();
 
 		// Compute Y = transpose(Q)*B
-		for (int k = 0; k < _cols; k++) {
+		for (int k = 0; k < cols; k++) {
 			for (int j = 0; j < nx; j++) {
 				double s = 0.0;
-				for (int i = k; i < _rows; i++) {
-					s += _data[i * _cols + k] * X[i * nx + j];
+				for (int i = k; i < rows; i++) {
+					s += _data[i * cols + k] * X[i * nx + j];
 				}
-				s = -s / _data[k * _cols + k];
-				for (int i = k; i < _rows; i++) {
-					X[i * nx + j] += s * _data[i * _cols + k];
+				s = -s / _data[k * cols + k];
+				for (int i = k; i < rows; i++) {
+					X[i * nx + j] += s * _data[i * cols + k];
 				}
 			}
 		}
 		// Solve R*X = Y;
-		for (int k = _cols - 1; k >= 0; k--) {
+		for (int k = cols - 1; k >= 0; k--) {
 			for (int j = 0; j < nx; j++) {
 				X[k * nx + j] /= _rdiag[k];
 			}
 			for (int i = 0; i < k; i++) {
 				for (int j = 0; j < nx; j++) {
-					X[i * nx + j] -= X[k * nx + j] * _data[i * _cols + k];
+					X[i * nx + j] -= X[k * nx + j] * _data[i * cols + k];
 				}
 			}
 		}
-		return (new MatrixDense(X, _cols, nx).subMatrix(0, _cols - 1, 0, nx - 1));
+		return (new MatrixDense(X, cols, nx).subMatrix(0, cols - 1, 0, nx - 1));
 	}
 	
 //	public Matrix solveTranspose(Matrix B) {
-////		if (B.getRowCount() != _rows) {
+////		if (B.getRowCount() != rows) {
 ////			throw new IllegalArgumentException("Matrix row dimensions must agree.");
 ////		}
 //		if (!this.isFullRank()) {
@@ -299,41 +293,41 @@ public class QRDecompositionDense {
 //		double[] X = B.getArrayCopy();
 //		
 //		// Solve RT*X = Y;
-//		for (int k = _cols - 1; k >= 0; k--) {
+//		for (int k = cols - 1; k >= 0; k--) {
 //			for (int j = 0; j < nx; j++) {
 //				X[k * nx + j] /= _rdiag[k];
 //			}
 //			for (int i = 0; i < k; i++) {
 //				for (int j = 0; j < nx; j++) {
-//					X[i * nx + j] -= X[k * nx + j] * _data[i * _cols + k];
+//					X[i * nx + j] -= X[k * nx + j] * _data[i * cols + k];
 //				}
 //			}
 //		}
 //
 //
-//		int mr = Math.min(_rows, _cols);
+//		int mr = Math.min(rows, cols);
 //		for (int k = mr - 1; k >= 0; --k) {
 //			for (int j = nx - 1; j >= 0; --j) {
 //				double s = 0.0;
-//				for (int i = k; i < _rows; i++) {
-//					s += _data[i * _cols + k] * X[i * nx + j];
+//				for (int i = k; i < rows; i++) {
+//					s += _data[i * cols + k] * X[i * nx + j];
 //				}
-//				s = -s / _data[k * _cols + k];
-//				for (int i = k; i < _rows; i++) {
-//					X[i * nx + j] += s * _data[i * _cols + k];
+//				s = -s / _data[k * cols + k];
+//				for (int i = k; i < rows; i++) {
+//					X[i * nx + j] += s * _data[i * cols + k];
 //				}
 //			}
 //		}
 //		return new Matrix(X, B.getRowCount(), B.getColumnCount());
 //
-//		//return (new Matrix(X, _cols, nx).subMatrix(0, _cols - 1, 0, nx - 1));
+//		//return (new Matrix(X, cols, nx).subMatrix(0, cols - 1, 0, nx - 1));
 //	}
 
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < _rows * _cols; ++i) {
-			if (i > 0 && i % _cols == 0) {
+		for (int i = 0; i < rows * cols; ++i) {
+			if (i > 0 && i % cols == 0) {
 				sb.append(System.lineSeparator());
 			}
 			sb.append(String.format("%.4f", _data[i])).append(" ");

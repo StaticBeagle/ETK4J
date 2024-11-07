@@ -63,7 +63,7 @@ public abstract class Matrix {
      * @param j   The column index.
      * @param val The value used to set {@code A(i, j) = val}.
      */
-    public abstract void set(int i, int j, double val);
+    public abstract void set(int row, int col, double val);
 
     /**
      * Set the value of the {@code Matrix} at a given position without any boundary checks.
@@ -72,7 +72,7 @@ public abstract class Matrix {
      * @param j   The column index.
      * @param val The value used to set {@code A(i, j) = val}.
      */
-    public abstract void unsafeSet(int i, int j, double val);
+    public abstract void unsafeSet(int row, int col, double val);
 
     /**
      * {@code Matrix} determinant.
@@ -119,14 +119,14 @@ public abstract class Matrix {
      * @return The {@link QRDecompositionDense} of the {@code Matrix}.
      * @see <a href="https://en.wikipedia.org/wiki/QR_decomposition">QR Decomposition</a>
      */
-    public abstract QRDecompositionDense QR();
+    public abstract QRDecomposition<?> QR();
     /**
      * Cholesky decomposition of the {@code Matrix}.
      *
      * @return The {@link CholeskyDecompositionDense} of the {@code Matrix}.
      * @see <a href="https://en.wikipedia.org/wiki/Cholesky_decomposition">Cholesky Decomposition</a>
      */
-    public abstract CholeskyDecompositionDense Chol();
+    public abstract CholeskyDecomposition<?> Chol();
     // endregion
 
     /***

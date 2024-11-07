@@ -2,7 +2,7 @@ package com.wildbitsfoundry.etk4j.control;
 
 import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
-import com.wildbitsfoundry.etk4j.math.linearalgebra.EigenvalueDecomposition;
+import com.wildbitsfoundry.etk4j.math.linearalgebra.EigenvalueDecompositionDense;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.MatrixDense;
 import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 import com.wildbitsfoundry.etk4j.util.DoubleArrays;
@@ -268,7 +268,7 @@ public abstract class LinearTimeInvariantSystem {
      * @return The default response times.
      */
     protected static double[] generateDefaultResponseTimes(MatrixDense A, int numberOfPoints) {
-        EigenvalueDecomposition eig = A.eig();
+        EigenvalueDecompositionDense eig = A.eig();
         double[] realEig = eig.getRealEigenvalues();
         for (int i = 0; i < realEig.length; ++i) {
             realEig[i] = Math.abs(realEig[i]);

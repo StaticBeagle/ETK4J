@@ -7,7 +7,7 @@ import com.wildbitsfoundry.etk4j.math.functions.ComplexUnivariateFunction;
 import com.wildbitsfoundry.etk4j.math.functions.DifferentiableFunction;
 import com.wildbitsfoundry.etk4j.math.functions.IntegrableFunction;
 import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
-import com.wildbitsfoundry.etk4j.math.linearalgebra.EigenvalueDecomposition;
+import com.wildbitsfoundry.etk4j.math.linearalgebra.EigenvalueDecompositionDense;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.MatrixDense;
 import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 import com.wildbitsfoundry.etk4j.util.DoubleArrays;
@@ -355,7 +355,7 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
                     // Use generalized eigenvalue decomposition to find the roots
                     roots = new Complex[N];
                     MatrixDense c = MatrixDense.companion(coefficients, N);
-                    EigenvalueDecomposition evd = c.eig();
+                    EigenvalueDecompositionDense evd = c.eig();
                     double[] realEig = evd.getRealEigenvalues();
                     double[] imagEig = evd.getImagEigenvalues();
                     roots = ComplexArrays.zip(realEig, imagEig);

@@ -17,7 +17,6 @@ public abstract class LUDecomposition <T extends Matrix> {
      *
      * @return L
      */
-
     public abstract T getL();
 
     /**
@@ -25,44 +24,7 @@ public abstract class LUDecomposition <T extends Matrix> {
      *
      * @return U
      */
-
     public abstract T getU();
-
-    /**
-     * Return pivot permutation vector
-     *
-     * @return piv
-     */
-
-//    public int[] getPivot() {
-//        return Arrays.copyOf(_pivot, _pivot.length);
-//    }
-//
-//    /**
-//     * Return pivot permutation vector as a one-dimensional double array
-//     *
-//     * @return (double) piv
-//     */
-//
-//    public double[] getPivotAsDouble() {
-//        final int rows = _rows;
-//        double[] vals = new double[rows];
-//        for (int i = 0; i < rows; i++) {
-//            vals[i] = (double) _pivot[i];
-//        }
-//        return vals;
-//    }
-//
-//    public double det() {
-//        if (_rows != _cols) {
-//            throw new IllegalArgumentException("Matrix must be square.");
-//        }
-//        double det = _pivotsign;
-//        for (int i = 0; i < _cols; i++) {
-//            det *= this._data[i * _cols + i];
-//        }
-//        return det;
-//    }
 
     /**
      * Solve A*X = B
@@ -75,6 +37,5 @@ public abstract class LUDecomposition <T extends Matrix> {
      * @exception RuntimeException
      *                Matrix is singular.
      */
-
     public abstract T solve(double[] b);
 }

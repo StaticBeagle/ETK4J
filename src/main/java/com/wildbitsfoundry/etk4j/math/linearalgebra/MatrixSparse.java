@@ -1,5 +1,8 @@
 package com.wildbitsfoundry.etk4j.math.linearalgebra;
 
+import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
+import com.wildbitsfoundry.etk4j.math.MathETK;
+
 import java.util.Arrays;
 
 public class MatrixSparse extends Matrix {
@@ -24,78 +27,57 @@ public class MatrixSparse extends Matrix {
     public int[] col_idx;
 
     /**
-     * Number of rows in the matrix
-     */
-    int numRows;
-    /**
-     * Number of columns in the matrix
-     */
-    int numCols;
-
-    /**
      * Flag that's used to indicate of the row indices are sorted or not.
      */
     boolean indicesSorted = false;
 
-    public static double EPS = Math.pow(2.0, -52.0);
+//    public static double EPS = Math.pow(2.0, -52.0);
 
     /**
      * Constructor with a default arrayLength of zero.
      *
-     * @param numRows Number of rows
-     * @param numCols Number of columns
+     * @param rows Number of rows
+     * @param cols Number of columns
      */
-    public MatrixSparse(int numRows, int numCols) {
-        this(numRows, numCols, 0);
+    public MatrixSparse(int rows, int cols) {
+        this(rows, cols, 0);
     }
 
     /**
      * Specifies shape and number of non-zero elements that can be stored.
      *
-     * @param numRows     Number of rows
-     * @param numCols     Number of columns
+     * @param rows     Number of rows
+     * @param cols     Number of columns
      * @param arrayLength Initial maximum number of non-zero elements that can be in the matrix
      */
-    public MatrixSparse(int numRows, int numCols, int arrayLength) {
-        if (numRows < 0 || numCols < 0 || arrayLength < 0)
+    public MatrixSparse(int rows, int cols, int arrayLength) {
+        if (rows < 0 || cols < 0 || arrayLength < 0)
             throw new IllegalArgumentException("Rows, columns, and arrayLength must be not be negative");
-        this.numRows = numRows;
-        this.numCols = numCols;
+        this.rows = rows;
+        this.cols = cols;
         this.nz_length = 0;
-        col_idx = new int[numCols + 1];
+        col_idx = new int[cols + 1];
         growMaxLength(arrayLength, false);
     }
 
     public MatrixSparse(MatrixSparse original) {
-        this(original.numRows, original.numCols, original.nz_length);
+        this(original.rows, original.cols, original.nz_length);
 
         setTo(original);
-    }
-
-    public int getNumRows() {
-        return numRows;
-    }
-
-    public int getNumCols() {
-        return numCols;
     }
 
     public MatrixSparse copy() {
         return new MatrixSparse(this);
     }
 
-    public MatrixSparse createLike() {
-        return new MatrixSparse(numRows, numCols);
-    }
-
     public void setTo(MatrixSparse original) {
         MatrixSparse o = original;
-        reshape(o.numRows, o.numCols, o.nz_length);
+        reshape(o.rows, o.cols, o.nz_length);
         this.nz_length = o.nz_length;
 
         System.arraycopy(o.nz_values, 0, nz_values, 0, nz_length);
         System.arraycopy(o.nz_rows, 0, nz_rows, 0, nz_length);
-        System.arraycopy(o.col_idx, 0, col_idx, 0, numCols + 1);
+        System.arraycopy(o.col_idx, 0, col_idx, 0, cols + 1);
         this.indicesSorted = o.indicesSorted;
     }
 
@@ -109,10 +91,10 @@ public class MatrixSparse extends Matrix {
 
 //    public void printNonZero() {
 //        String format = "%d %d " + MatrixIO.DEFAULT_FLOAT_FORMAT + "\n";
-//        System.out.println("Type = " + getType().name() + " , rows = " + numRows + " , cols = " + numCols
+//        System.out.println("Type = " + getType().name() + " , rows = " + rows + " , cols = " + cols
 //                + " , nz_length = " + nz_length);
 //
-//        for (int col = 0; col < numCols; col++) {
+//        for (int col = 0; col < cols; col++) {
 //            int idx0 = col_idx[col];
 //            int idx1 = col_idx[col + 1];
 //
@@ -130,7 +112,7 @@ public class MatrixSparse extends Matrix {
     }
 
     public double get(int row, int col) {
-        if (row < 0 || row >= numRows || col < 0 || col >= numCols)
+        if (row < 0 || row >= rows || col < 0 || col >= cols)
             throw new IllegalArgumentException("Outside of matrix bounds");
 
         return unsafeGet(row, col);
@@ -145,7 +127,7 @@ public class MatrixSparse extends Matrix {
     }
 
     public double get(int row, int col, double fallBackValue) {
-        if (row < 0 || row >= numRows || col < 0 || col >= numCols)
+        if (row < 0 || row >= rows || col < 0 || col >= cols)
             throw new IllegalArgumentException("Outside of matrix bounds");
 
         return unsafeGet(row, col, fallBackValue);
@@ -183,43 +165,39 @@ public class MatrixSparse extends Matrix {
     }
 
     public void set(int row, int col, double val) {
-        if (row < 0 || row >= numRows || col < 0 || col >= numCols)
+        if (row < 0 || row >= rows || col < 0 || col >= cols)
             throw new IllegalArgumentException("Outside of matrix bounds");
 
-        unsafe_set(row, col, val);
-    }
-
-    @Override
-    public void unsafeSet(int i, int j, double val) {
-
+        unsafeSet(row, col, val);
     }
 
     @Override
     public double det() {
-        return 0;
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override
-    public LUDecomposition LU() {
-        return null;
+    public LUDecompositionSparse LU() {
+        return new LUDecompositionSparse(this);
     }
 
     @Override
-    public QRDecompositionDense QR() {
-        return null;
+    public QRDecompositionSparse QR() {
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override
-    public CholeskyDecompositionDense Chol() {
-        return null;
+    public CholeskyDecompositionSparse Chol() {
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override
     public boolean isEmpty() {
-        return false;
+        return rows == 0 && cols == 0;
     }
 
-    public void unsafe_set(int row, int col, double val) {
+    @Override
+    public void unsafeSet(int row, int col, double val) {
         int index = nz_index(row, col);
         if (index >= 0) {
             nz_values[index] = val;
@@ -237,7 +215,7 @@ public class MatrixSparse extends Matrix {
             }
 
             // shift all the col_idx after this point by 1
-            for (int i = col + 1; i <= numCols; i++) {
+            for (int i = col + 1; i <= cols; i++) {
                 col_idx[i]++;
             }
 
@@ -263,7 +241,7 @@ public class MatrixSparse extends Matrix {
             return;
 
         // shift all the col_idx after this point by -1
-        for (int i = col + 1; i <= numCols; i++) {
+        for (int i = col + 1; i <= cols; i++) {
             col_idx[i]--;
         }
 
@@ -275,41 +253,41 @@ public class MatrixSparse extends Matrix {
     }
 
     public void zero() {
-        Arrays.fill(col_idx, 0, numCols + 1, 0);
+        Arrays.fill(col_idx, 0, cols + 1, 0);
         nz_length = 0;
         indicesSorted = false; // see justification in reshape
     }
 
-    public MatrixSparse create(int numRows, int numCols) {
-        return new MatrixSparse(numRows, numCols);
+    public MatrixSparse create(int rows, int cols) {
+        return new MatrixSparse(rows, cols);
     }
 
     public int getNonZeroLength() {
         return nz_length;
     }
 
-    public void reshape(int numRows, int numCols, int arrayLength) {
-        if (numRows < 0 || numCols < 0 || arrayLength < 0)
+    public void reshape(int rows, int cols, int arrayLength) {
+        if (rows < 0 || cols < 0 || arrayLength < 0)
             throw new IllegalArgumentException("Rows, columns, and arrayLength must be not be negative");
 
         // OK so technically it is sorted, but forgetting to correctly set this flag is a common mistake so
         // decided to be conservative and mark it as unsorted so that stuff doesn't blow up
         this.indicesSorted = false;
-        this.numRows = numRows;
-        this.numCols = numCols;
+        this.rows = rows;
+        this.cols = cols;
         growMaxLength(arrayLength, false);
         this.nz_length = 0;
 
-        if (numCols + 1 > col_idx.length) {
-            col_idx = new int[numCols + 1];
+        if (cols + 1 > col_idx.length) {
+            col_idx = new int[cols + 1];
         } else {
-            Arrays.fill(col_idx, 0, numCols + 1, 0);
+            Arrays.fill(col_idx, 0, cols + 1, 0);
         }
     }
 
 
-    public void reshape(int numRows, int numCols) {
-        reshape(numRows, numCols, 0);
+    public void reshape(int rows, int cols) {
+        reshape(rows, cols, 0);
     }
 
 
@@ -340,10 +318,10 @@ public class MatrixSparse extends Matrix {
         // NOTE: The code below has been (experimentally) commented out. A situation arose where we wanted to exceed
         //       the max physical size, which would then be corrected later on.
 
-        // see if multiplying numRows*numCols will cause an overflow. If it won't then pick the smaller of the two
-//        if( numRows != 0 && numCols <= Integer.MAX_VALUE / numRows ) {
+        // see if multiplying rows*cols will cause an overflow. If it won't then pick the smaller of the two
+//        if( rows != 0 && cols <= Integer.MAX_VALUE / rows ) {
 //            // save the user from themselves
-//            arrayLength = Math.min(numRows*numCols, arrayLength);
+//            arrayLength = Math.min(rows*cols, arrayLength);
 //        }
         if (arrayLength > this.nz_values.length) {
             double[] data = new double[arrayLength];
@@ -383,12 +361,12 @@ public class MatrixSparse extends Matrix {
     public void histogramToStructure(int[] histogram) {
         col_idx[0] = 0;
         int index = 0;
-        for (int i = 1; i <= numCols; i++) {
+        for (int i = 1; i <= cols; i++) {
             col_idx[i] = index += histogram[i - 1];
         }
         nz_length = index;
         growMaxLength(nz_length, false);
-        if (col_idx[numCols] != nz_length)
+        if (col_idx[cols] != nz_length)
             throw new RuntimeException("Egads");
     }
 
@@ -398,9 +376,9 @@ public class MatrixSparse extends Matrix {
      * @param orig Matrix who's structure is to be copied
      */
     public void copyStructure(MatrixSparse orig) {
-        reshape(orig.numRows, orig.numCols, orig.nz_length);
+        reshape(orig.rows, orig.cols, orig.nz_length);
         this.nz_length = orig.nz_length;
-        System.arraycopy(orig.col_idx, 0, col_idx, 0, orig.numCols + 1);
+        System.arraycopy(orig.col_idx, 0, col_idx, 0, orig.cols + 1);
         System.arraycopy(orig.nz_rows, 0, nz_rows, 0, orig.nz_length);
     }
 
@@ -419,13 +397,13 @@ public class MatrixSparse extends Matrix {
      * @return true if no more non-zero elements can be added
      */
     public boolean isFull() {
-        return nz_length == numRows * numCols;
+        return nz_length == rows * cols;
     }
 
     public static MatrixSparse convert(double circuitMatrix[][], double tol) {
         int nonzero = 0;
         for (int i = 0; i != circuitMatrix.length; i++)
-            for (int j = 0; j != circuitMatrix.length; j++) {
+            for (int j = 0; j != circuitMatrix[i].length; j++) {
                 if (circuitMatrix[i][j] != 0) {
                     nonzero++;
                 }
@@ -434,7 +412,7 @@ public class MatrixSparse extends Matrix {
         dst.nz_length = 0;
         dst.col_idx[0] = 0;
         int i, j;
-        for (i = 0; i != circuitMatrix.length; i++) {
+        for (i = 0; i != circuitMatrix[0].length; i++) {
             for (j = 0; j != circuitMatrix.length; j++) {
                 double value = circuitMatrix[j][i];
                 if (!(Math.abs(value) <= tol)) {
@@ -489,7 +467,7 @@ public class MatrixSparse extends Matrix {
 //            }
 //
 //            private void incrementColumn() {
-//                while (column + 1 <= numCols && nz_index >= col_idx[column + 1]) {
+//                while (column + 1 <= cols && nz_index >= col_idx[column + 1]) {
 //                    column++;
 //                }
 //            }
@@ -503,11 +481,14 @@ public class MatrixSparse extends Matrix {
                 {3, 6, 10},
         };
 
-        MatrixSparse sparseCSC = MatrixSparse.convert(matrix, MatrixSparse.EPS);
+        System.out.println(Math.pow(2.0, -52.0));
+        System.out.println(ConstantsETK.DOUBLE_EPS);
+
+        MatrixSparse sparseCSC = MatrixSparse.convert(matrix, ConstantsETK.DOUBLE_EPS);
         double[] b = {1, 2, 0};
         LUDecompositionSparse sparseLU = new LUDecompositionSparse(sparseCSC);
 
-        sparseLU.solve(b);
+        MatrixSparse mm = sparseLU.solve(b);
         System.out.println("b = " + Arrays.toString(b));
 
         MatrixSparse gg = new MatrixSparse(3, 3);

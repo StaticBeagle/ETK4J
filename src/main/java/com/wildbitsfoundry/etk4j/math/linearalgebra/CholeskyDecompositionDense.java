@@ -13,7 +13,7 @@ import com.wildbitsfoundry.etk4j.util.DoubleArrays;
  * isSPD() method.
  */
 
-public class CholeskyDecompositionDense {
+public class CholeskyDecompositionDense extends CholeskyDecomposition<MatrixDense>{
 
 	/*
 	 * ------------------------ Class variables ------------------------
@@ -53,7 +53,7 @@ public class CholeskyDecompositionDense {
 	 */
 
 	public CholeskyDecompositionDense(MatrixDense Arg) {
-
+		super(Arg);
 		// Initialize.
 		double[] A = Arg.getArray();
 		final int m = Arg.getRowCount();

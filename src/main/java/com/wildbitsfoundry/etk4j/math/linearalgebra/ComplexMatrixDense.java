@@ -230,7 +230,7 @@ public class ComplexMatrixDense {
 
     // region solve
     public ComplexMatrixDense solve(MatrixDense B) {
-        return new ComplexLUDecomposition(this).solve(B);
+        return new ComplexLUDecompositionDense(this).solve(B);
         // Only implemented for square matrices for now.
 //        if (rows == cols) { // Matrix is Squared
 //            return new LUDecomposition(this).solve(B);

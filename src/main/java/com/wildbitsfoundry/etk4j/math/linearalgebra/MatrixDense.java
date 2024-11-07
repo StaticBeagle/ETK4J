@@ -252,24 +252,14 @@ public class MatrixDense extends Matrix {
     /**
      * Retrieve value from {@code Matrix} at a given position.
      *
-     * @param i The row index.
-     * @param j The column index.
+     * @param row The row index.
+     * @param col The column index.
      * @return The value at {@code A(i, j)}.
      */
-    public double get(int i, int j) {
-        if (i < 0) {
-            throw new ArrayIndexOutOfBoundsException("Index i cannot be less thant zero.");
-        }
-        if (i >= rows) {
-            throw new ArrayIndexOutOfBoundsException(String.format("Index i: %d >= than number of rows: %d.", i, rows));
-        }
-        if (j < 0) {
-            throw new ArrayIndexOutOfBoundsException("Index j cannot be less thant zero.");
-        }
-        if (j >= cols) {
-            throw new ArrayIndexOutOfBoundsException(String.format("Index j: %d >= than number of columns: %d.", j, cols));
-        }
-        return data[i * cols + j];
+    public double get(int row, int col) {
+        if (row < 0 || row >= rows || col < 0 || col >= cols)
+            throw new ArrayIndexOutOfBoundsException("Outside of matrix bounds");
+        return data[row * cols + col];
     }
 
     @Override
@@ -280,29 +270,19 @@ public class MatrixDense extends Matrix {
     /**
      * Set the value of the {@code Matrix} at a given position.
      *
-     * @param i   The row index.
-     * @param j   The column index.
+     * @param row   The row index.
+     * @param col   The column index.
      * @param val The value used to set {@code A(i, j) = val}.
      */
-    public void set(int i, int j, double val) {
-        if (i < 0) {
-            throw new ArrayIndexOutOfBoundsException("Index i cannot be less thant zero.");
-        }
-        if (i >= rows) {
-            throw new ArrayIndexOutOfBoundsException(String.format("Index i: %d >= than number of rows: %d.", i, rows));
-        }
-        if (j < 0) {
-            throw new ArrayIndexOutOfBoundsException("Index j cannot be less thant zero.");
-        }
-        if (j >= cols) {
-            throw new ArrayIndexOutOfBoundsException(String.format("Index j: %d >= than number of columns: %d.", j, cols));
-        }
-        data[i * cols + j] = val;
+    public void set(int row, int col, double val) {
+        if (row < 0 || row >= rows || col < 0 || col >= cols)
+            throw new ArrayIndexOutOfBoundsException("Outside of matrix bounds");
+        data[row * cols + col] = val;
     }
 
     @Override
-    public void unsafeSet(int i, int j, double val) {
-        data[i * cols + j] = val;
+    public void unsafeSet(int row, int col, double val) {
+        data[row * cols + col] = val;
     }
 
     /**
@@ -420,7 +400,7 @@ public class MatrixDense extends Matrix {
      * @return The effective numerical rank, obtained from SVD.
      */
     public int rank() {
-        return new SingularValueDecomposition(this).rank();
+        return new SingularValueDecompositionDense(this).rank();
     }
 
     /**
@@ -430,7 +410,7 @@ public class MatrixDense extends Matrix {
      */
 
     public double cond() {
-        return new SingularValueDecomposition(this).cond();
+        return new SingularValueDecompositionDense(this).cond();
     }
 
     /**
@@ -546,11 +526,11 @@ public class MatrixDense extends Matrix {
     /**
      * Singular Value Decomposition of the {@code Matrix}.
      *
-     * @return The {@link SingularValueDecomposition} of the {@code Matrix}.
+     * @return The {@link SingularValueDecompositionDense} of the {@code Matrix}.
      * @see <a href="https://en.wikipedia.org/wiki/Singular_value_decomposition">Singular Value Decomposition</a>
      */
-    public SingularValueDecomposition SVD() {
-        return new SingularValueDecomposition(this);
+    public SingularValueDecompositionDense SVD() {
+        return new SingularValueDecompositionDense(this);
     }
     // endregion
 
@@ -641,7 +621,7 @@ public class MatrixDense extends Matrix {
      */
 
     public double norm2() {
-        return new SingularValueDecomposition(this).norm2();
+        return new SingularValueDecompositionDense(this).norm2();
     }
 
     /***
@@ -989,7 +969,7 @@ public class MatrixDense extends Matrix {
             return result;
         }
 
-        SingularValueDecomposition svdX = this.SVD();
+        SingularValueDecompositionDense svdX = this.SVD();
         if (svdX.rank() < 1) {
             return null;
         }
@@ -1035,20 +1015,20 @@ public class MatrixDense extends Matrix {
     /**
      * Eigenvalue decomposition. The {@Matrix} is balanced ({@link MatrixDense#balance()}) prior to the decomposition.
      *
-     * @return The {@link EigenvalueDecomposition} of the {@code Matrix}.
+     * @return The {@link EigenvalueDecompositionDense} of the {@code Matrix}.
      */
-    public EigenvalueDecomposition eig() {
-        return new EigenvalueDecomposition(this);
+    public EigenvalueDecompositionDense eig() {
+        return new EigenvalueDecompositionDense(this);
     }
 
     /**
      * Eigenvalue decomposition with optional pre balance.
      *
      * @param balance If this flag is set to {@code true}, the {@code Matrix} is balanced prior to the decomposition.
-     * @return The {@link EigenvalueDecomposition} of the {@code Matrix}.
+     * @return The {@link EigenvalueDecompositionDense} of the {@code Matrix}.
      */
-    public EigenvalueDecomposition eig(boolean balance) {
-        return new EigenvalueDecomposition(this, balance);
+    public EigenvalueDecompositionDense eig(boolean balance) {
+        return new EigenvalueDecompositionDense(this, balance);
     }
 
     /**
@@ -1406,7 +1386,7 @@ public class MatrixDense extends Matrix {
             return pow((int) n);
         }
         MatrixDense a = n < 0 ? inv() : new MatrixDense(this);
-        EigenvalueDecomposition eig = a.eig();
+        EigenvalueDecompositionDense eig = a.eig();
         MatrixDense D = eig.getD();
         for (int i = 0, j = 0; i < D.rows; ++i, ++j) {
             D.set(i, j, Math.pow(D.get(i, j), n));
@@ -1631,7 +1611,7 @@ public class MatrixDense extends Matrix {
      * @return The Characteristic polynomial of the Matrix.
      */
     public double[] poly() {
-        EigenvalueDecomposition eig = this.eig();
+        EigenvalueDecompositionDense eig = this.eig();
         Complex[] roots = ComplexArrays.zip(eig.getRealEigenvalues(), eig.getImagEigenvalues());
         return new Polynomial(roots).getCoefficients();
     }
