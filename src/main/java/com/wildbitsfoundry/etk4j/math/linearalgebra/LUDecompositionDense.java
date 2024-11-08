@@ -71,13 +71,13 @@ public class LUDecompositionDense extends LUDecomposition<MatrixDense> {
 		_data = data;
 	}
 
-	public boolean isNonSingular() {
+	public boolean isSingular() {
 		for (int j = 0; j < cols; ++j) {
 			if (_data[j * cols + j] == 0) {
-				return false;
+				return true;
 			}
 		}
-		return true;
+		return false;
 	}
 
 	/**
@@ -186,7 +186,7 @@ public class LUDecompositionDense extends LUDecomposition<MatrixDense> {
 		if (B.getRowCount() != this.rows) {
 			throw new IllegalArgumentException("Matrix row dimensions must agree.");
 		}
-		if (!this.isNonSingular()) {
+		if (this.isSingular()) {
 			throw new RuntimeException("Matrix is singular.");
 		}
 

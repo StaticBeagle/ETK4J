@@ -127,8 +127,8 @@ public class LUDecompositionSparse extends LUDecomposition<MatrixSparse> {
     }
 
     @Override
-    public boolean isNonSingular() {
-        return !singular;
+    public boolean isSingular() {
+        return singular;
     }
 
     @Override

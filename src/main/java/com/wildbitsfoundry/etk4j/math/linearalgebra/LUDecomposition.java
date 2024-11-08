@@ -10,7 +10,7 @@ public abstract class LUDecomposition <T extends Matrix> {
         this.cols = matrix.getColumnCount();
     }
 
-    public abstract boolean isNonSingular();
+    public abstract boolean isSingular();
 
     /**
      * Return lower triangular factor
