@@ -324,7 +324,7 @@ public class StateSpace extends LinearTimeInvariantSystem {
      */
     public TimeResponse simulateTimeResponse(double[][] input, double[] time, double[] initialConditions,
                                              IntegrationMethod integrationMethod) {
-        return lsim(input, time, initialConditions, this, integrationMethod);
+        return lSim(input, time, initialConditions, this, integrationMethod);
     }
 
     @Override

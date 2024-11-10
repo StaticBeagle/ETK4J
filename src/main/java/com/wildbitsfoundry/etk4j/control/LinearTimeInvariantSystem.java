@@ -48,7 +48,7 @@ public abstract class LinearTimeInvariantSystem {
      * @throws IllegalArgumentException     If the length of the initial conditions is different from the number of states.
      * @see <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.lsim.html">lsim</a>
      */
-    protected TimeResponse lsim(double[][] input, double[] time, double[] initialConditions,
+    protected TimeResponse lSim(double[][] input, double[] time, double[] initialConditions,
                                 StateSpace ss, IntegrationMethod integrationMethod) {
         double[][] U = DoubleArrays.transpose(input);
 
@@ -251,7 +251,7 @@ public abstract class LinearTimeInvariantSystem {
         time = time == null ? generateDefaultResponseTimes(ss.getA(), numberOfPoints) : time;
         double[][] U = new double[1][];
         U[0] = DoubleArrays.ones(time.length);
-        TimeResponse lSim = lsim(U, time, initialConditions, ss, IntegrationMethod.ZERO_ORDER_HOLD);
+        TimeResponse lSim = lSim(U, time, initialConditions, ss, IntegrationMethod.ZERO_ORDER_HOLD);
         return new StepResponse(lSim.getTime(), lSim.getResponse()[0]);
     }
 
@@ -535,7 +535,7 @@ public abstract class LinearTimeInvariantSystem {
                                                  IntegrationMethod integrationMethod) {
         double[][] U = new double[1][time.length];
         U[0] = input;
-        TimeResponse tr = lsim(U, time, initialConditions, this.toStateSpace(), integrationMethod);
+        TimeResponse tr = lSim(U, time, initialConditions, this.toStateSpace(), integrationMethod);
         return new SISOTimeResponse(tr.getTime(), tr.getResponse()[0], tr.getEvolutionOfStateVector());
     }
 

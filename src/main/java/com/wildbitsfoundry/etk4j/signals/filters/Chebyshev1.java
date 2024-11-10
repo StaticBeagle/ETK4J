@@ -21,7 +21,7 @@ public class Chebyshev1 extends AnalogFilter {
      * @param rp The pass band ripple in dB.
      * @return The zeros and poles of the Chebyshev type I filter.
      */
-    public static ZeroPoleGain cheb1ap(int n, double rp) {
+    public static ZeroPoleGain cheb1Ap(int n, double rp) {
         double eps = Math.sqrt(Math.pow(10, rp * 0.1) - 1);
 
         double a = 1.0 / n * MathETK.asinh(1 / eps);
@@ -58,7 +58,7 @@ public class Chebyshev1 extends AnalogFilter {
      * @param specs The filter design specifications.
      * @return The minimum order required to meet the design specifications.
      */
-    public static LowPassResults cheb1ord(LowPassSpecs specs) {
+    public static LowPassResults cheb1Ord(LowPassSpecs specs) {
         specs.validate();
         return lowPassFilterOrder(specs, new Chebyshev1OrderCalculationStrategy());
     }
@@ -68,7 +68,7 @@ public class Chebyshev1 extends AnalogFilter {
      * @param specs The filter design specifications.
      * @return The minimum order required to meet the design specifications.
      */
-    public static HighPassResults cheb1ord(HighPassSpecs specs) {
+    public static HighPassResults cheb1Ord(HighPassSpecs specs) {
         specs.validate();
         return highPassFilterOrder(specs, new Chebyshev1OrderCalculationStrategy());
     }
@@ -78,7 +78,7 @@ public class Chebyshev1 extends AnalogFilter {
      * @param specs The filter design specifications.
      * @return The minimum order required to meet the design specifications.
      */
-    public static BandpassResults cheb1ord(BandpassSpecs specs) {
+    public static BandpassResults cheb1Ord(BandpassSpecs specs) {
         specs.validate();
         return bandpassFilterOrder(specs, new Chebyshev1OrderCalculationStrategy());
     }
@@ -88,7 +88,7 @@ public class Chebyshev1 extends AnalogFilter {
      * @param specs The filter design specifications.
      * @return The minimum order required to meet the design specifications.
      */
-    public static BandStopResults cheb1ord(BandStopSpecs specs) {
+    public static BandStopResults cheb1Ord(BandStopSpecs specs) {
         specs.validate();
         return bandStopFilterOrder(specs, new Chebyshev1OrderCalculationStrategy());
     }
@@ -105,8 +105,8 @@ public class Chebyshev1 extends AnalogFilter {
      */
     public static TransferFunction newLowPass(int n, double rp, double wn) {
         validateInputsLowPass(n, rp, wn);
-        ZeroPoleGain zpk = cheb1ap(n, rp);
-        return lpTolp(zpk, wn);
+        ZeroPoleGain zpk = cheb1Ap(n, rp);
+        return lpToLp(zpk, wn);
     }
 
     /**
@@ -118,8 +118,8 @@ public class Chebyshev1 extends AnalogFilter {
      */
     public static ZeroPoleGain newLowPassZPK(int n, double rp, double wn) {
         validateInputsLowPass(n, rp, wn);
-        ZeroPoleGain zpk = cheb1ap(n, rp);
-        return lpTolpZPK(zpk, wn);
+        ZeroPoleGain zpk = cheb1Ap(n, rp);
+        return lpToLpZPK(zpk, wn);
     }
 
     /**
@@ -134,8 +134,8 @@ public class Chebyshev1 extends AnalogFilter {
      */
     public static TransferFunction newHighPass(int n, double rp, double wn) {
         validateInputsHighPass(n, rp, wn);
-        ZeroPoleGain zpk = cheb1ap(n, rp);
-        return lpTohp(zpk, wn);
+        ZeroPoleGain zpk = cheb1Ap(n, rp);
+        return lpToHp(zpk, wn);
     }
 
     /**
@@ -147,8 +147,8 @@ public class Chebyshev1 extends AnalogFilter {
      */
     public static ZeroPoleGain newHighPassZPK(int n, double rp, double wn) {
         validateInputsHighPass(n, rp, wn);
-        ZeroPoleGain zpk = cheb1ap(n, rp);
-        return lpTohpZPK(zpk, wn);
+        ZeroPoleGain zpk = cheb1Ap(n, rp);
+        return lpToHpZPK(zpk, wn);
     }
 
     /**
@@ -164,10 +164,10 @@ public class Chebyshev1 extends AnalogFilter {
      */
     public static TransferFunction newBandpass(int n, double rp, double wp1, double wp2) {
         validateInputsBandpass(n, rp, wp1, wp2);
-        ZeroPoleGain zpk = cheb1ap(n, rp);
+        ZeroPoleGain zpk = cheb1Ap(n, rp);
         double w0 = Math.sqrt(wp1 * wp2);
         double bw = wp2 - wp1;
-        return lpTobp(zpk, w0, bw);
+        return lpToBp(zpk, w0, bw);
     }
 
     /**
@@ -180,10 +180,10 @@ public class Chebyshev1 extends AnalogFilter {
      */
     public static ZeroPoleGain newBandpassZPK(int n, double rp, double wp1, double wp2) {
         validateInputsBandpass(n, rp, wp1, wp2);
-        ZeroPoleGain zpk = cheb1ap(n, rp);
+        ZeroPoleGain zpk = cheb1Ap(n, rp);
         double w0 = Math.sqrt(wp1 * wp2);
         double bw = wp2 - wp1;
-        return lpTobpZPK(zpk, w0, bw);
+        return lpToBpZPK(zpk, w0, bw);
     }
 
     /**
@@ -199,10 +199,10 @@ public class Chebyshev1 extends AnalogFilter {
      */
     public static TransferFunction newBandStop(int n, double rp, double wp1, double wp2) {
         validateInputsBandStop(n, rp, wp1, wp2);
-        ZeroPoleGain zpk = cheb1ap(n, rp);
+        ZeroPoleGain zpk = cheb1Ap(n, rp);
         double w0 = Math.sqrt(wp1 * wp2);
         double bw = wp2 - wp1;
-        return lpTobs(zpk, w0, bw);
+        return lpToBs(zpk, w0, bw);
     }
 
     /**
@@ -215,10 +215,10 @@ public class Chebyshev1 extends AnalogFilter {
      */
     public static ZeroPoleGain newBandStopZPK(int n, double rp, double wp1, double wp2) {
         validateInputsBandStop(n, rp, wp1, wp2);
-        ZeroPoleGain zpk = cheb1ap(n, rp);
+        ZeroPoleGain zpk = cheb1Ap(n, rp);
         double w0 = Math.sqrt(wp1 * wp2);
         double bw = wp2 - wp1;
-        return lpTobsZPK(zpk, w0, bw);
+        return lpToBsZPK(zpk, w0, bw);
     }
 
     private static void validateInputsLowPass(int n, double rp, double wn) {

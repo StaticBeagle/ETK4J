@@ -67,16 +67,16 @@ public class AnalogFiltersExample {
     }
 
     public static void buildLowPassFilters(LowPassSpecs lpSpecs) {
-        LowPassResults lpr = ButterWorth.buttord(lpSpecs);
+        LowPassResults lpr = ButterWorth.buttOrd(lpSpecs);
         TransferFunction bu = ButterWorth.newLowPass(lpr.getOrder(), lpr.getCutoffFrequency());
 
-        lpr = Chebyshev1.cheb1ord(lpSpecs);
+        lpr = Chebyshev1.cheb1Ord(lpSpecs);
         TransferFunction cb1 = Chebyshev1.newLowPass(lpr.getOrder(), lpSpecs.getPassBandRipple(), lpr.getCutoffFrequency());
 
-        lpr = Chebyshev2.cheb2ord(lpSpecs);
+        lpr = Chebyshev2.cheb2Ord(lpSpecs);
         TransferFunction cb2 = Chebyshev2.newLowPass(lpr.getOrder(), lpSpecs.getStopBandAttenuation(), lpr.getCutoffFrequency());
 
-        lpr = Elliptic.ellipord(lpSpecs);
+        lpr = Elliptic.ellipOrd(lpSpecs);
         TransferFunction el = Elliptic.newLowPass(lpr.getOrder(), lpSpecs.getPassBandRipple(),
                 lpSpecs.getStopBandAttenuation(), lpr.getCutoffFrequency());
 
@@ -91,16 +91,16 @@ public class AnalogFiltersExample {
     }
 
     public static void buildHighPassFilters(HighPassSpecs hpSpecs) {
-        HighPassResults hpr = ButterWorth.buttord(hpSpecs);
+        HighPassResults hpr = ButterWorth.buttOrd(hpSpecs);
         TransferFunction bu = ButterWorth.newHighPass(hpr.getOrder(), hpr.getCutoffFrequency());
 
-        hpr = Chebyshev1.cheb1ord(hpSpecs);
+        hpr = Chebyshev1.cheb1Ord(hpSpecs);
         TransferFunction cb1 = Chebyshev1.newHighPass(hpr.getOrder(), hpSpecs.getPassBandRipple(), hpr.getCutoffFrequency());
 
-        hpr = Chebyshev2.cheb2ord(hpSpecs);
+        hpr = Chebyshev2.cheb2Ord(hpSpecs);
         TransferFunction cb2 = Chebyshev2.newHighPass(hpr.getOrder(), hpSpecs.getStopBandAttenuation(), hpr.getCutoffFrequency());
 
-        hpr = Elliptic.ellipord(hpSpecs);
+        hpr = Elliptic.ellipOrd(hpSpecs);
         TransferFunction el = Elliptic.newHighPass(hpr.getOrder(), hpSpecs.getPassBandRipple(),
                 hpSpecs.getStopBandAttenuation(), hpr.getCutoffFrequency());
 
@@ -115,19 +115,19 @@ public class AnalogFiltersExample {
     }
 
     public static void buildBandPassFilters(BandpassSpecs bpSpecs) {
-        BandpassResults bpr = ButterWorth.buttord(bpSpecs);
+        BandpassResults bpr = ButterWorth.buttOrd(bpSpecs);
         TransferFunction bu = ButterWorth.newBandpass(bpr.getOrder(), bpr.getLowerCutoffFrequency(),
                 bpr.getUpperCutoffFrequency());
 
-        bpr = Chebyshev1.cheb1ord(bpSpecs);
+        bpr = Chebyshev1.cheb1Ord(bpSpecs);
         TransferFunction cb1 = Chebyshev1.newBandpass(bpr.getOrder(), bpSpecs.getPassBandRipple(),
                 bpr.getLowerCutoffFrequency(), bpr.getUpperCutoffFrequency());
 
-        bpr = Chebyshev2.cheb2ord(bpSpecs);
+        bpr = Chebyshev2.cheb2Ord(bpSpecs);
         TransferFunction cb2 = Chebyshev2.newBandpass(bpr.getOrder(), bpSpecs.getStopBandAttenuation(),
                 bpr.getLowerCutoffFrequency(), bpr.getUpperCutoffFrequency());
 
-        bpr = Elliptic.ellipord(bpSpecs);
+        bpr = Elliptic.ellipOrd(bpSpecs);
         TransferFunction el = Elliptic.newBandpass(bpr.getOrder(), bpSpecs.getPassBandRipple(),
                 bpSpecs.getStopBandAttenuation(), bpr.getLowerCutoffFrequency(), bpr.getUpperCutoffFrequency());
 
@@ -142,19 +142,19 @@ public class AnalogFiltersExample {
     }
 
     public static void buildBandStopFilters(BandStopSpecs bsSpecs) {
-        BandStopResults bsr = ButterWorth.buttord(bsSpecs);
+        BandStopResults bsr = ButterWorth.buttOrd(bsSpecs);
         TransferFunction bu = ButterWorth.newBandStop(bsr.getOrder(), bsr.getLowerCutoffFrequency(),
                 bsr.getUpperCutoffFrequency());
 
-        bsr = Chebyshev1.cheb1ord(bsSpecs);
+        bsr = Chebyshev1.cheb1Ord(bsSpecs);
         TransferFunction cb1 = Chebyshev1.newBandStop(bsr.getOrder(), bsSpecs.getPassBandRipple(),
                 bsr.getLowerCutoffFrequency(), bsr.getUpperCutoffFrequency());
 
-        bsr = Chebyshev2.cheb2ord(bsSpecs);
+        bsr = Chebyshev2.cheb2Ord(bsSpecs);
         TransferFunction cb2 = Chebyshev2.newBandStop(bsr.getOrder(), bsSpecs.getStopBandAttenuation(),
                 bsr.getLowerCutoffFrequency(), bsr.getUpperCutoffFrequency());
 
-        bsr = Elliptic.ellipord(bsSpecs);
+        bsr = Elliptic.ellipOrd(bsSpecs);
         TransferFunction el = Elliptic.newBandStop(bsr.getOrder(), bsSpecs.getPassBandRipple(),
                 bsSpecs.getStopBandAttenuation(), bsr.getLowerCutoffFrequency(), bsr.getUpperCutoffFrequency());
 

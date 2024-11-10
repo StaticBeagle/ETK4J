@@ -2,7 +2,6 @@ package com.wildbitsfoundry.etk4j.signals.filters;
 
 import com.wildbitsfoundry.etk4j.control.ZeroPoleGain;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
-import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 import org.junit.Test;
 
 import com.wildbitsfoundry.etk4j.control.TransferFunction;
@@ -44,26 +43,26 @@ public class AnalogFilterTest {
         bsSpecs.setPassBandRipple(passBandRipple);
         bsSpecs.setStopBandAttenuation(38.0);
 
-        LowPassResults lpr = ButterWorth.buttord(lpSpecs);
+        LowPassResults lpr = ButterWorth.buttOrd(lpSpecs);
         TransferFunction ba = ButterWorth.newLowPass(lpr.getOrder(), lpr.getCutoffFrequency());
         assertArrayEquals(new double[]{6.416238909177711E-4}, ba.getNumerator().getCoefficients(), 1e-12);
         assertArrayEquals(new double[]{1.0, 0.4158919086417555, 0.08648303983684116, 0.010534665112713422,
                 6.416238909177713E-4}, ba.getDenominator().getCoefficients(), 1e-12);
 
-        HighPassResults hpr = ButterWorth.buttord(hpSpecs);
+        HighPassResults hpr = ButterWorth.buttOrd(hpSpecs);
         ba = ButterWorth.newHighPass(hpr.getOrder(), hpr.getCutoffFrequency());
         assertArrayEquals(new double[]{1.0, 0.0, 0.0, 0.0, 0.0}, ba.getNumerator().getCoefficients(), 1e-12);
         assertArrayEquals(new double[]{1.0, 0.4158919086417555, 0.08648303983684116, 0.010534665112713422,
                 6.416238909177713E-4}, ba.getDenominator().getCoefficients(), 1e-12);
 
-        BandpassResults bpr = ButterWorth.buttord(bpSpecs);
+        BandpassResults bpr = ButterWorth.buttOrd(bpSpecs);
         ba = ButterWorth.newBandpass(bpr.getOrder(), bpr.getLowerCutoffFrequency(), bpr.getUpperCutoffFrequency());
         assertArrayEquals(new double[]{160000.0, 0.0, 0.0, 0.0, 0.0}, ba.getNumerator().getCoefficients(), 1e-12);
         assertArrayEquals(new double[]{1.0, 52.26251859505506, 160965.68542494922, 6276728.483266111,
                 9.66120169691095E9, 2.5044146648231787E11, 2.562589808533734E14, 3.319777843917693E15,
                 2.5344958400999997E18}, ba.getDenominator().getCoefficients(), 1e-12);
 
-        BandStopResults bsr = ButterWorth.buttord(bsSpecs);
+        BandStopResults bsr = ButterWorth.buttOrd(bsSpecs);
         ba = ButterWorth.newBandStop(bsr.getOrder(), bsr.getLowerCutoffFrequency(), bsr.getUpperCutoffFrequency());
         assertArrayEquals(new double[]{1.0, 0.0, 6.431000006042599E7, 0.0, 1.0339440269429976E15},
                 ba.getNumerator().getCoefficients(), 1e-12);
@@ -104,28 +103,28 @@ public class AnalogFilterTest {
         bsSpecs.setPassBandRipple(passBandRipple);
         bsSpecs.setStopBandAttenuation(38.0);
 
-        LowPassResults lpr = Chebyshev1.cheb1ord(lpSpecs);
+        LowPassResults lpr = Chebyshev1.cheb1Ord(lpSpecs);
         TransferFunction ba = Chebyshev1.newLowPass(lpr.getOrder(), lpSpecs.getPassBandRipple(),
                 lpr.getCutoffFrequency());
         assertArrayEquals(new double[]{0.0010078604510374838}, ba.getNumerator().getCoefficients(), 1e-12);
         assertArrayEquals(new double[]{1.0, 0.09486774762192837, 0.023497666702367283, 0.0010078604510374838},
                 ba.getDenominator().getCoefficients(), 1e-12);
 
-        HighPassResults hpr = Chebyshev1.cheb1ord(hpSpecs);
+        HighPassResults hpr = Chebyshev1.cheb1Ord(hpSpecs);
         ba = Chebyshev1.newHighPass(hpr.getOrder(), hpSpecs.getPassBandRipple(),
                 hpr.getCutoffFrequency());
         assertArrayEquals(new double[]{0.9999999999999999, 0.0, 0.0, 0.0}, ba.getNumerator().getCoefficients(), 1e-12);
         assertArrayEquals(new double[]{1.0, 0.5905607767092684, 0.0603946838960972, 0.016125767216599744},
                 ba.getDenominator().getCoefficients(), 1e-12);
 
-        BandpassResults bpr = Chebyshev1.cheb1ord(bpSpecs);
+        BandpassResults bpr = Chebyshev1.cheb1Ord(bpSpecs);
         ba = Chebyshev1.newBandpass(bpr.getOrder(), bpSpecs.getPassBandRipple(), bpr.getLowerCutoffFrequency(),
                 bpr.getUpperCutoffFrequency());
         assertArrayEquals(new double[]{1999.9999999999993, 0.0, 0.0, 0.0}, ba.getNumerator().getCoefficients(), 1e-12);
         assertArrayEquals(new double[]{1.0, 11.921432759666429, 120071.06027952161, 953330.334221381,
                 4.790835305152913E9, 1.8979040167716553E10, 6.3521199000000016E13}, ba.getDenominator().getCoefficients(), 1e-12);
 
-        BandStopResults bsr = Chebyshev1.cheb1ord(bsSpecs);
+        BandStopResults bsr = Chebyshev1.cheb1Ord(bsSpecs);
         ba = Chebyshev1.newBandStop(bsr.getOrder(), bsSpecs.getPassBandRipple(), bsr.getLowerCutoffFrequency(),
                 bsr.getUpperCutoffFrequency());
         assertArrayEquals(new double[]{0.7071067811865476, 0.0, 4.547403706833129E7, 0.0, 7.311088304873791E14},
@@ -167,14 +166,14 @@ public class AnalogFilterTest {
         bsSpecs.setPassBandRipple(passBandRipple);
         bsSpecs.setStopBandAttenuation(38.0);
 
-        LowPassResults lpr = Chebyshev2.cheb2ord(lpSpecs);
+        LowPassResults lpr = Chebyshev2.cheb2Ord(lpSpecs);
         TransferFunction ba = Chebyshev2.newLowPass(lpr.getOrder(), lpSpecs.getStopBandAttenuation(),
                 lpr.getCutoffFrequency());
         assertArrayEquals(new double[]{0.0014001979322511749, 0.0, 0.004066909232107251}, ba.getNumerator().getCoefficients(), 1e-12);
         assertArrayEquals(new double[]{1.0, 0.3187766294691388, 0.050808289470727575, 0.004066909232107251},
                 ba.getDenominator().getCoefficients(), 1e-12);
 
-        HighPassResults hpr = Chebyshev2.cheb2ord(hpSpecs);
+        HighPassResults hpr = Chebyshev2.cheb2Ord(hpSpecs);
         ba = Chebyshev2.newHighPass(hpr.getOrder(), hpSpecs.getStopBandAttenuation(),
                 hpr.getCutoffFrequency());
         assertArrayEquals(new double[]{0.9999999999999997, 0.0, 2.2090496592679388E-4, 0.0}, ba.getNumerator().getCoefficients(),
@@ -182,7 +181,7 @@ public class AnalogFilterTest {
         assertArrayEquals(new double[]{1.0, 0.3164538310429205, 0.05029241855679742, 0.003996283686869137},
                 ba.getDenominator().getCoefficients(), 1e-12);
 
-        BandpassResults bpr = Chebyshev2.cheb2ord(bpSpecs);
+        BandpassResults bpr = Chebyshev2.cheb2Ord(bpSpecs);
         ba = Chebyshev2.newBandpass(bpr.getOrder(), bpSpecs.getStopBandAttenuation(), bpr.getLowerCutoffFrequency(),
                 bpr.getUpperCutoffFrequency());
         assertArrayEquals(new double[]{9.277258525655208, 0.0, 752036.1337575477, 0.0, 1.4769488345428343E10, 0.0},
@@ -190,7 +189,7 @@ public class AnalogFilterTest {
         assertArrayEquals(new double[]{1.0, 43.24250812255668, 120591.92349148876, 3462463.051590285,
                 4.811617747310401E9, 6.884250535619144E10, 6.352119899999999E13}, ba.getDenominator().getCoefficients(), 1e-12);
 
-        BandStopResults bsr = Chebyshev2.cheb2ord(bsSpecs);
+        BandStopResults bsr = Chebyshev2.cheb2Ord(bsSpecs);
         ba = Chebyshev2.newBandStop(bsr.getOrder(), bsSpecs.getStopBandAttenuation(), bsr.getLowerCutoffFrequency(),
                 bsr.getUpperCutoffFrequency());
         assertArrayEquals(new double[]{1.0, 0.0, 6.466348566357853E7, 0.0, 1.0339440236459846E15},
@@ -232,14 +231,14 @@ public class AnalogFilterTest {
         bsSpecs.setPassBandRipple(passBandRipple);
         bsSpecs.setStopBandAttenuation(38.0);
 
-        LowPassResults lpr = Elliptic.ellipord(lpSpecs);
+        LowPassResults lpr = Elliptic.ellipOrd(lpSpecs);
         TransferFunction ba = Elliptic.newLowPass(lpr.getOrder(), lpSpecs.getPassBandRipple(),
                 lpSpecs.getStopBandAttenuation(), lpr.getCutoffFrequency());
         assertArrayEquals(new double[]{8.794918109662971E-4, 0.0, 0.0010190301217685481}, ba.getNumerator().getCoefficients(), 1e-12);
         assertArrayEquals(new double[]{1.0, 0.09475123472716065, 0.02355602777927699, 0.0010190301217685483},
                 ba.getDenominator().getCoefficients(), 1e-12);
 
-        HighPassResults hpr = Elliptic.ellipord(hpSpecs);
+        HighPassResults hpr = Elliptic.ellipOrd(hpSpecs);
         ba = Elliptic.newHighPass(hpr.getOrder(), lpSpecs.getPassBandRipple(),
                 lpSpecs.getStopBandAttenuation(), hpr.getCutoffFrequency());
         assertArrayEquals(new double[]{1.0, 0.0, 5.5376474721194E-4, 0.0}, ba.getNumerator().getCoefficients(),
@@ -247,7 +246,7 @@ public class AnalogFilterTest {
         assertArrayEquals(new double[]{1.0, 0.58553828918372, 0.059659331550860784, 0.015949011391381742},
                 ba.getDenominator().getCoefficients(), 1e-12);
 
-        BandpassResults bpr = Elliptic.ellipord(bpSpecs);
+        BandpassResults bpr = Elliptic.ellipOrd(bpSpecs);
         ba = Elliptic.newBandpass(bpr.getOrder(), bpSpecs.getPassBandRipple(), bpSpecs.getStopBandAttenuation(),
                 bpr.getLowerCutoffFrequency(), bpr.getUpperCutoffFrequency());
         assertArrayEquals(new double[]{0.10000000000000003, 0.0, 8198.997487421326, 0.0, 1.5920100000000003E8},
@@ -255,7 +254,7 @@ public class AnalogFilterTest {
         assertArrayEquals(new double[]{1.0, 11.824526997102488, 80109.70921683687, 471798.6271843893,
                 1.5920099999999998E9}, ba.getDenominator().getCoefficients(), 1e-12);
 
-        BandStopResults bsr = Elliptic.ellipord(bsSpecs);
+        BandStopResults bsr = Elliptic.ellipOrd(bsSpecs);
         ba = Elliptic.newBandStop(bsr.getOrder(), bsSpecs.getPassBandRipple(), bsSpecs.getStopBandAttenuation(),
                 bsr.getLowerCutoffFrequency(), bsr.getUpperCutoffFrequency());
         assertArrayEquals(new double[]{0.7071067811865475, 0.0, 4.597394172926564E7, 0.0, 7.311088423294805E14},
@@ -292,7 +291,7 @@ public class AnalogFilterTest {
 
     @Test
     public void testBesselapPhaseNormalized() {
-        ZeroPoleGain zpk = Bessel.besselapPhaseNormalized(4);
+        ZeroPoleGain zpk = Bessel.besselApPhaseNormalized(4);
         double p1Real = -0.6572111716718828;
         double p1Imag = 0.8301614350048732;
         double p2Real = -0.904758796788245;
@@ -321,7 +320,7 @@ public class AnalogFilterTest {
 
     @Test
     public void testBesselapMagnitudeNormalized() {
-        ZeroPoleGain zpk = Bessel.besselapMagnitudeNormalized(4);
+        ZeroPoleGain zpk = Bessel.besselApMagnitudeNormalized(4);
         double p1Real = -0.9952087643502732;
         double p1Imag = 1.2571057394546656;
         double p2Real = -1.3700678305514442;
@@ -350,7 +349,7 @@ public class AnalogFilterTest {
 
     @Test
     public void testBesselapDelayNormalized() {
-        ZeroPoleGain zpk = Bessel.besselapDelayNormalized(4);
+        ZeroPoleGain zpk = Bessel.besselApDelayNormalized(4);
         double p1Real = -2.1037893971796278;
         double p1Imag = 2.6574180418567526;
         double p2Real = -2.8962106028203727;

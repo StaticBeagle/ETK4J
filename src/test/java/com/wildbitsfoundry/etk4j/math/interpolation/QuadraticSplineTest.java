@@ -38,8 +38,6 @@ public class QuadraticSplineTest {
         double[] y = {0.0, 227.04, 362.78, 517.35, 602.97, 901.67};
         QuadraticSpline qs = QuadraticSpline.newClampedSpline(x, y, 1, 3);
 
-        System.out.println(Arrays.toString(qs.evaluateAt(DoubleArrays.linSteps(0, 30))));
-
         double[] expected = {0.0, 30.214199999999995, 58.75946666666666, 85.63579999999999, 110.84319999999998,
                 134.38166666666663, 156.25119999999998, 176.45179999999996, 194.98346666666663, 211.84619999999998,
                 227.04, 243.95706666666666, 265.9896, 293.1376, 325.4010666666667, 362.78, 400.9121333333333,
