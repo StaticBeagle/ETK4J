@@ -46,7 +46,7 @@ public final class Matrices {
      * @param b The solution vector.
      * @return The solution to {@code LDL<sup>T</sup>X = b}
      */
-    public static double[] solveLDLtTridiagonalSystem(double[] lower, double[] diagonal, double[] b) {
+    public static void solveLDLtTridiagonalSystem(double[] lower, double[] diagonal, double[] b) {
         final int length = diagonal.length;
         for (int i = 0; i < length - 1; ++i) {
             double ui = lower[i];
@@ -58,7 +58,6 @@ public final class Matrices {
         for (int i = length - 2; i >= 0; --i) {
             b[i] = b[i] / diagonal[i] - lower[i] * b[i + 1];
         }
-        return b;
     }
 
     /**
