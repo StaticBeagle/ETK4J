@@ -1,7 +1,6 @@
 package com.wildbitsfoundry.etk4j.math.linearalgebra;
 
 import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
-import com.wildbitsfoundry.etk4j.math.MathETK;
 
 import java.util.Arrays;
 
@@ -400,21 +399,21 @@ public class MatrixSparse extends Matrix {
         return nz_length == rows * cols;
     }
 
-    public static MatrixSparse convert(double circuitMatrix[][], double tol) {
+    public static MatrixSparse from2dArray(double array[][], double tol) {
         int nonzero = 0;
-        for (int i = 0; i != circuitMatrix.length; i++)
-            for (int j = 0; j != circuitMatrix[i].length; j++) {
-                if (circuitMatrix[i][j] != 0) {
+        for (int i = 0; i != array.length; i++)
+            for (int j = 0; j != array[i].length; j++) {
+                if (array[i][j] != 0) {
                     nonzero++;
                 }
             }
-        MatrixSparse dst = new MatrixSparse(circuitMatrix.length, circuitMatrix.length, nonzero);
+        MatrixSparse dst = new MatrixSparse(array.length, array.length, nonzero);
         dst.nz_length = 0;
         dst.col_idx[0] = 0;
         int i, j;
-        for (i = 0; i != circuitMatrix[0].length; i++) {
-            for (j = 0; j != circuitMatrix.length; j++) {
-                double value = circuitMatrix[j][i];
+        for (i = 0; i != array[0].length; i++) {
+            for (j = 0; j != array.length; j++) {
+                double value = array[j][i];
                 if (!(Math.abs(value) <= tol)) {
                     dst.nz_rows[dst.nz_length] = j;
                     dst.nz_values[dst.nz_length] = value;
@@ -473,42 +472,4 @@ public class MatrixSparse extends Matrix {
 //            }
 //        };
 //    }
-
-    public static void main(String[] args) {
-        double[][] matrix = {
-                {1, 4, 7},
-                {2, 5, 8},
-                {3, 6, 10},
-        };
-
-        System.out.println(Math.pow(2.0, -52.0));
-        System.out.println(ConstantsETK.DOUBLE_EPS);
-
-        MatrixSparse sparseCSC = MatrixSparse.convert(matrix, ConstantsETK.DOUBLE_EPS);
-        double[] b = {1, 2, 0};
-        LUDecompositionSparse sparseLU = new LUDecompositionSparse(sparseCSC);
-
-        MatrixSparse mm = sparseLU.solve(b);
-        System.out.println("b = " + Arrays.toString(b));
-
-        MatrixSparse gg = new MatrixSparse(3, 3);
-        gg.set(0, 0, 1);
-        gg.set(0, 1, 4);
-        gg.set(0, 2, 7);
-
-        gg.set(1, 0, 2);
-        gg.set(1, 1, 5);
-        gg.set(1, 2, 8);
-
-        gg.set(2, 0, 3);
-        gg.set(2, 1, 6);
-        gg.set(2, 2, 10);
-
-        double[] c = {1, 2, 0};
-
-        LUDecompositionSparse sparseLU2 = new LUDecompositionSparse(gg);
-
-        sparseLU2.solve(c);
-        System.out.println("c = " + Arrays.toString(c));
-    }
 }

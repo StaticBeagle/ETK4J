@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
 
-public class MatrixTest {
+public class MatrixDenseTest {
 
     @Test
     public void testMagic() {
@@ -94,7 +94,6 @@ public class MatrixTest {
         double[][] rankdef = avals;
         double[][] tvals = {{1., 2., 3.}, {4., 5., 6.}, {7., 8., 9.}, {10., 11., 12.}};
         double[][] subavals = {{5., 8., 11.}, {6., 9., 12.}};
-        double[][] rvals = {{1., 4., 7.}, {2., 5., 8., 11.}, {3., 6., 9., 12.}};
         double[][] pvals = {{4., 1., 1.}, {1., 2., 3.}, {1., 3., 6.}};
         double[][] ivals = {{1., 0., 0., 0.}, {0., 1., 0., 0.}, {0., 0., 1., 0.}};
         double[][] evals = {{0., 1., 0., 0.}, {1., 0., 2.e-7, 0.}, {0., -2.e-7, 0., 1.}, {0., 0., 1., 0.}};
@@ -103,7 +102,6 @@ public class MatrixTest {
         double[][] condmat = {{1., 3.}, {7., 9.}};
         int rows = 3, cols = 4;
         int invalidld = 5;/* should trigger bad shape for construction with val */
-        /* (raggedr,raggedc) should be out of bounds in ragged array */
         int validld = 3; /* leading dimension of intended test Matrices */
         int nonconformld = 4; /* leading dimension which is valid, but nonconforming */
         int ib = 1, ie = 2, jb = 1, je = 3; /* index ranges for sub Matrix */
