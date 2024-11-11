@@ -2,7 +2,7 @@ package com.wildbitsfoundry.etk4j.math.polynomials;
 
 import java.util.Arrays;
 import com.wildbitsfoundry.etk4j.math.functions.BivariateFunction;
-import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
+import com.wildbitsfoundry.etk4j.math.linearalgebra.MatrixDense;
 import com.wildbitsfoundry.etk4j.util.Grids;
 import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 
@@ -99,10 +99,10 @@ public class Polynomial2d implements BivariateFunction {
 			}
 		}
 
-		Matrix A = new Matrix(vandermonde);
-		Matrix b = new Matrix(z, z.length);
+		MatrixDense A = new MatrixDense(vandermonde);
+		MatrixDense b = new MatrixDense(z, z.length);
 
-		Matrix c = A.solve(b);
+		MatrixDense c = A.solve(b);
 
 		return c.getArray();
 	}

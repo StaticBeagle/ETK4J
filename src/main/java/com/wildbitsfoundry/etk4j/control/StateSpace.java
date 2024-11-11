@@ -1,8 +1,8 @@
 package com.wildbitsfoundry.etk4j.control;
 
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
-import com.wildbitsfoundry.etk4j.math.linearalgebra.ComplexMatrix;
-import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
+import com.wildbitsfoundry.etk4j.math.linearalgebra.ComplexMatrixDense;
+import com.wildbitsfoundry.etk4j.math.linearalgebra.MatrixDense;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.NonSquareMatrixException;
 import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 
@@ -13,19 +13,19 @@ import java.util.Arrays;
  */
 public class StateSpace extends LinearTimeInvariantSystem {
 
-    private Matrix A;
-    private Matrix B;
-    private Matrix C;
-    private Matrix D;
+    private MatrixDense A;
+    private MatrixDense B;
+    private MatrixDense C;
+    private MatrixDense D;
 
     /**
      * Constructs a null system where all the matrices are empty matrices.
      */
     public StateSpace() {
-        this.A = Matrix.empty();
-        this.B = Matrix.empty();
-        this.C = Matrix.empty();
-        this.D = Matrix.empty();
+        this.A = MatrixDense.empty();
+        this.B = MatrixDense.empty();
+        this.C = MatrixDense.empty();
+        this.D = MatrixDense.empty();
     }
 
     /**
@@ -36,10 +36,10 @@ public class StateSpace extends LinearTimeInvariantSystem {
      * @param D The feed through matrix in array form.
      */
     public StateSpace(double[][] A, double[][] B, double[][] C, double[][] D) {
-        this.A = A == null ? null : new Matrix(A);
-        this.B = B == null ? null : new Matrix(B);
-        this.C = C == null ? null : new Matrix(C);
-        this.D = D == null ? null : new Matrix(D);
+        this.A = A == null ? null : new MatrixDense(A);
+        this.B = B == null ? null : new MatrixDense(B);
+        this.C = C == null ? null : new MatrixDense(C);
+        this.D = D == null ? null : new MatrixDense(D);
     }
 
     /**
@@ -49,43 +49,43 @@ public class StateSpace extends LinearTimeInvariantSystem {
      * @param C The state to output matrix.
      * @param D The feed through matrix.
      */
-    public StateSpace(Matrix A, Matrix B, Matrix C, Matrix D) {
-        this.A = A == null ? null : new Matrix(A);
-        this.B = B == null ? null : new Matrix(B);
-        this.C = C == null ? null : new Matrix(C);
-        this.D = D == null ? null : new Matrix(D);
+    public StateSpace(MatrixDense A, MatrixDense B, MatrixDense C, MatrixDense D) {
+        this.A = A == null ? null : new MatrixDense(A);
+        this.B = B == null ? null : new MatrixDense(B);
+        this.C = C == null ? null : new MatrixDense(C);
+        this.D = D == null ? null : new MatrixDense(D);
     }
 
     /**
-     * Get the state {@link Matrix}.
+     * Get the state {@link MatrixDense}.
      * @return A copy of the state matrix A.
      */
-    public Matrix getA() {
-        return new Matrix(A);
+    public MatrixDense getA() {
+        return new MatrixDense(A);
     }
 
     /**
-     * Get input to state {@link Matrix}.
+     * Get input to state {@link MatrixDense}.
      * @return A copy of the input to state matrix B.
      */
-    public Matrix getB() {
-        return new Matrix(B);
+    public MatrixDense getB() {
+        return new MatrixDense(B);
     }
 
     /**
-     * Get the state to output {@link Matrix}.
+     * Get the state to output {@link MatrixDense}.
      * @return A copy of the state to output matrix C.
      */
-    public Matrix getC() {
-        return new Matrix(C);
+    public MatrixDense getC() {
+        return new MatrixDense(C);
     }
 
     /**
-     * Get the feed through {@link Matrix}.
+     * Get the feed through {@link MatrixDense}.
      * @return A copy of the feed through matrix D.
      */
-    public Matrix getD() {
-        return new Matrix(D);
+    public MatrixDense getD() {
+        return new MatrixDense(D);
     }
 
     @Override
@@ -110,10 +110,10 @@ public class StateSpace extends LinearTimeInvariantSystem {
      */
     public TransferFunction[] toTransferFunction(int input) {
         StateSpace ss = normalize(this);
-        Matrix A = ss.A;
-        Matrix B = ss.B;
-        Matrix C = ss.C;
-        Matrix D = ss.D;
+        MatrixDense A = ss.A;
+        MatrixDense B = ss.B;
+        MatrixDense C = ss.C;
+        MatrixDense D = ss.D;
         int nin = D.getColumnCount();
         int nout = D.getRowCount();
         if(input >= nin) {
@@ -144,7 +144,7 @@ public class StateSpace extends LinearTimeInvariantSystem {
         for(int k = 0; k < nout; ++k) {
             double[] Ck = C.getRow(k);
             double Dk = D.get(k, 0);
-            num[k] = A.subtract(new Matrix(dot(B.getArray(), Ck))).poly();
+            num[k] = A.subtract(new MatrixDense(dot(B.getArray(), Ck))).poly();
             DoubleArrays.addElementWiseInPlace(num[k], DoubleArrays.multiplyElementWise(den, Dk - 1));
             tfs[k] = new TransferFunction(num[k], den);
         }
@@ -181,16 +181,16 @@ public class StateSpace extends LinearTimeInvariantSystem {
         }
 
         if(result.A == null) {
-            result.A = Matrix.empty();
+            result.A = MatrixDense.empty();
         }
         if(result.B == null) {
-            result.B = Matrix.empty();
+            result.B = MatrixDense.empty();
         }
         if(result.C == null) {
-            result.C = Matrix.empty();
+            result.C = MatrixDense.empty();
         }
         if(result.D == null) {
-            result.D = Matrix.empty();
+            result.D = MatrixDense.empty();
         }
         result.A = restore(result.A, p, p);
         result.B = restore(result.B, p, q);
@@ -204,7 +204,7 @@ public class StateSpace extends LinearTimeInvariantSystem {
     Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
     All rights reserved. See https://github.com/StaticBeagle/ETK4J/blob/master/SciPy.
      */
-    private Integer[] shapeOrNull(Matrix m) {
+    private Integer[] shapeOrNull(MatrixDense m) {
         return m != null ? new Integer[] {m.getRowCount(), m.getColumnCount()} : new Integer[2];
     }
 
@@ -225,9 +225,9 @@ public class StateSpace extends LinearTimeInvariantSystem {
     Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
     All rights reserved. See https://github.com/StaticBeagle/ETK4J/blob/master/SciPy.
      */
-    private Matrix restore(Matrix m, int rows, int cols) {
+    private MatrixDense restore(MatrixDense m, int rows, int cols) {
         if(m.isEmpty()) {
-            return new Matrix(rows, cols);
+            return new MatrixDense(rows, cols);
         } else {
             if(m.getRowCount() != rows && m.getColumnCount() != cols) {
                 throw new RuntimeException("The input arrays have incompatible shapes.");
@@ -324,7 +324,7 @@ public class StateSpace extends LinearTimeInvariantSystem {
      */
     public TimeResponse simulateTimeResponse(double[][] input, double[] time, double[] initialConditions,
                                              IntegrationMethod integrationMethod) {
-        return lsim(input, time, initialConditions, this, integrationMethod);
+        return lSim(input, time, initialConditions, this, integrationMethod);
     }
 
     @Override
@@ -338,9 +338,9 @@ public class StateSpace extends LinearTimeInvariantSystem {
      * @return The complex frequency response of the system.
      */
     public Complex[] evaluateMIMOAt(double w) {
-        ComplexMatrix inner = Matrix.identity(A.getRowCount()).multiply(Complex.fromImaginary(w)).subtract(A).inv();
-        ComplexMatrix outer = C.multiply(inner).multiply(B);
-        return ComplexMatrix.fromRealMatrix(D).add(outer).transpose().getArray();
+        ComplexMatrixDense inner = MatrixDense.identity(A.getRowCount()).multiply(Complex.fromImaginary(w)).subtract(A).inv();
+        ComplexMatrixDense outer = C.multiply(inner).multiply(B);
+        return ComplexMatrixDense.fromRealMatrix(D).add(outer).transpose().getArray();
     }
 
     /**

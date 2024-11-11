@@ -47,7 +47,7 @@ public final class ButterWorth extends AnalogFilter {
      * @param specs The filter design specifications.
      * @return The minimum order required to meet the design specifications.
      */
-    public static LowPassResults buttord(LowPassSpecs specs) {
+    public static LowPassResults buttOrd(LowPassSpecs specs) {
         specs.validate();
         return lowPassFilterOrder(specs, new ButterworthOrderCalculationStrategy());
     }
@@ -57,7 +57,7 @@ public final class ButterWorth extends AnalogFilter {
      * @param specs The filter design specifications.
      * @return The minimum order required to meet the design specifications.
      */
-    public static HighPassResults buttord(HighPassSpecs specs) {
+    public static HighPassResults buttOrd(HighPassSpecs specs) {
         specs.validate();
         return highPassFilterOrder(specs, new ButterworthOrderCalculationStrategy());
     }
@@ -67,7 +67,7 @@ public final class ButterWorth extends AnalogFilter {
      * @param specs The filter design specifications.
      * @return The minimum order required to meet the design specifications.
      */
-    public static BandpassResults buttord(BandpassSpecs specs) {
+    public static BandpassResults buttOrd(BandpassSpecs specs) {
         specs.validate();
         return bandpassFilterOrder(specs, new ButterworthOrderCalculationStrategy());
     }
@@ -77,7 +77,7 @@ public final class ButterWorth extends AnalogFilter {
      * @param specs The filter design specifications.
      * @return The minimum order required to meet the design specifications.
      */
-    public static BandStopResults buttord(BandStopSpecs specs) {
+    public static BandStopResults buttOrd(BandStopSpecs specs) {
         specs.validate();
         return bandStopFilterOrder(specs, new ButterworthOrderCalculationStrategy());
     }
@@ -94,7 +94,7 @@ public final class ButterWorth extends AnalogFilter {
     public static TransferFunction newLowPass(int n, double wn) {
         validateInputsLowPass(n, wn);
         ZeroPoleGain zpk = buttAp(n);
-        return lpTolp(zpk, wn);
+        return lpToLp(zpk, wn);
     }
 
     /**
@@ -106,7 +106,7 @@ public final class ButterWorth extends AnalogFilter {
     public static ZeroPoleGain newLowPassZPK(int n, double wn) {
         validateInputsLowPass(n, wn);
         ZeroPoleGain zpk = buttAp(n);
-        return lpTolpZPK(zpk, wn);
+        return lpToLpZPK(zpk, wn);
     }
 
     /**
@@ -121,7 +121,7 @@ public final class ButterWorth extends AnalogFilter {
     public static TransferFunction newHighPass(int n, double wn) {
         validateInputsHighPass(n, wn);
         ZeroPoleGain zpk = buttAp(n);
-        return lpTohp(zpk, wn);
+        return lpToHp(zpk, wn);
     }
 
     /**
@@ -133,7 +133,7 @@ public final class ButterWorth extends AnalogFilter {
     public static ZeroPoleGain newHighPassZPK(int n, double wn) {
         validateInputsHighPass(n, wn);
         ZeroPoleGain zpk = buttAp(n);
-        return lpTohpZPK(zpk, wn);
+        return lpToHpZPK(zpk, wn);
     }
 
     /**
@@ -151,7 +151,7 @@ public final class ButterWorth extends AnalogFilter {
         ZeroPoleGain zpk = buttAp(n);
         double w0 = Math.sqrt(wp1 * wp2);
         double bw = wp2 - wp1;
-        return lpTobp(zpk, w0, bw);
+        return lpToBp(zpk, w0, bw);
     }
 
     /**
@@ -166,7 +166,7 @@ public final class ButterWorth extends AnalogFilter {
         ZeroPoleGain zpk = buttAp(n);
         double w0 = Math.sqrt(wp1 * wp2);
         double bw = wp2 - wp1;
-        return lpTobpZPK(zpk, w0, bw);
+        return lpToBpZPK(zpk, w0, bw);
     }
 
     /**
@@ -184,7 +184,7 @@ public final class ButterWorth extends AnalogFilter {
         ZeroPoleGain zpk = buttAp(n);
         double w0 = Math.sqrt(wp1 * wp2);
         double bw = wp2 - wp1;
-        return lpTobs(zpk, w0, bw);
+        return lpToBs(zpk, w0, bw);
     }
 
     /**
@@ -199,7 +199,7 @@ public final class ButterWorth extends AnalogFilter {
         ZeroPoleGain zpk = buttAp(n);
         double w0 = Math.sqrt(wp1 * wp2);
         double bw = wp2 - wp1;
-        return lpTobsZPK(zpk, w0, bw);
+        return lpToBsZPK(zpk, w0, bw);
     }
 
     protected static void validateInputsLowPass(int n, double wn) {

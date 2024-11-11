@@ -24,7 +24,7 @@ public final class Filters {
      * @param w0  The new cutoff frequency.
      * @return The {@link TransferFunction} of the new low pass filter with new cutoff.
      */
-    public static TransferFunction lpTolp(double[] num, double[] den, double w0) {
+    public static TransferFunction lpToLp(double[] num, double[] den, double w0) {
         TransferFunction tf = new TransferFunction(num, den);
         tf.substituteInPlace(1.0 / w0);
         tf.normalize();
@@ -38,7 +38,7 @@ public final class Filters {
      * @param w0  The new cutoff frequency.
      * @return The new {@link ZeroPoleGain} representation of the filter with new cutoff frequency.
      */
-    public static ZeroPoleGain lpTolpZPK(ZeroPoleGain zpk, double w0) {
+    public static ZeroPoleGain lpToLpZPK(ZeroPoleGain zpk, double w0) {
         Complex[] zeros = zpk.getZeros();
         Complex[] poles = zpk.getPoles();
         double k = zpk.getGain();
@@ -56,8 +56,8 @@ public final class Filters {
      * @param w0  The new cutoff frequency.
      * @return The {@link TransferFunction} of the new low pass filter with new cutoff.
      */
-    public static TransferFunction lpTolp(ZeroPoleGain zpk, double w0) {
-        return new TransferFunction(lpTolpZPK(zpk, w0));
+    public static TransferFunction lpToLp(ZeroPoleGain zpk, double w0) {
+        return new TransferFunction(lpToLpZPK(zpk, w0));
     }
 
     /**
@@ -68,7 +68,7 @@ public final class Filters {
      * @param w0  The cutoff frequency of the high pass filter.
      * @return The {@link TransferFunction} of the new high pass filter.
      */
-    public static TransferFunction lpTohp(double[] num, double[] den, double w0) {
+    public static TransferFunction lpToHp(double[] num, double[] den, double w0) {
         final int numDegree = num.length - 1;
         final int denDegree = den.length - 1;
         final int filterOrder = Math.max(numDegree, denDegree) + 1;
@@ -103,7 +103,7 @@ public final class Filters {
      * @param w0  The cutoff frequency of the high pass filter.
      * @return The new {@link ZeroPoleGain} representation of the new high pass filter.
      */
-    public static ZeroPoleGain lpTohpZPK(ZeroPoleGain zpk, double w0) {
+    public static ZeroPoleGain lpToHpZPK(ZeroPoleGain zpk, double w0) {
         Complex[] zeros = zpk.getZeros();
         Complex[] poles = zpk.getPoles();
         double k = zpk.getGain();
@@ -128,8 +128,8 @@ public final class Filters {
      * @param w0  The cutoff frequency of the high pass filter.
      * @return The {@link TransferFunction} of the new high pass filter.
      */
-    public static TransferFunction lpTohp(ZeroPoleGain zpk, double w0) {
-        return new TransferFunction(lpTohpZPK(zpk, w0));
+    public static TransferFunction lpToHp(ZeroPoleGain zpk, double w0) {
+        return new TransferFunction(lpToHpZPK(zpk, w0));
     }
 
     /**
@@ -141,7 +141,7 @@ public final class Filters {
      * @param bw  The bandwidth of the filter.
      * @return The {@link TransferFunction} of the new bandpass filter.
      */
-    public static TransferFunction lpTobp(double[] num, double[] den, double w0, double bw) {
+    public static TransferFunction lpToBp(double[] num, double[] den, double w0, double bw) {
         Polynomial s = new Polynomial(bw, 0.0);
         Polynomial s2w02 = new Polynomial(1.0, 0, w0 * w0);
 
@@ -166,7 +166,7 @@ public final class Filters {
      * @param bw  The bandwidth of the filter.
      * @return The {@link ZeroPoleGain} representation of the new bandpass filter.
      */
-    public static ZeroPoleGain lpTobpZPK(ZeroPoleGain zpk, double w0, double bw) {
+    public static ZeroPoleGain lpToBpZPK(ZeroPoleGain zpk, double w0, double bw) {
         Complex[] zeros = zpk.getZeros();
         Complex[] poles = zpk.getPoles();
         double k = zpk.getGain();
@@ -209,8 +209,8 @@ public final class Filters {
      * @param bw  The bandwidth.
      * @return The {@link TransferFunction} of the new bandpass filter.
      */
-    public static TransferFunction lpTobp(ZeroPoleGain zpk, double w0, double bw) {
-        return new TransferFunction(lpTobpZPK(zpk, w0, bw));
+    public static TransferFunction lpToBp(ZeroPoleGain zpk, double w0, double bw) {
+        return new TransferFunction(lpToBpZPK(zpk, w0, bw));
     }
 
     /**
@@ -222,7 +222,7 @@ public final class Filters {
      * @param bw  The bandwidth.
      * @return The {@link TransferFunction} of the new band stop filter.
      */
-    public static TransferFunction lpTobs(double[] num, double[] den, double w0, double bw) {
+    public static TransferFunction lpToBs(double[] num, double[] den, double w0, double bw) {
         Polynomial s = new Polynomial(bw, 0.0);
         Polynomial s2w02 = new Polynomial(1.0, 0.0, w0 * w0);
 
@@ -245,7 +245,7 @@ public final class Filters {
      * @param bw  The bandwidth.
      * @return The {@link ZeroPoleGain} representation of the filter.
      */
-    public static ZeroPoleGain lpTobsZPK(ZeroPoleGain zpk, double w0, double bw) {
+    public static ZeroPoleGain lpToBsZPK(ZeroPoleGain zpk, double w0, double bw) {
         Complex[] zeros = zpk.getZeros();
         Complex[] poles = zpk.getPoles();
         double k = zpk.getGain();
@@ -296,8 +296,8 @@ public final class Filters {
      * @param bw The bandwidth.
      * @return The {@link TransferFunction} of the new band stop filter.
      */
-    public static TransferFunction lpTobs(ZeroPoleGain zpk, double w0, double bw) {
-        return new TransferFunction(lpTobsZPK(zpk, w0, bw));
+    public static TransferFunction lpToBs(ZeroPoleGain zpk, double w0, double bw) {
+        return new TransferFunction(lpToBsZPK(zpk, w0, bw));
     }
 
     /*

@@ -25,7 +25,7 @@ public class Elliptic extends AnalogFilter {
      * @param rs The stop band ripple in dB.
      * @return The zeros and poles of the elliptic filter.
      */
-    public static ZeroPoleGain ellipap(int n, double rp, double rs) {
+    public static ZeroPoleGain ellipAp(int n, double rp, double rs) {
         if (n == 1) {
             // filter becomes Chebyshev I
             Complex[] z = new Complex[0];
@@ -125,7 +125,7 @@ public class Elliptic extends AnalogFilter {
      * @param specs The filter design specifications.
      * @return The minimum order required to meet the design specifications.
      */
-    public static LowPassResults ellipord(LowPassSpecs specs) {
+    public static LowPassResults ellipOrd(LowPassSpecs specs) {
         specs.validate();
         LowPassSpecs specsCopy = new LowPassSpecs(specs);
         double rp = 10 * Math.log10(specs.getPassBandRipple());
@@ -140,7 +140,7 @@ public class Elliptic extends AnalogFilter {
      * @param specs The filter design specifications.
      * @return The minimum order required to meet the design specifications.
      */
-    public static HighPassResults ellipord(HighPassSpecs specs) {
+    public static HighPassResults ellipOrd(HighPassSpecs specs) {
         specs.validate();
         HighPassSpecs specsCopy = new HighPassSpecs(specs);
         double rp = 10 * Math.log10(specs.getPassBandRipple());
@@ -155,7 +155,7 @@ public class Elliptic extends AnalogFilter {
      * @param specs The filter design specifications.
      * @return The minimum order required to meet the design specifications.
      */
-    public static BandpassResults ellipord(BandpassSpecs specs) {
+    public static BandpassResults ellipOrd(BandpassSpecs specs) {
         specs.validate();
         BandpassSpecs specsCopy = new BandpassSpecs(specs);
         double rp = 10 * Math.log10(specs.getPassBandRipple());
@@ -170,7 +170,7 @@ public class Elliptic extends AnalogFilter {
      * @param specs The filter design specifications.
      * @return The minimum order required to meet the design specifications.
      */
-    public static BandStopResults ellipord(BandStopSpecs specs) {
+    public static BandStopResults ellipOrd(BandStopSpecs specs) {
         specs.validate();
         BandStopSpecs specsCopy = new BandStopSpecs(specs);
         double rp = 10 * Math.log10(specs.getPassBandRipple());
@@ -192,8 +192,8 @@ public class Elliptic extends AnalogFilter {
      * variant.
      */
     public static TransferFunction newLowPass(int n, double rp, double rs, double wn) {
-        ZeroPoleGain zpk = ellipap(n, rp, rs);
-        return lpTolp(zpk, wn);
+        ZeroPoleGain zpk = ellipAp(n, rp, rs);
+        return lpToLp(zpk, wn);
     }
 
     /**
@@ -205,8 +205,8 @@ public class Elliptic extends AnalogFilter {
      * @return A {@link ZeroPoleGain} representation of the filter.
      */
     public static ZeroPoleGain newLowPassZPK(int n, double rp, double rs, double wn) {
-        ZeroPoleGain zpk = ellipap(n, rp, rs);
-        return lpTolpZPK(zpk, wn);
+        ZeroPoleGain zpk = ellipAp(n, rp, rs);
+        return lpToLpZPK(zpk, wn);
     }
 
     /**
@@ -221,8 +221,8 @@ public class Elliptic extends AnalogFilter {
      * variant.
      */
     public static TransferFunction newHighPass(int n, double rp, double rs, double wn) {
-        ZeroPoleGain zpk = ellipap(n, rp, rs);
-        return lpTohp(zpk, wn);
+        ZeroPoleGain zpk = ellipAp(n, rp, rs);
+        return lpToHp(zpk, wn);
     }
 
     /**
@@ -234,8 +234,8 @@ public class Elliptic extends AnalogFilter {
      * @return A {@link ZeroPoleGain} representation of the filter.
      */
     public static ZeroPoleGain newHighPassZPK(int n, double rp, double rs, double wn) {
-        ZeroPoleGain zpk = ellipap(n, rp, rs);
-        return lpTohpZPK(zpk, wn);
+        ZeroPoleGain zpk = ellipAp(n, rp, rs);
+        return lpToHpZPK(zpk, wn);
     }
 
     /**
@@ -251,10 +251,10 @@ public class Elliptic extends AnalogFilter {
      * variant.
      */
     public static TransferFunction newBandpass(int n, double rp, double rs, double wp1, double wp2) {
-        ZeroPoleGain zpk = ellipap(n, rp, rs);
+        ZeroPoleGain zpk = ellipAp(n, rp, rs);
         double w0 = Math.sqrt(wp1 * wp2);
         double bw = wp2 - wp1;
-        return lpTobp(zpk, w0, bw);
+        return lpToBp(zpk, w0, bw);
     }
 
     /**
@@ -267,10 +267,10 @@ public class Elliptic extends AnalogFilter {
      * @return A {@link ZeroPoleGain} representation of the filter.
      */
     public static ZeroPoleGain newBandpassZPK(int n, double rp, double rs, double wp1, double wp2) {
-        ZeroPoleGain zpk = ellipap(n, rp, rs);
+        ZeroPoleGain zpk = ellipAp(n, rp, rs);
         double w0 = Math.sqrt(wp1 * wp2);
         double bw = wp2 - wp1;
-        return lpTobpZPK(zpk, w0, bw);
+        return lpToBpZPK(zpk, w0, bw);
     }
 
     /**
@@ -286,10 +286,10 @@ public class Elliptic extends AnalogFilter {
      * variant.
      */
     public static TransferFunction newBandStop(int n, double rp, double rs, double wp1, double wp2) {
-        ZeroPoleGain zpk = ellipap(n, rp, rs);
+        ZeroPoleGain zpk = ellipAp(n, rp, rs);
         double w0 = Math.sqrt(wp1 * wp2);
         double bw = wp2 - wp1;
-        return lpTobs(zpk, w0, bw);
+        return lpToBs(zpk, w0, bw);
     }
 
     /**
@@ -302,10 +302,10 @@ public class Elliptic extends AnalogFilter {
      * @return A {@link ZeroPoleGain} representation of the filter.
      */
     public static ZeroPoleGain newBandStopZPK(int n, double rp, double rs, double wp1, double wp2) {
-        ZeroPoleGain zpk = ellipap(n, rp, rs);
+        ZeroPoleGain zpk = ellipAp(n, rp, rs);
         double w0 = Math.sqrt(wp1 * wp2);
         double bw = wp2 - wp1;
-        return lpTobsZPK(zpk, w0, bw);
+        return lpToBsZPK(zpk, w0, bw);
     }
 
     private static void validateInputsLowPass(int n, double rp, double rs, double wn) {

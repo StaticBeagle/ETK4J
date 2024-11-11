@@ -1,28 +1,30 @@
 package com.wildbitsfoundry.etk4j.math.linearalgebra;
 
-import com.wildbitsfoundry.etk4j.math.complex.Complex;
-
 import java.util.Arrays;
 
-public class ComplexLUDecomposition {
-	protected Complex[] _data;
-	protected final int _rows;
-	protected final int _cols;
+public class LUDecompositionDense extends LUDecomposition<MatrixDense> {
+	protected double[] _data;
 
 	protected int _pivotsign = 1;
 	protected int[] _pivot;
 
-	public ComplexLUDecomposition(ComplexMatrix matrix) {
+	private MatrixDense L;
+	private MatrixDense U;
+
+	//private
+
+	public LUDecompositionDense(MatrixDense matrix) {
+		super(matrix);
 		final int rows = matrix.getRowCount();
 		final int cols = matrix.getColumnCount();
-		Complex[] data = matrix.getArrayCopy();
+		double[] data = matrix.getArrayCopy();
 
 		_pivot = new int[rows];
 		for (int i = 0; i < rows; i++) {
 			_pivot[i] = i;
 		}
 
-		Complex[] LUcol = new Complex[rows];
+		double[] LUcol = new double[rows];
 
 		// Begin the outer loop
 		for (int j = 0; j < cols; j++) {
@@ -33,24 +35,24 @@ public class ComplexLUDecomposition {
 			// Apply previous transformations
 			for (int i = 0; i < rows; i++) {
 				int maxel = Math.min(i, j);
-				Complex s = new Complex();
+				double s = 0.0;
 				for (int k = 0; k < maxel; k++) {
-					s.addEquals(data[i * cols + k].multiply(LUcol[k]));
+					s += data[i * cols + k] * LUcol[k];
 				}
-				LUcol[i].subtractEquals(s);
-				data[i * cols + j] = LUcol[i];
+
+				data[i * cols + j] = LUcol[i] -= s;
 			}
 
 			// Find pivot and swap if needed
 			int p = j;
 			for (int i = j + 1; i < rows; i++) {
-				if (LUcol[i].abs() > LUcol[p].abs()) {
+				if (Math.abs(LUcol[i]) > Math.abs(LUcol[p])) {
 					p = i;
 				}
 			}
 			if (p != j) {
 				for (int k = 0; k < cols; k++) {
-					Complex temp = data[p * cols + k];
+					double temp = data[p * cols + k];
 					data[p * cols + k] = data[j * cols + k];
 					data[j * cols + k] = temp;
 				}
@@ -60,24 +62,22 @@ public class ComplexLUDecomposition {
 				_pivotsign = -_pivotsign;
 			}
 			// Wrapping up
-			if (j < rows & !data[j * cols + j].equals(new Complex())) {
+			if (j < rows & data[j * cols + j] != 0.0) {
 				for (int i = j + 1; i < rows; i++) {
-					data[i * cols + j].divideEquals(data[j * cols + j]);
+					data[i * cols + j] /= data[j * cols + j];
 				}
 			}
 		}
 		_data = data;
-		_rows = rows;
-		_cols = cols;
 	}
 
-	public boolean isNonSingular() {
-		for (int j = 0; j < _cols; ++j) {
-			if (_data[j * _cols + j].equals(new Complex())) {
-				return false;
+	public boolean isSingular() {
+		for (int j = 0; j < cols; ++j) {
+			if (_data[j * cols + j] == 0) {
+				return true;
 			}
 		}
-		return true;
+		return false;
 	}
 
 	/**
@@ -86,22 +86,26 @@ public class ComplexLUDecomposition {
 	 * @return L
 	 */
 
-	public ComplexMatrix getL() {
-		final int rows = _rows;
-		final int cols = _cols;
-		Complex[] L = new Complex[rows * cols];
+	public MatrixDense getL() {
+		if(this.L != null) {
+			return this.L;
+		}
+		final int rows = this.rows;
+		final int cols = this.cols;
+		double[] L = new double[rows * cols];
 		for (int i = 0; i < rows; ++i) {
 			for (int j = 0; j < cols; ++j) {
 				if (i > j) {
 					L[i * cols + j] = _data[i * cols + j];
 				} else if (i == j) {
-					L[i * cols + j] = Complex.fromReal(1.0);
+					L[i * cols + j] = 1.0;
 				} else {
-					L[i * cols + j] = new Complex();
+					L[i * cols + j] = 0.0;
 				}
 			}
 		}
-		return new ComplexMatrix(L, rows, cols);
+		this.L = new MatrixDense(L, rows, cols);
+		return this.L;
 	}
 
 	/**
@@ -110,20 +114,24 @@ public class ComplexLUDecomposition {
 	 * @return U
 	 */
 
-	public ComplexMatrix getU() {
-		final int rows = _rows;
-		final int cols = _cols;
-		Complex[] U = new Complex[rows * cols];
+	public MatrixDense getU() {
+		if(this.U != null) {
+			return this.U;
+		}
+		final int rows = this.rows;
+		final int cols = this.cols;
+		double[] U = new double[rows * cols];
 		for (int i = 0; i < cols; i++) {
 			for (int j = 0; j < cols; j++) {
 				if (i <= j) {
 					U[i * cols + j] = _data[i * cols + j];
 				} else {
-					U[i * cols + j] = new Complex();
+					U[i * cols + j] = 0.0;
 				}
 			}
 		}
-		return new ComplexMatrix(U, rows, cols);
+		this.U = new MatrixDense(U, rows, cols);
+		return this.U;
 	}
 
 	/**
@@ -143,21 +151,21 @@ public class ComplexLUDecomposition {
 	 */
 
 	public double[] getPivotAsDouble() {
-		final int rows = _rows;
+		final int rows = this.rows;
 		double[] vals = new double[rows];
 		for (int i = 0; i < rows; i++) {
-			vals[i] = (double) _pivot[i];
+			vals[i] = _pivot[i];
 		}
 		return vals;
 	}
 
-	public Complex det() {
-		if (_rows != _cols) {
+	public double det() {
+		if (this.rows != this.cols) {
 			throw new IllegalArgumentException("Matrix must be square.");
 		}
-		Complex det = Complex.fromReal(_pivotsign);
-		for (int i = 0; i < _cols; i++) {
-			det.multiplyEquals(this._data[i * _cols + i]);
+		double det = _pivotsign;
+		for (int i = 0; i < this.cols; i++) {
+			det *= this._data[i * this.cols + i];
 		}
 		return det;
 	}
@@ -174,48 +182,54 @@ public class ComplexLUDecomposition {
 	 *                Matrix is singular.
 	 */
 
-	public ComplexMatrix solve(Matrix B) {
-		if (B.getRowCount() != _rows) {
+	public MatrixDense solve(MatrixDense B) {
+		if (B.getRowCount() != this.rows) {
 			throw new IllegalArgumentException("Matrix row dimensions must agree.");
 		}
-		if (!this.isNonSingular()) {
+		if (this.isSingular()) {
 			throw new RuntimeException("Matrix is singular.");
 		}
 
-		// Copy right hand side with pivoting
+		// Copy right-hand side with pivoting
 		int nx = B.getColumnCount();
-		ComplexMatrix Xmat = ComplexMatrix.fromRealMatrix(B.subMatrix(_pivot, 0, nx - 1));
-		Complex[] X = Xmat.getArray();
+		MatrixDense Xmat = B.subMatrix(_pivot, 0, nx - 1);
+		double[] X = Xmat.getArray();
 
-		final int cols = _cols;
+		final int cols = this.cols;
 
 		// Solve L * Y = B(_pivot,:)
 		for (int k = 0; k < cols; ++k) {
 			for (int i = k + 1; i < cols; ++i) {
 				for (int j = 0; j < nx; ++j) {
-					X[i * nx + j].subtractEquals(X[k * nx + j].multiply(_data[i * cols + k]));
+					X[i * nx + j] -= X[k * nx + j] * _data[i * cols + k];
 				}
 			}
 		}
 		// Solve U * X = Y;
 		for (int k = cols - 1; k >= 0; --k) {
 			for (int j = 0; j < nx; ++j) {
-				X[k * nx + j].divideEquals(_data[k * cols + k]);
+				X[k * nx + j] /= _data[k * cols + k];
 			}
 			for (int i = 0; i < k; ++i) {
 				for (int j = 0; j < nx; ++j) {
-					X[i * nx + j].subtractEquals(X[k * nx + j].multiply(_data[i * cols + k]));
+					X[i * nx + j] -= X[k * nx + j] * _data[i * cols + k];
 				}
 			}
 		}
 		return Xmat;
 	}
 
+	// TODO write test
+	@Override
+	public MatrixDense solve(double[] b) {
+		return solve(new MatrixDense(b, b.length));
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < _rows * _cols; ++i) {
-			if (i > 0 && i % _cols == 0) {
+		for (int i = 0; i < this.rows * this.cols; ++i) {
+			if (i > 0 && i % this.cols == 0) {
 				sb.append(System.lineSeparator());
 			}
 			sb.append(String.format("%.4f", _data[i])).append(" ");

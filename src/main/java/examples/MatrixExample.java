@@ -1,16 +1,16 @@
 package examples;
 
-import java.util.Arrays;
+import com.wildbitsfoundry.etk4j.math.linearalgebra.MatrixDense;
 
-import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
+import java.util.Arrays;
 
 public class MatrixExample {
 	public static void main(String[] args) {
 
 		double[][] original = { { 1, 2, 3 }, { 0, 4, 5 }, { 1, 0, 6 } };
-		Matrix sol = new Matrix(new double[] { 6, 4, 2 }, 3);
+		MatrixDense sol = new MatrixDense(new double[] { 6, 4, 2 }, 3);
 
-		Matrix A = new Matrix(original);
+		MatrixDense A = new MatrixDense(original);
 		System.out.printf("A : %n%s%n%n", A);
 		
 		// Basic matrix operations

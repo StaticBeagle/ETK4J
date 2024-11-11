@@ -50,7 +50,7 @@ public class Bessel extends AnalogFilter {
      */
 
     /**
-     * Bessel analog low pass filter prototype.This method is an alias for {@link Bessel#besselapPhaseNormalized(int)}.
+     * Bessel analog low pass filter prototype.This method is an alias for {@link Bessel#besselApPhaseNormalized(int)}.
      * The filter is normalized such that the phase response reaches its
      * midpoint at an angular (e.g., rad/s) cutoff frequency of 1. This
      * happens for both low-pass and high-pass filters, so this is the
@@ -62,8 +62,8 @@ public class Bessel extends AnalogFilter {
      *
      * @param n The order of the filter.
      */
-    public static ZeroPoleGain besselap(int n) {
-        return besselapPhaseNormalized(n);
+    public static ZeroPoleGain besselAp(int n) {
+        return besselApPhaseNormalized(n);
     }
 
     /*
@@ -84,7 +84,7 @@ public class Bessel extends AnalogFilter {
      *
      * @param n The order of the filter.
      */
-    public static ZeroPoleGain besselapPhaseNormalized(int n) {
+    public static ZeroPoleGain besselApPhaseNormalized(int n) {
         if (n == 0) {
             return new ZeroPoleGain(new Complex[]{}, new Complex[]{}, 1.0);
         }
@@ -112,7 +112,7 @@ public class Bessel extends AnalogFilter {
      *
      * @param n The order of the filter.
      */
-    public static ZeroPoleGain besselapDelayNormalized(int n) {
+    public static ZeroPoleGain besselApDelayNormalized(int n) {
         if (n == 0) {
             return new ZeroPoleGain(new Complex[]{}, new Complex[]{}, 1.0);
         }
@@ -135,7 +135,7 @@ public class Bessel extends AnalogFilter {
      *
      * @param n The order of the filter.
      */
-    public static ZeroPoleGain besselapMagnitudeNormalized(int n) {
+    public static ZeroPoleGain besselApMagnitudeNormalized(int n) {
         if (n == 0) {
             return new ZeroPoleGain(new Complex[]{}, new Complex[]{}, 1.0);
         }
@@ -165,8 +165,8 @@ public class Bessel extends AnalogFilter {
      */
     public static TransferFunction newLowPass(int n, double wn) {
         ButterWorth.validateInputsLowPass(n, wn);
-        ZeroPoleGain zpk = besselap(n);
-        return lpTolp(zpk, wn);
+        ZeroPoleGain zpk = besselAp(n);
+        return lpToLp(zpk, wn);
     }
 
     /**
@@ -178,7 +178,7 @@ public class Bessel extends AnalogFilter {
      */
     public static ZeroPoleGain newLowPassZPK(int n, double wn) {
         ButterWorth.validateInputsLowPass(n, wn);
-        return besselap(n);
+        return besselAp(n);
     }
 
     /**
@@ -193,8 +193,8 @@ public class Bessel extends AnalogFilter {
      */
     public static TransferFunction newHighPass(int n, double wn) {
         ButterWorth.validateInputsHighPass(n, wn);
-        ZeroPoleGain zpk = besselap(n);
-        return lpTohp(zpk, wn);
+        ZeroPoleGain zpk = besselAp(n);
+        return lpToHp(zpk, wn);
     }
 
     /**
@@ -206,8 +206,8 @@ public class Bessel extends AnalogFilter {
      */
     public static ZeroPoleGain newHighPassZPK(int n, double wn) {
         ButterWorth.validateInputsHighPass(n, wn);
-        ZeroPoleGain zpk = besselap(n);
-        return lpTohpZPK(zpk, wn);
+        ZeroPoleGain zpk = besselAp(n);
+        return lpToHpZPK(zpk, wn);
     }
 
     /**
@@ -223,10 +223,10 @@ public class Bessel extends AnalogFilter {
      */
     public static TransferFunction newBandpass(int n, double wp1, double wp2) {
         ButterWorth.validateInputsBandpass(n, wp1, wp2);
-        ZeroPoleGain zpk = besselap(n);
+        ZeroPoleGain zpk = besselAp(n);
         double w0 = Math.sqrt(wp1 * wp2);
         double bw = wp2 - wp1;
-        return lpTobp(zpk, w0, bw);
+        return lpToBp(zpk, w0, bw);
     }
 
     /**
@@ -239,10 +239,10 @@ public class Bessel extends AnalogFilter {
      */
     public static ZeroPoleGain newBandpassZPK(int n, double wp1, double wp2) {
         ButterWorth.validateInputsBandpass(n, wp1, wp2);
-        ZeroPoleGain zpk = besselap(n);
+        ZeroPoleGain zpk = besselAp(n);
         double w0 = Math.sqrt(wp1 * wp2);
         double bw = wp2 - wp1;
-        return lpTobpZPK(zpk, w0, bw);
+        return lpToBpZPK(zpk, w0, bw);
     }
 
     /**
@@ -258,10 +258,10 @@ public class Bessel extends AnalogFilter {
      */
     public static TransferFunction newBandStop(int n, double wp1, double wp2) {
         ButterWorth.validateInputsBandStop(n, wp1, wp2);
-        ZeroPoleGain zpk = besselap(n);
+        ZeroPoleGain zpk = besselAp(n);
         double w0 = Math.sqrt(wp1 * wp2);
         double bw = wp2 - wp1;
-        return lpTobs(zpk, w0, bw);
+        return lpToBs(zpk, w0, bw);
     }
 
     /**
@@ -274,10 +274,10 @@ public class Bessel extends AnalogFilter {
      */
     public static ZeroPoleGain newBandStopZPK(int n, double wp1, double wp2) {
         ButterWorth.validateInputsBandStop(n, wp1, wp2);
-        ZeroPoleGain zpk = besselap(n);
+        ZeroPoleGain zpk = besselAp(n);
         double w0 = Math.sqrt(wp1 * wp2);
         double bw = wp2 - wp1;
-        return lpTobsZPK(zpk, w0, bw);
+        return lpToBsZPK(zpk, w0, bw);
     }
 
     /*

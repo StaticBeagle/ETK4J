@@ -2,7 +2,7 @@ package com.wildbitsfoundry.etk4j.statistics.regression;
 
 import java.util.Arrays;
 
-import com.wildbitsfoundry.etk4j.math.linearalgebra.Matrix;
+import com.wildbitsfoundry.etk4j.math.linearalgebra.MatrixDense;
 import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 
 abstract class UnivariateRegression {
@@ -16,11 +16,11 @@ abstract class UnivariateRegression {
 	private double[] _residuals;
 	private double _rnorm;	// Norm of residuals
 	
-	protected void doRegression(Matrix X, double[] x, double[] y) {
+	protected void doRegression(MatrixDense X, double[] x, double[] y) {
 		final int n = x.length;
 
-		Matrix Y = new Matrix(y, n);
-		Matrix B = X.solve(Y);
+		MatrixDense Y = new MatrixDense(y, n);
+		MatrixDense B = X.solve(Y);
 
 		_beta = DoubleArrays.reverse(B.getArray());
 

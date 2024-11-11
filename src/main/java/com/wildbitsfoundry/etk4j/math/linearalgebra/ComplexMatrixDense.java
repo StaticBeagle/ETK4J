@@ -5,12 +5,12 @@ import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 
 import java.util.Arrays;
 
-public class ComplexMatrix {
+public class ComplexMatrixDense {
     private Complex[] data;
     private int rows;
     private int cols;
 
-    public ComplexMatrix(int rows, int cols) {
+    public ComplexMatrixDense(int rows, int cols) {
         this.rows = rows;
         this.cols = cols;
 
@@ -22,7 +22,7 @@ public class ComplexMatrix {
      * @param data
      * @param rows
      */
-    public ComplexMatrix(Complex[] data, int rows) {
+    public ComplexMatrixDense(Complex[] data, int rows) {
         this.rows = rows;
         cols = (this.rows != 0 ? data.length / this.rows : 0);
         if (this.rows * cols != data.length) {
@@ -38,7 +38,7 @@ public class ComplexMatrix {
         }
     }
 
-    public ComplexMatrix(Complex[][] data) {
+    public ComplexMatrixDense(Complex[][] data) {
         rows = data.length;
         cols = data[0].length;
         this.data = ComplexArrays.flatten(data);
@@ -48,20 +48,20 @@ public class ComplexMatrix {
     // _rows = rows
     // _cols = cols
     // _data = data;
-    public ComplexMatrix(Complex[] data, int rows, int cols) {
+    public ComplexMatrixDense(Complex[] data, int rows, int cols) {
         this.rows = rows;
         this.cols = cols;
         this.data = data;
     }
 
-    public ComplexMatrix(ComplexMatrix matrix) {
+    public ComplexMatrixDense(ComplexMatrixDense matrix) {
         rows = matrix.rows;
         cols = matrix.cols;
         data = new Complex[rows * cols];
         System.arraycopy(matrix.data, 0, this.data, 0, this.rows * this.cols);
     }
 
-    public ComplexMatrix(int rows, int cols, double val) {
+    public ComplexMatrixDense(int rows, int cols, double val) {
         this.rows = rows;
         this.cols = cols;
         data = new Complex[this.rows * this.cols];
@@ -72,13 +72,13 @@ public class ComplexMatrix {
      * Deep copy
      * @return
      */
-    public ComplexMatrix copy() {
+    public ComplexMatrixDense copy() {
         Complex[] data = ComplexArrays.deepCopy(this.data);
-        return new ComplexMatrix(data, this.rows, this.cols);
+        return new ComplexMatrixDense(data, this.rows, this.cols);
     }
 
-    public static ComplexMatrix fromRealMatrix(Matrix m) {
-        return new ComplexMatrix(ComplexArrays.fromReal(m.getArray()), m.getRowCount(), m.getColumnCount());
+    public static ComplexMatrixDense fromRealMatrix(MatrixDense m) {
+        return new ComplexMatrixDense(ComplexArrays.fromReal(m.getArray()), m.getRowCount(), m.getColumnCount());
     }
     // region SubMatrix
 
@@ -135,16 +135,16 @@ public class ComplexMatrix {
     // endregion
 
     // region arithmetic operations
-    public ComplexMatrix add(ComplexMatrix m) {
+    public ComplexMatrixDense add(ComplexMatrixDense m) {
         checkMatrixDimensions(m);
         Complex[] result = new Complex[this.rows * this.cols];
         for (int i = 0; i < this.rows * this.cols; ++i) {
             result[i] = this.data[i].add(m.data[i]);
         }
-        return new ComplexMatrix(result, rows, cols);
+        return new ComplexMatrixDense(result, rows, cols);
     }
 
-    public void addEquals(Matrix m) {
+    public void addEquals(MatrixDense m) {
         double[] mData = m.getArray();
         checkMatrixDimensions(m);
         final int length = rows * cols;
@@ -153,23 +153,23 @@ public class ComplexMatrix {
         }
     }
 
-    public ComplexMatrix subtract(Matrix m) {
+    public ComplexMatrixDense subtract(MatrixDense m) {
         double[] data = m.getArray();
         checkMatrixDimensions(m);
         Complex[] result = new Complex[this.rows * this.cols];
         for (int i = 0; i < this.rows * this.cols; ++i) {
             result[i] = this.data[i].subtract(data[i]);
         }
-        return new ComplexMatrix(result, rows, cols);
+        return new ComplexMatrixDense(result, rows, cols);
     }
 
-    public ComplexMatrix multiply(Matrix matrix) {
-        ComplexMatrix c = new ComplexMatrix(0, 0);
+    public ComplexMatrixDense multiply(MatrixDense matrix) {
+        ComplexMatrixDense c = new ComplexMatrixDense(0, 0);
         multiplyOp(this, matrix, c);
         return c;
     }
 
-    private static void multiplyOp(ComplexMatrix a, Matrix b, ComplexMatrix c) {
+    private static void multiplyOp(ComplexMatrixDense a, MatrixDense b, ComplexMatrixDense c) {
         int bRows = b.getRowCount();
         int bCols = b.getColumnCount();
         if (bRows != a.cols) {
@@ -196,7 +196,7 @@ public class ComplexMatrix {
         c.cols = bCols;
     }
 
-    public void multiplyEquals(Matrix matrix) {
+    public void multiplyEquals(MatrixDense matrix) {
         multiplyOp(this, matrix, this);
     }
     // endregion
@@ -208,9 +208,9 @@ public class ComplexMatrix {
         return false;
     }
 
-    public ComplexMatrix transpose() {
+    public ComplexMatrixDense transpose() {
         if (this.isEmpty()) {
-            return new ComplexMatrix(null, 0, 0);
+            return new ComplexMatrixDense(null, 0, 0);
         }
         Complex[] result = new Complex[rows * cols];
         final int trows = cols;
@@ -221,16 +221,16 @@ public class ComplexMatrix {
                 result[j * tcols + i] = data[i * cols + j];
             }
         }
-        return new ComplexMatrix(result, trows, tcols);
+        return new ComplexMatrixDense(result, trows, tcols);
     }
 
-    public ComplexMatrix inv() {
-        return this.solve(Matrix.identity(rows));
+    public ComplexMatrixDense inv() {
+        return this.solve(MatrixDense.identity(rows));
     }
 
     // region solve
-    public ComplexMatrix solve(Matrix B) {
-        return new ComplexLUDecomposition(this).solve(B);
+    public ComplexMatrixDense solve(MatrixDense B) {
+        return new ComplexLUDecompositionDense(this).solve(B);
         // Only implemented for square matrices for now.
 //        if (rows == cols) { // Matrix is Squared
 //            return new LUDecomposition(this).solve(B);
@@ -262,7 +262,7 @@ public class ComplexMatrix {
     /**
      * Check if size(A) == size(B)
      **/
-    void checkMatrixDimensions(ComplexMatrix B) {
+    void checkMatrixDimensions(ComplexMatrixDense B) {
         if (B.rows != rows || B.cols != cols) {
             throw new IllegalArgumentException("Matrix dimensions must agree.");
         }
@@ -271,22 +271,22 @@ public class ComplexMatrix {
     /**
      * Check if size(A) == size(B)
      **/
-    void checkMatrixDimensions(Matrix B) {
+    void checkMatrixDimensions(MatrixDense B) {
         if (B.getRowCount() != rows || B.getColumnCount() != cols) {
             throw new IllegalArgumentException("Matrix dimensions must agree.");
         }
     }
 
     public static void main(String[] args) {
-        Matrix A = new Matrix(new double[][]{{-2, -1}, {1, 0}});
-        Matrix B = new Matrix(new double[][]{{1}, {0}});
-        Matrix C = new Matrix(new double[][]{{1, 2}});
-        Matrix D = new Matrix(new double[][]{{1}});
+        MatrixDense A = new MatrixDense(new double[][]{{-2, -1}, {1, 0}});
+        MatrixDense B = new MatrixDense(new double[][]{{1}, {0}});
+        MatrixDense C = new MatrixDense(new double[][]{{1, 2}});
+        MatrixDense D = new MatrixDense(new double[][]{{1}});
 
         double w = 100;
         Complex jw = Complex.fromImaginary(w);
-        ComplexMatrix gg = Matrix.identity(A.getRowCount()).multiply(jw).subtract(A);
-        ComplexMatrix inv = gg.inv();
+        ComplexMatrixDense gg = MatrixDense.identity(A.getRowCount()).multiply(jw).subtract(A);
+        ComplexMatrixDense inv = gg.inv();
         System.out.println(gg);
         System.out.println(inv);
     }

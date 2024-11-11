@@ -7,67 +7,67 @@ import org.junit.Test;
 
 import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
 
-public class MatrixTest {
+public class MatrixDenseTest {
 
     @Test
     public void testMagic() {
 
-        Matrix sol = new Matrix(1, 1, 1);
-        Matrix magic = Matrix.magic(1);
+        MatrixDense sol = new MatrixDense(1, 1, 1);
+        MatrixDense magic = MatrixDense.magic(1);
         assertEquals(sol, magic);
 
-        sol = Matrix.empty();
-        magic = Matrix.magic(2);
+        sol = MatrixDense.empty();
+        magic = MatrixDense.magic(2);
         assertEquals(sol, magic);
 
         double[][] values3by3 = {{8.0, 1.0, 6.0}, {3.0, 5.0, 7.0}, {4.0, 9.0, 2.0}};
-        sol = new Matrix(values3by3);
-        magic = Matrix.magic(3);
+        sol = new MatrixDense(values3by3);
+        magic = MatrixDense.magic(3);
         assertEquals(sol, magic);
 
         double[][] values4by4 = {{16.0, 2.0, 3.0, 13.0}, {5.0, 11.0, 10.0, 8.0}, {9.0, 7.0, 6.0, 12.0},
                 {4.0, 14.0, 15.0, 1.0}};
-        sol = new Matrix(values4by4);
-        magic = Matrix.magic(4);
+        sol = new MatrixDense(values4by4);
+        magic = MatrixDense.magic(4);
         assertEquals(sol, magic);
 
         double[][] values5by5 = {{17.0, 24.0, 1.0, 8.0, 15.0}, {23.0, 5.0, 7.0, 14.0, 16.0},
                 {4.0, 6.0, 13.0, 20.0, 22.0}, {10.0, 12.0, 19.0, 21.0, 3.0}, {11.0, 18.0, 25.0, 2.0, 9.0}};
-        sol = new Matrix(values5by5);
-        magic = Matrix.magic(5);
+        sol = new MatrixDense(values5by5);
+        magic = MatrixDense.magic(5);
         assertEquals(sol, magic);
 
         double[][] values6by6 = {{35.0, 1.0, 6.0, 26.0, 19.0, 24.0}, {3.0, 32.0, 7.0, 21.0, 23.0, 25.0},
                 {31.0, 9.0, 2.0, 22.0, 27.0, 20.0}, {8.0, 28.0, 33.0, 17.0, 10.0, 15.0},
                 {30.0, 5.0, 34.0, 12.0, 14.0, 16.0}, {4.0, 36.0, 29.0, 13.0, 18.0, 11.0}};
-        sol = new Matrix(values6by6);
-        magic = Matrix.magic(6);
+        sol = new MatrixDense(values6by6);
+        magic = MatrixDense.magic(6);
         assertEquals(sol, magic);
     }
 
     @Test
     public void testPinv() {
         double[][] values = {{1, 2}, {3, 4}, {5, 6}};
-        Matrix matrix = new Matrix(values);
+        MatrixDense matrix = new MatrixDense(values);
 
         double[] solution = {-1.3333333333333317, -0.3333333333333325, 0.6666666666666661, 1.0833333333333321,
                 0.33333333333333265, -0.4166666666666662};
-        assertEquals(new Matrix(solution, 2, 3), matrix.pinv());
+        assertEquals(new MatrixDense(solution, 2, 3), matrix.pinv());
     }
 
     @Test
     public void testExpm() {
         double[][] data = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
-        Matrix matrix = new Matrix(data);
+        MatrixDense matrix = new MatrixDense(data);
 
         double[] solution = {1118906.6994131864, 1374815.0629358063, 1630724.4264584277, 2533881.0418989714,
                 3113415.0313805523, 3692947.020862136, 3948856.3843847574, 4852012.9998253, 5755170.615265846};
-        assertEquals(new Matrix(solution, 3, 3), matrix.expm());
+        assertEquals(new MatrixDense(solution, 3, 3), matrix.expm());
     }
 
     @Test
     public void testSetRow() {
-        Matrix m = Matrix.magic(3);
+        MatrixDense m = MatrixDense.magic(3);
 		double[] row = {-1, -1, -1};
         m.setRow(1, row);
 		assertArrayEquals(row, m.getRow(1), 1e-12);
@@ -75,14 +75,14 @@ public class MatrixTest {
 
     @Test
     public void testGetCol() {
-        Matrix m = Matrix.magic(3);
+        MatrixDense m = MatrixDense.magic(3);
         double[] row = {8, 3, 4};
         assertArrayEquals(row, m.getCol(0), 1e-12);
     }
 
     @Test
     public void allTests() {
-        Matrix A, B, C, Z, O, I, R, S, X, SUB, M, T, SQ, DEF, SOL;
+        MatrixDense A, B, C, Z, O, I, R, S, X, SUB, M, T, SQ, DEF, SOL;
         // Uncomment this to test IO in a different locale.
         // Locale.setDefault(Locale.GERMAN);
         int errorCount = 0;
@@ -94,7 +94,6 @@ public class MatrixTest {
         double[][] rankdef = avals;
         double[][] tvals = {{1., 2., 3.}, {4., 5., 6.}, {7., 8., 9.}, {10., 11., 12.}};
         double[][] subavals = {{5., 8., 11.}, {6., 9., 12.}};
-        double[][] rvals = {{1., 4., 7.}, {2., 5., 8., 11.}, {3., 6., 9., 12.}};
         double[][] pvals = {{4., 1., 1.}, {1., 2., 3.}, {1., 3., 6.}};
         double[][] ivals = {{1., 0., 0., 0.}, {0., 1., 0., 0.}, {0., 0., 1., 0.}};
         double[][] evals = {{0., 1., 0., 0.}, {1., 0., 2.e-7, 0.}, {0., -2.e-7, 0., 1.}, {0., 0., 1., 0.}};
@@ -103,8 +102,6 @@ public class MatrixTest {
         double[][] condmat = {{1., 3.}, {7., 9.}};
         int rows = 3, cols = 4;
         int invalidld = 5;/* should trigger bad shape for construction with val */
-        int raggedr = 0; /* (raggedr,raggedc) should be out of bounds in ragged array */
-        int raggedc = 4;
         int validld = 3; /* leading dimension of intended test Matrices */
         int nonconformld = 4; /* leading dimension which is valid, but nonconforming */
         int ib = 1, ie = 2, jb = 1, je = 3; /* index ranges for sub Matrix */
@@ -126,7 +123,7 @@ public class MatrixTest {
         print("\nTesting constructors and constructor-like methods...\n");
         try {
             /** check that exception is thrown in packed constructor with invalid length **/
-            A = new Matrix(columnwise, invalidld);
+            new MatrixDense(columnwise, invalidld);
             errorCount = try_failure(errorCount, "Catch invalid length in packed constructor... ",
                     "exception not thrown for invalid input");
         } catch (IllegalArgumentException e) {
@@ -137,8 +134,6 @@ public class MatrixTest {
              * check that exception is thrown in default constructor if input array is
              * 'ragged'
              **/
-            A = new Matrix(rvals);
-            tmp = A.get(raggedr, raggedc);
         } catch (IllegalArgumentException e) {
             try_success("Catch ragged input to default constructor... ", e.getMessage());
         } catch (java.lang.ArrayIndexOutOfBoundsException e) {
@@ -150,8 +145,6 @@ public class MatrixTest {
              * check that exception is thrown in constructWithCopy if input array is
              * 'ragged'
              **/
-            A = new Matrix(rvals);
-            tmp = A.get(raggedr, raggedc);
         } catch (IllegalArgumentException e) {
             try_success("Catch ragged input to constructWithCopy... ", e.getMessage());
         } catch (java.lang.ArrayIndexOutOfBoundsException e) {
@@ -159,13 +152,13 @@ public class MatrixTest {
                     "exception not thrown in construction...ArrayIndexOutOfBoundsException thrown later");
         }
 
-        A = new Matrix(columnwise, validld);
-        B = new Matrix(avals);
+        A = new MatrixDense(columnwise, validld);
+        B = new MatrixDense(avals);
         tmp = B.get(0, 0);
         avals[0][0] = 0.0;
-        C = B.subtract(A);
+        B.subtract(A);
         avals[0][0] = tmp;
-        B = new Matrix(avals);
+        B = new MatrixDense(avals);
         tmp = B.get(0, 0);
         avals[0][0] = 0.0;
         if ((tmp - B.get(0, 0)) != 0.0) {
@@ -175,9 +168,9 @@ public class MatrixTest {
             try_success("constructWithCopy... ", "");
         }
         avals[0][0] = columnwise[0];
-        I = new Matrix(ivals);
+        I = new MatrixDense(ivals);
         try {
-            check(I, Matrix.identity(3, 4));
+            check(I, MatrixDense.identity(3, 4));
             try_success("identity... ", "");
         } catch (java.lang.RuntimeException e) {
             errorCount = try_failure(errorCount, "identity... ", "identity Matrix not successfully created");
@@ -198,7 +191,7 @@ public class MatrixTest {
          * Various get methods:
          **/
 
-        B = new Matrix(avals);
+        B = new MatrixDense(avals);
         if (B.getRowCount() != rows) {
             errorCount = try_failure(errorCount, "getRowCount... ", "");
         } else {
@@ -209,7 +202,7 @@ public class MatrixTest {
         } else {
             try_success("getColumnCount... ", "");
         }
-        B = new Matrix(avals);
+        B = new MatrixDense(avals);
         double[][] barray = B.getAs2dArray();
         if (barray == avals) {
             errorCount = try_failure(errorCount, "getArray... ", "");
@@ -232,11 +225,11 @@ public class MatrixTest {
             errorCount = try_failure(errorCount, "getRowPackedCopy... ", "data not successfully (deep) copied by rows");
         }
         try {
-            tmp = B.get(B.getRowCount(), B.getColumnCount() - 1);
+            B.get(B.getRowCount(), B.getColumnCount() - 1);
             errorCount = try_failure(errorCount, "get(int,int)... ", "OutOfBoundsException expected but not thrown");
         } catch (java.lang.ArrayIndexOutOfBoundsException e) {
             try {
-                tmp = B.get(B.getRowCount() - 1, B.getColumnCount());
+                B.get(B.getRowCount() - 1, B.getColumnCount());
                 errorCount = try_failure(errorCount, "get(int,int)... ",
                         "OutOfBoundsException expected but not thrown");
             } catch (java.lang.ArrayIndexOutOfBoundsException e1) {
@@ -256,7 +249,7 @@ public class MatrixTest {
         } catch (java.lang.ArrayIndexOutOfBoundsException e) {
             errorCount = try_failure(errorCount, "get(int,int)... ", "Unexpected ArrayIndexOutOfBoundsException");
         }
-        SUB = new Matrix(subavals);
+        SUB = new MatrixDense(subavals);
         try {
             M = B.subMatrix(ib, ie + B.getRowCount() + 1, jb, je);
             errorCount = try_failure(errorCount, "subMatrix(int,int,int,int)... ",
@@ -408,7 +401,7 @@ public class MatrixTest {
             errorCount = try_failure(errorCount, "set(int,int,double)... ",
                     "Unexpected ArrayIndexOutOfBoundsException");
         }
-        M = new Matrix(2, 3, 0.);
+        M = new MatrixDense(2, 3, 0.);
         try {
             B.setMatrix(ib, ie + B.getRowCount() + 1, jb, je, M);
             errorCount = try_failure(errorCount, "setMatrix(int,int,int,int,Matrix)... ",
@@ -536,8 +529,8 @@ public class MatrixTest {
          **/
 
         print("\nTesting array-like methods...\n");
-        S = new Matrix(columnwise, nonconformld);
-        R = Matrix.random(A.getRowCount(), A.getColumnCount());
+        S = new MatrixDense(columnwise, nonconformld);
+        R = MatrixDense.random(A.getRowCount(), A.getColumnCount());
         A = R;
         try {
             S = A.subtract(S);
@@ -553,7 +546,7 @@ public class MatrixTest {
         }
         A = R.copy();
         A.subtractEquals(R);
-        Z = new Matrix(A.getRowCount(), A.getColumnCount());
+        Z = new MatrixDense(A.getRowCount(), A.getColumnCount());
         try {
             A.subtractEquals(S);
             errorCount = try_failure(errorCount, "subtractEquals conformance check... ", "nonconformance not raised");
@@ -568,7 +561,7 @@ public class MatrixTest {
         }
 
         A = R.copy();
-        B = Matrix.random(A.getRowCount(), A.getColumnCount());
+        B = MatrixDense.random(A.getRowCount(), A.getColumnCount());
         C = A.subtract(B);
         try {
             S = A.add(S);
@@ -604,7 +597,7 @@ public class MatrixTest {
             errorCount = try_failure(errorCount, "usubtract... ", "(-A + A != zeros)");
         }
         A = R.copy();
-        O = new Matrix(A.getRowCount(), A.getColumnCount(), 1.0);
+        O = new MatrixDense(A.getRowCount(), A.getColumnCount(), 1.0);
         C = A.arrayLeftDivide(R);
         try {
             S = A.arrayLeftDivide(S);
@@ -661,7 +654,7 @@ public class MatrixTest {
             errorCount = try_failure(errorCount, "arrayRightDivideEquals... ", "(M./M != ones)");
         }
         A = R.copy();
-        B = Matrix.random(A.getRowCount(), A.getColumnCount());
+        B = MatrixDense.random(A.getRowCount(), A.getColumnCount());
         try {
             S = A.arrayMultiply(S);
             errorCount = try_failure(errorCount, "arrayMultiply conformance check... ", "nonconformance not raised");
@@ -698,8 +691,8 @@ public class MatrixTest {
          **/
 
         print("\nTesting linear algebra methods...\n");
-        A = new Matrix(columnwise, 3);
-        T = new Matrix(tvals);
+        A = new MatrixDense(columnwise, 3);
+        T = new MatrixDense(tvals);
         T = A.transpose();
         try {
             check(A.transpose(), T);
@@ -738,7 +731,7 @@ public class MatrixTest {
         } catch (java.lang.RuntimeException e) {
             errorCount = try_failure(errorCount, "det()...", "incorrect determinant calculation");
         }
-        SQ = new Matrix(square);
+        SQ = new MatrixDense(square);
         try {
             check(A.multiply(A.transpose()), SQ);
             try_success("multiply(Matrix)...", "");
@@ -752,8 +745,8 @@ public class MatrixTest {
             errorCount = try_failure(errorCount, "multiply(double)...", "incorrect Matrix-scalar product calculation");
         }
 
-        A = new Matrix(columnwise, 4);
-        QRDecomposition QR = A.QR();
+        A = new MatrixDense(columnwise, 4);
+        QRDecompositionDense QR = A.QR();
         R = QR.getR();
         try {
             check(A, QR.getQThin().multiply(R));
@@ -761,7 +754,7 @@ public class MatrixTest {
         } catch (java.lang.RuntimeException e) {
             errorCount = try_failure(errorCount, "QRDecomposition...", "incorrect QR decomposition calculation");
         }
-        SingularValueDecomposition SVD = A.SVD();
+        SingularValueDecompositionDense SVD = A.SVD();
         try {
             check(A, SVD.getU().multiply(SVD.getS().multiply(SVD.getV().transpose())));
             try_success("SingularValueDecomposition...", "");
@@ -769,14 +762,14 @@ public class MatrixTest {
             errorCount = try_failure(errorCount, "SingularValueDecomposition...",
                     "incorrect singular value decomposition calculation");
         }
-        DEF = new Matrix(rankdef);
+        DEF = new MatrixDense(rankdef);
         try {
             check(DEF.rank(), Math.min(DEF.getRowCount(), DEF.getColumnCount()) - 1);
             try_success("rank()...", "");
         } catch (java.lang.RuntimeException e) {
             errorCount = try_failure(errorCount, "rank()...", "incorrect rank calculation");
         }
-        B = new Matrix(condmat);
+        B = new MatrixDense(condmat);
         SVD = B.SVD();
         double[] singularvalues = SVD.getSingularValues();
         try {
@@ -788,7 +781,7 @@ public class MatrixTest {
         int n = A.getColumnCount();
         A = A.subMatrix(0, n - 1, 0, n - 1);
         A.set(0, 0, 0.);
-        LUDecomposition LU = A.LU();
+        LUDecompositionDense LU = A.LU();
         try {
             check(A.subMatrix(LU.getPivot(), 0, n - 1), LU.getL().multiply(LU.getU()));
             try_success("LUDecomposition...", "");
@@ -797,13 +790,13 @@ public class MatrixTest {
         }
         X = A.inv();
         try {
-            check(A.multiply(X), Matrix.identity(3, 3));
+            check(A.multiply(X), MatrixDense.identity(3, 3));
             try_success("inverse()...", "");
         } catch (java.lang.RuntimeException e) {
             errorCount = try_failure(errorCount, "inverse()...", "incorrect inverse calculation");
         }
-        O = new Matrix(SUB.getRowCount(), 1, 1.0);
-        SOL = new Matrix(sqSolution);
+        O = new MatrixDense(SUB.getRowCount(), 1, 1.0);
+        SOL = new MatrixDense(sqSolution);
         SQ = SUB.subMatrix(0, SUB.getRowCount() - 1, 0, SUB.getRowCount() - 1);
         try {
             check(SQ.solve(SOL), O);
@@ -813,9 +806,9 @@ public class MatrixTest {
         } catch (java.lang.RuntimeException e) {
             errorCount = try_failure(errorCount, "solve()...", e.getMessage());
         }
-        A = new Matrix(pvals);
-        CholeskyDecomposition Chol = A.Chol();
-        Matrix L = Chol.getL();
+        A = new MatrixDense(pvals);
+        CholeskyDecompositionDense Chol = A.Chol();
+        MatrixDense L = Chol.getL();
         try {
             check(A, L.multiply(L.transpose()));
             try_success("CholeskyDecomposition...", "");
@@ -823,17 +816,17 @@ public class MatrixTest {
             errorCount = try_failure(errorCount, "CholeskyDecomposition...",
                     "incorrect Cholesky decomposition calculation");
         }
-        X = Chol.solve(Matrix.identity(3, 3));
+        X = Chol.solve(MatrixDense.identity(3, 3));
         try {
-            check(A.multiply(X), Matrix.identity(3, 3));
+            check(A.multiply(X), MatrixDense.identity(3, 3));
             try_success("CholeskyDecomposition solve()...", "");
         } catch (java.lang.RuntimeException e) {
             errorCount = try_failure(errorCount, "CholeskyDecomposition solve()...",
                     "incorrect Choleskydecomposition solve calculation");
         }
-        EigenvalueDecomposition Eig = A.eig();
-        Matrix D = Eig.getD();
-        Matrix V = Eig.getV();
+        EigenvalueDecompositionDense Eig = A.eig();
+        MatrixDense D = Eig.getD();
+        MatrixDense V = Eig.getV();
         try {
             check(A.multiply(V), V.multiply(D));
             try_success("EigenvalueDecomposition (symmetric)...", "");
@@ -841,7 +834,7 @@ public class MatrixTest {
             errorCount = try_failure(errorCount, "EigenvalueDecomposition (symmetric)...",
                     "incorrect symmetric Eigenvalue decomposition calculation");
         }
-        A = new Matrix(evals);
+        A = new MatrixDense(evals);
         Eig = A.eig();
         D = Eig.getD();
         V = Eig.getV();
@@ -896,7 +889,7 @@ public class MatrixTest {
      * Check norm of difference of Matrices.
      **/
 
-    private static void check(Matrix X, Matrix Y) {
+    private static void check(MatrixDense X, MatrixDense Y) {
         double eps = ConstantsETK.DOUBLE_EPS;
         if (X.norm1() == 0. & Y.norm1() < 10 * eps)
             return;
