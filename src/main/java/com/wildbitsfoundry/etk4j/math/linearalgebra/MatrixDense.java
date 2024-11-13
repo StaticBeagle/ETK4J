@@ -923,17 +923,18 @@ public class MatrixDense extends Matrix {
      * @return The solution to {@code Ax = b}
      */
     public MatrixDense solve(MatrixDense b) {
-
         if (rows == cols) { // Matrix is Squared
             return new LUDecompositionDense(this).solve(b);
         } else if (rows > cols) { // Matrix is thin (Overdetermined system)
             return new QRDecompositionDense(this).solve(b);
         } else { // Matrix is short and wide (Under-determined system)
-            QRDecompositionDense qr = this.transpose().QR();
-            MatrixDense R1 = forwardSubstitutionSolve(qr.getRT(), b);
-            R1.appendRows(cols - R1.rows);
-            return qr.QmultiplyX(R1);
+            return this.pinv().multiply(b);
         }
+    }
+
+    // TODO document and write test
+    public MatrixDense solve(double[] b) {
+        return solve(new MatrixDense(b, b.length));
     }
 
     /**

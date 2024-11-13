@@ -1,27 +1,22 @@
 package com.wildbitsfoundry.etk4j.math.interpolation;
 
-import com.wildbitsfoundry.etk4j.math.linearalgebra.LUDecomposition;
+import com.wildbitsfoundry.etk4j.math.linearalgebra.GaussianElimination;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.LUDecompositionDense;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.MatrixDense;
 import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
+
+import static com.wildbitsfoundry.etk4j.math.linearalgebra.Matrices.solveLDLtTridiagonalSystem;
+import static com.wildbitsfoundry.etk4j.math.linearalgebra.Matrices.solveLDUTridiagonalSystem;
 
 public class QuadraticSpline extends Spline {
 
     private static final double P5 = 0.5, P33 = 1.0 / 3.0;
 
-    protected QuadraticSpline(double[] x, double[] y, double[] coefficients) {
+    protected QuadraticSpline(double[] x, double[] coefficients) {
         super(x, 3);
-        final int n = this.x.length;
-        // compute coefficients
-        this.coefficients = new double[(n - 1) * 3];
-        for (int i = 0, j = 0; i < n - 1; ++i, ++j) {
-            this.coefficients[j] = coefficients[i + n - 1];
-            this.coefficients[++j] = coefficients[i];
-            this.coefficients[++j] = y[i];
-        }
+        this.coefficients = coefficients;
     }
 
     public static QuadraticSpline newNaturalSpline(double[] x, double[] y) {
@@ -48,17 +43,18 @@ public class QuadraticSpline extends Spline {
             A.set(j + n - 1, j + n - 1, 2 * hx);
         }
 
-        A.set(2 * n - 4, n - 1, 1); // c_0 = 0
-        A.set(2 * n - 3, 2 * n - 3, 1); // c_n-1 = 0
+        A.set(2 * n - 4, n - 1, 1); // c[0] = 0
+        A.set(2 * n - 3, 2 * n - 3, 1); // c[n - 1] = 0
 
-        LUDecompositionDense LU = new LUDecompositionDense(A);
-        if(LU.isSingular()) {
-            // Apply a little regularization factor if the x vectors is evenly spaced to help with singularity
-            A.addEquals(MatrixDense.identity(A.getRowCount(), A.getColumnCount()).multiply(1e-10));
-            LU = new LUDecompositionDense(A);
+        double[] solution = GaussianElimination.solve(A, b);
+        // compute coefficients
+        double[] coefficients = new double[(n - 1) * 3];
+        for (int i = 0, j = 0; i < n - 1; ++i, ++j) {
+            coefficients[j] = solution[i + n - 1];
+            coefficients[++j] = solution[i];
+            coefficients[++j] = y[i];
         }
-        double[] coefficients = LU.solve(b).getArray();
-        return new QuadraticSpline(x, y, coefficients);
+        return new QuadraticSpline(x, coefficients);
     }
 
     public static QuadraticSpline newClampedSpline(double[] x, double[] y, double m0, double mn) {
@@ -92,14 +88,15 @@ public class QuadraticSpline extends Spline {
         A.set(2 * n - 3, 2 * n - 3, 2 * (x[n - 1] - x[n - 2]));
         b[2 * n - 3] = mn; // derivative at the end
 
-        LUDecompositionDense LU = new LUDecompositionDense(A);
-        if(LU.isSingular()) {
-            // Apply a little regularization factor if the x vectors is evenly spaced to help with singularity
-            A.addEquals(MatrixDense.identity(A.getRowCount(), A.getColumnCount()).multiply(1e-10));
-            LU = new LUDecompositionDense(A);
+        double[] solution = GaussianElimination.solve(A, b);
+        // compute coefficients
+        double[] coefficients = new double[(n - 1) * 3];
+        for (int i = 0, j = 0; i < n - 1; ++i, ++j) {
+            coefficients[j] = solution[i + n - 1];
+            coefficients[++j] = solution[i];
+            coefficients[++j] = y[i];
         }
-        double[] coefficients = LU.solve(b).getArray();
-        return new QuadraticSpline(x, y, coefficients);
+        return new QuadraticSpline(x, coefficients);
     }
 
     @Override
@@ -140,5 +137,46 @@ public class QuadraticSpline extends Spline {
         sb.setLength(Math.max(sb.length() - System.lineSeparator().length(), 0));
         return sb.toString().replace("+ -", "- ").replace("- -", "+ ")
                 .replace("=  + ", "= ").replace("=  - ", "= -");
+    }
+
+    public static void main(String[] args) {
+        double[] x = {0.0, 10.0, 15.0, 20.0, 22.5, 30.0};
+        double[] y = {0.0, 227.04, 362.78, 517.35, 602.97, 901.67};
+//        double[] x = {0, 1, 2, 3};
+//        double[] y = {1, Math.exp(1), Math.exp(2), Math.exp(3)};
+//        double[] x = {0, 1, 2, 3, 4};
+//        double[] y = {1, 2, 0, 2, 1};
+
+//        QuadraticSpline qs2 = QuadraticSpline.newNaturalSpline(x, y);
+//
+//        System.out.println(qs2.evaluateAt(3));
+//
+//        CubicSpline cs = CubicSpline.newNaturalSpline(x, y);
+//
+//        System.out.println(cs.evaluateAt(3));
+
+        QuadraticSpline qs3 = QuadraticSpline.newClampedSpline(x, y, 1, Math.exp(3));
+
+        System.out.println(qs3.evaluateAt(3));
+
+        System.out.println(qs3);
+
+
+//        CubicSpline cs3 = CubicSpline.newClampedSpline(x, y, 1, Math.exp(3));
+//
+//        System.out.println(cs3.evaluateAt(3));
+
+//        QuadraticSpline qs3 = QuadraticSpline.newNaturalSpline(x, y);
+//
+//        System.out.println(qs3.evaluateAt(3));
+//
+//        System.out.println(qs3);
+//
+//        QuadraticSpline qs4 = QuadraticSpline.newMeowMix2(x, y);
+//
+//        System.out.println(qs4.evaluateAt(3));
+//
+//        System.out.println(qs4);
+
     }
 }
