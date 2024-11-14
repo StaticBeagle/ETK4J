@@ -1,14 +1,9 @@
 package com.wildbitsfoundry.etk4j.math.interpolation;
 
 import com.wildbitsfoundry.etk4j.math.linearalgebra.GaussianElimination;
-import com.wildbitsfoundry.etk4j.math.linearalgebra.LUDecompositionDense;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.MatrixDense;
-import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 
 import java.util.Arrays;
-
-import static com.wildbitsfoundry.etk4j.math.linearalgebra.Matrices.solveLDLtTridiagonalSystem;
-import static com.wildbitsfoundry.etk4j.math.linearalgebra.Matrices.solveLDUTridiagonalSystem;
 
 public class QuadraticSpline extends Spline {
 
@@ -137,46 +132,5 @@ public class QuadraticSpline extends Spline {
         sb.setLength(Math.max(sb.length() - System.lineSeparator().length(), 0));
         return sb.toString().replace("+ -", "- ").replace("- -", "+ ")
                 .replace("=  + ", "= ").replace("=  - ", "= -");
-    }
-
-    public static void main(String[] args) {
-        double[] x = {0.0, 10.0, 15.0, 20.0, 22.5, 30.0};
-        double[] y = {0.0, 227.04, 362.78, 517.35, 602.97, 901.67};
-//        double[] x = {0, 1, 2, 3};
-//        double[] y = {1, Math.exp(1), Math.exp(2), Math.exp(3)};
-//        double[] x = {0, 1, 2, 3, 4};
-//        double[] y = {1, 2, 0, 2, 1};
-
-//        QuadraticSpline qs2 = QuadraticSpline.newNaturalSpline(x, y);
-//
-//        System.out.println(qs2.evaluateAt(3));
-//
-//        CubicSpline cs = CubicSpline.newNaturalSpline(x, y);
-//
-//        System.out.println(cs.evaluateAt(3));
-
-        QuadraticSpline qs3 = QuadraticSpline.newClampedSpline(x, y, 1, Math.exp(3));
-
-        System.out.println(qs3.evaluateAt(3));
-
-        System.out.println(qs3);
-
-
-//        CubicSpline cs3 = CubicSpline.newClampedSpline(x, y, 1, Math.exp(3));
-//
-//        System.out.println(cs3.evaluateAt(3));
-
-//        QuadraticSpline qs3 = QuadraticSpline.newNaturalSpline(x, y);
-//
-//        System.out.println(qs3.evaluateAt(3));
-//
-//        System.out.println(qs3);
-//
-//        QuadraticSpline qs4 = QuadraticSpline.newMeowMix2(x, y);
-//
-//        System.out.println(qs4.evaluateAt(3));
-//
-//        System.out.println(qs4);
-
     }
 }
