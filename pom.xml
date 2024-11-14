@@ -24,8 +24,7 @@
         <developerConnection>
             scm:git:git@github.com:StaticBeagle/ETK4J.git
         </developerConnection>
-      <tag>v2.0.0</tag>
-  </scm>
+    </scm>
 
     <dependencies>
         <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine -->
