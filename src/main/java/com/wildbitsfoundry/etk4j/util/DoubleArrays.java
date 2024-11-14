@@ -204,7 +204,6 @@ public final class DoubleArrays {
      * Add an array and a scalar element wise in place. The result of the addition is stored in array a.
      * @param a The array to multiply.
      * @param b The scalar.
-     * @return {@code a + b}.
      */
     public static void addElementWiseInPlace(double[] a, double b) {
         for (int i = 0; i < a.length; ++i) {
@@ -216,7 +215,6 @@ public final class DoubleArrays {
      * Add two arrays element wise in place. The result of the addition is stored in array a.
      * @param a The left-hand array.
      * @param b The right-hand array.
-     * @return {@code a + b}.
      */
     public static void addElementWiseInPlace(double[] a, double[] b) {
         if (a.length != b.length) {
@@ -244,7 +242,6 @@ public final class DoubleArrays {
      * Multiply two and array a scalar element wise in place. The result of the multiplication is stored in array a.
      * @param a The array to multiply.
      * @param d The scalar to multiply.
-     * @return {@code a * b}.
      */
     public static void multiplyElementWiseInPlace(double[] a, double d) {
         final int length = a.length;
@@ -269,7 +266,6 @@ public final class DoubleArrays {
      * Multiply two arrays element wise in place. The result of the multiplication is stored in array a.
      * @param a The left-hand array.
      * @param b The right-hand array.
-     * @return {@code a * b}.
      */
     public static void multiplyElementWiseInPlace(double[] a, double[] b) {
         if (a.length != b.length) {
@@ -297,7 +293,6 @@ public final class DoubleArrays {
      * Array division element wise in place. The result of the division is stored in array a.
      * @param a The left-hand array.
      * @param b The right-hand array.
-     * @return {@code a / b}.
      */
     public static void divideElementWiseInPlace(double[] a, double[] b) {
         if (a.length != b.length) {
@@ -591,7 +586,7 @@ public final class DoubleArrays {
     /**
      * Is array ascending.
      * @param a The input array.
-     * @return {@cde true} if all the elements in the array are sorted in ascending order, {@code false} otherwise.
+     * @return {@code true} if all the elements in the array are sorted in ascending order, {@code false} otherwise.
      */
     public static boolean isAscending(double[] a) {
         final int n = a.length;

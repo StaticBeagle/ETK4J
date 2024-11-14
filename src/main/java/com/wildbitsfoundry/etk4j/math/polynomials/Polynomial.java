@@ -19,7 +19,7 @@ import java.util.List;
 import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkXYDimensions;
 
 /**
- * The {@code Polynomial} class represents a polynomial {@code P(x) = c<sub>0</sub>x<sup>n</sup> +
+ * The {@link Polynomial} class represents a polynomial {@code P(x) = c<sub>0</sub>x<sup>n</sup> +
  * c<sub>1</sub>x<sup>n - 1</sup> + ... + c<sub>n</sub>x<sup>0</sup>}.
  */
 public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction, DifferentiableFunction,
@@ -516,7 +516,7 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
     }
 
     /**
-     * Indefinite integral of the {@code Polynomial}.
+     * Indefinite integral of the {@link Polynomial}.
      * This method is equivalent to calling {@link #integral()} with integration constant equal to 0.
      *
      * @return The indefinite integral of the polynomial.
@@ -526,7 +526,7 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
     }
 
     /**
-     * Indefinite integral of the {@Polynomial}.
+     * Indefinite integral of the {@link Polynomial}.
      *
      * @param constant The integration constant.
      * @return The indefinite integral of the polynomial.
@@ -542,7 +542,7 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
     }
 
     /**
-     * Definite integral of the {@code Polynomial}.
+     * Definite integral of the {@link Polynomial}.
      *
      * @param a The lower bound of the integration.
      * @param b The upper bound of the integration.
@@ -555,7 +555,7 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
     }
 
     /**
-     * Differentiate {@code Polynomial}.
+     * Differentiate {@link Polynomial}.
      *
      * @param x The argument at which to evaluate the derivative of the polynomial.
      * @return The derivative of the polynomial evaluate at {@code x}.
@@ -572,35 +572,35 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
     }
 
     /**
-     * Evaluate a {@Polynomial} from its coefficients.
+     * Evaluate a {@link Polynomial} from its coefficients.
      *
      * @param coefficients The coefficients of the polynomial to evaluate.
      * @param x            The argument at which to evaluate the polynomial.
-     * @returnThe The value of the polynomial at {@code x}.
+     * @return The value of the polynomial at  x.
      */
-    public static double polyval(double[] coefficients, double x) {
+    public static double polyVal(double[] coefficients, double x) {
         return DoubleArrays.horner(coefficients, x);
     }
 
     /**
-     * Evaluate a {@Polynomial} from its coefficients.
+     * Evaluate a {@link Polynomial} from its coefficients.
      *
      * @param coefficients The coefficients of the polynomial to evaluate.
      * @param x            The array of argument at which to evaluate the polynomial.
-     * @returnThe The values of the polynomial at {@code x}.
+     * @return The values of the polynomial at x.
      */
-    public static double[] polyval(double[] coefficients, double[] x) {
+    public static double[] polyVal(double[] coefficients, double[] x) {
         final int length = x.length;
         double[] result = new double[length];
         for (int i = 0; i < length; ++i) {
-            result[i] = polyval(coefficients, x[i]);
+            result[i] = polyVal(coefficients, x[i]);
 
         }
         return result;
     }
 
     /**
-     * Evaluate a {@code Polynomial}.
+     * Evaluate a {@link Polynomial}.
      *
      * @param roots The roots of teh polynomial.
      * @param x     Argument at which to evaluate the polynomial.

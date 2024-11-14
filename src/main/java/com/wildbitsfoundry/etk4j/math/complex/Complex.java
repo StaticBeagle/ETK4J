@@ -116,7 +116,6 @@ public class Complex implements Comparable<Complex> {
     /**
      * Compare complex numbers lexicographically.
      * Real parts get compared first and if they are equal then the imaginary parts are compared.
-     * @see java.lang.Comparable(java.lang.Object)
      */
     @Override
     public int compareTo(Complex obj) {
@@ -213,8 +212,6 @@ public class Complex implements Comparable<Complex> {
 
     /**
      * Inverse of the complex number in place.
-     *
-     * @return {@code Complex a = 1 / a. No new object is created.
      */
     public void invertEquals() {
         invertOp(this);
@@ -269,7 +266,7 @@ public class Complex implements Comparable<Complex> {
 
     /**
      * Addition in place. <br>
-     * Performs the equivalent of {@ code Complex a += d}.
+     * Performs the equivalent of {@code Complex a += d}.
      *
      * @param d The real number to add.
      */

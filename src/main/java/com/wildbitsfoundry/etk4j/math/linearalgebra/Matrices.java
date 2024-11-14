@@ -5,7 +5,7 @@ public final class Matrices {
     }
 
     /**
-     * Solve an {@code LDU Tri-diagonal system. A Tri-diagonal system is a matrix that only has entries
+     * Solve an {@code} LDU Tri-diagonal system. A Tri-diagonal system is a matrix that only has entries
      * in its sub-diagonal, its diagonal, and its super-diagonal e.g:
      * <pre>
      *     1 1 0
@@ -16,7 +16,6 @@ public final class Matrices {
      * @param diagonal The diagonal.
      * @param upper The super-diagonal.
      * @param b The solution vector.
-     * @return The solution to {@code LDUX = b}
      */
     public static void solveLDUTridiagonalSystem(double[] lower, double[] diagonal, double[] upper, double[] b) {
         final int m = b.length;
@@ -44,7 +43,6 @@ public final class Matrices {
      * @param lower The sub-diagonal.
      * @param diagonal The diagonal.
      * @param b The solution vector.
-     * @return The solution to {@code LDL<sup>T</sup>X = b}
      */
     public static void solveLDLtTridiagonalSystem(double[] lower, double[] diagonal, double[] b) {
         final int length = diagonal.length;

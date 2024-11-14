@@ -9,7 +9,7 @@ public final class Extrapolators {
 	}
 
 	/**
-	 * The {@ClampToEndPointExtrapolator} class clamps the value of the extrapolation to the values prescribed by
+	 * The {@code ClampToEndPointExtrapolator} class clamps the value of the extrapolation to the values prescribed by
 	 * {@code y0 and yn}.
 	 */
 	public static class ClampToEndPointExtrapolator implements Extrapolator {
@@ -26,7 +26,7 @@ public final class Extrapolators {
 		/**
 		 * Extrapolation.
 		 * @param x Argument at which to evaluate the extrapolation.
-		 * @return {@code y0} if {@code x < x0} and {@yn} if {@code x > xn}.
+		 * @return y0 if x &lt; x0 and yn if x &gt; xn.
 		 */
 		@Override
 		public double extrapolate(double x) {
@@ -40,7 +40,7 @@ public final class Extrapolators {
 	}
 
 	/**
-	 * The {@ClampToValueExtrapolator} class clamps the value of the extrapolation to a prescribed value.
+	 * The {@code ClampToValueExtrapolator} class clamps the value of the extrapolation to a prescribed value.
 	 */
 	public static class ClampToValueExtrapolator implements Extrapolator {
 
@@ -63,7 +63,7 @@ public final class Extrapolators {
 	}
 
 	/**
-	 * The {@ClampToNaNExtrapolator} class returns NaN as the result of the extrapolation.
+	 * The {@code ClampToNaNExtrapolator} class returns NaN as the result of the extrapolation.
 	 */
 	public static class ClampToNaNExtrapolator extends ClampToValueExtrapolator {
 
@@ -73,7 +73,7 @@ public final class Extrapolators {
 	}
 
 	/**
-	 * The {@ClampToNaNExtrapolator} class returns zero as the result of the extrapolation.
+	 * The {@code ClampToNaNExtrapolator} class returns zero as the result of the extrapolation.
 	 */
 	public static class ClampToZeroExtrapolator extends ClampToValueExtrapolator {
 
@@ -83,8 +83,8 @@ public final class Extrapolators {
 	}
 
 	/**
-	 * The {@LinearExtrapolator} class constructs a line {@code y = m * (x - xi) + yi} where {@code m} is calculated by
-	 * differentiating the {@link DifferentiableFunction}. {@(xi, yi)} are the left-hand side coordinates if x is
+	 * The {@code LinearExtrapolator} class constructs a line {@code y = m * (x - xi) + yi} where {@code m} is calculated by
+	 * differentiating the {@link DifferentiableFunction}. {@code (xi, yi)} are the left-hand side coordinates if x is
 	 * less than the minimum value for extrapolation or the right-hand side values otherwise.
 	 */
 	public static class LinearExtrapolator implements Extrapolator {

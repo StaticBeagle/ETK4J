@@ -169,7 +169,7 @@ public final class Integrals {
      * @param b The upper limit of the integral.
      * @param absTol The absolute tolerance.
      * @param relTol The relative tolerance.
-     * @param
+     * @param maxEval The maximum number of evaluations.
      * @return The approximate definite integral of {@code func} from a to b.
      */
     public static double qadrat(UnivariateFunction func, double a, double b,

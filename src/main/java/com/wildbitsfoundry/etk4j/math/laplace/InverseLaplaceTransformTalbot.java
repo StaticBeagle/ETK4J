@@ -14,7 +14,7 @@ import com.wildbitsfoundry.etk4j.util.ComplexArrays;
  *     (https://www.mathworks.com/matlabcentral/fileexchange/39035-numerical-inverse-laplace-transform),
  *     MATLAB Central File Exchange. Retrieved February 16, 2022.
  * </pre>
- * @see <a href="http://www.columbia.edu/~ww2040/UnifiedDraft.pdf pages">Unified Framework pages 17-18</a>
+ * See <a href="http://www.columbia.edu/~ww2040/UnifiedDraft.pdf">Unified Framework pages 17-18</a>
  */
 public class InverseLaplaceTransformTalbot {
 

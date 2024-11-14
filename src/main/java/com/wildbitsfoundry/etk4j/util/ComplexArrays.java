@@ -266,7 +266,6 @@ public final class ComplexArrays {
      * the input array a.
      * @param a The input array.
      * @param d The real value to multiply.
-     * @return {@code a * b}
      */
     public static void multiplyElementWiseInPlace(Complex[] a, double d) {
         for (int i = 0; i < a.length; ++i) {

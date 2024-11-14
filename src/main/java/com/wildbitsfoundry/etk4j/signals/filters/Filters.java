@@ -10,7 +10,7 @@ import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 import java.util.Arrays;
 
 /**
- * The {@Filters} class is a utility class providing static methods for {@link AnalogFilter}.
+ * The {@code Filters} class is a utility class providing static methods for {@link AnalogFilter}.
  */
 public final class Filters {
     private Filters() {

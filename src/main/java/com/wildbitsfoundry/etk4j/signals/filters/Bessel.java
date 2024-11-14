@@ -389,19 +389,19 @@ public class Bessel extends AnalogFilter {
             return new Complex[]{Complex.fromReal(-1.0)};
         }
 
-        double s = Polynomial.polyval(new double[]{1, -3, 0, 2, 0, 0}, n);
-        double b3 = Polynomial.polyval(new double[]{-8, 16}, n) / s;
-        double b2 = Polynomial.polyval(new double[]{12, -12, -24}, n) / s;
-        double b1 = Polynomial.polyval(new double[]{-2, -12, 24, 8}, n) / s;
-        double b0 = Polynomial.polyval(new double[]{-1, 5, 0, -6, 0}, n) / s;
+        double s = Polynomial.polyVal(new double[]{1, -3, 0, 2, 0, 0}, n);
+        double b3 = Polynomial.polyVal(new double[]{-8, 16}, n) / s;
+        double b2 = Polynomial.polyVal(new double[]{12, -12, -24}, n) / s;
+        double b1 = Polynomial.polyVal(new double[]{-2, -12, 24, 8}, n) / s;
+        double b0 = Polynomial.polyVal(new double[]{-1, 5, 0, -6, 0}, n) / s;
 
-        double r = Polynomial.polyval(new double[]{1, 2, 0, 0}, n);
-        double a1 = Polynomial.polyval(new double[]{-6, -6}, n) / r;
+        double r = Polynomial.polyVal(new double[]{1, 2, 0, 0}, n);
+        double a1 = Polynomial.polyVal(new double[]{-6, -6}, n) / r;
         double a2 = 6 / r;
 
         double[] k = DoubleArrays.linSteps(1, n);
-        double[] x = Polynomial.polyval(new double[]{a2, a1, 0}, k);
-        double[] y = Polynomial.polyval(new double[]{b3, b2, b1, b0}, k);
+        double[] x = Polynomial.polyVal(new double[]{a2, a1, 0}, k);
+        double[] y = Polynomial.polyVal(new double[]{b3, b2, b1, b0}, k);
         return ComplexArrays.zip(x, y);
     }
 

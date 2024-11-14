@@ -17,7 +17,7 @@ public class Elliptic extends AnalogFilter {
      * Elliptic analog low pass filter prototype.
      * <br>
      * References: <pre>
-     *     H. J. Orchard and A. N. Willson Jr., “Elliptic functions for filter design,”
+     *     H. J. Orchard and A. N. Willson Jr., Elliptic functions for filter design,
      *     IEEE Trans. Circuits Syst., vol. 44, pp. 273–287, 1997
      * </pre>
      * @param n The order of the filter.

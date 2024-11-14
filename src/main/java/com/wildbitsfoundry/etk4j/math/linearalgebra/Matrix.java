@@ -59,8 +59,8 @@ public abstract class Matrix {
     /**
      * Set the value of the {@code Matrix} at a given position.
      *
-     * @param i   The row index.
-     * @param j   The column index.
+     * @param row   The row index.
+     * @param col   The column index.
      * @param val The value used to set {@code A(i, j) = val}.
      */
     public abstract void set(int row, int col, double val);
@@ -68,8 +68,8 @@ public abstract class Matrix {
     /**
      * Set the value of the {@code Matrix} at a given position without any boundary checks.
      *
-     * @param i   The row index.
-     * @param j   The column index.
+     * @param row   The row index.
+     * @param col   The column index.
      * @param val The value used to set {@code A(i, j) = val}.
      */
     public abstract void unsafeSet(int row, int col, double val);

@@ -191,14 +191,14 @@ public class TransferFunction extends LinearTimeInvariantSystem {
     }
 
     /***
-     * Calculates the phase at of the system a given frequency. </br>
+     * Calculates the phase at of the system a given frequency. <br/>
      * This operation uses the zeros and poles of the system to calculate the phase as:
      * <pre>
      * 	&Sigma; Phase(Zeros) - &Sigma; Phase(Poles)
      * </pre>
-     * If you need to calculate the magnitude and phase or just the phase for an array of frequencies,</br>
+     * If you need to calculate the magnitude and phase or just the phase for an array of frequencies,<br/>
      * it might be more efficient to use {@link #evaluateAt(double)}, and then <strong>unwrap</strong> the
-     * phase information</br> using {@link #unwrapPhase(double[])}.
+     * phase information<br/> using {@link #unwrapPhase(double[])}.
      * @param w
      * @return the phase of the system in degrees
      */
@@ -435,7 +435,7 @@ public class TransferFunction extends LinearTimeInvariantSystem {
 
     /**
      * Gain cross over frequency.
-     * @tol The tolerance used to determine the smallest acceptable frequency that can be considered.
+     * @param tol The tolerance used to determine the smallest acceptable frequency that can be considered.
      * @return The first frequency at where the gain (in dB) crosses 0 dB.
      */
     public double calculateGainCrossoverFrequency(double tol) {
@@ -581,7 +581,7 @@ public class TransferFunction extends LinearTimeInvariantSystem {
     }
 
     /**
-     * Proper {@TransferFunction}.
+     * Proper {@link TransferFunction}.
      * @return True if the order of the numerator is less or equal than the order of the denominator.
      */
     public boolean isProper() {

@@ -43,7 +43,7 @@ public class Polynomial2d implements BivariateFunction {
 		vars[1] = y;
 
 		int[] nm = new int[] { n, m };
-		double[] coefs = polyfitN(vars, z, nm);
+		double[] coefs = polyFitN(vars, z, nm);
 		return new Polynomial2d(coefs, n, m);
 	}
 
@@ -75,11 +75,11 @@ public class Polynomial2d implements BivariateFunction {
 		vars[1] = gd.Y;
 
 		int[] nm = new int[] { n, m };
-		double[] coefs = polyfitN(vars, DoubleArrays.flatten(z), nm);
-		return new Polynomial2d(coefs, n, m);
+		double[] coefficients = polyFitN(vars, DoubleArrays.flatten(z), nm);
+		return new Polynomial2d(coefficients, n, m);
 	}
 
-	private static double[] polyfitN(double[][] vars, double[] z, int[] n) {
+	private static double[] polyFitN(double[][] vars, double[] z, int[] n) {
 
 		// int order = (m + 1) * (n + 1); // ... * (nx + 1)
 		int[] degrees = n;
@@ -156,23 +156,6 @@ public class Polynomial2d implements BivariateFunction {
 		return result;
 	}
 
-	/***
-	 * Evaluate a 2D polynomial using Horner's method.
-	 * 
-	 * @param poly
-	 *            Polynomial to be evaluated at the points polyecified by x and y,
-	 *            which must have the same dimensions.
-	 * @param x
-	 *            Arrays of points for the independent variable x
-	 * @param y
-	 *            Arrays of points for the independent variable y
-	 * @param n
-	 *            Order of x
-	 * @param m
-	 *            order of y
-	 * @return Array of values resulting from evaluating poly(x,y) at the points
-	 *         polyecified by x and y
-	 */
 	public double evaluateAt(double x, double y) {
 		double result = _coefs[0];
 		final int n = _n;

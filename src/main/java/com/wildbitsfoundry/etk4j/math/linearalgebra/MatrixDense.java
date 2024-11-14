@@ -301,7 +301,7 @@ public class MatrixDense extends Matrix {
      * @param i1 Final row index
      * @param j0 Initial column index
      * @param j1 Final column index
-     * @param X  {@codeA(i0:i1,j0:j1)}
+     * @param X  A(i0:i1,j0:j1)
      */
     public void setMatrix(int i0, int i1, int j0, int j1, MatrixDense X) {
         if(i0 < 0 || i0 >= rows) {
@@ -742,7 +742,6 @@ public class MatrixDense extends Matrix {
      * Element-by-element multiplication in place, A = A.*B
      *
      * @param B another matrix
-     * @return A.*B
      */
     public void arrayMultiplyEquals(MatrixDense B) {
         checkMatrixDimensions(B);
@@ -919,7 +918,7 @@ public class MatrixDense extends Matrix {
      *     Transpose QR if the matrix is short and wide in other words it has more columns than rows. (Under-determined system)
      * </pre>
      *
-     * @param b The solution {@Matrix}.
+     * @param b The solution {@link Matrix}.
      * @return The solution to {@code Ax = b}
      */
     public MatrixDense solve(MatrixDense b) {
@@ -1014,7 +1013,7 @@ public class MatrixDense extends Matrix {
     }
 
     /**
-     * Eigenvalue decomposition. The {@Matrix} is balanced ({@link MatrixDense#balance()}) prior to the decomposition.
+     * Eigenvalue decomposition. The {@link Matrix} is balanced ({@link MatrixDense#balance()}) prior to the decomposition.
      *
      * @return The {@link EigenvalueDecompositionDense} of the {@code Matrix}.
      */
@@ -1216,9 +1215,9 @@ public class MatrixDense extends Matrix {
     }
 
     /**
-     * Retrieve {@code Matrix} data as 2d array.
+     * Retrieve {@link Matrix} data as 2d array.
      *
-     * @return A 2d array copy of the internal data of the {@Matrix}.
+     * @return A 2d array copy of the internal data of the Matrix.
      */
     public double[][] getAs2dArray() {
         double[][] data = new double[rows][cols];

@@ -6,9 +6,7 @@ import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
 
 /**
  * The {@code InverseLaplaceTransformStehfest} implements the inverse laplace transform using Stehfest's method.
- * @see <a href=https://www.codeproject.com/Articles/25189/Numerical-Laplace-Transforms-and-Inverse-Transform">
- *     Numerical-Laplace-Transforms-and-Inverse-Transform
- *     </a>
+ * See <a href="https://www.codeproject.com/Articles/25189/Numerical-Laplace-Transforms-and-Inverse-Transform">Numerical-Laplace-Transforms-and-Inverse-Transform</a>
  */
 public class InverseLaplaceTransformStehfest {
     private final double[] V;       //  Stehfest coefficients
