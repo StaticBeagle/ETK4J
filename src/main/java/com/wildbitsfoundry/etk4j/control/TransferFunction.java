@@ -191,14 +191,14 @@ public class TransferFunction extends LinearTimeInvariantSystem {
     }
 
     /***
-     * Calculates the phase at of the system a given frequency. <br/>
+     * Calculates the phase at of the system a given frequency. <br>
      * This operation uses the zeros and poles of the system to calculate the phase as:
      * <pre>
      * 	&Sigma; Phase(Zeros) - &Sigma; Phase(Poles)
      * </pre>
-     * If you need to calculate the magnitude and phase or just the phase for an array of frequencies,<br/>
+     * If you need to calculate the magnitude and phase or just the phase for an array of frequencies,<br>
      * it might be more efficient to use {@link #evaluateAt(double)}, and then <strong>unwrap</strong> the
-     * phase information<br/> using {@link #unwrapPhase(double[])}.
+     * phase information<br> using {@link #unwrapPhase(double[])}.
      * @param w
      * @return the phase of the system in degrees
      */
