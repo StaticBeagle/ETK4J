@@ -34,11 +34,11 @@ public class Spline2d implements BivariateFunction {
      *
      * {@code x = [1, 2, 3, 4]}, {@code y = [1, 2, 3, 4]}, <br>and {@code z(x, y) = x<sup>2</sup> * y<sup>2</sup>}. <br>
      *          This means that the first row of {@code z} will be all the values obtained by fixing {@code x = 1} and
-     *          iterating over all the values of {@code y}. <br />
-     *          {@code z[0] = [z(1, 1), z(1, 2), z(1, 3), z(1, 4)}; <br />
-     *          Similarly: <br />
-     *          {@code z[1] = [z(2, 1), z(2, 2), z(2, 3), z(2, 4)}; <br />
-     *          and so on. <br />
+     *          iterating over all the values of {@code y}. <br>
+     *          {@code z[0] = [z(1, 1), z(1, 2), z(1, 3), z(1, 4)}; <br>
+     *          Similarly: <br>
+     *          {@code z[1] = [z(2, 1), z(2, 2), z(2, 3), z(2, 4)}; <br>
+     *          and so on. <br>
      *          Even though internally we iterate over {@code x} and {@code y} multiple times, only a single copy of
      *          each {@code (x, y)} is required while. Please refer to the example in {@link examples.Spline2dExample}.
      *
@@ -81,11 +81,11 @@ public class Spline2d implements BivariateFunction {
      *
      * {@code x = [1, 2, 3, 4]}, {@code y = [1, 2, 3, 4]}, <br>and {@code z(x, y) = x<sup>2</sup> * y<sup>2</sup>}. <br>
      *          This means that the first row of {@code z} will be all the values obtained by fixing {@code x = 1} and
-     *          iterating over all the values of {@code y}. <br />
-     *          {@code z[0] = [z(1, 1), z(1, 2), z(1, 3), z(1, 4)}; <br />
-     *          Similarly: <br />
-     *          {@code z[1] = [z(2, 1), z(2, 2), z(2, 3), z(2, 4)}; <br />
-     *          and so on. <br />
+     *          iterating over all the values of {@code y}. <br>
+     *          {@code z[0] = [z(1, 1), z(1, 2), z(1, 3), z(1, 4)}; <br>
+     *          Similarly: <br>
+     *          {@code z[1] = [z(2, 1), z(2, 2), z(2, 3), z(2, 4)}; <br>
+     *          and so on. <br>
      *          Even though internally we iterate over {@code x} and {@code y} multiple times, only a single copy of
      *          each {@code (x, y)} is required while. Please refer to the example in {@link examples.Spline2dExample}.
      *
