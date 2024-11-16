@@ -25,6 +25,7 @@ public class DGrowArray {
      * Changes the array's length and doesn't attempt to preserve previous values if a new array is required
      *
      * @param length New array length
+     * @return The reshaped array with new length
      */
     public DGrowArray reshape(int length) {
         if (data.length < length) {

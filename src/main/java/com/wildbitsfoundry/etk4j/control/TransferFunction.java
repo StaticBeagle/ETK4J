@@ -131,8 +131,8 @@ public class TransferFunction extends LinearTimeInvariantSystem {
      * However, this method pads the resulting array with zeros if the degree of the denominator is greater than the degree
      * of the numerator e.g.
      * <pre>
-     *     numerator: x + 1             -> [0, 1, 1];<br>
-     *     denominator: x^2 + 2 * x + 1 -> [1, 2, 1];
+     *     numerator: x + 1             -&gt; [0, 1, 1];<br>
+     *     denominator: x^2 + 2 * x + 1 -&gt; [1, 2, 1];
      * </pre>
      */
     public double[] getNumeratorCoefficients() {
@@ -163,8 +163,8 @@ public class TransferFunction extends LinearTimeInvariantSystem {
      * However, this method pads the resulting array with zeros if the degree of the numerator is greater than the degree
      * of the denominator e.g.
      * <pre>
-     *     numerator: x^2 + 2 * x + 1 -> [1, 2, 1];<br>
-     *     denominator: x + 1         -> [0, 1, 1];
+     *     numerator: x^2 + 2 * x + 1 -&gt; [1, 2, 1];<br>
+     *     denominator: x + 1         -&gt; [0, 1, 1];
      * </pre>
      */
     public double[] getDenominatorCoefficients() {
@@ -199,7 +199,7 @@ public class TransferFunction extends LinearTimeInvariantSystem {
      * If you need to calculate the magnitude and phase or just the phase for an array of frequencies,<br>
      * it might be more efficient to use {@link #evaluateAt(double)}, and then <strong>unwrap</strong> the
      * phase information<br> using {@link #unwrapPhase(double[])}.
-     * @param w
+     * @param w The frequency at which to calculate the phase
      * @return the phase of the system in degrees
      */
     public double calculateUnwrappedPhaseInDegreesAt(double w) {
@@ -508,6 +508,7 @@ public class TransferFunction extends LinearTimeInvariantSystem {
      *   Real(Nump(jw)) = 0
      * </pre>
      * The resulting roots are all the phase crossover frequencies.
+     * @param tol The tolerance used to determine the smallest acceptable frequency that can be considered.
      * @return An array of the phase crossover frequencies in ascending order.
      */
     public double[] calculateAllPhaseCrossoverFrequencies(double tol) {
@@ -602,7 +603,7 @@ public class TransferFunction extends LinearTimeInvariantSystem {
      */
     /***
      * Transform SISO only single input single output TFs
-     * @return
+     * @return {@link StateSpace} representation of this {@link TransferFunction}
      * @throws ImproperTransferFunctionException If the order of the numerator is greater than the order of the
      * denominator.
      */

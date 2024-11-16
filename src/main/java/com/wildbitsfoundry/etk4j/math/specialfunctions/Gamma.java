@@ -33,14 +33,14 @@ public final class Gamma {
             inv = false;
         }
         if (x > 22.0)
-            g = Math.exp(loggamma(x));
+            g = Math.exp(logGamma(x));
         else {
             s = 1.0;
             while (x > 1.5) {
                 x = x - 1.0;
                 s *= x;
             }
-            g = s / recipgamma(1.0 - x, odd, even);
+            g = s / recipGamma(1.0 - x, odd, even);
         }
         return (inv ? f / g : g);
     }
@@ -52,7 +52,7 @@ public final class Gamma {
      * @param even Output: the even part.
      * @return the value of the reciprocal gamma function evaluated at 1 - x.
      */
-    public static double recipgamma(double x, double[] odd, double[] even) {
+    public static double recipGamma(double x, double[] odd, double[] even) {
         int i;
         double alfa, beta, x2;
         double[] b = new double[13];
@@ -88,10 +88,10 @@ public final class Gamma {
 
     /**
      * Natural logarithm of the gamma function.
-     * @param x Argument at which to evaluate the function. x must be >= 0.
+     * @param x Argument at which to evaluate the function. x must be &ge; 0.
      * @return the natural logarithm of the gamma function at <code>x</code>.
      */
-    public static double loggamma(double x) {
+    public static double logGamma(double x) {
         int i;
         double r, x2, y, f, u0, u1, u, z;
         double[] b = new double[19];

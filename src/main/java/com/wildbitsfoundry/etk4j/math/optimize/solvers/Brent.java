@@ -37,6 +37,7 @@ public class Brent {
     /**
      * Maximum number of iterations.
      * @param limit The maximum number of iterations allowed.
+     * @return {@code this} instance
      */
     public Brent iterationLimit(int limit) {
         maxNumberOfIterations = limit;
@@ -46,6 +47,7 @@ public class Brent {
     /**
      * Absolute tolerance.
      * @param tol The maximum allowed absolute tolerance.
+     * @return {@code this} instance
      */
     public Brent absTolerance(double tol) {
         absTol = tol;
@@ -55,7 +57,7 @@ public class Brent {
     /**
      * Relative tolerance.
      * @param tol The maximum allowed relative tolerance. This value must be bigger than 4 * {@link ConstantsETK#DOUBLE_EPS}.
-     * @return
+     * @return {@code this} instance
      */
     public Brent relTolerance(double tol) {
         if (tol < 4.0 * ConstantsETK.DOUBLE_EPS) {

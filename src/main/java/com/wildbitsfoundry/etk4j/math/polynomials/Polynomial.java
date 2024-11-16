@@ -30,6 +30,7 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
 
     /***
      * Copy constructor
+     * @param polynomial {@link Polynomial} to be copied
      */
     public Polynomial(Polynomial polynomial) {
         int length = polynomial.coefficients.length;
@@ -289,7 +290,7 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
     /***
      * Evaluates the polynomial at x using Horner's method
      *
-     * @param x
+     * @param x The value at which the polynomial needs to be evaluated
      * @return The value of the polynomial at x
      */
     @Override
@@ -367,10 +368,10 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
 
     /***
      * Substitutes polynomial coefficients
-     * For a polynomial P(x) = x^2 + x + 1, it substitutes the x by x * d
-     * thus P(x * d) = x^2 * d^2 + x * d + 1
+     * For a polynomial {@code P(x) = x^2 + x + 1}, it substitutes the {@code x} by {@code x * d}
+     * thus {@code  (x * d) = x^2 * d^2 + x * d + 1}
      *
-     * @param d
+     * @param d The value to be used for substitution
      */
     public void substituteInPlace(double d) {
         roots = null;
@@ -391,7 +392,7 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
      * Substitutes polynomial coefficients
      * For a polynomial P(x) = x^2 + x + 1, it substitutes the x by x * d
      * thus P(x * d) = x^2 * d^2 + x * d + 1
-     * @param d
+     * @param d The value to be used for substitution
      * @return P(x * d)
      */
     public Polynomial substitute(double d) {

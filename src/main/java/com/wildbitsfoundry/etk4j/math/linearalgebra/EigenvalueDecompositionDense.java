@@ -873,6 +873,7 @@ public class EigenvalueDecompositionDense {
 	 * 
 	 * @param Arg
 	 *            Square matrix
+	 * @param balance balance the matrix before computing the decomposition
 	 */
 
 	public EigenvalueDecompositionDense(MatrixDense Arg, boolean balance) {

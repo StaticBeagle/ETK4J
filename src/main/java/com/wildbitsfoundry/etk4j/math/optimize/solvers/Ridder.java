@@ -39,6 +39,7 @@ public class Ridder {
     /**
      * Maximum number of iterations.
      * @param limit The maximum number of iterations allowed.
+     * @return {@code this} instance
      */
     public Ridder iterationLimit(int limit) {
         maxNumberOfIterations = limit;
@@ -48,6 +49,7 @@ public class Ridder {
     /**
      * Absolute tolerance.
      * @param tol The maximum allowed absolute tolerance.
+     * @return {@code this} instance
      */
     public Ridder absTolerance(double tol) {
         absTol = tol;
@@ -57,7 +59,7 @@ public class Ridder {
     /**
      * Relative tolerance.
      * @param tol The maximum allowed relative tolerance. This value must be bigger than 4 * {@link ConstantsETK#DOUBLE_EPS}.
-     * @return
+     * @return {@code this} instance
      */
     public Ridder relTolerance(double tol) {
         if (tol < 4.0 * ConstantsETK.DOUBLE_EPS) {

@@ -40,7 +40,7 @@ public final class NewtonRaphsonComplex {
     /**
      * Second initial guess.
      *
-     * @param secondInitialGuess
+     * @param secondInitialGuess The second guess of where the root might be.
      */
     public NewtonRaphsonComplex secondInitialGuess(Complex secondInitialGuess) {
         this.x1 = secondInitialGuess;
@@ -52,6 +52,7 @@ public final class NewtonRaphsonComplex {
      *
      * @param derivative The first derivative of the function. If this argument is not provided, the Secant method
      *                   is used to find the root of the function.
+     * @return {@code this} instance
      */
     public NewtonRaphsonComplex derivative(ComplexUnivariateFunction derivative) {
         this.derivative = derivative;
@@ -63,7 +64,7 @@ public final class NewtonRaphsonComplex {
      *
      * @param secondDerivative The second derivative of the function. If this argument is provided, Halley's method
      *                         is used to find the root of the function.
-     * @return
+     * @return {@code this} instance
      */
     public NewtonRaphsonComplex secondDerivative(ComplexUnivariateFunction secondDerivative) {
         this.secondDerivative = secondDerivative;
@@ -74,6 +75,7 @@ public final class NewtonRaphsonComplex {
      * Maximum number of iterations.
      *
      * @param limit The maximum number of iterations allowed.
+     * @return {@code this} instance
      */
     public NewtonRaphsonComplex iterationLimit(int limit) {
         maxNumberOfIterations = limit;
@@ -85,6 +87,7 @@ public final class NewtonRaphsonComplex {
      * the tolerance so if the method fails to converge, try relaxing the tolerance criteria.
      *
      * @param tol The maximum allowed absolute tolerance.
+     * @return {@code this} instance
      */
     public NewtonRaphsonComplex absTolerance(double tol) {
         absTol = tol;
@@ -96,7 +99,7 @@ public final class NewtonRaphsonComplex {
      * the tolerance so if the method fails to converge, try relaxing the tolerance criteria.
      *
      * @param tol The maximum allowed relative tolerance.
-     * @return
+     * @return {@code this} instance
      */
     public NewtonRaphsonComplex relTolerance(double tol) {
         relTol = tol;

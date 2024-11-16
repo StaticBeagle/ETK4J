@@ -21,7 +21,7 @@ public class Polynomial2d implements BivariateFunction {
 	/***
 	 * Finds the coefficients of a polynomial P(x,y) of degree n + m that fits the
 	 * data z best in a least-square sense. Always make sure that the number of
-	 * points for x,y,z are the same and that the total number of points >= (n + 1)
+	 * points for x,y,z are the same and that the total number of points &ge; (n + 1)
 	 * * (m + 1)
 	 * 
 	 * @param x
@@ -50,7 +50,7 @@ public class Polynomial2d implements BivariateFunction {
 	/***
 	 * Finds the coefficients of a polynomial P(x,y) of degree n + m that fits the
 	 * data z best in a least-square sense. Always make sure that the number of
-	 * points for x,y,z are the same and that the total number of points >= (n + 1)
+	 * points for x,y,z are the same and that the total number of points &ge; (n + 1)
 	 * * (m + 1) in a regular grid
 	 * 
 	 * @param x
