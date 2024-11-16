@@ -28,7 +28,7 @@ public final class CurveFitting {
     }
 
     /**
-     * Linear least squares fit. <br />
+     * Linear least squares fit. <br>
      * Fits x and y to a function <code>f(x) = m * x + b</code> in a least square sense.
      *
      * @param x Independent variable. This array must be monotonically increasing.
@@ -94,7 +94,7 @@ public final class CurveFitting {
     }
 
     /**
-     * Exponential least squares fit. <br />
+     * Exponential least squares fit. <br>
      * Fits x and y to a function a * e^(b * x) in a least square sense.
      *
      * @param x Independent variable. This array must be monotonically increasing.

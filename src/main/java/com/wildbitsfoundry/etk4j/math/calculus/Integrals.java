@@ -128,6 +128,7 @@ public final class Integrals {
      * @param absTol The absolute tolerance.
      * @param relTol The relative tolerance.
      * @param params Optional parameters passed to {@code func}.
+     * @param maxEval The maximum number of evaluations.
      * @return The approximate definite integral of {@code func} from a to b.
      */
     public static double qadrat(BiFunction<Double, Object[], Double> func, double a, double b,

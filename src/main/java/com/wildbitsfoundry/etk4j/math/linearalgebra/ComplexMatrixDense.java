@@ -17,11 +17,8 @@ public class ComplexMatrixDense {
         this.data = new Complex[rows * cols];
     }
 
-    /***
-     * Column packed
-     * @param data
-     * @param rows
-     */
+    // TODO javadoc all file. Clean up the check in get set
+    // add unsafe set and get
     public ComplexMatrixDense(Complex[] data, int rows) {
         this.rows = rows;
         cols = (this.rows != 0 ? data.length / this.rows : 0);
@@ -70,7 +67,7 @@ public class ComplexMatrixDense {
 
     /***
      * Deep copy
-     * @return
+     * @return A newly created {@link ComplexMatrixDense} with the values of this current one.
      */
     public ComplexMatrixDense copy() {
         Complex[] data = ComplexArrays.deepCopy(this.data);
@@ -275,19 +272,5 @@ public class ComplexMatrixDense {
         if (B.getRowCount() != rows || B.getColumnCount() != cols) {
             throw new IllegalArgumentException("Matrix dimensions must agree.");
         }
-    }
-
-    public static void main(String[] args) {
-        MatrixDense A = new MatrixDense(new double[][]{{-2, -1}, {1, 0}});
-        MatrixDense B = new MatrixDense(new double[][]{{1}, {0}});
-        MatrixDense C = new MatrixDense(new double[][]{{1, 2}});
-        MatrixDense D = new MatrixDense(new double[][]{{1}});
-
-        double w = 100;
-        Complex jw = Complex.fromImaginary(w);
-        ComplexMatrixDense gg = MatrixDense.identity(A.getRowCount()).multiply(jw).subtract(A);
-        ComplexMatrixDense inv = gg.inv();
-        System.out.println(gg);
-        System.out.println(inv);
     }
 }

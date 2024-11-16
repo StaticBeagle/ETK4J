@@ -8,8 +8,8 @@ public final class MathETK {
 
 	/***
 	 * Hypotenuse without under/overflow.
-	 * @param a
-	 * @param b
+	 * @param a The a value
+	 * @param b The b value
 	 * @return sqrt(a^2 + b^2)
 	 */
 	public static double hypot(double a, double b) {
@@ -28,7 +28,7 @@ public final class MathETK {
 
 	/***
 	 * Inverse hyperbolic sine.
-	 * @param x
+	 * @param x The value at where to calculate the function
 	 * @return
 	 */
 	public static double asinh(double x) {
@@ -53,7 +53,7 @@ public final class MathETK {
 	
 	/***
 	 * Round towards zero.
-	 * @param x
+	 * @param x The value at where to calculate the function
 	 * @return the value of x rounded to the nearest integer toward zero
 	 */
 	public static double fix(double x) {
@@ -62,9 +62,9 @@ public final class MathETK {
 	
 	/***
 	 * Remainder after division.
-	 * @param a
-	 * @param b
-	 * @return
+	 * @param a The dividend
+	 * @param b The divisor
+	 * @return The remainder of a ÷ b
 	 */
 	public static double rem(double a, double b) {
 		if(b == 0) {
@@ -75,10 +75,10 @@ public final class MathETK {
 
 	/***
 	 * Find the number rounded down to a multiple of the threshold.
-	 * @param x
-	 * @param threshold
-	 * @return
-	 */
+	 * @param x The input value
+	 * @param threshold The threshold value
+	 * @return The value of x rounded down to the nearest multiple of the threshold
+ 	 */
 	public static double floor(double x, double threshold) {
 		double result = 0.0d;
 		result = x / threshold;
@@ -87,9 +87,9 @@ public final class MathETK {
 
 	/***
 	 * Find the number rounded up to a multiple of the threshold.
-	 * @param x
-	 * @param threshold
-	 * @return
+	 * @param x The input value
+	 * @param threshold The threshold value
+	 * @return The value of x rounded up to the nearest multiple of the threshold
 	 */
 	public static double ceil(double x, double threshold) {
 		double result = 0.0d;

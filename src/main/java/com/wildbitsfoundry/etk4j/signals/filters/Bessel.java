@@ -61,6 +61,7 @@ public class Bessel extends AnalogFilter {
      * Port from scipy.
      *
      * @param n The order of the filter.
+     * @return {@link ZeroPoleGain} representation of the Bessel filter Analog prototype.
      */
     public static ZeroPoleGain besselAp(int n) {
         return besselApPhaseNormalized(n);
@@ -83,6 +84,7 @@ public class Bessel extends AnalogFilter {
      * Port from scipy.
      *
      * @param n The order of the filter.
+     * @return {@link ZeroPoleGain} representation of the Bessel filter Analog prototype.
      */
     public static ZeroPoleGain besselApPhaseNormalized(int n) {
         if (n == 0) {
@@ -111,6 +113,7 @@ public class Bessel extends AnalogFilter {
      * solving Bessel polynomials.
      *
      * @param n The order of the filter.
+     * @return {@link ZeroPoleGain} representation of the Bessel filter Analog prototype.
      */
     public static ZeroPoleGain besselApDelayNormalized(int n) {
         if (n == 0) {
@@ -134,6 +137,7 @@ public class Bessel extends AnalogFilter {
      * Bond. [1]
      *
      * @param n The order of the filter.
+     * @return {@link ZeroPoleGain} representation of the Bessel filter Analog prototype.
      */
     public static ZeroPoleGain besselApMagnitudeNormalized(int n) {
         if (n == 0) {

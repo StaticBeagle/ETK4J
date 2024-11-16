@@ -29,14 +29,14 @@ public final class Interpolation {
 		double t = (xi - x0) / hx;
 		return (y1 - y0) * t + y0;
 	}
-
+	// TODO check all the See in the project and change to @see if needed
 	/**
 	 * Neville's interpolation algorithm. This array must be monotonically increasing.
 	 * @param x Array of x coordinates.
 	 * @param y Array of ordinates.
 	 * @param xi Argument at which to evaluate the function.
 	 * @return The result of Neville's algorithm evaluated at {@code xi}.
-	 * @see <a href="https://mathworld.wolfram.com/NevillesAlgorithm.html">Neville's algorithm</a>.
+	 * @see <a href="https://mathworld.wolfram.com/NevillesAlgorithm.html">Neville's algorithm</a>
 	 */
 	public static double neville(double[] x, double[] y, double xi) {
 		if(xi < x[0] || xi > x[x.length - 1]) {

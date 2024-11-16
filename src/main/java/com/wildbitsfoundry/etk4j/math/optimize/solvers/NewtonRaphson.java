@@ -40,7 +40,7 @@ public final class NewtonRaphson {
     /**
      * Second initial guess.
      *
-     * @param secondInitialGuess
+     * @param secondInitialGuess The second guess of there the where the root migth be.
      */
     public NewtonRaphson secondInitialGuess(double secondInitialGuess) {
         this.x1 = secondInitialGuess;
@@ -52,6 +52,7 @@ public final class NewtonRaphson {
      *
      * @param derivative The first derivative of the function. If this argument is not provided, the Secant method
      *                   is used to find the root of the function.
+     * @return {@code this} instance
      */
     public NewtonRaphson derivative(UnivariateFunction derivative) {
         this.derivative = derivative;
@@ -63,7 +64,7 @@ public final class NewtonRaphson {
      *
      * @param secondDerivative The second derivative of the function. If this argument is provided, Halley's method
      *                         is used to find the root of the function.
-     * @return
+     * @return {@code this} instance
      */
     public NewtonRaphson secondDerivative(UnivariateFunction secondDerivative) {
         this.secondDerivative = secondDerivative;
@@ -74,6 +75,7 @@ public final class NewtonRaphson {
      * Maximum number of iterations.
      *
      * @param limit The maximum number of iterations allowed.
+     * @return {@code this} instance
      */
     public NewtonRaphson iterationLimit(int limit) {
         maxNumberOfIterations = limit;
@@ -84,6 +86,7 @@ public final class NewtonRaphson {
      * Absolute tolerance.
      *
      * @param tol The maximum allowed absolute tolerance.
+     * @return {@code this} instance
      */
     public NewtonRaphson absTolerance(double tol) {
         absTol = tol;
@@ -94,7 +97,7 @@ public final class NewtonRaphson {
      * Relative tolerance.
      *
      * @param tol The maximum allowed relative tolerance.
-     * @return
+     * @return {@code this} instance
      */
     public NewtonRaphson relTolerance(double tol) {
         relTol = tol;

@@ -2,7 +2,7 @@ package com.wildbitsfoundry.etk4j.math.specialfunctions;
 
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 
-import static com.wildbitsfoundry.etk4j.math.specialfunctions.Gamma.recipgamma;
+import static com.wildbitsfoundry.etk4j.math.specialfunctions.Gamma.recipGamma;
 
 /**
  * Docs https://github.com/JeffBezanson/numal/tree/master/CHAPTER6
@@ -314,7 +314,7 @@ public final class Bessel {
                 s = (Math.abs(e) < 1.0e-15) ? 1.0 : Math.sinh(e) / e;
                 e = Math.exp(e);
                 a1 = (e + 1.0 / e) / 2.0;
-                g = recipgamma(a, tmp1, tmp2) * e;
+                g = recipGamma(a, tmp1, tmp2) * e;
                 p = tmp1[0];
                 q = tmp2[0];
                 ka[0] = f = c * (p * a1 + q * s * d);
@@ -411,7 +411,7 @@ public final class Bessel {
                 s = (e.abs() < 1.0e-15) ? Complex.fromReal(1.0) : e.sinh().divide(e);
                 e = e.exp();
                 a1 = e.invert().add(e).multiply(0.5);
-                g = e.multiply(recipgamma(a, tmp1, tmp2));
+                g = e.multiply(recipGamma(a, tmp1, tmp2));
                 p = Complex.fromReal(tmp1[0]);
                 q = Complex.fromReal(tmp2[0]);
                 ka[0] = d.multiply(s).multiply(q).add(a1.multiply(p)).multiply(c);
