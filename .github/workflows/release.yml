@@ -4,6 +4,12 @@ on:
     types:
       - published
 
+env:
+  MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+  MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+  MAVEN_GPG_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+  MAVEN_GPG_PASSPHRASE : ${{ secrets.GPG_PASSPHRASE }}
+
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -17,12 +23,7 @@ jobs:
           server-id: central
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
-          gpg-private-key: GPG_PRIVATE_KEY
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           gpg-passphrase: GPG_PASSPHRASE
       - name: Publish package
         run: mvn -B deploy
-        env:
-          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
-          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
