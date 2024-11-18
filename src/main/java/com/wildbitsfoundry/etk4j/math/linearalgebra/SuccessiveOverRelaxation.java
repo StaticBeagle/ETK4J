@@ -66,20 +66,4 @@ public class SuccessiveOverRelaxation {
         solverResults.setNumberOfIterations(it);
         return solverResults;
     }
-
-    public static void main(String[] args) {
-        double[][] A = {{4, -1, 0, 1, 0},
-                {-1, 4, -1, 0, 1},
-                {0, -1, 4, -1, 0},
-                {1, 0, -1, 4, -1},
-                {0, 1, 0, -1, 4}};
-
-        double[] b = {100, 100, 100, 100, 100};
-
-        double[] x = new SuccessiveOverRelaxation(new MatrixDense(A), b, 1)
-                .iterationLimit(20)
-                .tolerance(0.000001)
-                .solve().getValue();
-        System.out.println(Arrays.toString(x));
-    }
 }
