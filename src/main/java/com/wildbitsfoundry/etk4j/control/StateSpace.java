@@ -22,10 +22,10 @@ public class StateSpace extends LinearTimeInvariantSystem {
      * Constructs a null system where all the matrices are empty matrices.
      */
     public StateSpace() {
-        this.A = MatrixDense.empty();
-        this.B = MatrixDense.empty();
-        this.C = MatrixDense.empty();
-        this.D = MatrixDense.empty();
+        this.A = MatrixDense.Factory.empty();
+        this.B = MatrixDense.Factory.empty();
+        this.C = MatrixDense.Factory.empty();
+        this.D = MatrixDense.Factory.empty();
     }
 
     /**
@@ -181,16 +181,16 @@ public class StateSpace extends LinearTimeInvariantSystem {
         }
 
         if(result.A == null) {
-            result.A = MatrixDense.empty();
+            result.A = MatrixDense.Factory.empty();
         }
         if(result.B == null) {
-            result.B = MatrixDense.empty();
+            result.B = MatrixDense.Factory.empty();
         }
         if(result.C == null) {
-            result.C = MatrixDense.empty();
+            result.C = MatrixDense.Factory.empty();
         }
         if(result.D == null) {
-            result.D = MatrixDense.empty();
+            result.D = MatrixDense.Factory.empty();
         }
         result.A = restore(result.A, p, p);
         result.B = restore(result.B, p, q);
@@ -338,7 +338,7 @@ public class StateSpace extends LinearTimeInvariantSystem {
      * @return The complex frequency response of the system.
      */
     public Complex[] evaluateMIMOAt(double w) {
-        ComplexMatrixDense inner = MatrixDense.identity(A.getRowCount()).multiply(Complex.fromImaginary(w)).subtract(A).inv();
+        ComplexMatrixDense inner = MatrixDense.Factory.identity(A.getRowCount()).multiply(Complex.fromImaginary(w)).subtract(A).inv();
         ComplexMatrixDense outer = C.multiply(inner).multiply(B);
         return ComplexMatrixDense.fromRealMatrix(D).add(outer).transpose().getArray();
     }

@@ -120,7 +120,7 @@ public abstract class LinearTimeInvariantSystem {
                     for (int i = 0; i < noStates; ++i) {
                         M[i] = DoubleArrays.concatenateAll(A.getRow(i), B.getRow(i), new double[noInputs]);
                     }
-                    double[][] identity = MatrixDense.identity(noInputs).getAs2dArray();
+                    double[][] identity = MatrixDense.Factory.identity(noInputs).getAs2dArray();
                     for (int i = noStates, j = 0; i < noStates + noInputs; ++i, ++j) {
                         M[i] = DoubleArrays.concatenate(new double[noStates + noInputs], identity[j]);
                     }

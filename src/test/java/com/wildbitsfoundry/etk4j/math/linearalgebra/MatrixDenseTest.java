@@ -13,35 +13,35 @@ public class MatrixDenseTest {
     public void testMagic() {
 
         MatrixDense sol = new MatrixDense(1, 1, 1);
-        MatrixDense magic = MatrixDense.magic(1);
+        MatrixDense magic = MatrixDense.Factory.magic(1);
         assertEquals(sol, magic);
 
-        sol = MatrixDense.empty();
-        magic = MatrixDense.magic(2);
+        sol = MatrixDense.Factory.empty();
+        magic = MatrixDense.Factory.magic(2);
         assertEquals(sol, magic);
 
         double[][] values3by3 = {{8.0, 1.0, 6.0}, {3.0, 5.0, 7.0}, {4.0, 9.0, 2.0}};
         sol = new MatrixDense(values3by3);
-        magic = MatrixDense.magic(3);
+        magic = MatrixDense.Factory.magic(3);
         assertEquals(sol, magic);
 
         double[][] values4by4 = {{16.0, 2.0, 3.0, 13.0}, {5.0, 11.0, 10.0, 8.0}, {9.0, 7.0, 6.0, 12.0},
                 {4.0, 14.0, 15.0, 1.0}};
         sol = new MatrixDense(values4by4);
-        magic = MatrixDense.magic(4);
+        magic = MatrixDense.Factory.magic(4);
         assertEquals(sol, magic);
 
         double[][] values5by5 = {{17.0, 24.0, 1.0, 8.0, 15.0}, {23.0, 5.0, 7.0, 14.0, 16.0},
                 {4.0, 6.0, 13.0, 20.0, 22.0}, {10.0, 12.0, 19.0, 21.0, 3.0}, {11.0, 18.0, 25.0, 2.0, 9.0}};
         sol = new MatrixDense(values5by5);
-        magic = MatrixDense.magic(5);
+        magic = MatrixDense.Factory.magic(5);
         assertEquals(sol, magic);
 
         double[][] values6by6 = {{35.0, 1.0, 6.0, 26.0, 19.0, 24.0}, {3.0, 32.0, 7.0, 21.0, 23.0, 25.0},
                 {31.0, 9.0, 2.0, 22.0, 27.0, 20.0}, {8.0, 28.0, 33.0, 17.0, 10.0, 15.0},
                 {30.0, 5.0, 34.0, 12.0, 14.0, 16.0}, {4.0, 36.0, 29.0, 13.0, 18.0, 11.0}};
         sol = new MatrixDense(values6by6);
-        magic = MatrixDense.magic(6);
+        magic = MatrixDense.Factory.magic(6);
         assertEquals(sol, magic);
     }
 
@@ -67,7 +67,7 @@ public class MatrixDenseTest {
 
     @Test
     public void testSetRow() {
-        MatrixDense m = MatrixDense.magic(3);
+        MatrixDense m = MatrixDense.Factory.magic(3);
 		double[] row = {-1, -1, -1};
         m.setRow(1, row);
 		assertArrayEquals(row, m.getRow(1), 1e-12);
@@ -75,7 +75,7 @@ public class MatrixDenseTest {
 
     @Test
     public void testGetCol() {
-        MatrixDense m = MatrixDense.magic(3);
+        MatrixDense m = MatrixDense.Factory.magic(3);
         double[] row = {8, 3, 4};
         assertArrayEquals(row, m.getCol(0), 1e-12);
     }
@@ -170,7 +170,7 @@ public class MatrixDenseTest {
         avals[0][0] = columnwise[0];
         I = new MatrixDense(ivals);
         try {
-            check(I, MatrixDense.identity(3, 4));
+            check(I, MatrixDense.Factory.identity(3, 4));
             try_success("identity... ", "");
         } catch (java.lang.RuntimeException e) {
             errorCount = try_failure(errorCount, "identity... ", "identity Matrix not successfully created");
@@ -530,7 +530,7 @@ public class MatrixDenseTest {
 
         print("\nTesting array-like methods...\n");
         S = new MatrixDense(columnwise, nonconformld);
-        R = MatrixDense.random(A.getRowCount(), A.getColumnCount());
+        R = MatrixDense.Factory.random(A.getRowCount(), A.getColumnCount());
         A = R;
         try {
             S = A.subtract(S);
@@ -561,7 +561,7 @@ public class MatrixDenseTest {
         }
 
         A = R.copy();
-        B = MatrixDense.random(A.getRowCount(), A.getColumnCount());
+        B = MatrixDense.Factory.random(A.getRowCount(), A.getColumnCount());
         C = A.subtract(B);
         try {
             S = A.add(S);
@@ -654,7 +654,7 @@ public class MatrixDenseTest {
             errorCount = try_failure(errorCount, "arrayRightDivideEquals... ", "(M./M != ones)");
         }
         A = R.copy();
-        B = MatrixDense.random(A.getRowCount(), A.getColumnCount());
+        B = MatrixDense.Factory.random(A.getRowCount(), A.getColumnCount());
         try {
             S = A.arrayMultiply(S);
             errorCount = try_failure(errorCount, "arrayMultiply conformance check... ", "nonconformance not raised");
@@ -790,7 +790,7 @@ public class MatrixDenseTest {
         }
         X = A.inv();
         try {
-            check(A.multiply(X), MatrixDense.identity(3, 3));
+            check(A.multiply(X), MatrixDense.Factory.identity(3));
             try_success("inverse()...", "");
         } catch (java.lang.RuntimeException e) {
             errorCount = try_failure(errorCount, "inverse()...", "incorrect inverse calculation");
@@ -816,9 +816,9 @@ public class MatrixDenseTest {
             errorCount = try_failure(errorCount, "CholeskyDecomposition...",
                     "incorrect Cholesky decomposition calculation");
         }
-        X = Chol.solve(MatrixDense.identity(3, 3));
+        X = Chol.solve(MatrixDense.Factory.identity(3));
         try {
-            check(A.multiply(X), MatrixDense.identity(3, 3));
+            check(A.multiply(X), MatrixDense.Factory.identity(3));
             try_success("CholeskyDecomposition solve()...", "");
         } catch (java.lang.RuntimeException e) {
             errorCount = try_failure(errorCount, "CholeskyDecomposition solve()...",

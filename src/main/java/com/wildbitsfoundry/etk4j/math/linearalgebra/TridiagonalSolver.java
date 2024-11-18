@@ -1,8 +1,8 @@
 package com.wildbitsfoundry.etk4j.math.linearalgebra;
 
-public final class Matrices {
-    private Matrices() {
-    }
+public final class TridiagonalSolver {
+
+    private TridiagonalSolver() {}
 
     /**
      * Solve an {@code} LDU Tri-diagonal system. A Tri-diagonal system is a matrix that only has entries
@@ -56,29 +56,5 @@ public final class Matrices {
         for (int i = length - 2; i >= 0; --i) {
             b[i] = b[i] / diagonal[i] - lower[i] * b[i + 1];
         }
-    }
-
-    /**
-     * Forward Substitution Solve.
-     * @param L The Lower triangular Matrix.
-     * @param b The RHS (Solution) Matrix
-     * @return The solution of {@code LX = b}.
-     */
-    public static MatrixDense forwardSubstitutionSolve(MatrixDense L, MatrixDense b) {
-        final int nx = b.getColumnCount();
-        final int m = L.getRowCount();
-        final int n = L.getColumnCount();
-        double[] t = L.getArray();
-        double[] X = b.getArrayCopy();
-
-        for (int j = 0; j < nx; ++j) {
-            for (int i = 0; i < m; ++i) {
-                for (int k = 0; k < i; ++k) {
-                    X[i * nx + j] -= X[k * nx + j] * t[i * n + k];
-                }
-                X[i * nx + j] /= t[i * n + i];
-            }
-        }
-        return new MatrixDense(X, m, nx);
     }
 }

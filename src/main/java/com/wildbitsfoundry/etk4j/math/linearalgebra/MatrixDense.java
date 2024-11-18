@@ -1,9 +1,8 @@
 package com.wildbitsfoundry.etk4j.math.linearalgebra;
 
-import com.wildbitsfoundry.etk4j.math.complex.Complex;
-
 import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
 import com.wildbitsfoundry.etk4j.math.MathETK;
+import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
 import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 import com.wildbitsfoundry.etk4j.util.DoubleArrays;
@@ -12,7 +11,6 @@ import java.util.Arrays;
 import java.util.Random;
 
 import static com.wildbitsfoundry.etk4j.math.MathETK.frexp;
-import static com.wildbitsfoundry.etk4j.math.linearalgebra.Matrices.forwardSubstitutionSolve;
 
 public class MatrixDense extends Matrix {
     private double[] data;
@@ -557,7 +555,7 @@ public class MatrixDense extends Matrix {
      * @return {@code A<sup>-1</sup>}.
      */
     public MatrixDense inv() {
-        return this.solve(MatrixDense.identity(rows));
+        return this.solve(MatrixDense.Factory.identity(rows));
     }
 
     /**
@@ -581,7 +579,7 @@ public class MatrixDense extends Matrix {
      */
     public MatrixDense transpose() {
         if (this.isEmpty()) {
-            return MatrixDense.empty();
+            return MatrixDense.Factory.empty();
         }
         double[] result = new double[rows * cols];
         final int trows = cols;
@@ -1338,7 +1336,7 @@ public class MatrixDense extends Matrix {
         }
         n = Math.abs(n);
         if (n == 0) {
-            return MatrixDense.identity(rows);
+            return MatrixDense.Factory.identity(rows);
         }
         MatrixDense a = n < 0 ? inv() : new MatrixDense(this);
 
@@ -1408,8 +1406,8 @@ public class MatrixDense extends Matrix {
 
         MatrixDense X = new MatrixDense(A);
         double c = 0.5;
-        MatrixDense E = MatrixDense.identity(A.rows, A.cols).add(A.multiply(c));
-        MatrixDense D = MatrixDense.identity(A.rows, A.cols).subtract(A.multiply(c));
+        MatrixDense E = MatrixDense.Factory.identity(A.rows, A.cols).add(A.multiply(c));
+        MatrixDense D = MatrixDense.Factory.identity(A.rows, A.cols).subtract(A.multiply(c));
         double q = 6.0;
         boolean p = true;
         for (int k = 2; k <= q; ++k) {
@@ -1434,178 +1432,6 @@ public class MatrixDense extends Matrix {
     }
 
     /**
-     * Vandermonde {@code Matrix}.
-     * @param x The coefficient values.
-     * @param rows The number of rows.
-     * @param cols The number of columns.
-     * @return {@code Vandermonde(rows, cols)}.
-     * @see <a href="https://en.wikipedia.org/wiki/Vandermonde_matrix">Vandermonde matrix</a>
-     */
-    public static MatrixDense vandermonde(double[] x, int rows, int cols) {
-        double[][] V = new double[rows][cols];
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                V[i][j] = Math.pow(x[i], j);
-            }
-        }
-        return new MatrixDense(V);
-    }
-
-    /**
-     * Identity {@code Matrix}.
-     * @param rows The number of rows.
-     * @param cols The number of columns.
-     * @return {@code identity(rows, cols)}.
-     */
-    public static MatrixDense identity(int rows, int cols) {
-        double[] data = new double[rows * cols];
-        for (int i = 0; i < rows; ++i) {
-            for (int j = 0; j < cols; ++j) {
-                if (i == j) {
-                    data[i * cols + j] = 1.0;
-                }
-            }
-        }
-        return new MatrixDense(data, rows, cols);
-    }
-
-    /**
-     * Identity {@code Matrix.}
-     * @param n The number of rows and columns.
-     * @return {@code identity(n, n)}.
-     */
-    public static MatrixDense identity(int n) {
-        return MatrixDense.identity(n, n);
-    }
-
-    /**
-     * Random {@code Matrix.}
-     * @param n The number of rows and columns.
-     * @return {@code random(n, n)}.
-     */
-    public static MatrixDense random(int n) {
-        return random(n, n);
-    }
-
-    /**
-     * Random {@code Matrix.}
-     * @param rows The number of rows
-     * @param cols The number of columns.
-     * @return {@code random(rows, cols)}.
-     */
-    public static MatrixDense random(int rows, int cols) {
-        Random rand = new Random();
-        double[] data = new double[rows * cols];
-
-        for (int i = 0; i < data.length; ++i) {
-            data[i] = rand.nextDouble() * 100.0;
-        }
-        return new MatrixDense(data, rows, cols);
-    }
-
-    /**
-     * Companion matrix.
-     * @param coefficients The polynomial coefficients.
-     * @param n The number of rows and columns.
-     * @return The companion {@code Matrix} for the prescribed coefficients.
-     * @see <a href="https://mathworld.wolfram.com/CompanionMatrix.html">Companion matrix</a>
-     */
-    public static MatrixDense companion(double[] coefficients, int n) {
-        // Construct the companion matrix
-        MatrixDense c = new MatrixDense(n, n);
-
-        double a = 1.0 / coefficients[0];
-        for (int i = 0; i < n; i++) {
-            c.set(0, n - 1 - i, -coefficients[n - i] * a);
-        }
-        for (int i = 1; i < n; i++) {
-            c.set(i, i - 1, 1);
-        }
-        return c;
-    }
-
-    /**
-     * Create empty {@code Matrix}.
-     * @return A {@code Matrix} with zero rows and zero columns.
-     */
-    public static MatrixDense empty() {
-        return new MatrixDense(0, 0);
-    }
-
-    /**
-     * Magic {@code Matrix}.
-     * @param n The number of rows and columns.
-     * @return A magic {@code Matrix} of dimensions {@code n}.
-     * @see <a href="https://www.mathworks.com/help/matlab/ref/magic.html">Magic matrix</a>
-     */
-    public static MatrixDense magic(int n) {
-        MatrixDense magicMatrix;
-        if (n == 1) {
-            magicMatrix = new MatrixDense(n, n);
-            magicMatrix.set(0, 0, 1.0);
-        } else if (n == 2) {
-            return empty();
-        }
-        double[][] M = new double[n][n];
-
-        // Odd order
-        if ((n % 2) == 1) {
-            int a = (n + 1) / 2;
-            int b = (n + 1);
-            for (int j = 0; j < n; j++) {
-                for (int i = 0; i < n; i++) {
-                    M[i][j] = n * ((i + j + a) % n) + ((i + 2 * j + b) % n) + 1;
-                }
-            }
-            // Doubly Even Order
-        } else if ((n % 4) == 0) {
-            for (int j = 0; j < n; j++) {
-                for (int i = 0; i < n; i++) {
-                    if (((i + 1) / 2) % 2 == ((j + 1) / 2) % 2) {
-                        M[i][j] = n * n - n * i - j;
-                    } else {
-                        M[i][j] = n * i + j + 1;
-                    }
-                }
-            }
-            // Singly Even Order
-        } else {
-            int p = n / 2;
-            int k = (n - 2) / 4;
-            MatrixDense A = magic(p);
-            for (int j = 0; j < p; j++) {
-                for (int i = 0; i < p; i++) {
-                    double aij = A.get(i, j);
-                    M[i][j] = aij;
-                    M[i][j + p] = aij + 2 * p * p;
-                    M[i + p][j] = aij + 3 * p * p;
-                    M[i + p][j + p] = aij + p * p;
-                }
-            }
-            for (int i = 0; i < p; i++) {
-                for (int j = 0; j < k; j++) {
-                    double t = M[i][j];
-                    M[i][j] = M[i + p][j];
-                    M[i + p][j] = t;
-                }
-                for (int j = n - k + 1; j < n; j++) {
-                    double t = M[i][j];
-                    M[i][j] = M[i + p][j];
-                    M[i + p][j] = t;
-                }
-            }
-            double t = M[k][0];
-            M[k][0] = M[k + p][0];
-            M[k + p][0] = t;
-
-            t = M[k][k];
-            M[k][k] = M[k + p][k];
-            M[k + p][k] = t;
-        }
-        return new MatrixDense(M);
-    }
-
-    /**
      * Characteristic polynomial of matrix.
      *
      * @return The Characteristic polynomial of the Matrix.
@@ -1614,5 +1440,181 @@ public class MatrixDense extends Matrix {
         EigenvalueDecompositionDense eig = this.eig();
         Complex[] roots = ComplexArrays.zip(eig.getRealEigenvalues(), eig.getImagEigenvalues());
         return new Polynomial(roots).getCoefficients();
+    }
+
+    public static final class Factory {
+        private Factory() {}
+
+        /**
+         * Vandermonde {@code Matrix}.
+         * @param x The coefficient values.
+         * @param rows The number of rows.
+         * @param cols The number of columns.
+         * @return {@code Vandermonde(rows, cols)}.
+         * @see <a href="https://en.wikipedia.org/wiki/Vandermonde_matrix">Vandermonde matrix</a>
+         */
+        public static MatrixDense vandermonde(double[] x, int rows, int cols) {
+            double[][] V = new double[rows][cols];
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < cols; j++) {
+                    V[i][j] = Math.pow(x[i], j);
+                }
+            }
+            return new MatrixDense(V);
+        }
+
+        /**
+         * Identity {@code Matrix}.
+         * @param rows The number of rows.
+         * @param cols The number of columns.
+         * @return {@code identity(rows, cols)}.
+         */
+        public static MatrixDense identity(int rows, int cols) {
+            double[] data = new double[rows * cols];
+            for (int i = 0; i < rows; ++i) {
+                for (int j = 0; j < cols; ++j) {
+                    if (i == j) {
+                        data[i * cols + j] = 1.0;
+                    }
+                }
+            }
+            return new MatrixDense(data, rows, cols);
+        }
+
+        /**
+         * Identity {@code Matrix.}
+         * @param n The number of rows and columns.
+         * @return {@code identity(n, n)}.
+         */
+        public static MatrixDense identity(int n) {
+            return MatrixDense.Factory.identity(n, n);
+        }
+
+        /**
+         * Random {@code Matrix.}
+         * @param n The number of rows and columns.
+         * @return {@code random(n, n)}.
+         */
+        public static MatrixDense random(int n) {
+            return random(n, n);
+        }
+
+        /**
+         * Random {@code Matrix.}
+         * @param rows The number of rows
+         * @param cols The number of columns.
+         * @return {@code random(rows, cols)}.
+         */
+        public static MatrixDense random(int rows, int cols) {
+            Random rand = new Random();
+            double[] data = new double[rows * cols];
+
+            for (int i = 0; i < data.length; ++i) {
+                data[i] = rand.nextDouble() * 100.0;
+            }
+            return new MatrixDense(data, rows, cols);
+        }
+
+        /**
+         * Companion matrix.
+         * @param coefficients The polynomial coefficients.
+         * @param n The number of rows and columns.
+         * @return The companion {@code Matrix} for the prescribed coefficients.
+         * @see <a href="https://mathworld.wolfram.com/CompanionMatrix.html">Companion matrix</a>
+         */
+        public static MatrixDense companion(double[] coefficients, int n) {
+            // Construct the companion matrix
+            MatrixDense c = new MatrixDense(n, n);
+
+            double a = 1.0 / coefficients[0];
+            for (int i = 0; i < n; i++) {
+                c.set(0, n - 1 - i, -coefficients[n - i] * a);
+            }
+            for (int i = 1; i < n; i++) {
+                c.set(i, i - 1, 1);
+            }
+            return c;
+        }
+
+        /**
+         * Create empty {@code Matrix}.
+         * @return A {@code Matrix} with zero rows and zero columns.
+         */
+        public static MatrixDense empty() {
+            return new MatrixDense(0, 0);
+        }
+
+        /**
+         * Magic {@code Matrix}.
+         * @param n The number of rows and columns.
+         * @return A magic {@code Matrix} of dimensions {@code n}.
+         * @see <a href="https://www.mathworks.com/help/matlab/ref/magic.html">Magic matrix</a>
+         */
+        public static MatrixDense magic(int n) {
+            MatrixDense magicMatrix;
+            if (n == 1) {
+                magicMatrix = new MatrixDense(n, n);
+                magicMatrix.set(0, 0, 1.0);
+            } else if (n == 2) {
+                return empty();
+            }
+            double[][] M = new double[n][n];
+
+            // Odd order
+            if ((n % 2) == 1) {
+                int a = (n + 1) / 2;
+                int b = (n + 1);
+                for (int j = 0; j < n; j++) {
+                    for (int i = 0; i < n; i++) {
+                        M[i][j] = n * ((i + j + a) % n) + ((i + 2 * j + b) % n) + 1;
+                    }
+                }
+                // Doubly Even Order
+            } else if ((n % 4) == 0) {
+                for (int j = 0; j < n; j++) {
+                    for (int i = 0; i < n; i++) {
+                        if (((i + 1) / 2) % 2 == ((j + 1) / 2) % 2) {
+                            M[i][j] = n * n - n * i - j;
+                        } else {
+                            M[i][j] = n * i + j + 1;
+                        }
+                    }
+                }
+                // Singly Even Order
+            } else {
+                int p = n / 2;
+                int k = (n - 2) / 4;
+                MatrixDense A = magic(p);
+                for (int j = 0; j < p; j++) {
+                    for (int i = 0; i < p; i++) {
+                        double aij = A.get(i, j);
+                        M[i][j] = aij;
+                        M[i][j + p] = aij + 2 * p * p;
+                        M[i + p][j] = aij + 3 * p * p;
+                        M[i + p][j + p] = aij + p * p;
+                    }
+                }
+                for (int i = 0; i < p; i++) {
+                    for (int j = 0; j < k; j++) {
+                        double t = M[i][j];
+                        M[i][j] = M[i + p][j];
+                        M[i + p][j] = t;
+                    }
+                    for (int j = n - k + 1; j < n; j++) {
+                        double t = M[i][j];
+                        M[i][j] = M[i + p][j];
+                        M[i + p][j] = t;
+                    }
+                }
+                double t = M[k][0];
+                M[k][0] = M[k + p][0];
+                M[k + p][0] = t;
+
+                t = M[k][k];
+                M[k][k] = M[k + p][k];
+                M[k + p][k] = t;
+            }
+            return new MatrixDense(M);
+        }
     }
 }

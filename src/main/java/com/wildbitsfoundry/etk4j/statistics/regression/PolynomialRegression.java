@@ -15,7 +15,7 @@ public class PolynomialRegression extends UnivariateRegression {
             throw new IllegalArgumentException("x and y dimensions must match.");
         }
         int rows = x.length;
-        MatrixDense X = MatrixDense.vandermonde(x, rows, n + 1);
+        MatrixDense X = MatrixDense.Factory.vandermonde(x, rows, n + 1);
         this.doRegression(X, x, y);
     }
 
