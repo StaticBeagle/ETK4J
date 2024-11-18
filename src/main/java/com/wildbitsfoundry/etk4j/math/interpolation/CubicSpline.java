@@ -4,8 +4,8 @@ import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
 
 import java.util.Arrays;
 
-import static com.wildbitsfoundry.etk4j.math.linearalgebra.Matrices.solveLDLtTridiagonalSystem;
-import static com.wildbitsfoundry.etk4j.math.linearalgebra.Matrices.solveLDUTridiagonalSystem;
+import static com.wildbitsfoundry.etk4j.math.linearalgebra.TridiagonalSolver.solveLDLtTridiagonalSystem;
+import static com.wildbitsfoundry.etk4j.math.linearalgebra.TridiagonalSolver.solveLDUTridiagonalSystem;
 import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkMinXLength;
 import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkXYDimensions;
 

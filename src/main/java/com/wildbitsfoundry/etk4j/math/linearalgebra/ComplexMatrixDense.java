@@ -222,7 +222,7 @@ public class ComplexMatrixDense {
     }
 
     public ComplexMatrixDense inv() {
-        return this.solve(MatrixDense.identity(rows));
+        return this.solve(MatrixDense.Factory.identity(rows));
     }
 
     // region solve

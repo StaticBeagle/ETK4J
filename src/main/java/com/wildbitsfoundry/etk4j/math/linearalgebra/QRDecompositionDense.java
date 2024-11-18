@@ -167,7 +167,7 @@ public class QRDecompositionDense extends QRDecomposition<MatrixDense> {
 	 */
 	public MatrixDense getQ() {
 		// Compute Q = Q * I
-		MatrixDense Q = MatrixDense.identity(rows, rows);
+		MatrixDense Q = MatrixDense.Factory.identity(rows);
 		double[] X = Q.getArray();
 		int mr = Math.min(rows, cols);
 		for (int k = mr - 1; k >= 0; --k) {
@@ -211,7 +211,7 @@ public class QRDecompositionDense extends QRDecomposition<MatrixDense> {
 	 */
 	public MatrixDense getQT() {
 		// Compute Q = Q * I
-		MatrixDense Q = MatrixDense.identity(rows, rows);
+		MatrixDense Q = MatrixDense.Factory.identity(rows);
 		double[] X = Q.getArray();
 		int mr = Math.min(rows, cols);
 		for (int k = 0; k < mr; ++k) {
