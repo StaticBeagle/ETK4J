@@ -30,12 +30,20 @@ can be found in:
 ---------------------------------------------------------------------------
 ## Maven Central
 
-ETK4J can be included from Maven Central
+ETK4J can be included from Maven Central.
+
+Maven
 
 ```xml
-<groupId>com.wildbitsfoundry</groupId>
-<artifactId>etk4j</artifactId>
-<version>2.0.0</version>
+<dependency>
+    <groupId>com.wildbitsfoundry</groupId>
+    <artifactId>etk4j</artifactId>
+    <version>2.0.0</version>
+</dependency>
+```
+Gradle
+```bash
+implementation 'com.wildbitsfoundry:etk4j:2.0.0'
 ```
 
 Requirements

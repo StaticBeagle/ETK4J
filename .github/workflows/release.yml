@@ -26,4 +26,4 @@ jobs:
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           gpg-passphrase: GPG_PASSPHRASE
       - name: Publish package
-        run: mvn -B deploy
+        run: mvn -B deploy -P release

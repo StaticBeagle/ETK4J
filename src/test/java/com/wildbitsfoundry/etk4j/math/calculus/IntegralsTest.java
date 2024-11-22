@@ -34,6 +34,13 @@ public final class IntegralsTest {
 		double simp = Integrals.simpson(fx, 0, Math.PI / 2.0, 1000);
 		assertEquals(0.8281163288433171, simp, 1e-12);
 	}
+
+	@Test
+	public void testRomberg() {
+		UnivariateFunction fx = x -> Math.sin(x * x);
+		double romb = Integrals.romberg(fx, 0, Math.PI / 2.0);
+		assertEquals(0.8281163288428953, romb, 1e-12);
+	}
 	
 	@Test
 	public void testQadrat() {

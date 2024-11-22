@@ -32,9 +32,8 @@
     </licenses>
 
     <scm>
-        <url>
-            scm:git:git@github.com:StaticBeagle/ETK4J.git
-        </url>
+        <connection>scm:git:https://github.com/StaticBeagle/ETK4J.git</connection>
+        <url>https://github.com/StaticBeagle/ETK4J</url>
     </scm>
 
     <dependencies>
@@ -46,6 +45,30 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>3.2.7</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
     <build>
         <plugins>
@@ -96,20 +119,6 @@
                         <phase>package</phase>
                         <goals>
                             <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
-                <version>3.2.7</version>
-                <executions>
-                    <execution>
-                        <id>sign-artifacts</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>sign</goal>
                         </goals>
                     </execution>
                 </executions>

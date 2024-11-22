@@ -119,6 +119,56 @@ public final class Integrals {
         return simpson((x, o) -> func.evaluateAt(x), a, b, n);
     }
 
+    /**
+     * Computes the approximate definite integral from a to b using the Romberg and Richardson extrapolation.
+     *
+     * @param func   The function to be integrated.
+     * @param a      The lower limit of the integral.
+     * @param b      The upper limit of the integral.
+     * @param maxIterations The maximum number of iterations
+     * @param params Optional parameters passed to {@code func}.
+     * @return The approximate definite integral of {@code func} from a to b.
+     */
+    public static double romberg(BiFunction<Double, Object[], Double> func, double a, double b, int maxIterations, Object... params) {
+        double[][] R = new double[maxIterations + 1][maxIterations + 1];
+
+        R[0][0] = trapz(func, a, b, 1, params);
+        for(int i = 0; i <= maxIterations; i++) {
+            int n = (int) Math.pow(2, i);
+            R[i][0] = trapz(func, a, b, n, params);
+
+            for(int j = 1; j <= i; j++) {
+                R[i][j] = (Math.pow(4, j) * R[i][j - 1] - R[i - 1][j - 1]) / (Math.pow(4, j) - 1);
+            }
+        }
+        return R[maxIterations][maxIterations];
+    }
+
+    /**
+     * Computes the approximate definite integral from a to b using the Romberg and Richardson extrapolation.
+     *
+     * @param func   The function to be integrated.
+     * @param a      The lower limit of the integral.
+     * @param b      The upper limit of the integral.
+     * @param maxIterations The maximum number of iterations
+     * @return The approximate definite integral of {@code func} from a to b.
+     */
+    public static double romberg(UnivariateFunction func, double a, double b, int maxIterations) {
+        return romberg((x, o) -> func.evaluateAt(x), a, b, maxIterations);
+    }
+
+    /**
+     * Computes the approximate definite integral from a to b using the Romberg and Richardson extrapolation.
+     *
+     * @param func   The function to be integrated.
+     * @param a      The lower limit of the integral.
+     * @param b      The upper limit of the integral.
+     * @return The approximate definite integral of {@code func} from a to b.
+     */
+    public static double romberg(UnivariateFunction func, double a, double b) {
+        return romberg((x, o) -> func.evaluateAt(x), a, b, 10);
+    }
+
 
     /***
      * Computes The approximate definite integral from a to b using 1d quadrature.

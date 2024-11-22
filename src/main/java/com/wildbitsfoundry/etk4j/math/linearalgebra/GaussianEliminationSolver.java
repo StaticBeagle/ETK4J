@@ -1,8 +1,8 @@
 package com.wildbitsfoundry.etk4j.math.linearalgebra;
+// TODO javadocs
+public final class GaussianEliminationSolver {
 
-public final class GaussianElimination {
-
-    private GaussianElimination() {}
+    private GaussianEliminationSolver() {}
 
     public static double[] solve(MatrixDense A, double[] b) {
         return solve(A, b, 1e-10);
