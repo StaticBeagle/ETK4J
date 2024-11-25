@@ -1,5 +1,6 @@
 package com.wildbitsfoundry.etk4j.signals.smoothing;
 
+import com.wildbitsfoundry.etk4j.math.linearalgebra.LeastSquaresSolver;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.MatrixDense;
 import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
 import com.wildbitsfoundry.etk4j.util.DoubleArrays;
@@ -39,7 +40,7 @@ public class SavitzkyGolayFilter {
         double[] x = DoubleArrays.linSteps(-halfWindow, halfWindow, 1);
 
         MatrixDense A = MatrixDense.Factory.vandermonde(x, windowSize, polyOrder + 1);
-        double[] coefficients = A.inv().getRow(0);
+        double[] coefficients = LeastSquaresSolver.solve(A, MatrixDense.Factory.identity(A.getRowCount())).getRow(0);
 
         switch (mode) {
             case INTERPOLATION:
@@ -181,7 +182,7 @@ public class SavitzkyGolayFilter {
         int windowSize = 5; // Odd window size
         int polyOrder = 2; // Polynomial degree
 
-        double[] smoothed = applyFilter(data, windowSize, polyOrder, Mode.WRAP, 5);
+        double[] smoothed = applyFilter(data, windowSize, polyOrder, Mode.INTERPOLATION, 5);
 
         System.out.println("Original data: " + Arrays.toString(data));
         System.out.println("Smoothed data: " + Arrays.toString(smoothed));
