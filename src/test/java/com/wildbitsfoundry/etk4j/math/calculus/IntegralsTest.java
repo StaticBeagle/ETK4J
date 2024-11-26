@@ -37,10 +37,7 @@ public final class IntegralsTest {
 
 	@Test
 	public void testGaussianQuadrature() {
-		double[] e = new double[2];
 		UnivariateFunction fx = x -> Math.sin(x * x);
-		e[0] = ConstantsETK.FLOAT_EPS; // relative tol
-		e[1] = ConstantsETK.FLOAT_EPS; // absolute tol
 		double qadrat = Integrals.gaussianQuadrature(fx, 0, Math.PI / 2.0);
 		assertEquals(0.8281262542785998, qadrat, 1e-12);
 
