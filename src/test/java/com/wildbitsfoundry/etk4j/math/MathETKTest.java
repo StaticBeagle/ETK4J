@@ -93,49 +93,49 @@ public final class MathETKTest {
 	@Test
 	public void testFrexp() {
 		double value = -5.35;
-		MathETK.FRexpResult frexp = frexp(value);
+		MathETK.FRexpResult frexp = frExp(value);
 		assertEquals(frexp.exponent, 3);
 		assertEquals(frexp.mantissa, -0.66875, 1e-12);
 		assertEquals(-5.35, frexp.mantissa * (1 << frexp.exponent), 1e-12);
 
 		value = 5.35;
-		frexp = frexp(value);
+		frexp = frExp(value);
 		assertEquals(frexp.exponent, 3);
 		assertEquals(frexp.mantissa, 0.66875, 1e-12);
 		assertEquals(5.35, frexp.mantissa * (1 << frexp.exponent), 1e-12);
 
 		value = 8.0;
-		frexp = frexp(value);
+		frexp = frExp(value);
 		assertEquals(frexp.exponent, 3);
 		assertEquals(frexp.mantissa, 1.0, 1e-12);
 		assertEquals(8.0, frexp.mantissa * (1 << frexp.exponent), 1e-12);
 
 		value = 0.0;
-		frexp = frexp(value);
+		frexp = frExp(value);
 		assertEquals(frexp.exponent, 0);
 		assertEquals(frexp.mantissa, 0.0, 1e-12);
 		assertEquals(0.0, frexp.mantissa * (1 << frexp.exponent), 1e-12);
 
 		value = -0.0;
-		frexp = frexp(value);
+		frexp = frExp(value);
 		assertEquals(frexp.exponent, 0);
 		assertEquals(frexp.mantissa, 0.0, 1e-12);
 		assertEquals(0.0, frexp.mantissa * (1 << frexp.exponent), 1e-12);
 
 		value = Double.NaN;
-		frexp = frexp(value);
+		frexp = frExp(value);
 		assertEquals(frexp.exponent, -1);
 		assertEquals(frexp.mantissa, Double.NaN, 1e-12);
 		assertEquals(Double.NaN, frexp.mantissa * (1 << frexp.exponent), 1e-12);
 
 		value = Double.NEGATIVE_INFINITY;
-		frexp = frexp(value);
+		frexp = frExp(value);
 		assertEquals(frexp.exponent, -1);
 		assertEquals(frexp.mantissa, Double.NEGATIVE_INFINITY, 1e-12);
 		assertEquals(Double.POSITIVE_INFINITY, frexp.mantissa * (1 << frexp.exponent), 1e-12);
 
 		value = Double.POSITIVE_INFINITY;
-		frexp = frexp(value);
+		frexp = frExp(value);
 		assertEquals(frexp.exponent, -1);
 		assertEquals(frexp.mantissa, Double.POSITIVE_INFINITY, 1e-12);
 		assertEquals(Double.NEGATIVE_INFINITY, frexp.mantissa * (1 << frexp.exponent), 1e-12);

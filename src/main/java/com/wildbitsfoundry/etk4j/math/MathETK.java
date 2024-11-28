@@ -174,7 +174,7 @@ public final class MathETK {
 	 * @return The mantissa and exponent of a number such that number = m * 2^e.
 	 * @see <a href="https://stackoverflow.com/a/3946294/6383857">https://stackoverflow.com/a/3946294/6383857</a>
 	 */
-	public static FRexpResult frexp(double value) {
+	public static FRexpResult frExp(double value) {
 		FRexpResult result = new FRexpResult();
 
 		result.exponent = 0;

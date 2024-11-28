@@ -10,7 +10,7 @@ import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 import java.util.Arrays;
 import java.util.Random;
 
-import static com.wildbitsfoundry.etk4j.math.MathETK.frexp;
+import static com.wildbitsfoundry.etk4j.math.MathETK.frExp;
 
 public class MatrixDense extends Matrix {
     private double[] data;
@@ -1400,7 +1400,7 @@ public class MatrixDense extends Matrix {
      * @return {@code e<sup>A</sup>}.
      */
     public MatrixDense expm() {
-        MathETK.FRexpResult result = frexp(this.normInf());
+        MathETK.FRexpResult result = frExp(this.normInf());
         double s = Math.max(0.0, result.exponent + 1);
         MatrixDense A = this.multiply(1 / Math.pow(2.0, s));
 
