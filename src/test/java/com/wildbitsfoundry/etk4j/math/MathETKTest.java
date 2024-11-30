@@ -141,4 +141,9 @@ public final class MathETKTest {
 		assertEquals(Double.NEGATIVE_INFINITY, frexp.mantissa * (1 << frexp.exponent), 1e-12);
 	}
 
+	@Test
+	public void testCombinations() {
+		long combinations = combinations(10, 3);
+		assertEquals(120, combinations);
+	}
 }

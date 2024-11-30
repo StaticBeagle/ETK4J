@@ -126,7 +126,7 @@ public class TransferFunction extends LinearTimeInvariantSystem {
 
     /**
      * Numerator coefficients.
-     * @return An array containing the coefficients of the numerator in descending order.This is equivalent to
+     * @return An array containing the coefficients of the numerator in descending order.This is similar to
      * calling {@link #getNumerator()} and subsequently calling {@link Polynomial#getCoefficients()}.
      * However, this method pads the resulting array with zeros if the degree of the denominator is greater than the degree
      * of the numerator e.g.
@@ -135,7 +135,7 @@ public class TransferFunction extends LinearTimeInvariantSystem {
      *     denominator: x^2 + 2 * x + 1 -&gt; [1, 2, 1];
      * </pre>
      */
-    public double[] getNumeratorCoefficients() {
+    public double[] getNumeratorCoefficientsPadded() {
         Polynomial num = rf.getNumerator();
         int numOrder = num.degree();
         int denOrder = rf.getDenominator().degree();
@@ -146,6 +146,15 @@ public class TransferFunction extends LinearTimeInvariantSystem {
         int start = denOrder - numOrder;
         System.arraycopy(num.getCoefficients(), 0, result, start, numOrder + 1);
         return result;
+    }
+
+    /**
+     * Numerator coefficients.
+     * @return An array containing the coefficients of the numerator in descending order.This is equivalent to
+     * calling {@link #getNumerator()} and subsequently calling {@link Polynomial#getCoefficients()}.
+     */
+    public double[] getNumeratorCoefficients() {
+        return this.rf.getNumerator().getCoefficients();
     }
 
     /**
@@ -160,6 +169,15 @@ public class TransferFunction extends LinearTimeInvariantSystem {
      * Denominator coefficients.
      * @return An array containing the coefficients of the denominator in descending order. This is equivalent to
      * calling {@link #getDenominator()} and subsequently calling {@link Polynomial#getCoefficients()}.
+     */
+    public double[] getDenominatorCoefficients() {
+        return  rf.getDenominator().getCoefficients();
+    }
+
+    /**
+     * Denominator coefficients.
+     * @return An array containing the coefficients of the denominator in descending order. This is similar to
+     * calling {@link #getDenominator()} and subsequently calling {@link Polynomial#getCoefficients()}.
      * However, this method pads the resulting array with zeros if the degree of the numerator is greater than the degree
      * of the denominator e.g.
      * <pre>
@@ -167,7 +185,7 @@ public class TransferFunction extends LinearTimeInvariantSystem {
      *     denominator: x + 1         -&gt; [0, 1, 1];
      * </pre>
      */
-    public double[] getDenominatorCoefficients() {
+    public double[] getDenominatorCoefficientsPadded() {
         Polynomial den = rf.getDenominator();
         int numOrder = rf.getNumerator().degree();
         int denOrder = den.degree();

@@ -229,4 +229,26 @@ public final class MathETK {
 
 		return result;
 	}
+
+	/**
+	 * Combinations of picking k unordered outcomes from n possibilities
+	 * @param n the number of things
+	 * @param k the number of elements taken
+	 * @return The total number of combinations
+	 */
+	public static long combinations(long n, long k) {
+		return factorial(n) / (factorial(k) * factorial(n - k));
+	}
+
+	/**
+	 * Factorial of a number
+	 * @param n the number
+	 * @return {@code n!}
+	 */
+	public static long factorial(long n) {
+		if(n == 0) {
+			return 1;
+		}
+		return n * factorial(n - 1);
+	}
 }

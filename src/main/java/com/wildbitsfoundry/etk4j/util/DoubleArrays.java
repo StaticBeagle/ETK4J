@@ -276,6 +276,18 @@ public final class DoubleArrays {
             a[i] *= b[i];
         }
     }
+//TODO test
+    /**
+     * Array division element wise.
+     * @param a The left-hand array.
+     * @param d The divisor.
+     * @return {@code a / b}.
+     */
+    public static double[] divideElementWise(double[] a, double d) {
+        double[] result = Arrays.copyOf(a, a.length);
+        divideElementWiseInPlace(result, d);
+        return result;
+    }
 
     /**
      * Array division element wise.
@@ -287,6 +299,15 @@ public final class DoubleArrays {
         double[] result = Arrays.copyOf(a, a.length);
         divideElementWiseInPlace(result, b);
         return result;
+    }
+// TODO test
+    /**
+     * Array division element wise in place. The result of the division is stored in array a.
+     * @param a The left-hand array.
+     * @param d The divisor.
+     */
+    public static void divideElementWiseInPlace(double[] a, double d) {
+        multiplyElementWiseInPlace(a, 1 / d);
     }
 
     /**
