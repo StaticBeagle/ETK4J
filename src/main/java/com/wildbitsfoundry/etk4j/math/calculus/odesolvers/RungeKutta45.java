@@ -1,4 +1,4 @@
-package com.wildbitsfoundry.etk4j.math.calculus;
+package com.wildbitsfoundry.etk4j.math.calculus.odesolvers;
 
 import com.wildbitsfoundry.etk4j.math.functions.BivariateFunction;
 
@@ -25,7 +25,13 @@ public class RungeKutta45 extends RungeKutta {
             {0, 40617522 / 29380423d, -110615467 / 29380423d, 69997945 / 29380423d}
     };
 
-    public RungeKutta45(BivariateFunction func, double t0, double y0, Double tBound, double maxStep, double rTol, double aTol, Double firstStep) {
+    public RungeKutta45(ODESystemOfEquations systemOfEquations, double t0, double[] y0, Double tBound, double maxStep,
+                        double rTol, double aTol, Double firstStep) {
+        super(systemOfEquations, t0, y0, tBound, maxStep, rTol, aTol, firstStep, 4, 6, A, B, C, E, P);
+    }
+
+    public RungeKutta45(BivariateFunction func, double t0, double y0, Double tBound, double maxStep,
+                        double rTol, double aTol, Double firstStep) {
         super(func, t0, y0, tBound, maxStep, rTol, aTol, firstStep, 4, 6, A, B, C, E, P);
     }
 }

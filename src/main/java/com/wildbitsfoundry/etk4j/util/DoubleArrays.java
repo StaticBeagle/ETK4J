@@ -763,6 +763,20 @@ public final class DoubleArrays {
     }
 
     /**
+     * Dot product between multiple arrays.
+     * @param a Array of arrays.
+     * @param b The second array.
+     * @return The dot (inner) product of arrays {@code a[i]} and {@code b}.
+     */
+    public static double[] dot(double[][] a, double[] b) {
+        double[] result = new double[a.length];
+        for(int i = 0; i < a.length; i++) {
+            result[i] = dot(a[i], b);
+        }
+        return result;
+    }
+
+    /**
      * Array product.
      * @param a The input array.
      * @return The product of multiplying all the elements in the array.
@@ -860,6 +874,30 @@ public final class DoubleArrays {
             for (int y = 0; y < height; y++) {
                 result[y][x] = a[x][y];
             }
+        }
+        return result;
+    }
+
+    /***
+     * Calculates the absolute value element wise for all the elements in the array
+     * @param a The array
+     * @return {@code abs(a)}
+     */
+    public static double[] abs(double[] a) {
+        double[] result = new double[a.length];
+        for(int i = 0; i < a.length; i++) {
+            result[i] = Math.abs(a[i]);
+        }
+        return result;
+    }
+
+    public static double[] max(double[] a, double[] b) {
+        if(a.length != b.length) {
+            throw new IllegalArgumentException("The length of the two arrays must be the same");
+        }
+        double[] result = new double[a.length];
+        for(int i = 0; i < a.length; i++) {
+            result[i] = Math.max(a[i], b[i]);
         }
         return result;
     }
