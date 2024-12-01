@@ -1,12 +1,21 @@
 package com.wildbitsfoundry.etk4j.signals.stoz;
 
+import com.wildbitsfoundry.etk4j.control.TransferFunction;
+import com.wildbitsfoundry.etk4j.math.polynomials.RationalFunction;
+import com.wildbitsfoundry.etk4j.signals.filters.ButterWorth;
 import com.wildbitsfoundry.etk4j.util.DoubleArrays;
+
+import java.util.Arrays;
 
 import static com.wildbitsfoundry.etk4j.math.MathETK.combinations;
 
+/**
+ * The {@code Bilinear Transform} class contains methods to convert a continuous time system numerator and denominator
+ * to the discrete time domain
+ */
 public class BilinearTransform {
     /**
-     * Perform bilinear transform on analog filter coefficients.
+     * Perform bilinear transform on analog filter coefficients. No frequency pre-warping is performed in this method.
      *
      * @param num  Numerator coefficients of the analog filter
      * @param den  Denominator coefficients of the analog filter
@@ -55,24 +64,19 @@ public class BilinearTransform {
         }
 
         // Normalize by the first non-zero element in aDigital
-        int i = 0, j = 0;
-        while(j < denDigital.length) {
-            if(denDigital[i] == 0) {
-                i++;
+        int i = 0;
+        while(i <= denDigital.length) {
+            if(i == denDigital.length) {
+                throw new RuntimeException("fix this");
             }
-            j++;
+            if(denDigital[i] != 0) {
+                break;
+            }
+            i++;
         }
         double normalizingFactor = denDigital[i];
         DoubleArrays.divideElementWiseInPlace(numDigital, normalizingFactor);
         DoubleArrays.divideElementWiseInPlace(denDigital, normalizingFactor);
         return new double[][]{numDigital, denDigital};
     }
-// TODO test and documment
-//    public static void main(String[] args) {
-//        TransferFunction filts = ButterWorth.newBandpass(4, 2 * Math.PI * 7, 2 * Math.PI * 13);
-//
-//        double[][] filtz = transform(filts.getNumeratorCoefficients(), filts.getDenominatorCoefficients(), 100);
-//        System.out.println(Arrays.toString(filtz[0]));
-//        System.out.println(Arrays.toString(filtz[1]));
-//    }
 }
