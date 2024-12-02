@@ -2,9 +2,6 @@ package com.wildbitsfoundry.etk4j.math.calculus.odesolvers;
 
 import com.wildbitsfoundry.etk4j.math.functions.BivariateFunction;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class RungeKutta23 extends RungeKutta {
 
     private static final double[][] A = {
