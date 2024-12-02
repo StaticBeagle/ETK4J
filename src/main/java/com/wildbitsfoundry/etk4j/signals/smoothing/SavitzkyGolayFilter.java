@@ -7,7 +7,10 @@ import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 
 import java.util.Arrays;
 
-// TODO write tests
+
+/***
+ * Savitzky-Golay filter to smooth the input data
+ */
 public class SavitzkyGolayFilter {
 
     public enum Mode {
@@ -26,7 +29,30 @@ public class SavitzkyGolayFilter {
      * @param polyOrder  Degree of the polynomial (must be less than window size).
      * @return Smoothed data array.
      */
-    public static double[] applyFilter(double[] data, int windowSize, int polyOrder, Mode mode, double constant) {
+
+    private double[] data;
+    private int windowSize;
+    private int polyOrder;
+    private Mode mode = Mode.INTERPOLATION;
+    private double constant;
+
+    public SavitzkyGolayFilter(double[] data, int windowSize, int polyOrder) {
+        this.data = data;
+        this.windowSize = windowSize;
+        this.polyOrder = polyOrder;
+    }
+
+    public SavitzkyGolayFilter mode(Mode mode) {
+        this.mode = mode;
+        return this;
+    }
+
+    public SavitzkyGolayFilter constant(double constant) {
+        this.constant = constant;
+        return this;
+    }
+
+    public double[] filter() {
         if (windowSize % 2 == 0) {
             throw new IllegalArgumentException("Window size must be odd.");
         }
@@ -173,18 +199,5 @@ public class SavitzkyGolayFilter {
             smoothed[i] = result;
         }
         return smoothed;
-    }
-
-
-    public static void main(String[] args) {
-// Example noisy data
-        double[] data = {2, 2, 5, 2, 1, 0, 1, 4, 9};
-        int windowSize = 5; // Odd window size
-        int polyOrder = 2; // Polynomial degree
-
-        double[] smoothed = applyFilter(data, windowSize, polyOrder, Mode.INTERPOLATION, 5);
-
-        System.out.println("Original data: " + Arrays.toString(data));
-        System.out.println("Smoothed data: " + Arrays.toString(smoothed));
     }
 }
