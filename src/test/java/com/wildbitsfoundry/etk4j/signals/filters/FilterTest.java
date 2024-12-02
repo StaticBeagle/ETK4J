@@ -8,7 +8,7 @@ import com.wildbitsfoundry.etk4j.control.TransferFunction;
 
 import static org.junit.Assert.*;
 
-public class AnalogFilterTest {
+public class FilterTest {
 
     @Test
     public void testButterworth() {

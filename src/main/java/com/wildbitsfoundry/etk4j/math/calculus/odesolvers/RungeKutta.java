@@ -58,7 +58,7 @@ public abstract class RungeKutta extends OdeSolver {
             this.hAbs = selectInitialStep(systemOfEquations, this.t, this.y, tBound, maxStep, this.f,
                     this.direction, this.errorEstimatorOrder, this.rTol, this.aTol);
         } else {
-            this.hAbs = validateFirstStep(firstStep, t0, tBound);
+            this.hAbs = validateFirstStep(firstStep, t0, tBound); // TODO test with firstStep not null
         }
         this.K = new double[this.nStages + 1][this.n];
         this.errorExponent = -1.0 / (this.errorEstimatorOrder + 1);
@@ -258,28 +258,5 @@ public abstract class RungeKutta extends OdeSolver {
     @Override
     protected Object getDenseOutputImpl() {
         return null;
-    }
-
-    public static void main(String[] args) {
-        ODESystemOfEquations odeSystemOfEquations = (t, y) -> {
-            double dxdt = y[0] - y[1];
-            double dydt = y[0] + y[1];
-            return new double[] {dxdt, dydt};
-        };
-        RungeKutta rungeKutta = new RungeKutta45(odeSystemOfEquations, 0.0, new double[] {1, 0}, 10.0, 1.0, 0.001,
-                Math.exp(-6), null);
-
-        List<Double> tValues = new ArrayList<>();
-        List<Double> yValues0 = new ArrayList<>();
-        List<Double> yValues1 = new ArrayList<>();
-        while (!rungeKutta.status.equals("finished")) {
-            rungeKutta.step();
-            tValues.add(rungeKutta.t);
-            yValues0.add(rungeKutta.y[0]);
-            yValues1.add(rungeKutta.y[1]);
-        }
-        System.out.println(tValues);
-        System.out.println(yValues0);
-        System.out.println(yValues1);
     }
 }
