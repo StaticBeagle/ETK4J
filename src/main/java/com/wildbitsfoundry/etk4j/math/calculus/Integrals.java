@@ -119,9 +119,46 @@ public final class Integrals {
         return simpson((x, o) -> func.evaluateAt(x), a, b, n);
     }
 
+    /**
+     * Computes the approximate definite integral from a to b using 5 point Gaussian quadrature.
+     *
+     * @param func   The function to be integrated.
+     * @param a      The lower limit of the integral.
+     * @param b      The upper limit of the integral.
+     * @param params Optional parameters passed to {@code func}.
+     * @return The approximate definite integral of {@code func} from a to b.
+     */
+    public static double gaussianQuadrature(BiFunction<Double, Object[], Double> func, double a, double b, Object... params) {
+        // Gauss-Legendre points and weights for n = 5
+        final double[] GAUSS_POINTS = {-0.9061798459, -0.5384693101, 0.0000000000, 0.5384693101, 0.9061798459};
+        final double[] GAUSS_WEIGHTS = {0.2369268850, 0.4786286705, 0.5688888889, 0.4786286705, 0.2369268850};
+        double sum = 0.0; // Perform change of variables for the interval [a, b]
+        double midpoint = (a + b) / 2.0;
+        double halfLength = (b - a) / 2.0;
+        for (int i = 0; i < GAUSS_POINTS.length; i++) {
+            // Map Gauss points to the interval [a, b]
+            double x = midpoint + halfLength * GAUSS_POINTS[i];
+            double weight = GAUSS_WEIGHTS[i]; // Evaluate function and add weighted contribution to the sum
+            sum += weight * func.apply(x, params);
+        }
+        // Scale the result by the length of the interval
+        return sum * halfLength;
+    }
+
+    /**
+     * Computes the approximate definite integral from a to b using 5 point Gaussian quadrature.
+     *
+     * @param func   The function to be integrated.
+     * @param a      The lower limit of the integral.
+     * @param b      The upper limit of the integral.
+     * @return The approximate definite integral of {@code func} from a to b.
+     */
+    public static double gaussianQuadrature(UnivariateFunction func, double a, double b) {
+        return gaussianQuadrature((x, o) -> func.evaluateAt(x), a, b);
+    }
 
     /***
-     * Computes The approximate definite integral from a to b using 1d quadrature.
+     * Computes The approximate definite integral from a to b using adaptive Gaussian quadrature.
      * @param func The function to be integrated.
      * @param a The lower limit of the integral.
      * @param b The upper limit of the integral.
@@ -131,8 +168,8 @@ public final class Integrals {
      * @param maxEval The maximum number of evaluations.
      * @return The approximate definite integral of {@code func} from a to b.
      */
-    public static double qadrat(BiFunction<Double, Object[], Double> func, double a, double b,
-                                double absTol, double relTol, int maxEval, Object... params) {
+    public static double adaptiveGaussianQuadrature(BiFunction<Double, Object[], Double> func, double a, double b,
+                                                    double absTol, double relTol, int maxEval, Object... params) {
         double x, f0, f2, f3, f5, f6, f7, f9, f14, hmin, hmax, re, ae, result;
 
         RefInteger numEval = new RefInteger(0);
@@ -164,7 +201,7 @@ public final class Integrals {
     }
 
     /***
-     * Computes the approximate definite integral from a to b using 1d quadrature.
+     * Computes the approximate definite integral from a to b using adaptive Gaussian quadrature.
      * @param func The function to be integrated.
      * @param a The lower limit of the integral.
      * @param b The upper limit of the integral.
@@ -173,9 +210,9 @@ public final class Integrals {
      * @param maxEval The maximum number of evaluations.
      * @return The approximate definite integral of {@code func} from a to b.
      */
-    public static double qadrat(UnivariateFunction func, double a, double b,
-                                double absTol, double relTol, int maxEval) {
-        return qadrat((x, o) -> func.evaluateAt(x), a, b, absTol, relTol, maxEval);
+    public static double adaptiveGaussianQuadrature(UnivariateFunction func, double a, double b,
+                                                    double absTol, double relTol, int maxEval) {
+        return adaptiveGaussianQuadrature((x, o) -> func.evaluateAt(x), a, b, absTol, relTol, maxEval);
     }
 
 

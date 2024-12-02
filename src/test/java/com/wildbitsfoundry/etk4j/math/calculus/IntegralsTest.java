@@ -34,18 +34,29 @@ public final class IntegralsTest {
 		double simp = Integrals.simpson(fx, 0, Math.PI / 2.0, 1000);
 		assertEquals(0.8281163288433171, simp, 1e-12);
 	}
+
+	@Test
+	public void testGaussianQuadrature() {
+		UnivariateFunction fx = x -> Math.sin(x * x);
+		double qadrat = Integrals.gaussianQuadrature(fx, 0, Math.PI / 2.0);
+		assertEquals(0.8281262542785998, qadrat, 1e-12);
+
+		fx = x -> Math.sin(x * x) / x;
+		qadrat = Integrals.gaussianQuadrature(fx, Math.PI / 4.0, Math.PI / 2.0);
+		assertEquals(0.5832680904501192, qadrat, 1e-12);
+	}
 	
 	@Test
-	public void testQadrat() {
+	public void testAdaptiveGaussianQuadrature() {
 		double[] e = new double[2];
 		UnivariateFunction fx = x -> Math.sin(x * x);
 		e[0] = ConstantsETK.FLOAT_EPS; // relative tol
 		e[1] = ConstantsETK.FLOAT_EPS; // absolute tol
-		double qadrat = Integrals.qadrat(fx, 0, Math.PI / 2.0, e[0], e[1], 150);
+		double qadrat = Integrals.adaptiveGaussianQuadrature(fx, 0, Math.PI / 2.0, e[0], e[1], 150);
 		assertEquals(0.8281163273860381, qadrat, 1e-12);
 
 		fx = x -> Math.sin(x * x) / x;
-		qadrat = Integrals.qadrat(fx, Math.PI / 4.0, Math.PI / 2.0, 1e-12, 1e-12, 150);
+		qadrat = Integrals.adaptiveGaussianQuadrature(fx, Math.PI / 4.0, Math.PI / 2.0, 1e-12, 1e-12, 150);
 		assertEquals(0.5832680936916835, qadrat, 1e-12);
 	}
 }
