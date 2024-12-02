@@ -8,11 +8,6 @@ public class LUDecompositionDense extends LUDecomposition<MatrixDense> {
 	protected int _pivotsign = 1;
 	protected int[] _pivot;
 
-	private MatrixDense L;
-	private MatrixDense U;
-
-	//private
-
 	public LUDecompositionDense(MatrixDense matrix) {
 		super(matrix);
 		final int rows = matrix.getRowCount();
@@ -87,9 +82,6 @@ public class LUDecompositionDense extends LUDecomposition<MatrixDense> {
 	 */
 
 	public MatrixDense getL() {
-		if(this.L != null) {
-			return this.L;
-		}
 		final int rows = this.rows;
 		final int cols = this.cols;
 		double[] L = new double[rows * cols];
@@ -104,8 +96,8 @@ public class LUDecompositionDense extends LUDecomposition<MatrixDense> {
 				}
 			}
 		}
-		this.L = new MatrixDense(L, rows, cols);
-		return this.L;
+
+		return new MatrixDense(L, rows, cols);
 	}
 
 	/**
@@ -115,9 +107,6 @@ public class LUDecompositionDense extends LUDecomposition<MatrixDense> {
 	 */
 
 	public MatrixDense getU() {
-		if(this.U != null) {
-			return this.U;
-		}
 		final int rows = this.rows;
 		final int cols = this.cols;
 		double[] U = new double[rows * cols];
@@ -130,8 +119,7 @@ public class LUDecompositionDense extends LUDecomposition<MatrixDense> {
 				}
 			}
 		}
-		this.U = new MatrixDense(U, rows, cols);
-		return this.U;
+		return new MatrixDense(U, rows, cols);
 	}
 
 	/**
