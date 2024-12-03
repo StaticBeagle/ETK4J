@@ -49,15 +49,8 @@ public class Spline2d implements BivariateFunction {
         final int cols = x.length;
         final int order = 4;
 
-        if (cols % order != 0) {
-            throw new IllegalArgumentException(String.format("x length has to be a multiple of %d.", order));
-        }
-        if (rows % order != 0) {
-            throw new IllegalArgumentException(String.format("y length has to be a multiple of %d.", order));
-        }
         if (z.length != y.length) {
-            throw new IllegalArgumentException(
-                    String.format("The number of arrays in z has to be a multiple of %d.", order));
+            throw new IllegalArgumentException("The length of z has to be the same length as y.");
         }
 
         double[] yt = Arrays.copyOf(y, rows);
@@ -96,15 +89,8 @@ public class Spline2d implements BivariateFunction {
         final int cols = x.length;
         final int order = 2;
 
-        if (cols % order != 0) {
-            throw new IllegalArgumentException(String.format("x length has to be a multiple of %d.", order));
-        }
-        if (rows % order != 0) {
-            throw new IllegalArgumentException(String.format("y length has to be a multiple of %d.", order));
-        }
         if (z.length != y.length) {
-            throw new IllegalArgumentException(
-                    String.format("The number of arrays in z has to be a multiple of %d.", order));
+            throw new IllegalArgumentException("The length of z has to be the same length as y.");
         }
 
         double[] yt = Arrays.copyOf(y, rows);
@@ -128,12 +114,18 @@ public class Spline2d implements BivariateFunction {
     @Override
     public double evaluateAt(double x, double y) {
         int index = this.findLeftIndex(y);
-
         double[] tmp = new double[order];
-        for (int i = 0; i < order; ++i) {
-            tmp[i] = splines[i + index].evaluateAt(x);
+        if(index == this.y.length - 1) {
+            for (int i = this.y.length - order, j = 0; i <= order; ++i, ++j) {
+                tmp[j] = splines[i].evaluateAt(x);
+            }
+            return Interpolation.spline(Arrays.copyOfRange(this.y, this.y.length - order, order + 1), tmp, y);
+        } else {
+            for (int i = 0; i < order; ++i) {
+                tmp[i] = splines[i + index].evaluateAt(x);
+            }
+            return Interpolation.spline(Arrays.copyOfRange(this.y, index, index + order), tmp, y);
         }
-        return Interpolation.spline(Arrays.copyOfRange(this.y, index, index + order), tmp, y);
     }
 
     protected int findLeftIndex(double y) {
