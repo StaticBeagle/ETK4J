@@ -116,7 +116,7 @@ public class Spline2d implements BivariateFunction {
         int index = this.findLeftIndex(y);
         double[] tmp = new double[order];
         if(index == this.y.length - 1) {
-            for (int i = this.y.length - order, j = 0; i <= order; ++i, ++j) {
+            for (int i = this.y.length - order, j = 0; i < this.y.length; ++i, ++j) {
                 tmp[j] = splines[i].evaluateAt(x);
             }
             return Interpolation.spline(Arrays.copyOfRange(this.y, this.y.length - order, order + 1), tmp, y);
