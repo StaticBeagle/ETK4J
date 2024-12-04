@@ -2,7 +2,6 @@
 
 [![Java CI with Maven](https://github.com/StaticBeagle/ETK4J/actions/workflows/maven.yml/badge.svg)](https://github.com/StaticBeagle/ETK4J/actions/workflows/maven.yml)
 
----------------------------------------------------------------------------
 ## Engineering Toolkit for Java
 
 The purpose of this project is to create a library that can be used to prototype solutions to engineering problems. One 
@@ -27,15 +26,22 @@ can be found in:
 
     src/main/java
 
----------------------------------------------------------------------------
 ## Maven Central
 
-ETK4J can be included from Maven Central
+ETK4J can be included from Maven Central.
+
+Maven
 
 ```xml
-<groupId>com.wildbitsfoundry</groupId>
-<artifactId>etk4j</artifactId>
-<version>2.0.0</version>
+<dependency>
+    <groupId>com.wildbitsfoundry</groupId>
+    <artifactId>etk4j</artifactId>
+    <version>2.0.0</version>
+</dependency>
+```
+Gradle
+```bash
+implementation 'com.wildbitsfoundry:etk4j:2.0.0'
 ```
 
 Requirements

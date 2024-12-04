@@ -1,6 +1,6 @@
 package com.wildbitsfoundry.etk4j.math.interpolation;
 
-import com.wildbitsfoundry.etk4j.math.linearalgebra.GaussianElimination;
+import com.wildbitsfoundry.etk4j.math.linearalgebra.GaussianEliminationSolver;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.MatrixDense;
 
 import java.util.Arrays;
@@ -41,7 +41,7 @@ public class QuadraticSpline extends Spline {
         A.set(2 * n - 4, n - 1, 1); // c[0] = 0
         A.set(2 * n - 3, 2 * n - 3, 1); // c[n - 1] = 0
 
-        double[] solution = GaussianElimination.solve(A, b);
+        double[] solution = GaussianEliminationSolver.solve(A, b);
         // compute coefficients
         double[] coefficients = new double[(n - 1) * 3];
         for (int i = 0, j = 0; i < n - 1; ++i, ++j) {
@@ -83,7 +83,7 @@ public class QuadraticSpline extends Spline {
         A.set(2 * n - 3, 2 * n - 3, 2 * (x[n - 1] - x[n - 2]));
         b[2 * n - 3] = mn; // derivative at the end
 
-        double[] solution = GaussianElimination.solve(A, b);
+        double[] solution = GaussianEliminationSolver.solve(A, b);
         // compute coefficients
         double[] coefficients = new double[(n - 1) * 3];
         for (int i = 0, j = 0; i < n - 1; ++i, ++j) {

@@ -1,8 +1,7 @@
 package com.wildbitsfoundry.etk4j.math.linearalgebra;
 
-import java.util.Arrays;
 // TODO javadocs
-public class SuccessiveOverRelaxation {
+public class SuccessiveOverRelaxationSolver {
     private double w;
     private double[] b;
     private MatrixDense A;
@@ -10,23 +9,23 @@ public class SuccessiveOverRelaxation {
     private double tol = 1e-9;
     private double[] x0 = null;
 
-    public SuccessiveOverRelaxation(MatrixDense A, double[] b, double w) {
+    public SuccessiveOverRelaxationSolver(MatrixDense A, double[] b, double w) {
         this.A = A;
         this.b = b;
         this.w = w;
     }
 
-    public SuccessiveOverRelaxation iterationLimit(int iterationLimit) {
+    public SuccessiveOverRelaxationSolver iterationLimit(int iterationLimit) {
         this.iterationLimit = iterationLimit;
         return this;
     }
 
-    public SuccessiveOverRelaxation tolerance(double tolerance) {
+    public SuccessiveOverRelaxationSolver tolerance(double tolerance) {
         this.tol = tolerance;
         return this;
     }
 
-    public SuccessiveOverRelaxation initialConditions(double[] x0) {
+    public SuccessiveOverRelaxationSolver initialGuess(double[] x0) {
         this.x0 = x0;
         return this;
     }

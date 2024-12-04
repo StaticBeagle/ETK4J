@@ -36,6 +36,13 @@ public final class IntegralsTest {
 	}
 
 	@Test
+	public void testRomberg() {
+		UnivariateFunction fx = x -> Math.sin(x * x);
+		double romb = Integrals.romberg(fx, 0, Math.PI / 2.0);
+		assertEquals(0.8281163288428953, romb, 1e-12);
+	}
+
+	@Test
 	public void testGaussianQuadrature() {
 		UnivariateFunction fx = x -> Math.sin(x * x);
 		double qadrat = Integrals.gaussianQuadrature(fx, 0, Math.PI / 2.0);
@@ -45,7 +52,7 @@ public final class IntegralsTest {
 		qadrat = Integrals.gaussianQuadrature(fx, Math.PI / 4.0, Math.PI / 2.0);
 		assertEquals(0.5832680904501192, qadrat, 1e-12);
 	}
-	
+
 	@Test
 	public void testAdaptiveGaussianQuadrature() {
 		double[] e = new double[2];
