@@ -8,6 +8,7 @@ import com.wildbitsfoundry.etk4j.math.functions.DifferentiableFunction;
 import com.wildbitsfoundry.etk4j.math.functions.IntegrableFunction;
 import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.EigenvalueDecompositionDense;
+import com.wildbitsfoundry.etk4j.math.linearalgebra.LeastSquaresSolver;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.MatrixDense;
 import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 import com.wildbitsfoundry.etk4j.util.DoubleArrays;
@@ -505,15 +506,13 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
         int dim = x.length;
         // Building the coefficient matrix
         MatrixDense A = MatrixDense.Factory.vandermonde(x, dim, n + 1);
-        // Building the solution vector
-        MatrixDense b = new MatrixDense(y, dim);
-        MatrixDense c = A.solve(b);
+        MatrixDense c = n < y.length ? LeastSquaresSolver.solve(A, y) : A.solve(y);
 
-        double[] coeffs = new double[n + 1];
+        double[] coefficients = new double[n + 1];
         for (int i = 0; i <= n; i++) {
-            coeffs[i] = c.get(n - i, 0);
+            coefficients[i] = c.get(n - i, 0);
         }
-        return new Polynomial(coeffs);
+        return new Polynomial(coefficients);
     }
 
     /**

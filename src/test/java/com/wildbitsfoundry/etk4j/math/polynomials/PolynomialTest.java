@@ -11,8 +11,6 @@ import org.junit.rules.ExpectedException;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 
-import java.util.Arrays;
-
 public class PolynomialTest {
 
     @Test
@@ -134,13 +132,13 @@ public class PolynomialTest {
     }
 
     @Test
-    public void testPolyfit() {
+    public void testPolyFit() {
         double[] x = {1, 2, 3, 4};
         double[] y = {1, 10, 12, 15};
 
         // Over determined
         Polynomial poly = Polynomial.polyFit(x, y, 2);
-        assertArrayEquals(new double[]{-1.5, 11.9, -9.0}, poly.getCoefficients(), 1e-12);
+        assertArrayEquals(new double[]{-1.4999999999999996, 11.899999999999997, -8.999999999999996}, poly.getCoefficients(), 1e-12);
 
         // Unique solution
         Polynomial poly2 = Polynomial.polyFit(x, y, 3);

@@ -11,7 +11,7 @@ import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 
 import static com.wildbitsfoundry.etk4j.signals.filters.Filters.*;
 
-public class Elliptic extends AnalogFilter {
+public class Elliptic extends Filter {
 
     /**
      * Elliptic analog low pass filter prototype.

@@ -587,8 +587,8 @@ public class StateSpaceTest {
         numerator = new double[]{0.0, 1.0};
         denominator = new double[]{1.0, 1.0};
 
-        assertArrayEquals(numerator, tf.getNumeratorCoefficients(), 1e-12);
-        assertArrayEquals(denominator, tf.getDenominatorCoefficients(), 1e-12);
+        assertArrayEquals(numerator, tf.getNumeratorCoefficientsPadded(), 1e-12);
+        assertArrayEquals(denominator, tf.getDenominatorCoefficientsPadded(), 1e-12);
 
         A = new double[][]{{-2, -1, 3}, {1, 0, 5}, {4, 5, 10}};
         B = new double[][]{{1, 2, 4}, {0, 6, 7}, {9, 10, 22}};
@@ -610,8 +610,8 @@ public class StateSpaceTest {
         for (int i = 0; i < 3; ++i) {
             TransferFunction[] tfs = ss.toTransferFunction(i);
             for (int j = 0; j < tfs.length; ++j) {
-                assertArrayEquals(numerators[3 * i + j], tfs[j].getNumeratorCoefficients(), 1e-12);
-                assertArrayEquals(denominator, tfs[j].getDenominatorCoefficients(), 1e-12);
+                assertArrayEquals(numerators[3 * i + j], tfs[j].getNumeratorCoefficientsPadded(), 1e-12);
+                assertArrayEquals(denominator, tfs[j].getDenominatorCoefficientsPadded(), 1e-12);
             }
         }
     }
@@ -629,8 +629,8 @@ public class StateSpaceTest {
         double[] denominator = {1, 0, 0, 0};
 
         for (int j = 0; j < tfs.length; ++j) {
-            assertArrayEquals(numerators[j], tfs[j].getNumeratorCoefficients(), 1e-12);
-            assertArrayEquals(denominator, tfs[j].getDenominatorCoefficients(), 1e-12);
+            assertArrayEquals(numerators[j], tfs[j].getNumeratorCoefficientsPadded(), 1e-12);
+            assertArrayEquals(denominator, tfs[j].getDenominatorCoefficientsPadded(), 1e-12);
         }
     }
 

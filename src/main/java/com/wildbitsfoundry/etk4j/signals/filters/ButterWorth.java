@@ -7,7 +7,7 @@ import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 
 import static com.wildbitsfoundry.etk4j.signals.filters.Filters.*;
 
-public final class ButterWorth extends AnalogFilter {
+public final class ButterWorth extends Filter {
 
     /**
      * Butterworth analog low pass filter prototype.

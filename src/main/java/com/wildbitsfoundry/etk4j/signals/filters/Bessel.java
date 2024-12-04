@@ -16,7 +16,7 @@ import static com.wildbitsfoundry.etk4j.signals.filters.Filters.*;
 import java.util.Arrays;
 import java.util.function.Function;
 
-public class Bessel extends AnalogFilter {
+public class Bessel extends Filter {
     /**
      * Frequency normalization for Bessel filters.
      * <pre>

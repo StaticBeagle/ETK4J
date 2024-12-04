@@ -174,7 +174,7 @@ public final class MathETK {
 	 * @return The mantissa and exponent of a number such that number = m * 2^e.
 	 * @see <a href="https://stackoverflow.com/a/3946294/6383857">https://stackoverflow.com/a/3946294/6383857</a>
 	 */
-	public static FRexpResult frexp(double value) {
+	public static FRexpResult frExp(double value) {
 		FRexpResult result = new FRexpResult();
 
 		result.exponent = 0;
@@ -228,5 +228,27 @@ public final class MathETK {
 		result.mantissa = realMantissa;
 
 		return result;
+	}
+
+	/**
+	 * Combinations of picking k unordered outcomes from n possibilities
+	 * @param n the number of things
+	 * @param k the number of elements taken
+	 * @return The total number of combinations
+	 */
+	public static long combinations(long n, long k) {
+		return factorial(n) / (factorial(k) * factorial(n - k));
+	}
+
+	/**
+	 * Factorial of a number
+	 * @param n the number
+	 * @return {@code n!}
+	 */
+	public static long factorial(long n) {
+		if(n == 0) {
+			return 1;
+		}
+		return n * factorial(n - 1);
 	}
 }

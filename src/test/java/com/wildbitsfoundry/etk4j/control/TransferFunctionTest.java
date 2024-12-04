@@ -5,8 +5,6 @@ import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
 import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 import org.junit.Test;
 
-import java.util.Arrays;
-
 import static org.junit.Assert.*;
 
 public class TransferFunctionTest {
@@ -679,8 +677,8 @@ public class TransferFunctionTest {
         double[] den = {1, 1};
         TransferFunction tf = new TransferFunction(num, den);
 
-        double[] numCoefficients = tf.getNumeratorCoefficients();
-        double[] denCoefficients = tf.getDenominatorCoefficients();
+        double[] numCoefficients = tf.getNumeratorCoefficientsPadded();
+        double[] denCoefficients = tf.getDenominatorCoefficientsPadded();
 
         assertArrayEquals(new double[]{0, 1}, numCoefficients, 1e-12);
         assertArrayEquals(den, denCoefficients, 1e-12);
@@ -689,8 +687,8 @@ public class TransferFunctionTest {
         den = new double[]{1, 1, 1};
         tf = new TransferFunction(num, den);
 
-        numCoefficients = tf.getNumeratorCoefficients();
-        denCoefficients = tf.getDenominatorCoefficients();
+        numCoefficients = tf.getNumeratorCoefficientsPadded();
+        denCoefficients = tf.getDenominatorCoefficientsPadded();
 
         assertArrayEquals(new double[]{0, 0, 1}, numCoefficients, 1e-12);
         assertArrayEquals(den, denCoefficients, 1e-12);
@@ -699,8 +697,8 @@ public class TransferFunctionTest {
         den = new double[]{1, 1, 1};
         tf = new TransferFunction(num, den);
 
-        numCoefficients = tf.getNumeratorCoefficients();
-        denCoefficients = tf.getDenominatorCoefficients();
+        numCoefficients = tf.getNumeratorCoefficientsPadded();
+        denCoefficients = tf.getDenominatorCoefficientsPadded();
 
         assertArrayEquals(num, numCoefficients, 1e-12);
         assertArrayEquals(den, denCoefficients, 1e-12);
@@ -709,8 +707,8 @@ public class TransferFunctionTest {
         den = new double[]{1};
         tf = new TransferFunction(num, den);
 
-        numCoefficients = tf.getNumeratorCoefficients();
-        denCoefficients = tf.getDenominatorCoefficients();
+        numCoefficients = tf.getNumeratorCoefficientsPadded();
+        denCoefficients = tf.getDenominatorCoefficientsPadded();
 
         assertArrayEquals(num, numCoefficients, 1e-12);
         assertArrayEquals(new double[]{0, 0, 1}, denCoefficients, 1e-12);
@@ -719,8 +717,8 @@ public class TransferFunctionTest {
         den = new double[]{1};
         tf = new TransferFunction(num, den);
 
-        numCoefficients = tf.getNumeratorCoefficients();
-        denCoefficients = tf.getDenominatorCoefficients();
+        numCoefficients = tf.getNumeratorCoefficientsPadded();
+        denCoefficients = tf.getDenominatorCoefficientsPadded();
 
         assertArrayEquals(num, numCoefficients, 1e-12);
         assertArrayEquals(new double[]{0, 1}, denCoefficients, 1e-12);
