@@ -5,10 +5,8 @@ import com.wildbitsfoundry.etk4j.math.functions.BivariateFunction;
 import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 import com.wildbitsfoundry.etk4j.util.Tuples;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-
+// TODO document this class
 public abstract class RungeKutta extends OdeSolver {
 
     //Multiply steps computed from asymptotic behaviour of errors by this.
@@ -34,7 +32,17 @@ public abstract class RungeKutta extends OdeSolver {
     protected double errorExponent;
     protected Double hPrevious;
 
-    // TODO add builder
+    public RungeKutta(ODESystemOfEquations systemOfEquations, double t0, double[] y0, Double tBound,
+                      int errorEstimatorOrder, int nStages, double[][] A, double[] B, double[] C, double[] E, double[][] P) {
+        this(systemOfEquations, t0, y0, tBound, Double.POSITIVE_INFINITY, 0.001, 1e-6, null,
+                errorEstimatorOrder, nStages, A, B, C, E, P);
+    }
+
+    public RungeKutta(BivariateFunction func, double t0, double y0, Double tBound,
+                      int errorEstimatorOrder, int nStages, double[][] A, double[] B, double[] C, double[] E, double[][] P) {
+        this((t, y) -> new double[]{func.evaluateAt(t, y[0])}, t0, new double[]{y0}, tBound, Double.POSITIVE_INFINITY, 0.001, 1e-6, null,
+                errorEstimatorOrder, nStages, A, B, C, E, P);
+    }
 
     public RungeKutta(ODESystemOfEquations systemOfEquations, double t0, double[] y0, Double tBound,
                       double maxStep, double rTol, double aTol, Double firstStep, int errorEstimatorOrder, int nStages,
@@ -225,17 +233,17 @@ public abstract class RungeKutta extends OdeSolver {
 
             double[] dy = new double[y.length];
             double[][] kTranspose = new double[i][];
-            for(int j = 0; j < i; j++) {
+            for (int j = 0; j < i; j++) {
                 kTranspose[j] = K[j];
             }
             kTranspose = DoubleArrays.transpose(kTranspose);
-            for(int j = 0; j < y.length; j++) {
+            for (int j = 0; j < y.length; j++) {
                 dy[j] = DoubleArrays.dot(kTranspose[j], aSub) * h;
             }
             K[i] = systemOfEquations.evaluateAt(t + cSub * h, DoubleArrays.addElementWise(y, dy));
         }
         double[][] kTranspose = new double[K.length - 1][];
-        for(int i = 0; i < K.length - 1; i++) {
+        for (int i = 0; i < K.length - 1; i++) {
             kTranspose[i] = K[i];
         }
         kTranspose = DoubleArrays.transpose(kTranspose);
@@ -253,10 +261,5 @@ public abstract class RungeKutta extends OdeSolver {
 
     private double[] estimateError(double[][] K, double h) {
         return DoubleArrays.multiplyElementWise(DoubleArrays.dot(DoubleArrays.transpose(K), this.E), h);
-    }
-
-    @Override
-    protected Object getDenseOutputImpl() {
-        return null;
     }
 }
