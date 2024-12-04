@@ -8,7 +8,7 @@ import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 
 import static com.wildbitsfoundry.etk4j.signals.filters.Filters.*;
 
-public class Chebyshev2 extends AnalogFilter {
+public class Chebyshev2 extends Filter {
     /**
      * Chebyshev type II (a.k.a. Inverse Chebyshev) analog low pass filter prototype.
      * <br>
