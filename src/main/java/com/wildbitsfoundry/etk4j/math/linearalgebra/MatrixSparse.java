@@ -1,7 +1,5 @@
 package com.wildbitsfoundry.etk4j.math.linearalgebra;
 
-import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
-
 import java.util.Arrays;
 
 public class MatrixSparse extends Matrix {
@@ -399,7 +397,7 @@ public class MatrixSparse extends Matrix {
         return nz_length == rows * cols;
     }
 
-    public static MatrixSparse from2dArray(double array[][], double tol) {
+    public static MatrixSparse from2DArray(double array[][], double tol) {
         int nonzero = 0;
         for (int i = 0; i != array.length; i++)
             for (int j = 0; j != array[i].length; j++) {

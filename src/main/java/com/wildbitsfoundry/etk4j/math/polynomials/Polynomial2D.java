@@ -6,12 +6,12 @@ import com.wildbitsfoundry.etk4j.math.linearalgebra.MatrixDense;
 import com.wildbitsfoundry.etk4j.util.Grids;
 import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 
-public class Polynomial2d implements BivariateFunction {
+public class Polynomial2D implements BivariateFunction {
 	private double[] _coefs;
 	private int _n;
 	private int _m;
 
-	public Polynomial2d(double[] coefs, int n, int m) {
+	public Polynomial2D(double[] coefs, int n, int m) {
 		// check that (n + 1) * (m + 1) = coefs.length
 		_coefs = Arrays.copyOf(coefs, coefs.length);
 		_n = n;
@@ -37,14 +37,14 @@ public class Polynomial2d implements BivariateFunction {
 	 * @return Returns a bivariate polynomial of degree n + m fits the data z best
 	 *         in a least-square sense
 	 */
-	public static Polynomial2d polyFit2d(double[] x, double[] y, double[] z, int n, int m) {
+	public static Polynomial2D polyFit2D(double[] x, double[] y, double[] z, int n, int m) {
 		double[][] vars = new double[2][];
 		vars[0] = x;
 		vars[1] = y;
 
 		int[] nm = new int[] { n, m };
 		double[] coefs = polyFitN(vars, z, nm);
-		return new Polynomial2d(coefs, n, m);
+		return new Polynomial2D(coefs, n, m);
 	}
 
 	/***
@@ -66,7 +66,7 @@ public class Polynomial2d implements BivariateFunction {
 	 * @return Returns a bivariate polynomial of degree n + m fits the data z best
 	 *         in a least-square sense
 	 */
-	public static Polynomial2d polyFit2d(double[] x, double[] y, double[][] z, int n, int m) {
+	public static Polynomial2D polyFit2D(double[] x, double[] y, double[][] z, int n, int m) {
 		double[][] vars = new double[2][];
 		// Build grid
 		Grids.GridData gd = Grids.GridData.of(x, y);
@@ -76,7 +76,7 @@ public class Polynomial2d implements BivariateFunction {
 
 		int[] nm = new int[] { n, m };
 		double[] coefficients = polyFitN(vars, DoubleArrays.flatten(z), nm);
-		return new Polynomial2d(coefficients, n, m);
+		return new Polynomial2D(coefficients, n, m);
 	}
 
 	private static double[] polyFitN(double[][] vars, double[] z, int[] n) {

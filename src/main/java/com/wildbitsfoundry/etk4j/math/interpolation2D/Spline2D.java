@@ -1,4 +1,4 @@
-package com.wildbitsfoundry.etk4j.math.interpolation2d;
+package com.wildbitsfoundry.etk4j.math.interpolation2D;
 
 import java.util.Arrays;
 
@@ -7,18 +7,19 @@ import com.wildbitsfoundry.etk4j.math.interpolation.CubicSpline;
 import com.wildbitsfoundry.etk4j.math.interpolation.Interpolation;
 import com.wildbitsfoundry.etk4j.math.interpolation.LinearSpline;
 import com.wildbitsfoundry.etk4j.math.interpolation.Spline;
+import examples.Spline2DExample;
 
 /**
- * The {@code Spline2d} class represents bicubic and bilinear interpolation using cubic and linear splines respectively.
+ * The {@code Spline2D} class represents bicubic and bilinear interpolation using cubic and linear splines respectively.
  */
-public class Spline2d implements BivariateFunction {
+public class Spline2D implements BivariateFunction {
 
     private double[] y;
     private Spline[] splines;
 
     private int order;
 
-    protected Spline2d(double[] y, Spline[] splines, int order) {
+    protected Spline2D(double[] y, Spline[] splines, int order) {
         this.y = y;
         this.order = order;
         this.splines = splines;
@@ -40,11 +41,11 @@ public class Spline2d implements BivariateFunction {
      *          {@code z[1] = [z(2, 1), z(2, 2), z(2, 3), z(2, 4)}; <br>
      *          and so on. <br>
      *          Even though internally we iterate over {@code x} and {@code y} multiple times, only a single copy of
-     *          each {@code (x, y)} is required while. Please refer to the example in {@link examples.Spline2dExample}.
+     *          each {@code (x, y)} is required while. Please refer to the example in {@link examples.Spline2DExample}.
      *
      * @return A bicubic spline.
      */
-    public static Spline2d newBicubicSpline(double[] x, double[] y, double[][] z) {
+    public static Spline2D newBicubicSpline(double[] x, double[] y, double[][] z) {
         final int rows = y.length;
         final int cols = x.length;
         final int order = 4;
@@ -61,7 +62,7 @@ public class Spline2d implements BivariateFunction {
             }
             splines[i] = CubicSpline.newCubicSplineInPlace(x, z[i]);
         }
-        return new Spline2d(yt, splines, order);
+        return new Spline2D(yt, splines, order);
     }
 
     /**
@@ -80,11 +81,11 @@ public class Spline2d implements BivariateFunction {
      *          {@code z[1] = [z(2, 1), z(2, 2), z(2, 3), z(2, 4)}; <br>
      *          and so on. <br>
      *          Even though internally we iterate over {@code x} and {@code y} multiple times, only a single copy of
-     *          each {@code (x, y)} is required while. Please refer to the example in {@link examples.Spline2dExample}.
+     *          each {@code (x, y)} is required while. Please refer to the example in {@link Spline2DExample}.
      *
      * @return A bilinear spline.
      */
-    public static Spline2d newBilinearSpline(double[] x, double[] y, double[][] z) {
+    public static Spline2D newBilinearSpline(double[] x, double[] y, double[][] z) {
         final int rows = y.length;
         final int cols = x.length;
         final int order = 2;
@@ -101,7 +102,7 @@ public class Spline2d implements BivariateFunction {
             }
             splines[i] = LinearSpline.newLinearSplineInPlace(x, z[i]);
         }
-        return new Spline2d(yt, splines, order);
+        return new Spline2D(yt, splines, order);
     }
 
     /**

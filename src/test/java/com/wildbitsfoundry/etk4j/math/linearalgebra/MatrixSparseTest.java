@@ -16,7 +16,7 @@ public class MatrixSparseTest {
                 {2, 5, 8},
                 {3, 6, 10},
         };
-        MatrixSparse sparseCSC = MatrixSparse.from2dArray(matrix, ConstantsETK.DOUBLE_EPS);
+        MatrixSparse sparseCSC = MatrixSparse.from2DArray(matrix, ConstantsETK.DOUBLE_EPS);
         assertEquals(1, sparseCSC.get(0, 0), 1e-12);
     }
 
@@ -27,7 +27,7 @@ public class MatrixSparseTest {
                 {2, 5, 8},
                 {3, 6, 10},
         };
-        MatrixSparse sparseCSC = MatrixSparse.from2dArray(matrix, ConstantsETK.DOUBLE_EPS);
+        MatrixSparse sparseCSC = MatrixSparse.from2DArray(matrix, ConstantsETK.DOUBLE_EPS);
         sparseCSC.set(0, 0, 100);
         assertEquals(100, sparseCSC.unsafeGet(0, 0), 1e-12);
     }
@@ -39,7 +39,7 @@ public class MatrixSparseTest {
                 {2, 5, 8},
                 {3, 6, 10},
         };
-        MatrixSparse sparseCSC = MatrixSparse.from2dArray(matrix, ConstantsETK.DOUBLE_EPS);
+        MatrixSparse sparseCSC = MatrixSparse.from2DArray(matrix, ConstantsETK.DOUBLE_EPS);
         double[] b = {1, 2, 0};
         LUDecompositionSparse sparseLU = new LUDecompositionSparse(sparseCSC);
         MatrixSparse solution = sparseLU.solve(b);
@@ -54,7 +54,7 @@ public class MatrixSparseTest {
                 {2, 5, 8},
                 {3, 6, 10},
         };
-        MatrixSparse sparseCSC = MatrixSparse.from2dArray(matrix, ConstantsETK.DOUBLE_EPS);
+        MatrixSparse sparseCSC = MatrixSparse.from2DArray(matrix, ConstantsETK.DOUBLE_EPS);
         sparseCSC.unsafeSet(2, 2, 100);
         assertEquals(100, sparseCSC.unsafeGet(2, 2), 1e-12);
     }
@@ -66,7 +66,7 @@ public class MatrixSparseTest {
                 {2, 5, 8},
                 {3, 6, 10},
         };
-        MatrixSparse sparseCSC = MatrixSparse.from2dArray(matrix, ConstantsETK.DOUBLE_EPS);
+        MatrixSparse sparseCSC = MatrixSparse.from2DArray(matrix, ConstantsETK.DOUBLE_EPS);
         sparseCSC.reshape(10, 10);
         assertArrayEquals(new double[]{10, 10}, new double[]{sparseCSC.getRowCount(), sparseCSC.getColumnCount()}, 1e-12);
     }
@@ -78,7 +78,7 @@ public class MatrixSparseTest {
                 {2, 5, 8},
                 {3, 6, 10},
         };
-        MatrixSparse sparseCSC = MatrixSparse.from2dArray(matrix, ConstantsETK.DOUBLE_EPS);
+        MatrixSparse sparseCSC = MatrixSparse.from2DArray(matrix, ConstantsETK.DOUBLE_EPS);
         boolean isFull = sparseCSC.isFull();
         assertTrue(isFull);
     }
