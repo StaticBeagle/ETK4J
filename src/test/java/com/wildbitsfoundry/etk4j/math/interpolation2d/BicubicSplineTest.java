@@ -1,6 +1,6 @@
 package com.wildbitsfoundry.etk4j.math.interpolation2d;
 
-import static com.wildbitsfoundry.etk4j.math.interpolation2d.Spline2d.newBicubicSpline;
+import static com.wildbitsfoundry.etk4j.math.interpolation2d.Spline2D.newBicubicSpline;
 import static org.junit.Assert.assertEquals;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -31,7 +31,7 @@ public class BicubicSplineTest {
 
 	@Test
 	public void testBicubicInterpolation() {
-		Spline2d sp = newBicubicSpline(x, y, z);
+		Spline2D sp = newBicubicSpline(x, y, z);
 
 		double yi = sp.evaluateAt(xiyi[0][0], xiyi[0][1]);
 		assertEquals(5.0625, yi, 1e-12);

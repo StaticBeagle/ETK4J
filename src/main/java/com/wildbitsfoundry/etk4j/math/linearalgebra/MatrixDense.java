@@ -56,9 +56,9 @@ public class MatrixDense extends Matrix {
     }
 
     /**
-     * Construct matrix from a non-jagged 2d array of values.
+     * Construct matrix from a non-jagged 2D array of values.
      *
-     * @param data The 2d array of values used to populate the {@code Matrix} internal storage.
+     * @param data The 2D array of values used to populate the {@code Matrix} internal storage.
      */
     public MatrixDense(double[][] data) {
         if(data == null) {
@@ -129,6 +129,15 @@ public class MatrixDense extends Matrix {
     public MatrixDense copy() {
         double[] data = Arrays.copyOf(this.data, this.data.length);
         return new MatrixDense(data, this.rows, this.cols);
+    }
+
+    /***
+     * Creates a new {@link MatrixDense} from a 2D array of values
+     * @param A the input array
+     * @return a new {@link MatrixDense} created from the input array
+     */
+    public static MatrixDense from2DArray(double[][] A) {
+        return new MatrixDense(A);
     }
 
     /***
@@ -1213,11 +1222,11 @@ public class MatrixDense extends Matrix {
     }
 
     /**
-     * Retrieve {@link Matrix} data as 2d array.
+     * Retrieve {@link Matrix} data as 2D array.
      *
-     * @return A 2d array copy of the internal data of the Matrix.
+     * @return A 2D array copy of the internal data of the Matrix.
      */
-    public double[][] getAs2dArray() {
+    public double[][] getAs2DArray() {
         double[][] data = new double[rows][cols];
         for (int i = 0; i < rows; ++i) {
             data[i] = Arrays.copyOfRange(this.data, i * cols, i * cols + cols);
