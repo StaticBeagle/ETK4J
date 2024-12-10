@@ -1,8 +1,8 @@
 package examples;
 
-import static com.wildbitsfoundry.etk4j.math.interpolation2D.Spline2D.newBilinearSpline;
+import static com.wildbitsfoundry.etk4j.math.interpolation2d.Spline2D.newBilinearSpline;
 
-import com.wildbitsfoundry.etk4j.math.interpolation2D.Spline2D;
+import com.wildbitsfoundry.etk4j.math.interpolation2d.Spline2D;
 
 public class Spline2DifferentDimensionsExample {
 	

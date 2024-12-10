@@ -1,4 +1,4 @@
-package com.wildbitsfoundry.etk4j.math.interpolation2D;
+package com.wildbitsfoundry.etk4j.math.interpolation2d;
 
 import java.util.Arrays;
 
