@@ -1,13 +1,15 @@
-package com.wildbitsfoundry.etk4j.math.interpolation2d;
+package com.wildbitsfoundry.etk4j.math.interpolation;
 
-import static com.wildbitsfoundry.etk4j.math.interpolation2d.Spline2D.newBicubicSpline;
+import static com.wildbitsfoundry.etk4j.math.interpolation.Spline2D.newBilinearSpline;
 import static org.junit.Assert.assertEquals;
+
+import com.wildbitsfoundry.etk4j.math.interpolation.Spline2D;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class BicubicSplineTest {
+public class BilinearSplineTest {
 	static double[] x;
 	static double[] y;
 	static double[][] z;
@@ -30,28 +32,28 @@ public class BicubicSplineTest {
 	}
 
 	@Test
-	public void testBicubicInterpolation() {
-		Spline2D sp = newBicubicSpline(x, y, z);
+	public void testBilinearSplineInterpolation() {
+		Spline2D sp = newBilinearSpline(x, y, z);
 
 		double yi = sp.evaluateAt(xiyi[0][0], xiyi[0][1]);
-		assertEquals(5.0625, yi, 1e-12);
+		assertEquals(6.2500, yi, 1e-12);
 		
 		yi = sp.evaluateAt(xiyi[1][0], xiyi[1][1]);
-		assertEquals(39.0625, yi, 1e-12);
+		assertEquals(42.2500, yi, 1e-12);
 		
 		yi = sp.evaluateAt(xiyi[2][0], xiyi[2][1]);
-		assertEquals(150.0625, yi, 1e-12);
+		assertEquals(156.2500, yi, 1e-12);
 		
 		yi = sp.evaluateAt(xiyi[3][0], xiyi[3][1]);
-		assertEquals(410.0625, yi, 1e-12);
+		assertEquals(420.2500, yi, 1e-12);
 		
 		yi = sp.evaluateAt(xiyi[4][0], xiyi[4][1]);
-		assertEquals(915.0625, yi, 1e-12);
+		assertEquals(930.2500, yi, 1e-12);
 		
 		yi = sp.evaluateAt(xiyi[5][0], xiyi[5][1]);
-		assertEquals(1785.0625, yi, 1e-12);
+		assertEquals(1806.2500, yi, 1e-12);
 		
 		yi = sp.evaluateAt(xiyi[6][0], xiyi[6][1]);
-		assertEquals(3164.0625, yi, 1e-12);
+		assertEquals(3192.2500, yi, 1e-12);
 	}
 }

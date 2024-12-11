@@ -21,6 +21,10 @@ public class ComplexMatrixTest {
 
         Complex[] expected = ComplexArrays.zip(real, imag);
         assertArrayEquals(expected, inv.getArray());
+    }
 
+    @Test
+    public void testQR() {
+        //ComplexMatrixDense A = new ComplexMatrixDense();
     }
 }

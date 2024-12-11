@@ -1,12 +1,8 @@
-package com.wildbitsfoundry.etk4j.math.interpolation2d;
+package com.wildbitsfoundry.etk4j.math.interpolation;
 
 import java.util.Arrays;
 
 import com.wildbitsfoundry.etk4j.math.functions.BivariateFunction;
-import com.wildbitsfoundry.etk4j.math.interpolation.CubicSpline;
-import com.wildbitsfoundry.etk4j.math.interpolation.Interpolation;
-import com.wildbitsfoundry.etk4j.math.interpolation.LinearSpline;
-import com.wildbitsfoundry.etk4j.math.interpolation.Spline;
 import examples.Spline2DExample;
 
 /**
