@@ -78,7 +78,7 @@ public abstract class LinearTimeInvariantSystem {
         if (time[0] == 0.0) {
             xOut[0] = x0;
         } else if (time[0] > 0.0) {
-            xOut[0] = dot(x0, A.transpose().multiply(time[0]).expm().getAs2dArray());
+            xOut[0] = dot(x0, A.transpose().multiply(time[0]).expm().getAs2DArray());
         } else {
             throw new IllegalArgumentException("Initial time must be non negative.");
         }
@@ -106,8 +106,8 @@ public abstract class LinearTimeInvariantSystem {
                     }
 
                     MatrixDense expMT = new MatrixDense(M).transpose().expm();
-                    double[][] Ad = expMT.subMatrix(0, noStates - 1, 0, noStates - 1).getAs2dArray();
-                    double[][] Bd = expMT.subMatrix(noStates, expMT.getRowCount() - 1, 0, noStates - 1).getAs2dArray();
+                    double[][] Ad = expMT.subMatrix(0, noStates - 1, 0, noStates - 1).getAs2DArray();
+                    double[][] Bd = expMT.subMatrix(noStates, expMT.getRowCount() - 1, 0, noStates - 1).getAs2DArray();
                     for (int i = 1; i < noSteps; ++i) {
                         xOut[i] = DoubleArrays.addElementWise(dot(xOut[i - 1], Ad), dot(U[i - 1], Bd));
                     }
@@ -120,7 +120,7 @@ public abstract class LinearTimeInvariantSystem {
                     for (int i = 0; i < noStates; ++i) {
                         M[i] = DoubleArrays.concatenateAll(A.getRow(i), B.getRow(i), new double[noInputs]);
                     }
-                    double[][] identity = MatrixDense.Factory.identity(noInputs).getAs2dArray();
+                    double[][] identity = MatrixDense.Factory.identity(noInputs).getAs2DArray();
                     for (int i = noStates, j = 0; i < noStates + noInputs; ++i, ++j) {
                         M[i] = DoubleArrays.concatenate(new double[noStates + noInputs], identity[j]);
                     }
@@ -129,9 +129,9 @@ public abstract class LinearTimeInvariantSystem {
                     }
 
                     MatrixDense expMT = new MatrixDense(M).transpose().expm();
-                    double[][] Ad = expMT.subMatrix(0, noStates - 1, 0, noStates - 1).getAs2dArray();
-                    double[][] Bd1 = expMT.subMatrix(noStates + noInputs, expMT.getRowCount() - 1, 0, noStates - 1).getAs2dArray();
-                    double[][] Bd0 = expMT.subMatrix(noStates, noStates + noInputs - 1, 0, noStates - 1).getAs2dArray();
+                    double[][] Ad = expMT.subMatrix(0, noStates - 1, 0, noStates - 1).getAs2DArray();
+                    double[][] Bd1 = expMT.subMatrix(noStates + noInputs, expMT.getRowCount() - 1, 0, noStates - 1).getAs2DArray();
+                    double[][] Bd0 = expMT.subMatrix(noStates, noStates + noInputs - 1, 0, noStates - 1).getAs2DArray();
                     for (int i = 0; i < Bd0.length; ++i) {
                         DoubleArrays.subtractElementWiseInPlace(Bd0[i], Bd1[i]);
                     }
@@ -146,8 +146,8 @@ public abstract class LinearTimeInvariantSystem {
             }
         }
         double[][] yOut = new double[noSteps][noStates];
-        double[][] c = C.transpose().getAs2dArray();
-        double[][] d = D.transpose().getAs2dArray();
+        double[][] c = C.transpose().getAs2DArray();
+        double[][] d = D.transpose().getAs2DArray();
         for (int i = 0; i < noSteps; ++i) {
             yOut[i] = dot(xOut[i], c);
             DoubleArrays.addElementWiseInPlace(yOut[i], dot(U[i], d));

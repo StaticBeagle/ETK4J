@@ -610,6 +610,14 @@ public class Complex implements Comparable<Complex> {
         return Double.isFinite(real) && Double.isFinite(imag);
     }
 
+    /**
+     * Sign of the Complex number.
+     * @return the {@code sign()} of the complex number
+     */
+    public Complex sign() {
+        return this.divide(this.abs());
+    }
+
     private static final void invertOp(Complex c) {
         double mag = 1.0 / c.norm();
         c.real *= mag;

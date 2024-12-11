@@ -154,7 +154,7 @@ public class LUDecompositionSparse extends LUDecomposition<MatrixSparse> {
         for(int i = 0; i < b.length; i++) {
             xmat[i][0] = x[i];
         }
-        return MatrixSparse.from2dArray(xmat, 0);
+        return MatrixSparse.from2DArray(xmat, 0);
     }
 
     private static int solveColB(MatrixSparse G, boolean lower, MatrixSparse B, int colB, double[] x, int[] pinv, IGrowArray g_xi, int[] w) {
