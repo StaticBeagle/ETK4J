@@ -1,9 +1,8 @@
 package examples;
 
-import static com.wildbitsfoundry.etk4j.math.interpolation.Spline2D.newBicubicSpline;
-import static com.wildbitsfoundry.etk4j.math.interpolation.Spline2D.newBilinearSpline;
-
 import com.wildbitsfoundry.etk4j.math.functions.BivariateFunction;
+import com.wildbitsfoundry.etk4j.math.interpolation.BiCubicSpline;
+import com.wildbitsfoundry.etk4j.math.interpolation.BiLinearSpline;
 import com.wildbitsfoundry.etk4j.math.interpolation.Spline2D;
 
 public class Spline2DExample {
@@ -24,11 +23,11 @@ public class Spline2DExample {
 		System.out.printf(":: Function z(x, y) = x^2 * y^2%n%n");
 
 		System.out.println(":: Test Bicubic spline");
-		Spline2D sp = newBicubicSpline(x, y, z);
+		Spline2D sp = BiCubicSpline.newBicubicSpline(x, y, z);
 		printSpline2D(sp, x, y);
 
 		System.out.printf("%n:: Test Bilinear spline%n");
-		sp = newBilinearSpline(x, y, z);
+		sp = BiLinearSpline.newBilinearSpline(x, y, z);
 		printSpline2D(sp, x, y);
 	}
 

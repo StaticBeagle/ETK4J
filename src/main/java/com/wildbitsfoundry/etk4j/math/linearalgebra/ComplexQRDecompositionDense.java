@@ -56,6 +56,15 @@ public class ComplexQRDecompositionDense extends ComplexQRDecomposition<ComplexM
                 .solve(new ComplexMatrixDense(new Complex[][]{g, f}));
         System.out.println("Solution to system");
         System.out.println(sol);
+
+        ComplexMatrixDense AA = new ComplexMatrixDense(new Complex[][] {
+                {new Complex(1, 1), new Complex(2, 0)},
+                {new Complex(2, -1), new Complex(3, 0)}
+        });
+
+        ComplexQRDecompositionDense qrDecompositionDense = new ComplexQRDecompositionDense(AA);
+        System.out.println(qrDecompositionDense.getQ());
+        System.out.println(qrDecompositionDense.getR());
     }
 
     private static Complex sig(Complex u) {
