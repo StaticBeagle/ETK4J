@@ -36,7 +36,7 @@ public class Polynomial2DTest {
 	}
 
 	@Test
-	public void testPolynomial2D() {
+	public void testPolynomial2d() {
 		Polynomial2D poly = polyFit2D(x, y, z, 2, 2);
 
 		double yi = poly.evaluateAt(xiyi[0][0], xiyi[0][1]);
@@ -62,14 +62,14 @@ public class Polynomial2DTest {
 	}
 
 	@Test
-	public void testPolynomial2DFlatPolyFit() {
+	public void testPolynomial2dFlatPolyFit() {
 		int length = z.length;
 		double[] xx = DoubleArrays.repeat(x, length);
 		double[] yy = DoubleArrays.repeat(y, length);
 		Arrays.sort(yy);
 
 		double[] zz = DoubleArrays.flatten(z);
-		Polynomial2D poly = Polynomial2D.polyFit2D(xx, yy, zz, 2, 2);
+		Polynomial2D poly = polyFit2D(xx, yy, zz, 2, 2);
 
 		double yi = poly.evaluateAt(xiyi[0][0], xiyi[0][1]);
 		assertEquals(5.0625, yi, 1e-12);
@@ -94,7 +94,7 @@ public class Polynomial2DTest {
 	}
 
 	@Test
-	public void testPolynomial2DArrayEval() {
+	public void testPolynomial2dArrayEval() {
 		Polynomial2D poly = polyFit2D(x, y, z, 2, 2);
 
 		double[] yi = new double[xiyi.length];
