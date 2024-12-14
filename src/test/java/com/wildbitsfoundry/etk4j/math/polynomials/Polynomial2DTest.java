@@ -1,6 +1,6 @@
 package com.wildbitsfoundry.etk4j.math.polynomials;
 
-import static com.wildbitsfoundry.etk4j.math.polynomials.Polynomial2d.polyFit2d;
+import static com.wildbitsfoundry.etk4j.math.polynomials.Polynomial2D.polyFit2d;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
@@ -13,7 +13,7 @@ import org.junit.rules.ExpectedException;
 
 import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 
-public class Polynomial2dTest {
+public class Polynomial2DTest {
 	static double[] x;
 	static double[] y;
 	static double[][] z;
@@ -37,7 +37,7 @@ public class Polynomial2dTest {
 
 	@Test
 	public void testPolynomial2d() {
-		Polynomial2d poly = polyFit2d(x, y, z, 2, 2);
+		Polynomial2D poly = polyFit2d(x, y, z, 2, 2);
 
 		double yi = poly.evaluateAt(xiyi[0][0], xiyi[0][1]);
 		assertEquals(5.0625, yi, 1e-12);
@@ -69,7 +69,7 @@ public class Polynomial2dTest {
 		Arrays.sort(yy);
 
 		double[] zz = DoubleArrays.flatten(z);
-		Polynomial2d poly = polyFit2d(xx, yy, zz, 2, 2);
+		Polynomial2D poly = polyFit2d(xx, yy, zz, 2, 2);
 
 		double yi = poly.evaluateAt(xiyi[0][0], xiyi[0][1]);
 		assertEquals(5.0625, yi, 1e-12);
@@ -95,7 +95,7 @@ public class Polynomial2dTest {
 
 	@Test
 	public void testPolynomial2dArrayEval() {
-		Polynomial2d poly = polyFit2d(x, y, z, 2, 2);
+		Polynomial2D poly = polyFit2d(x, y, z, 2, 2);
 
 		double[] yi = new double[xiyi.length];
 		for (int i = 0; i < xiyi.length; ++i) {
@@ -107,26 +107,26 @@ public class Polynomial2dTest {
 
 	@Test
 	public void testToString() {
-		Polynomial2d poly = polyFit2d(x, y, z, 2, 2);
+		Polynomial2D poly = polyFit2d(x, y, z, 2, 2);
 
 		assertEquals("x^2 * y^2", poly.toString());
 
-		poly = new Polynomial2d(new double[] { 1, 1, 1, 1 }, 1, 1);
+		poly = new Polynomial2D(new double[] { 1, 1, 1, 1 }, 1, 1);
 		assertEquals("x * y + y + x + 1.000", poly.toString());
 		
-		poly = new Polynomial2d(new double[] { 2, 1, 1, 2 }, 1, 1);
+		poly = new Polynomial2D(new double[] { 2, 1, 1, 2 }, 1, 1);
 		assertEquals("2.000 * x * y + y + x + 2.000", poly.toString());
 		
-		poly = new Polynomial2d(new double[] { 1, 1, 1, 0, 1, 1 }, 2, 1);
+		poly = new Polynomial2D(new double[] { 1, 1, 1, 0, 1, 1 }, 2, 1);
 		assertEquals("x^2 * y + x * y + y + x + 1.000", poly.toString());
 		
-		poly = new Polynomial2d(new double[] { -1, 1, 1, 1, 1, 1 }, 2, 1);
+		poly = new Polynomial2D(new double[] { -1, 1, 1, 1, 1, 1 }, 2, 1);
 		assertEquals("-x^2 * y + x * y + y + x^2 + x + 1.000", poly.toString());
 		
-		poly = new Polynomial2d(new double[] { -1, 1, 1, 1, 1, -1 }, 2, 1);
+		poly = new Polynomial2D(new double[] { -1, 1, 1, 1, 1, -1 }, 2, 1);
 		assertEquals("-x^2 * y + x * y + y + x^2 + x - 1.000", poly.toString());
 		
-		poly = new Polynomial2d(new double[] { -1, 1, 1, 1, 1, -1 }, 1, 2);
+		poly = new Polynomial2D(new double[] { -1, 1, 1, 1, 1, -1 }, 1, 2);
 		assertEquals("-x * y^2 + y^2 + x * y + y + x - 1.000", poly.toString());
 		
 		
