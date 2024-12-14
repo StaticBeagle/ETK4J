@@ -1,12 +1,11 @@
 package examples;
 
-import static com.wildbitsfoundry.etk4j.math.interpolation2d.Spline2d.newBicubicSpline;
-import static com.wildbitsfoundry.etk4j.math.interpolation2d.Spline2d.newBilinearSpline;
-
 import com.wildbitsfoundry.etk4j.math.functions.BivariateFunction;
-import com.wildbitsfoundry.etk4j.math.interpolation2d.Spline2d;
+import com.wildbitsfoundry.etk4j.math.interpolation.BiCubicSpline;
+import com.wildbitsfoundry.etk4j.math.interpolation.BiLinearSpline;
+import com.wildbitsfoundry.etk4j.math.interpolation.Spline2D;
 
-public class Spline2dExample {
+public class Spline2DExample {
 
 	public static void main(String[] args) {
 		createSurface();
@@ -24,15 +23,15 @@ public class Spline2dExample {
 		System.out.printf(":: Function z(x, y) = x^2 * y^2%n%n");
 
 		System.out.println(":: Test Bicubic spline");
-		Spline2d sp = newBicubicSpline(x, y, z);
-		printSpline2d(sp, x, y);
+		Spline2D sp = BiCubicSpline.newBicubicSpline(x, y, z);
+		printSpline2D(sp, x, y);
 
 		System.out.printf("%n:: Test Bilinear spline%n");
-		sp = newBilinearSpline(x, y, z);
-		printSpline2d(sp, x, y);
+		sp = BiLinearSpline.newBilinearSpline(x, y, z);
+		printSpline2D(sp, x, y);
 	}
 
-	public static void printSpline2d(BivariateFunction sp, double[] x, double[] y) {
+	public static void printSpline2D(BivariateFunction sp, double[] x, double[] y) {
 
 		final int rows = y.length;
 		final int cols = x.length;

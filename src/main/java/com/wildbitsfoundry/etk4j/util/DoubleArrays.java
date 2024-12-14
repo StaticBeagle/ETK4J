@@ -621,8 +621,8 @@ public final class DoubleArrays {
 
 
     /**
-     * Converts (flattens) a 2d array into a 1d array by copying
-     * every row of the 2d array into the 1d array.
+     * Converts (flattens) a 2D array into a 1d array by copying
+     * every row of the 2D array into the 1d array.
      * <pre>
      * let a = {{1, 2, 3}, {4, 5, 6}};
      * thus flatten(a) returns:
@@ -855,10 +855,10 @@ public final class DoubleArrays {
     }
 
     /**
-     * Transpose a 2d array.
+     * Transpose a 2D array.
      * @param a The array to transpose.
      * @return The transposed array.
-     * @see <a href="https://stackoverflow.com/a/17634025/6383857">Transpose 2d array</a>
+     * @see <a href="https://stackoverflow.com/a/17634025/6383857">Transpose 2D array</a>
      */
     public static double[][] transpose(double[][] a) {
         // empty or unset array, nothing do to here

@@ -1,10 +1,12 @@
 package com.wildbitsfoundry.etk4j.math.linearalgebra;
 
-public abstract class Matrix {
+import com.wildbitsfoundry.etk4j.math.complex.Complex;
+
+public abstract class ComplexMatrix {
     protected int rows;
     protected int cols;
 
-    public Matrix() {}
+    public ComplexMatrix() {}
 
     /**
      * Constructs a {@code Matrix}.
@@ -12,7 +14,7 @@ public abstract class Matrix {
      * @param rows The number of rows of the {@code Matrix}..
      * @param cols The number of columns of the {@code Matrix}..
      */
-    public Matrix(int rows, int cols) {
+    public ComplexMatrix(int rows, int cols) {
         this.rows = rows;
         this.cols = cols;
     }
@@ -21,7 +23,7 @@ public abstract class Matrix {
      * Deep copy.
      * @return A deep copy of the {@code Matrix}.
      */
-    public abstract Matrix copy();
+    public abstract ComplexMatrix copy();
 
     /**
      * Retrieve value from {@code Matrix} at a given position.
@@ -30,7 +32,7 @@ public abstract class Matrix {
      * @param col The column index.
      * @return The value at {@code A(i, j)}.
      */
-    public abstract double get(int row, int col);
+    public abstract Complex get(int row, int col);
 
     /**
      * Retrieve value from {@code Matrix} at a given position without any boundary checks.
@@ -39,7 +41,7 @@ public abstract class Matrix {
      * @param col The column index.
      * @return The value at {@code A(i, j)}.
      */
-    public abstract double unsafeGet(int row, int col);
+    public abstract Complex unsafeGet(int row, int col);
 
     /**
      * Set the value of the {@code Matrix} at a given position.
@@ -48,7 +50,7 @@ public abstract class Matrix {
      * @param col   The column index.
      * @param val The value used to set {@code A(i, j) = val}.
      */
-    public abstract void set(int row, int col, double val);
+    public abstract void set(int row, int col, Complex val);
 
     /**
      * Set the value of the {@code Matrix} at a given position without any boundary checks.
@@ -57,7 +59,7 @@ public abstract class Matrix {
      * @param col   The column index.
      * @param val The value used to set {@code A(i, j) = val}.
      */
-    public abstract void unsafeSet(int row, int col, double val);
+    public abstract void unsafeSet(int row, int col, Complex val);
 
     /**
      * {@code Matrix} determinant.
@@ -66,18 +68,18 @@ public abstract class Matrix {
      */
     public abstract double det();
 
-    /**
-     * Matrix trace.
-     *
-     * @return sum of the diagonal elements.
-     */
-    public double trace() {
-        double t = 0;
-        for (int i = 0; i < Math.min(rows, cols); ++i) {
-            t += unsafeGet(i, i);
-        }
-        return t;
-    }
+//    /**
+//     * Matrix trace.
+//     *
+//     * @return sum of the diagonal elements.
+//     */
+//    public double trace() {
+//        double t = 0;
+//        for (int i = 0; i < Math.min(rows, cols); ++i) {
+//            t += unsafeGet(i, i);
+//        }
+//        return t;
+//    }
 
     /**
      * Is the {@code Matrix} squared.
@@ -96,7 +98,7 @@ public abstract class Matrix {
      * @return The {@link LUDecompositionDense} of the {@code Matrix}.
      * @see <a href="https://en.wikipedia.org/wiki/LU_decomposition">LU Decomposition</a>
      */
-    public abstract LUDecomposition<?> LU();
+    public abstract ComplexLUDecomposition<?> LU();
 
     /**
      * QR decomposition of the {@code Matrix}.
@@ -104,14 +106,14 @@ public abstract class Matrix {
      * @return The {@link QRDecompositionDense} of the {@code Matrix}.
      * @see <a href="https://en.wikipedia.org/wiki/QR_decomposition">QR Decomposition</a>
      */
-    public abstract QRDecomposition<?> QR();
+    public abstract ComplexQRDecomposition<?> QR();
     /**
      * Cholesky decomposition of the {@code Matrix}.
      *
      * @return The {@link CholeskyDecompositionDense} of the {@code Matrix}.
      * @see <a href="https://en.wikipedia.org/wiki/Cholesky_decomposition">Cholesky Decomposition</a>
      */
-    public abstract CholeskyDecomposition<?> Chol();
+    //public abstract ComplexCholeskyDecomposition<?> Chol();
     // endregion
 
     /***
@@ -119,12 +121,12 @@ public abstract class Matrix {
      *
      * @return Array containing the diagonal of the matrix
      */
-    public double[] diag() {
+    public Complex[] diag() {
         if (!this.isSquared()) {
             throw new RuntimeException("Matrix is not squared");
         }
         final int dim = rows;
-        double[] diag = new double[dim];
+        Complex[] diag = new Complex[dim];
         for (int i = 0; i < dim; ++i) {
             diag[i] = this.unsafeGet(i, i);
         }
@@ -156,4 +158,5 @@ public abstract class Matrix {
     public int getColumnCount() {
         return cols;
     }
+
 }

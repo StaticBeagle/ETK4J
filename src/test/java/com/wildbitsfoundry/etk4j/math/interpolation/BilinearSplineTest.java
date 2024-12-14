@@ -1,11 +1,11 @@
-package com.wildbitsfoundry.etk4j.math.interpolation2d;
+package com.wildbitsfoundry.etk4j.math.interpolation;
 
-import static com.wildbitsfoundry.etk4j.math.interpolation2d.Spline2d.newBilinearSpline;
-import static org.junit.Assert.assertEquals;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import static org.junit.Assert.assertEquals;
 
 public class BilinearSplineTest {
 	static double[] x;
@@ -31,7 +31,7 @@ public class BilinearSplineTest {
 
 	@Test
 	public void testBilinearSplineInterpolation() {
-		Spline2d sp = newBilinearSpline(x, y, z);
+		Spline2D sp = BiLinearSpline.newBilinearSpline(x, y, z);
 
 		double yi = sp.evaluateAt(xiyi[0][0], xiyi[0][1]);
 		assertEquals(6.2500, yi, 1e-12);
