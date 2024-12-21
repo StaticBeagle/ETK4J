@@ -203,7 +203,7 @@ public class MatrixDenseTest {
             try_success("getColumnCount... ", "");
         }
         B = new MatrixDense(avals);
-        double[][] barray = B.getAs2dArray();
+        double[][] barray = B.getAs2DArray();
         if (barray == avals) {
             errorCount = try_failure(errorCount, "getArray... ", "");
         } else {

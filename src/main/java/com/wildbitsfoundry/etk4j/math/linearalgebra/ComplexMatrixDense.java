@@ -5,7 +5,7 @@ import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 
 import java.util.Arrays;
 
-public class ComplexMatrixDense {
+public class ComplexMatrixDense extends ComplexMatrix {
     private Complex[] data;
     private int rows;
     private int cols;
@@ -65,6 +65,10 @@ public class ComplexMatrixDense {
         Arrays.fill(data, val);
     }
 
+    public static ComplexMatrixDense from2DArray(Complex[][] A) {
+        return new ComplexMatrixDense(A);
+    }
+
     /***
      * Deep copy
      * @return A newly created {@link ComplexMatrixDense} with the values of this current one.
@@ -91,6 +95,7 @@ public class ComplexMatrixDense {
     }
 
     public Complex get(int i, int j) {
+        // TODO clean up all these checks
         if(i < 0) {
             throw new ArrayIndexOutOfBoundsException("Index i cannot be less thant zero.");
         }
@@ -106,7 +111,13 @@ public class ComplexMatrixDense {
         return data[i * cols + j];
     }
 
+    @Override
+    public Complex unsafeGet(int row, int col) {
+        return data[row * cols + col];
+    }
+
     public void set(int i, int j, Complex val) {
+        // TODO clean up all these checks
         if(i < 0) {
             throw new ArrayIndexOutOfBoundsException("Index i cannot be less thant zero.");
         }
@@ -120,6 +131,26 @@ public class ComplexMatrixDense {
             throw new ArrayIndexOutOfBoundsException(String.format("Index j: %d >= than number of columns: %d.", j, cols));
         }
         data[i * cols + j] = val;
+    }
+
+    @Override
+    public void unsafeSet(int row, int col, Complex val) {
+        data[row * cols + col] = val;
+    }
+
+    @Override
+    public double det() {
+        return 0;
+    }
+
+    @Override
+    public ComplexLUDecomposition<?> LU() {
+        return null;
+    }
+
+    @Override
+    public ComplexQRDecomposition<?> QR() {
+        return null;
     }
 
     public Complex[] getArray() {
@@ -166,6 +197,12 @@ public class ComplexMatrixDense {
         return c;
     }
 
+    public ComplexMatrixDense multiply(ComplexMatrixDense matrix) {
+        ComplexMatrixDense c = new ComplexMatrixDense(0, 0);
+        multiplyOp(this, matrix, c);
+        return c;
+    }
+
     private static void multiplyOp(ComplexMatrixDense a, MatrixDense b, ComplexMatrixDense c) {
         int bRows = b.getRowCount();
         int bCols = b.getColumnCount();
@@ -176,6 +213,33 @@ public class ComplexMatrixDense {
         Complex[] result = new Complex[a.rows * bCols];
         double[] bColJ = new double[a.cols];
         double[] bData = b.getArray();
+        for (int j = 0; j < bCols; j++) {
+            for (int k = 0; k < a.cols; k++) {
+                bColJ[k] = bData[k * bCols + j];
+            }
+            for (int i = 0; i < a.rows; i++) {
+                Complex s = new Complex();
+                for (int k = 0; k < a.cols; k++) {
+                    s.addEquals(a.data[k + i * a.cols].multiply(bColJ[k]));
+                }
+                result[i * bCols + j] = s;
+            }
+        }
+        c.data = result;
+        c.rows = a.rows;
+        c.cols = bCols;
+    }
+
+    private static void multiplyOp(ComplexMatrixDense a, ComplexMatrixDense b, ComplexMatrixDense c) {
+        int bRows = b.getRowCount();
+        int bCols = b.getColumnCount();
+        if (bRows != a.cols) {
+            throw new IllegalArgumentException("Matrix inner dimensions must agree. Check that the number of" +
+                    "columns of the first matrix equal the number of rows of the second matrix.");
+        }
+        Complex[] result = new Complex[a.rows * bCols];
+        Complex[] bColJ = new Complex[a.cols];
+        Complex[] bData = b.getArray();
         for (int j = 0; j < bCols; j++) {
             for (int k = 0; k < a.cols; k++) {
                 bColJ[k] = bData[k * bCols + j];
@@ -271,6 +335,59 @@ public class ComplexMatrixDense {
     void checkMatrixDimensions(MatrixDense B) {
         if (B.getRowCount() != rows || B.getColumnCount() != cols) {
             throw new IllegalArgumentException("Matrix dimensions must agree.");
+        }
+    }
+
+    public ComplexMatrixDense conjugateTranspose() {
+        if (this.isEmpty()) {
+            return new ComplexMatrixDense(null, 0, 0);
+        }
+        Complex[] result = new Complex[rows * cols];
+        final int trows = cols;
+        final int tcols = rows;
+
+        for (int i = 0; i < rows; ++i) {
+            for (int j = 0; j < cols; ++j) {
+                result[j * tcols + i] = data[i * cols + j].conj();
+            }
+        }
+        return new ComplexMatrixDense(result, trows, tcols);
+    }
+
+    public static final class Factory {
+        private Factory() {
+        }
+
+
+
+        /**
+         * Identity {@code Matrix}.
+         *
+         * @param rows The number of rows.
+         * @param cols The number of columns.
+         * @return {@code identity(rows, cols)}.
+         */
+        public static ComplexMatrixDense identity(int rows, int cols) {
+            Complex[] data = new Complex[rows * cols];
+            for (int i = 0; i < rows; ++i) {
+                for (int j = 0; j < cols; ++j) {
+                    if (i == j) {
+                        data[i * cols + j] = new Complex(1, 0);
+                    } else {
+                        data[i * cols + j] = new Complex(0, 0);
+                    }
+                }
+            }
+            return new ComplexMatrixDense(data, rows, cols);
+        }
+
+        /**
+         * Identity {@code Matrix.}
+         * @param n The number of rows and columns.
+         * @return {@code identity(n, n)}.
+         */
+        public static ComplexMatrixDense identity(int n) {
+            return ComplexMatrixDense.Factory.identity(n, n);
         }
     }
 }

@@ -1,6 +1,6 @@
 package com.wildbitsfoundry.etk4j.math.polynomials;
 
-import static com.wildbitsfoundry.etk4j.math.polynomials.Polynomial2D.polyFit2d;
+import static com.wildbitsfoundry.etk4j.math.polynomials.Polynomial2D.polyFit2D;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
@@ -36,8 +36,8 @@ public class Polynomial2DTest {
 	}
 
 	@Test
-	public void testPolynomial2d() {
-		Polynomial2D poly = polyFit2d(x, y, z, 2, 2);
+	public void testPolynomial2D() {
+		Polynomial2D poly = polyFit2D(x, y, z, 2, 2);
 
 		double yi = poly.evaluateAt(xiyi[0][0], xiyi[0][1]);
 		assertEquals(5.0625, yi, 1e-12);
@@ -62,14 +62,14 @@ public class Polynomial2DTest {
 	}
 
 	@Test
-	public void testPolynomial2dFlatPolyFit() {
+	public void testPolynomial2DFlatPolyFit() {
 		int length = z.length;
 		double[] xx = DoubleArrays.repeat(x, length);
 		double[] yy = DoubleArrays.repeat(y, length);
 		Arrays.sort(yy);
 
 		double[] zz = DoubleArrays.flatten(z);
-		Polynomial2D poly = polyFit2d(xx, yy, zz, 2, 2);
+		Polynomial2D poly = polyFit2D(xx, yy, zz, 2, 2);
 
 		double yi = poly.evaluateAt(xiyi[0][0], xiyi[0][1]);
 		assertEquals(5.0625, yi, 1e-12);
@@ -94,8 +94,8 @@ public class Polynomial2DTest {
 	}
 
 	@Test
-	public void testPolynomial2dArrayEval() {
-		Polynomial2D poly = polyFit2d(x, y, z, 2, 2);
+	public void testPolynomial2DArrayEval() {
+		Polynomial2D poly = polyFit2D(x, y, z, 2, 2);
 
 		double[] yi = new double[xiyi.length];
 		for (int i = 0; i < xiyi.length; ++i) {
@@ -107,7 +107,7 @@ public class Polynomial2DTest {
 
 	@Test
 	public void testToString() {
-		Polynomial2D poly = polyFit2d(x, y, z, 2, 2);
+		Polynomial2D poly = polyFit2D(x, y, z, 2, 2);
 
 		assertEquals("x^2 * y^2", poly.toString());
 

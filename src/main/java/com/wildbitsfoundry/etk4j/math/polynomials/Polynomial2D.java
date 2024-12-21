@@ -37,7 +37,7 @@ public class Polynomial2D implements BivariateFunction {
 	 * @return Returns a bivariate polynomial of degree n + m fits the data z best
 	 *         in a least-square sense
 	 */
-	public static Polynomial2D polyFit2d(double[] x, double[] y, double[] z, int n, int m) {
+	public static Polynomial2D polyFit2D(double[] x, double[] y, double[] z, int n, int m) {
 		double[][] vars = new double[2][];
 		vars[0] = x;
 		vars[1] = y;
@@ -66,7 +66,7 @@ public class Polynomial2D implements BivariateFunction {
 	 * @return Returns a bivariate polynomial of degree n + m fits the data z best
 	 *         in a least-square sense
 	 */
-	public static Polynomial2D polyFit2d(double[] x, double[] y, double[][] z, int n, int m) {
+	public static Polynomial2D polyFit2D(double[] x, double[] y, double[][] z, int n, int m) {
 		double[][] vars = new double[2][];
 		// Build grid
 		Grids.GridData gd = Grids.GridData.of(x, y);

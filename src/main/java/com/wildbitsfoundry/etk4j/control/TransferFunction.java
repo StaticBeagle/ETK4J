@@ -664,13 +664,13 @@ public class TransferFunction extends LinearTimeInvariantSystem {
         System.arraycopy(den, 1, fRow, 0, fRow.length);
         DoubleArrays.multiplyElementWiseInPlace(fRow, -1.0);
 
-        double[][] eye = MatrixDense.Factory.identity(k - 2, k - 1).getAs2dArray();
+        double[][] eye = MatrixDense.Factory.identity(k - 2, k - 1).getAs2DArray();
         double[][] A = new double[eye.length + 1][];
         A[0] = fRow;
         for (int i = 0; i < eye.length; ++i) {
             A[i + 1] = Arrays.copyOf(eye[i], eye[0].length);
         }
-        double[][] B = MatrixDense.Factory.identity(k - 1, 1).getAs2dArray();
+        double[][] B = MatrixDense.Factory.identity(k - 1, 1).getAs2DArray();
         double[][] C = new double[1][];
         double[][] outer = DoubleArrays.outer(new double[]{numPadded[0]}, Arrays.copyOfRange(den, 1, den.length));
         C[0] = DoubleArrays.subtractElementWise(Arrays.copyOfRange(numPadded, 1, numPadded.length), outer[0]);

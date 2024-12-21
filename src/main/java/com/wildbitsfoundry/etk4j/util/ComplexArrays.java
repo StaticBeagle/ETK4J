@@ -1,5 +1,6 @@
 package com.wildbitsfoundry.etk4j.util;
 
+import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 
 import java.util.Arrays;
@@ -160,8 +161,8 @@ public final class ComplexArrays {
     }
 
     /**
-     * Converts (flattens) a 2d array into a 1d array by copying
-     * every row of the 2d array into the 1d array.
+     * Converts (flattens) a 2D array into a 1d array by copying
+     * every row of the 2D array into the 1d array.
      * <pre>
      * let a = {{1, 2, 3}, {4, 5, 6}};
      * thus flatten(a) returns:
@@ -237,6 +238,20 @@ public final class ComplexArrays {
 
     /**
      * Multiply and array of Complex values times a Complex value.
+     * @param a The left-hand side array.
+     * @param b The right-hand side array.
+     * @return {@code a * b}
+     */
+    public static Complex[] multiplyElementWise(Complex[] a, Complex[] b) {
+        Complex[] result = new Complex[a.length];
+        for (int i = 0; i < a.length; ++i) {
+            result[i] = a[i].multiply(b[i]);
+        }
+        return result;
+    }
+
+    /**
+     * Multiply and array of Complex values times a Complex value.
      * @param a The input array.
      * @param c The Complex value to multiply.
      * @return {@code a * b}
@@ -288,6 +303,21 @@ public final class ComplexArrays {
     }
 
     /**
+     * Divides a real number by an array of Complex number element wise.
+     * @param a The left-hand array of Complex values.
+     * @param d The right-hand double value.
+     * @return {@code a / d}.
+     */
+    public static Complex[] divideElementWise(Complex[] a, double d) {
+        Complex[] result = new Complex[a.length];
+        double dp = 1.0 / d;
+        for (int i = 0; i < a.length; ++i) {
+            result[i] = a[i].multiply(dp);
+        }
+        return result;
+    }
+
+    /**
      * Array concatenation.
      * @param a The left-hand array.
      * @param b The right-hand array.
@@ -313,6 +343,22 @@ public final class ComplexArrays {
             prod.multiplyEquals(a[i]);
         }
         return prod;
+    }
+
+    /**
+     * Subtract a Complex value from an array of Complex values element wise.
+     *
+     * @param a The left-hand array.
+     * @param b The right-hand array to be subtracted.
+     * @return {@code a - b}.
+     **/
+    public static Complex[] subtractElementWise(Complex[] a, Complex[] b) {
+        // TODO check dimensions
+        Complex[] result = new Complex[a.length];
+        for (int i = 0; i < a.length; ++i) {
+            result[i] = a[i].subtract(b[i]);
+        }
+        return result;
     }
 
     /**
@@ -351,5 +397,15 @@ public final class ComplexArrays {
             result[i] = c.subtract(a[i]);
         }
         return result;
+    }
+
+    // TODO document
+    public static double norm(Complex[] x) {
+        double nrm = 0.0;
+        // Compute 2-norm of k-th column without under/overflow.
+        for (int i = 0; i < x.length; ++i) {
+            nrm = MathETK.hypot(nrm, x[i].abs());
+        }
+        return nrm;
     }
 }

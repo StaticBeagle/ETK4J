@@ -10,7 +10,7 @@ they should be good enough in terms of accuracy and speed for many applications.
 
 The linear algebra part of the library is based on [Jama](https://math.nist.gov/javanumerics/jama/).
 The main difference between [Jama](https://math.nist.gov/javanumerics/jama/) and this project is that the internal
-representation of the data was changed from a 2d array of doubles to a 1d array of doubles and the values are accessed
+representation of the data was changed from a 2D array of doubles to a 1D array of doubles and the values are accessed
 using an offset. Other matrix methods were added as well.
 
 The library also uses code translated from [SciPy](https://scipy.org/) and [NumPy](https://numpy.org/). 
