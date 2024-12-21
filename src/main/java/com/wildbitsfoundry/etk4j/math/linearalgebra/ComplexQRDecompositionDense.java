@@ -14,59 +14,6 @@ public class ComplexQRDecompositionDense extends ComplexQRDecomposition<ComplexM
     private int m = 0;
     private int n = 0;
 
-    public static void main(String[] args) {
-// Define a 2x2 complex matrix
-        Complex[][] A = {
-                {new Complex(1, 1), new Complex(2, 2)},
-                {new Complex(3, 3), new Complex(4, 4)}
-        };
-
-// Perform Householder QR decomposition
-        ComplexQRDecompositionDense result = new ComplexQRDecompositionDense(new ComplexMatrixDense(A));
-
-// Print results
-        System.out.println("Matrix Q:");
-        System.out.println(result.getQ());
-
-//        System.out.println("Matrix Q thin:");
-//        System.out.println(result.getQThin());
-
-        System.out.println("Matrix R:");
-        System.out.println(result.getR());
-
-        System.out.println("Matrix H:");
-        System.out.println(result.getH());
-
-        System.out.println("Matrix Q * R:");
-        System.out.println(result.getQ().multiply(result.getR()));
-
-        System.out.println("Check that Q is orthogonal");
-        System.out.println(result.getQ().multiply(result.getQT()));
-
-        Complex[] x = {new Complex(1, 1), new Complex(2, 2)};
-        Complex[] u = {new Complex(3, 3), new Complex(4, 4)};
-
-        Complex[][] y = {x, u};
-        //houseQR(new ComplexMatrixDense(y));
-
-        Complex[] g = {new Complex(60, 70)};
-        Complex[] f = {new Complex(80, 90)};
-
-        ComplexMatrixDense sol = new ComplexQRDecompositionDense(new ComplexMatrixDense(y))
-                .solve(new ComplexMatrixDense(new Complex[][]{g, f}));
-        System.out.println("Solution to system");
-        System.out.println(sol);
-
-        ComplexMatrixDense AA = new ComplexMatrixDense(new Complex[][] {
-                {new Complex(1, 1), new Complex(2, 0)},
-                {new Complex(2, -1), new Complex(3, 0)}
-        });
-
-        ComplexQRDecompositionDense qrDecompositionDense = new ComplexQRDecompositionDense(AA);
-        System.out.println(qrDecompositionDense.getQ());
-        System.out.println(qrDecompositionDense.getR());
-    }
-
     private static Complex sig(Complex u) {
         return u.sign().add(u.equals(new Complex()) ? 1 : 0);
     }
@@ -138,7 +85,6 @@ public class ComplexQRDecompositionDense extends ComplexQRDecomposition<ComplexM
             A.set(i + startingRow, col, values[i]);
         }
     }
-
     private static void setColumn(ComplexMatrixDense A, Complex[] values, int col) {
         setColumn(A, values, col, 0);
     }
@@ -148,15 +94,6 @@ public class ComplexQRDecompositionDense extends ComplexQRDecomposition<ComplexM
             A.set(i, col, values[i]);
         }
     }
-
-//    private static ComplexMatrixDense getSubMatrix(ComplexMatrixDense A, int row0, int row1, int col0, int col1) {
-//        ComplexMatrixDense result = new ComplexMatrixDense(row1 - row0, col1 - col0);
-//        for(int i = row0; i < row1; i++) {
-//            for(int j = col0; j < col1; j++) {
-//                A.set
-//            }
-//        }
-//    }
 
     private static Complex[][] getSubMatrix(ComplexMatrixDense A, int row0, int row1, int col0, int col1) {
         Complex[][] result = new Complex[row1 - row0][col1 - col0];
@@ -169,15 +106,6 @@ public class ComplexQRDecompositionDense extends ComplexQRDecomposition<ComplexM
     }
 
     private static void setSubMatrix(ComplexMatrixDense A, Complex[][] values, int row0, int row1, int col0, int col1) {
-//        if(col0 == col1) {
-//            setColumn(A, values[0], row0, row1, col0);
-//        } else {
-//            for(int i = row0; i < row1; i++) {
-//                for(int j = col0; j < col1; j++) {
-//                    A.set(i, j, values[i - row0][j - col0]);
-//                }
-//            }
-//        }
         for (int i = row0; i < row1; i++) {
             for (int j = col0; j < col1; j++) {
                 A.set(i, j, values[i - row0][j - col0]);
@@ -245,30 +173,6 @@ public class ComplexQRDecompositionDense extends ComplexQRDecomposition<ComplexM
         return new ComplexMatrixDense(X);
     }
 
-//    public static ComplexMatrixDense solve(ComplexMatrixDense A, ComplexMatrixDense B) {
-//        ComplexMatrixDense X = new ComplexMatrixDense(zeros(B.getRowCount(), B.getColumnCount()));
-//
-//        Tuples.Tuple2<ComplexMatrixDense, ComplexMatrixDense> UR = houseQR(A);
-//        ComplexMatrixDense U = UR.getItem1();
-//        ComplexMatrixDense R = UR.getItem2();
-//
-//        // Compute Y = transpose(Q) * B
-//        ComplexMatrixDense Y = houseApplyTranspose(U, B);
-//
-//        // Solve R * X = Y;
-//        // Back Substitution
-//
-//
-////            if (B.getRowCount() != rows) {
-////                throw new IllegalArgumentException("Matrix row dimensions must agree.");
-////            }
-//////            if (!this.isFullRank()) {
-//////                throw new RuntimeException("Matrix is rank deficient.");
-//////            }
-////
-//        return backSubstitutionSolve(R, Y);
-//    }
-
     private ComplexMatrixDense U;
     private ComplexMatrixDense R;
 
@@ -333,26 +237,6 @@ public class ComplexQRDecompositionDense extends ComplexQRDecomposition<ComplexM
     public ComplexMatrixDense getR() {
         return R;
     }
-//
-//        /**
-//         * Return the upper triangular factor
-//         *
-//         * @return R
-//         */
-//
-//        public MatrixDense getRT() {
-
-//        }
-//
-//        /**
-//         * Generate and return the (economy-sized) orthogonal factor
-//         *
-//         * @return Q
-//         */
-//
-//        public ComplexMatrixDense getQThin() {
-//        }
-
 
     /**
      * Generate and return the unitary orthogonal factor
@@ -369,11 +253,11 @@ public class ComplexQRDecompositionDense extends ComplexQRDecomposition<ComplexM
     }
 
     /**
-     * Generate and return the transpose of the orthogonal factor
+     * Generate and return the conjugate transpose of the orthogonal factor
      *
      * @return transpose(Q)
      */
-    public ComplexMatrixDense getQT() {
+    public ComplexMatrixDense getQH() {
         ComplexMatrixDense I = ComplexMatrixDense.Factory.identity(U.getRowCount(), U.getColumnCount());
         return houseApplyTranspose(U, I);
     }
@@ -401,59 +285,16 @@ public class ComplexQRDecompositionDense extends ComplexQRDecomposition<ComplexM
         // Back Substitution
         return backSubstitutionSolve(R, Y);
     }
-//
-////	public Matrix solveTranspose(Matrix B) {
-//////		if (B.getRowCount() != rows) {
-//////			throw new IllegalArgumentException("Matrix row dimensions must agree.");
-//////		}
-////		if (!this.isFullRank()) {
-////			throw new RuntimeException("Matrix is rank deficient.");
-////		}
-////
-////		// Copy right hand side
-////		int nx = B.getColumnCount();
-////		double[] X = B.getArrayCopy();
-////
-////		// Solve RT*X = Y;
-////		for (int k = cols - 1; k >= 0; k--) {
-////			for (int j = 0; j < nx; j++) {
-////				X[k * nx + j] /= _rdiag[k];
-////			}
-////			for (int i = 0; i < k; i++) {
-////				for (int j = 0; j < nx; j++) {
-////					X[i * nx + j] -= X[k * nx + j] * _data[i * cols + k];
-////				}
-////			}
-////		}
-////
-////
-////		int mr = Math.min(rows, cols);
-////		for (int k = mr - 1; k >= 0; --k) {
-////			for (int j = nx - 1; j >= 0; --j) {
-////				double s = 0.0;
-////				for (int i = k; i < rows; i++) {
-////					s += _data[i * cols + k] * X[i * nx + j];
-////				}
-////				s = -s / _data[k * cols + k];
-////				for (int i = k; i < rows; i++) {
-////					X[i * nx + j] += s * _data[i * cols + k];
-////				}
-////			}
-////		}
-////		return new Matrix(X, B.getRowCount(), B.getColumnCount());
-////
-////		//return (new Matrix(X, cols, nx).subMatrix(0, cols - 1, 0, nx - 1));
-////	}
-//
-        @Override
-        public String toString() {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < rows * cols; ++i) {
-                if (i > 0 && i % cols == 0) {
-                    sb.append(System.lineSeparator());
-                }
-                sb.append(String.format("%.4f", _data[i])).append(" ");
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < rows * cols; ++i) {
+            if (i > 0 && i % cols == 0) {
+                sb.append(System.lineSeparator());
             }
-            return sb.toString();
+            sb.append(String.format("%.4f", _data[i])).append(" ");
         }
+        return sb.toString();
+    }
 }

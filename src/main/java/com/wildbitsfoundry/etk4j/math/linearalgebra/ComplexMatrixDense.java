@@ -65,6 +65,10 @@ public class ComplexMatrixDense extends ComplexMatrix {
         Arrays.fill(data, val);
     }
 
+    public static ComplexMatrixDense from2DArray(Complex[][] A) {
+        return new ComplexMatrixDense(A);
+    }
+
     /***
      * Deep copy
      * @return A newly created {@link ComplexMatrixDense} with the values of this current one.
