@@ -225,7 +225,7 @@ public class ComplexQRDecompositionDense extends ComplexQRDecomposition<ComplexM
      * @return Lower trapezoidal matrix whose columns define the reflections
      */
     public ComplexMatrixDense getH() {
-        return U;
+        return U.copy();
     }
 
     /**
@@ -235,7 +235,7 @@ public class ComplexQRDecompositionDense extends ComplexQRDecomposition<ComplexM
      */
 
     public ComplexMatrixDense getR() {
-        return R;
+        return R.copy();
     }
 
     /**
