@@ -4,6 +4,7 @@ import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 
 import java.util.Arrays;
+import java.util.Random;
 
 public class ComplexMatrixDense extends ComplexMatrix {
     private Complex[] data;
@@ -96,13 +97,13 @@ public class ComplexMatrixDense extends ComplexMatrix {
 
     public Complex get(int i, int j) {
         // TODO clean up all these checks
-        if(i < 0) {
+        if (i < 0) {
             throw new ArrayIndexOutOfBoundsException("Index i cannot be less thant zero.");
         }
         if (i >= rows) {
             throw new ArrayIndexOutOfBoundsException(String.format("Index i: %d >= than number of rows: %d.", i, rows));
         }
-        if(j < 0) {
+        if (j < 0) {
             throw new ArrayIndexOutOfBoundsException("Index j cannot be less thant zero.");
         }
         if (j >= cols) {
@@ -118,13 +119,13 @@ public class ComplexMatrixDense extends ComplexMatrix {
 
     public void set(int i, int j, Complex val) {
         // TODO clean up all these checks
-        if(i < 0) {
+        if (i < 0) {
             throw new ArrayIndexOutOfBoundsException("Index i cannot be less thant zero.");
         }
         if (i >= rows) {
             throw new ArrayIndexOutOfBoundsException(String.format("Index i: %d >= than number of rows: %d.", i, rows));
         }
-        if(j < 0) {
+        if (j < 0) {
             throw new ArrayIndexOutOfBoundsException("Index j cannot be less thant zero.");
         }
         if (j >= cols) {
@@ -260,6 +261,10 @@ public class ComplexMatrixDense extends ComplexMatrix {
     public void multiplyEquals(MatrixDense matrix) {
         multiplyOp(this, matrix, this);
     }
+
+    public void multiplyEquals(ComplexMatrixDense matrix) {
+        multiplyOp(this, matrix, this);
+    }
     // endregion
 
     public boolean isEmpty() {
@@ -355,9 +360,7 @@ public class ComplexMatrixDense extends ComplexMatrix {
     }
 
     public static final class Factory {
-        private Factory() {
-        }
-
+        private Factory() {}
 
 
         /**
@@ -383,11 +386,40 @@ public class ComplexMatrixDense extends ComplexMatrix {
 
         /**
          * Identity {@code Matrix.}
+         *
          * @param n The number of rows and columns.
          * @return {@code identity(n, n)}.
          */
         public static ComplexMatrixDense identity(int n) {
             return ComplexMatrixDense.Factory.identity(n, n);
+        }
+
+        /**
+         * Random {@code Matrix.}
+         * @param n The number of rows and columns.
+         * @return {@code random(n, n)}.
+         */
+        public static ComplexMatrixDense random(int n) {
+            return random(n, n);
+        }
+
+        /**
+         * Random {@code Matrix.}
+         *
+         * @param rows The number of rows
+         * @param cols The number of columns.
+         * @return {@code random(rows, cols)}.
+         */
+        public static ComplexMatrixDense random(int rows, int cols) {
+            Random rand = new Random();
+            Complex[] data = new Complex[rows * cols];
+
+            for (int i = 0; i < data.length; ++i) {
+                double real = rand.nextDouble() * 100.0;
+                double imag = rand.nextDouble() * 100.0;
+                data[i] = new Complex(real, imag);
+            }
+            return new ComplexMatrixDense(data, rows, cols);
         }
     }
 }
