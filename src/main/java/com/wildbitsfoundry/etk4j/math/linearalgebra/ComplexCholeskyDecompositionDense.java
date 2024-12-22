@@ -2,6 +2,9 @@ package com.wildbitsfoundry.etk4j.math.linearalgebra;
 
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 
+import static com.wildbitsfoundry.etk4j.math.linearalgebra.ComplexQRDecompositionDense.backSubstitutionSolve;
+import static com.wildbitsfoundry.etk4j.math.linearalgebra.ComplexQRDecompositionDense.forwardSubstitutionSolve;
+
 public class ComplexCholeskyDecompositionDense extends ComplexCholeskyDecomposition<ComplexMatrixDense> {
 
     private ComplexMatrixDense R;
@@ -48,6 +51,34 @@ public class ComplexCholeskyDecompositionDense extends ComplexCholeskyDecomposit
         return isSPD;
     }
 
+    /**
+     * Solve A*X = B
+     *
+     * @param B
+     *            A Matrix with as many rows as A and any number of columns.
+     * @return X so that L*L'*X = B
+     * @exception IllegalArgumentException
+     *                Matrix row dimensions must agree.
+     * @exception RuntimeException
+     *                Matrix is not symmetric positive definite.
+     */
+
+    public ComplexMatrixDense solve(ComplexMatrixDense B) {
+        final int n = rows;
+        if (B.getRowCount() != n) {
+            throw new IllegalArgumentException("Matrix row dimensions must agree.");
+        }
+        if (!isSPD) {
+            throw new RuntimeException("Matrix is not symmetric positive definite.");
+        }
+
+        // Solve RH * Y = B;
+        ComplexMatrixDense Y = forwardSubstitutionSolve(R.conjugateTranspose(), B.copy());
+
+        // Solve R * X = Y;
+        return backSubstitutionSolve(R, Y);
+    }
+
     public static void main(String[] args) {
         ComplexMatrixDense Arg = ComplexMatrixDense.from2DArray(new Complex[][]{
                 {new Complex(0.9767407521087846, 0.4711470863081668), new Complex(0.2794308404798361, 0.4587985898568102), new Complex(0.1685348957730604, 0.2220415588608931), new Complex(0.8646965674039528, 0.5496275298999502)},
@@ -69,5 +100,15 @@ public class ComplexCholeskyDecompositionDense extends ComplexCholeskyDecomposit
         System.out.println(R.conjugateTranspose().multiply(R));
         System.out.println("Is symmetric");
         System.out.println(choleskyDecompositionDense.isSPD());
+
+        ComplexMatrixDense b = ComplexMatrixDense.from2DArray(new Complex[][] {
+                {new Complex(90, 90)},
+                {new Complex(80, 80)},
+                {new Complex(70, 70)},
+                {new Complex(60, 60)}
+        });
+
+        ComplexMatrixDense X = choleskyDecompositionDense.solve(b);
+        System.out.println(X);
     }
 }
