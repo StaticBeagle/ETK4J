@@ -1,5 +1,6 @@
 package com.wildbitsfoundry.etk4j.math.linearalgebra;
 
+// TODO javadocs
 public final class LeastSquaresSolver {
 
     private LeastSquaresSolver() {}

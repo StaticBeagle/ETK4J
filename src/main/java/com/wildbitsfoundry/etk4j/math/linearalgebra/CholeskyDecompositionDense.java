@@ -83,7 +83,7 @@ public class CholeskyDecompositionDense extends CholeskyDecomposition<MatrixDens
 			}
 		}
 	}
-
+	// TODO change from Lower to upper R triangular matrix
 	/*
 	 * ------------------------ Temporary, experimental code.
 	 * ------------------------ *\

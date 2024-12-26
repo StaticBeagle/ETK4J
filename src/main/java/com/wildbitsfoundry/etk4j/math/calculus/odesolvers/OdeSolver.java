@@ -4,6 +4,8 @@ import com.wildbitsfoundry.etk4j.util.Tuples;
 
 import java.util.Arrays;
 // TODO document this class
+// TODO implement 8
+// TODO implement BDF
 public abstract class OdeSolver {
 
     protected double t;
@@ -29,13 +31,13 @@ public abstract class OdeSolver {
         // njev
         // nlu
     }
-
+// TODO test this
     private Double stepSize() {
         return tOld == null ? null : Math.abs(t - tOld);
     }
 
     public String step() {
-        if (this.status != "running") {
+        if (!this.status.equals("running")) {
             throw new RuntimeException("Attempt to step on a failed or finished solver.");
         }
 

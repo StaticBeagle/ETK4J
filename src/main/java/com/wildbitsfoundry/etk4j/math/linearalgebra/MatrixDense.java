@@ -1038,6 +1038,7 @@ public class MatrixDense extends Matrix {
         return new EigenvalueDecompositionDense(this, balance);
     }
 
+    // TODO maybe add iteration limit to balance?
     /**
      * Balances the matrix using the algorithm by Parlett and Reinsch with norm -1.
      * References:

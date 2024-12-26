@@ -5,7 +5,7 @@ import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 
 import java.util.Arrays;
 import java.util.Random;
-
+// TODO add balance method
 public class ComplexMatrixDense extends ComplexMatrix {
     private Complex[] data;
     private int rows;
