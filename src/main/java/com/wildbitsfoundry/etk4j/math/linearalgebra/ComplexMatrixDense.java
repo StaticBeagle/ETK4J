@@ -296,18 +296,17 @@ public class ComplexMatrixDense extends ComplexMatrix {
 
     // region solve
     public ComplexMatrixDense solve(MatrixDense B) {
-        return new ComplexLUDecompositionDense(this).solve(B);
-        // Only implemented for square matrices for now.
-//        if (rows == cols) { // Matrix is Squared
-//            return new LUDecomposition(this).solve(B);
-//        } else if (rows > cols) { // Matrix is thin (Overdetermined system)
-//            return new QRDecomposition(this).solve(B);
-//        } else { // Matrix is fat (Under-determined system)
-//            QRDecomposition qr = this.transpose().QR();
-//            Matrix R1 = fwdSubsSolve(qr.getRT(), B);
-//            R1.appendRows(cols - R1.rows);
-//            return qr.QmultiplyX(R1);
-//        }
+        return solve(fromRealMatrix(B));
+    }
+
+    public ComplexMatrixDense solve(ComplexMatrixDense B) {
+        if (rows == cols) { // Matrix is Squared
+            return new ComplexLUDecompositionDense(this).solve(B);
+        } else if (rows > cols) { // Matrix is tall and thin (Overdetermined system)
+            return new ComplexQRDecompositionDense(this).solve(B);
+        } else { // Matrix is short and wide (Under-determined system)
+            throw new UnsupportedOperationException("Method not implemented yet for short and wide Matrices");
+        }
     }
 
     // endregion
@@ -357,6 +356,35 @@ public class ComplexMatrixDense extends ComplexMatrix {
             }
         }
         return new ComplexMatrixDense(result, trows, tcols);
+    }
+
+    /***
+     * Get sub-matrix
+     *
+     * @param rows The array of row indices.
+     * @param col0 The initial column index.
+     * @param col1 The final column index.
+     * @return {@code A(rows(:), col0 : col1)}.
+     */
+    public ComplexMatrixDense subMatrix(int[] rows, int col0, int col1) {
+        if (col0 < 0 || col1 < 0) {
+            throw new IllegalArgumentException("The column indexes col0 and col1 must be greater than zero.");
+        }
+        if (Arrays.stream(rows).anyMatch(i -> i >= this.rows || i < 0)) {
+            throw new ArrayIndexOutOfBoundsException("The row indexes cannot be greater than the number of rows in the Matrix. and must be greater than zero.");
+        }
+        if (col1 >= cols) {
+            throw new ArrayIndexOutOfBoundsException("The final column index cannot be greater than the number of columns in the Matrix.");
+        }
+        int rowDim = rows.length;
+        int colDim = col1 - col0 + 1;
+        Complex[] data = new Complex[rowDim * colDim];
+        for (int i = 0; i < rowDim; ++i) {
+            for (int j = 0; j < colDim; ++j) {
+                data[i * colDim + j] = this.data[rows[i] * cols + (j + col0)];
+            }
+        }
+        return new ComplexMatrixDense(data, rowDim, colDim);
     }
 
     public static final class Factory {
