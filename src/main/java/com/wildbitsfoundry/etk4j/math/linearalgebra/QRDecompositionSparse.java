@@ -221,7 +221,7 @@ public class QRDecompositionSparse extends QRDecomposition<MatrixSparse> {
 		}
 	}
 
-	/**
+	/*
 	 * Creates a submatrix by extracting the specified rows from A. rows = {row0 %le; i %le; row1}.
 	 *
 	 * @param A (Input) matrix
@@ -257,7 +257,7 @@ public class QRDecompositionSparse extends QRDecomposition<MatrixSparse> {
 		return out;
 	}
 
-	/**
+	/*
 	 * Computes the inverse permutation vector
 	 *
 	 * @param original Original permutation vector
@@ -269,7 +269,7 @@ public class QRDecompositionSparse extends QRDecomposition<MatrixSparse> {
 		}
 	}
 
-	/**
+	/*
 	 * Applies the row permutation specified by the vector to the input matrix and save the results
 	 * in the output matrix. output[perm[j],:] = input[j,:]
 	 *
@@ -339,7 +339,7 @@ public class QRDecompositionSparse extends QRDecomposition<MatrixSparse> {
 		return singular;
 	}
 
-	/**
+	/*
 	 * <p>Applies a sparse Householder vector to a dense vector.</p>
 	 * <pre>
 	 *     x = x - v*(beta*(v'*x))</pre>
@@ -369,7 +369,7 @@ public class QRDecompositionSparse extends QRDecomposition<MatrixSparse> {
 		}
 	}
 
-	/**
+	/*
 	 * <p>
 	 * Performs a rank-1 update operation on the submatrix specified by V with the multiply on the right.<br>
 	 * <br>
@@ -401,7 +401,7 @@ public class QRDecompositionSparse extends QRDecomposition<MatrixSparse> {
 		}
 	}
 
-	/**
+	/*
 	 * Adds the results of adding a column in A and B as a new column in C.<br>
 	 * C(:,end+1) = &alpha;*A(:,colA) + &beta;*B(:,colB)
 	 *
@@ -451,7 +451,7 @@ public class QRDecompositionSparse extends QRDecomposition<MatrixSparse> {
 
 
 
-	/**
+	/*
 	 * Performs the operation x = x + A(:,i)*alpha
 	 *
 	 * <p>NOTE: This is the same as cs_scatter() in csparse.</p>
@@ -481,7 +481,7 @@ public class QRDecompositionSparse extends QRDecomposition<MatrixSparse> {
 		}
 	}
 
-	/**
+	/*
 	 * Adds rows to C[*,colC] that are in A[*,colA] as long as they are marked in w. This is used to grow C
 	 * and colC must be the last filled in column in C.
 	 *
@@ -515,7 +515,7 @@ public class QRDecompositionSparse extends QRDecomposition<MatrixSparse> {
 		C.col_idx[colC + 1] = C.nz_length;
 	}
 
-	/**
+	/*
 	 * Computes the inner product of two column vectors taken from the input matrices.
 	 *
 	 * <p>dot = A(:,colA)'*B(:,colB)</p>
@@ -560,7 +560,7 @@ public class QRDecompositionSparse extends QRDecomposition<MatrixSparse> {
 		return dot;
 	}
 
-	/**
+	/*
 	 * Creates a householder reflection.
 	 *
 	 * (I-gamma*v*v')*x = tau*e1
