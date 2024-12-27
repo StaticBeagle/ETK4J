@@ -1,5 +1,5 @@
 package com.wildbitsfoundry.etk4j.signals.smoothing;
-
+// TODO tests and javadocs
 public class AlphaBetaFilter {
     private double position; // Estimated position
     private double velocity; // Estimated velocity
