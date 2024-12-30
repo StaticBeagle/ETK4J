@@ -302,7 +302,7 @@ public class ComplexMatrixDense extends ComplexMatrix {
     public ComplexMatrixDense solve(ComplexMatrixDense B) {
         if (rows == cols) { // Matrix is Squared
             return new ComplexLUDecompositionDense(this).solve(B);
-        } else if (rows > cols) { // Matrix is tall and thin (Overdetermined system)
+        } else if (rows > cols) { // Matrix is tall and narrow (Overdetermined system)
             return new ComplexQRDecompositionDense(this).solve(B);
         } else { // Matrix is short and wide (Under-determined system)
             throw new UnsupportedOperationException("Method not implemented yet for short and wide Matrices");

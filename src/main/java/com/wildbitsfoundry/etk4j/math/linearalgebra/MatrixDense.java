@@ -931,7 +931,7 @@ public class MatrixDense extends Matrix {
     public MatrixDense solve(MatrixDense b) {
         if (rows == cols) { // Matrix is Squared
             return new LUDecompositionDense(this).solve(b);
-        } else if (rows > cols) { // Matrix is tall and thin (Overdetermined system)
+        } else if (rows > cols) { // Matrix is tall and narrow (Overdetermined system)
             return new QRDecompositionDense(this).solve(b);
         } else { // Matrix is short and wide (Under-determined system)
             return this.pinv().multiply(b);
