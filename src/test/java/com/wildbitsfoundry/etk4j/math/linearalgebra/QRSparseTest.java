@@ -83,7 +83,6 @@ public class QRSparseTest {
                 actual[A.getRowCount() * i + j] = A.unsafeGet(i, j);
             }
         }
-        // Perform Householder QR decomposition
         assertArrayEquals(expected, actual, 1e-12);
     }
 
