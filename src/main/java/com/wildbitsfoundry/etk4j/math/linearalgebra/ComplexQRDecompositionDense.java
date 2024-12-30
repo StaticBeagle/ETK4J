@@ -303,6 +303,19 @@ public class ComplexQRDecompositionDense extends ComplexQRDecomposition<ComplexM
         return backSubstitutionSolve(R, Y);
     }
 
+    /**
+     * Least squares solution of A*X = B
+     *
+     * @param B A Matrix with as many rows as A and any number of columns.
+     * @return X that minimizes the two norm of Q*R*X-B.
+     * @throws IllegalArgumentException Matrix row dimensions must agree.
+     * @throws RuntimeException         Matrix is rank deficient.
+     */
+
+    public ComplexMatrixDense solve(MatrixDense B) {
+        return solve(ComplexMatrixDense.fromRealMatrix(B));
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
