@@ -3,7 +3,7 @@ package com.wildbitsfoundry.etk4j.math.linearalgebra;
 import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
 
 import java.util.Arrays;
-
+// TODO add arithmetic operations
 import static com.wildbitsfoundry.etk4j.math.linearalgebra.ColumnCounts.adjust;
 
 public class MatrixSparse extends Matrix {
