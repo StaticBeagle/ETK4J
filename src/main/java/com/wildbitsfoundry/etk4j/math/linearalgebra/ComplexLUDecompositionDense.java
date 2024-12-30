@@ -175,6 +175,21 @@ public class ComplexLUDecompositionDense {
 	 */
 
 	public ComplexMatrixDense solve(MatrixDense B) {
+		return solve(ComplexMatrixDense.fromRealMatrix(B));
+	}
+
+	/**
+	 * Solve A*X = B
+	 *
+	 * @param B
+	 *            A Matrix with as many rows as A and any number of columns.
+	 * @return X so that L*U*X = B(piv,:)
+	 * @exception IllegalArgumentException
+	 *                Matrix row dimensions must agree.
+	 * @exception RuntimeException
+	 *                Matrix is singular.
+	 */
+	public ComplexMatrixDense solve(ComplexMatrixDense B) {
 		if (B.getRowCount() != _rows) {
 			throw new IllegalArgumentException("Matrix row dimensions must agree.");
 		}
@@ -184,7 +199,7 @@ public class ComplexLUDecompositionDense {
 
 		// Copy right hand side with pivoting
 		int nx = B.getColumnCount();
-		ComplexMatrixDense Xmat = ComplexMatrixDense.fromRealMatrix(B.subMatrix(_pivot, 0, nx - 1));
+		ComplexMatrixDense Xmat = B.subMatrix(_pivot, 0, nx - 1);
 		Complex[] X = Xmat.getArray();
 
 		final int cols = _cols;
