@@ -4,7 +4,7 @@ import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
 import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 
 import java.util.Arrays;
-// TODO test and javadocs
+
 import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkXYDimensions;
 
 public class LagrangePolynomial implements UnivariateFunction {
@@ -50,7 +50,7 @@ public class LagrangePolynomial implements UnivariateFunction {
         return numerator / denominator;
     }
 
-    public static LagrangePolynomial lagrangeFit(double[] x, double[] y, int n) {
+    public static LagrangePolynomial lagrangeFit(double[] x, double[] y) {
         return new LagrangePolynomial(x, y);
     }
 }
