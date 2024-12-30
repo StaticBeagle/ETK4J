@@ -1,5 +1,7 @@
 package com.wildbitsfoundry.etk4j.math.linearalgebra;
 
+import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
+
 import java.util.Arrays;
 
 import static com.wildbitsfoundry.etk4j.math.linearalgebra.ColumnCounts.adjust;
@@ -67,6 +69,10 @@ public class MatrixSparse extends Matrix {
 
     public MatrixSparse copy() {
         return new MatrixSparse(this);
+    }
+
+    public MatrixSparse createLike() {
+        return new MatrixSparse(rows, cols);
     }
 
     public void setTo(MatrixSparse original) {
@@ -405,6 +411,10 @@ public class MatrixSparse extends Matrix {
         return nz_length == rows * cols;
     }
 
+    public static MatrixSparse from2DArray(double[][] array) {
+        return from2DArray(array, ConstantsETK.DOUBLE_EPS);
+    }
+
     public static MatrixSparse from2DArray(double array[][], double tol) {
         int nonzero = 0;
         for (int i = 0; i != array.length; i++)
@@ -420,7 +430,7 @@ public class MatrixSparse extends Matrix {
         for (i = 0; i != array[0].length; i++) {
             for (j = 0; j != array.length; j++) {
                 double value = array[j][i];
-                if (!(Math.abs(value) <= tol)) {
+                if (Math.abs(value) > tol) {
                     dst.nz_rows[dst.nz_length] = j;
                     dst.nz_values[dst.nz_length] = value;
                     ++dst.nz_length;
