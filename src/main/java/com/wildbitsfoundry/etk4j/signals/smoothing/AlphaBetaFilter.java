@@ -50,26 +50,4 @@ public class AlphaBetaFilter {
     public double getVelocity() {
         return velocity;
     }
-
-    public static void main(String[] args) {
-        // Example usage of the Alpha-Beta Filter
-        double initialPosition = 0.0;
-        double initialVelocity = 0.0;
-        double alpha = 0.85; // Position smoothing factor
-        double beta = 0.005; // Velocity smoothing factor
-        double dt = 1.0; // Time step (e.g., 1 second)
-
-        // Initialize the filter
-        AlphaBetaFilter filter = new AlphaBetaFilter(initialPosition, initialVelocity, alpha, beta, dt);
-
-        // Example measurements
-        double[] measurements = {0.0, 1.2, 2.8, 4.1, 5.9, 7.4, 9.2};
-
-        System.out.println("Alpha-Beta Filter Output:");
-        for (double measurement : measurements) {
-            filter.update(measurement);
-            System.out.printf("Measured: %.2f, Position: %.2f, Velocity: %.2f%n",
-                    measurement, filter.getPosition(), filter.getVelocity());
-        }
-    }
 }
