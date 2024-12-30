@@ -1,6 +1,10 @@
 package com.wildbitsfoundry.etk4j.math.linearalgebra;
 
+import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
+
 import java.util.Arrays;
+// TODO add arithmetic operations
+import static com.wildbitsfoundry.etk4j.math.linearalgebra.ColumnCounts.adjust;
 
 public class MatrixSparse extends Matrix {
 
@@ -67,6 +71,10 @@ public class MatrixSparse extends Matrix {
         return new MatrixSparse(this);
     }
 
+    public MatrixSparse createLike() {
+        return new MatrixSparse(rows, cols);
+    }
+
     public void setTo(MatrixSparse original) {
         MatrixSparse o = original;
         reshape(o.rows, o.cols, o.nz_length);
@@ -103,6 +111,12 @@ public class MatrixSparse extends Matrix {
 //            }
 //        }
 //    }
+
+    public double[] getNonZeroValues() {
+        double[] result = new double[nz_length];
+        System.arraycopy(nz_values, 0, result, 0, result.length);
+        return result;
+    }
 
     public boolean isAssigned(int row, int col) {
         return nz_index(row, col) >= 0;
@@ -180,7 +194,7 @@ public class MatrixSparse extends Matrix {
 
     @Override
     public QRDecompositionSparse QR() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return new QRDecompositionSparse(this);
     }
 
     @Override
@@ -397,6 +411,10 @@ public class MatrixSparse extends Matrix {
         return nz_length == rows * cols;
     }
 
+    public static MatrixSparse from2DArray(double[][] array) {
+        return from2DArray(array, ConstantsETK.DOUBLE_EPS);
+    }
+
     public static MatrixSparse from2DArray(double array[][], double tol) {
         int nonzero = 0;
         for (int i = 0; i != array.length; i++)
@@ -412,7 +430,7 @@ public class MatrixSparse extends Matrix {
         for (i = 0; i != array[0].length; i++) {
             for (j = 0; j != array.length; j++) {
                 double value = array[j][i];
-                if (!(Math.abs(value) <= tol)) {
+                if (Math.abs(value) > tol) {
                     dst.nz_rows[dst.nz_length] = j;
                     dst.nz_values[dst.nz_length] = value;
                     ++dst.nz_length;
@@ -470,4 +488,88 @@ public class MatrixSparse extends Matrix {
 //            }
 //        };
 //    }
+
+    public MatrixSparse multiply(MatrixSparse A) {
+        MatrixSparse C = new MatrixSparse(this.rows, A.cols);
+        mult(this, A, C);
+        return C;
+    }
+
+    /**
+     * Performs matrix multiplication. C = A*B
+     *
+     *
+     * @param A Matrix
+     * @param B Matrix
+     * @param C Storage for results. Array size is increased if needed.
+     */
+    public static void mult( MatrixSparse A, MatrixSparse B, MatrixSparse C) {
+
+        double[] x = adjust(new DGrowArray(), A.rows);
+        int[] w = adjust(new IGrowArray(), A.rows, A.rows);
+
+        C.growMaxLength(A.nz_length + B.nz_length, false);
+        C.indicesSorted = false;
+        C.nz_length = 0;
+
+        // C(i,j) = sum_k A(i,k) * B(k,j)
+        int idx0 = B.col_idx[0];
+        for (int bj = 1; bj <= B.cols; bj++) {
+            int colB = bj - 1;
+            int idx1 = B.col_idx[bj];
+            C.col_idx[bj] = C.nz_length;
+
+            if (idx0 == idx1) {
+                continue;
+            }
+
+            // C(:,j) = sum_k A(:,k)*B(k,j)
+            for (int bi = idx0; bi < idx1; bi++) {
+                int rowB = B.nz_rows[bi];
+                double valB = B.nz_values[bi];  // B(k,j)  k=rowB j=colB
+
+                multAddColA(A, rowB, valB, C, colB + 1, x, w);
+            }
+
+            // take the values in the dense vector 'x' and put them into 'C'
+            int idxC0 = C.col_idx[colB];
+            int idxC1 = C.col_idx[colB + 1];
+
+            for (int i = idxC0; i < idxC1; i++) {
+                C.nz_values[i] = x[C.nz_rows[i]];
+            }
+
+            idx0 = idx1;
+        }
+    }
+
+    /**
+     * Performs the operation x = x + A(:,i)*alpha
+     *
+     * <p>NOTE: This is the same as cs_scatter() in csparse.</p>
+     */
+    public static void multAddColA( MatrixSparse A, int colA,
+                                    double alpha,
+                                    MatrixSparse C, int mark,
+                                    double[] x, int[] w ) {
+        int idxA0 = A.col_idx[colA];
+        int idxA1 = A.col_idx[colA + 1];
+
+        for (int j = idxA0; j < idxA1; j++) {
+            int row = A.nz_rows[j];
+
+            if (w[row] < mark) {
+                if (C.nz_length >= C.nz_rows.length) {
+                    C.growMaxLength(C.nz_length*2 + 1, true);
+                }
+
+                w[row] = mark;
+                C.nz_rows[C.nz_length] = row;
+                C.col_idx[mark] = ++C.nz_length;
+                x[row] = A.nz_values[j]*alpha;
+            } else {
+                x[row] += A.nz_values[j]*alpha;
+            }
+        }
+    }
 }
