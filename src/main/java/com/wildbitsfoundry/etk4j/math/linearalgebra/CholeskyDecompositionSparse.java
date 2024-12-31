@@ -9,6 +9,7 @@ import static com.wildbitsfoundry.etk4j.math.linearalgebra.QrStructuralCounts.po
 public class CholeskyDecompositionSparse extends CholeskyDecomposition<MatrixSparse> {
 
     private int N;
+    private boolean isSPD;
 
     // storage for decomposition
     MatrixSparse L = new MatrixSparse(1, 1, 0);
@@ -39,7 +40,8 @@ public class CholeskyDecompositionSparse extends CholeskyDecomposition<MatrixSpa
         if (!locked || !decomposed)
             performSymbolic(orig);
 
-        if (performDecomposition(orig)) {
+        performDecomposition(orig);
+        if (isSPD) {
             decomposed = true;
             return true;
         } else {
@@ -67,7 +69,7 @@ public class CholeskyDecompositionSparse extends CholeskyDecomposition<MatrixSpa
         }
     }
 
-    private boolean performDecomposition(MatrixSparse A) {
+    private void performDecomposition(MatrixSparse A) {
         int[] c = adjust(gw, N);
         int[] s = adjust(gs, N);
         double[] x = adjust(gx, N);
@@ -109,14 +111,18 @@ public class CholeskyDecompositionSparse extends CholeskyDecomposition<MatrixSpa
             //----- Compute L(k,k)
             if (d <= 0) {
                 // it's not positive definite
-                return false;
+                this.isSPD = false;
             }
             int p = c[k]++;
             L.nz_rows[p] = k;
             L.nz_values[p] = Math.sqrt(d);
         }
 
-        return true;
+        this.isSPD = true;
+    }
+
+    public boolean isSPD() {
+        return isSPD;
     }
 
     /**
@@ -205,7 +211,7 @@ public class CholeskyDecompositionSparse extends CholeskyDecomposition<MatrixSpa
     }
 
     public MatrixSparse solve(MatrixSparse B) {
-        MatrixSparse X = new MatrixSparse(0, 0, 0);
+        MatrixSparse X = new MatrixSparse(1, 1, 1);
         X.reshape(cols, B.cols, X.rows);
 
         IGrowArray gw1 = gw;
@@ -215,8 +221,8 @@ public class CholeskyDecompositionSparse extends CholeskyDecomposition<MatrixSpa
         MatrixSparse tmp = new MatrixSparse(1, 1, 1);
         tmp.reshape(L.rows, B.cols, 1);
 
-        QRDecompositionSparse.solve(L, true, B, tmp, null, gx, gw, gw1);
-        solveTran(L, true, tmp, X, null, gx, gw, gw1);
+        QRDecompositionSparse.solve(L, true, B, tmp, null, new DGrowArray(), new IGrowArray(), gw1);
+        solveTran(L, true, tmp, X, null, new DGrowArray(), new IGrowArray(), gw1);
         return X;
     }
 
