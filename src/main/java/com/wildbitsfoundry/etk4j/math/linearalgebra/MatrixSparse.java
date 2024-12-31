@@ -572,4 +572,51 @@ public class MatrixSparse extends Matrix {
             }
         }
     }
+
+    /**
+     * Perform matrix transpose
+     *
+     * @return The transposed matrix
+     */
+    public MatrixSparse transpose() {
+        MatrixSparse A_t = reshapeOrDeclare(null, cols, rows, nz_length);
+        transposeOp(this, A_t, null);
+        return A_t;
+    }
+
+    public static MatrixSparse reshapeOrDeclare(MatrixSparse target, int rows, int cols, int nz_length ) {
+        if (target == null)
+            return new MatrixSparse(rows, cols, nz_length);
+        else
+            target.reshape(rows, cols, nz_length);
+        return target;
+    }
+
+    private static void transposeOp( MatrixSparse A, MatrixSparse C, IGrowArray gw ) {
+        int[] work = adjust(gw, A.cols, A.rows);
+        C.reshape(A.cols, A.rows, A.nz_length);
+
+        // compute the histogram for each row in 'a'
+        for (int j = 0; j < A.nz_length; j++) {
+            work[A.nz_rows[j]]++;
+        }
+
+        // construct col_idx in the transposed matrix
+        C.histogramToStructure(work);
+        System.arraycopy(C.col_idx, 0, work, 0, C.cols);
+
+        // fill in the row indexes
+        int idx0 = A.col_idx[0];
+        for (int j = 1; j <= A.cols; j++) {
+            final int col = j - 1;
+            final int idx1 = A.col_idx[j];
+            for (int i = idx0; i < idx1; i++) {
+                int row = A.nz_rows[i];
+                int index = work[row]++;
+                C.nz_rows[index] = col;
+                C.nz_values[index] = A.nz_values[i];
+            }
+            idx0 = idx1;
+        }
+    }
 }
