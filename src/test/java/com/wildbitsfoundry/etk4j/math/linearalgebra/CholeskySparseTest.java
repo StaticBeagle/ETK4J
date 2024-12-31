@@ -1,9 +1,6 @@
 package com.wildbitsfoundry.etk4j.math.linearalgebra;
 
-import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import org.junit.Test;
-
-import java.util.Arrays;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertTrue;
