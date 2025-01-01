@@ -197,12 +197,12 @@ public class LUDecompositionSparse extends LUDecomposition<MatrixSparse> {
      * and save the results in the output matrix. output[permRow[j],permCol[i]] = input[j,i]
      *
      * @param permRowInv (Input) Inverse row permutation vector. Null is the same as passing in identity.
-     * @param input (Input) Matrix which is to be permuted
-     * @param permCol (Input) Column permutation vector. Null is the same as passing in identity.
-     * @param output (Output) Matrix which has the permutation stored in it. Is reshaped.
+     * @param input      (Input) Matrix which is to be permuted
+     * @param permCol    (Input) Column permutation vector. Null is the same as passing in identity.
+     * @param output     (Output) Matrix which has the permutation stored in it. Is reshaped.
      */
     public static void permute(int[] permRowInv, MatrixSparse input, int[] permCol,
-                               MatrixSparse output ) {
+                               MatrixSparse output) {
         if (permRowInv != null && input.rows > permRowInv.length)
             throw new IllegalArgumentException("rowInv permutation vector must have at least as many elements as input has columns");
         if (permCol != null && input.cols > permCol.length)
@@ -304,40 +304,42 @@ public class LUDecompositionSparse extends LUDecomposition<MatrixSparse> {
     }
 
     private static int searchNzRowsInX_DFS(int rowB, MatrixSparse G, int top, int[] pinv, int[] xi, int[] w) {
-        int N = G.cols;
-        int head = 0;
-        xi[head] = rowB;
-
+        int N = G.cols;  // first N elements in w is the length of X
+        int head = 0; // put the selected row into the FILO stack
+        xi[head] = rowB; // use the head of xi to store where the stack it's searching. The tail is where
+        // the graph ordered list of rows in B is stored.
         while (head >= 0) {
+            // the column in G being examined
             int G_col = xi[head];
             int G_col_new = pinv != null ? pinv[G_col] : G_col;
             if (w[G_col] == 0) {
                 w[G_col] = 1;
-                w[N + head] = G_col_new >= 0 && G_col_new < N ? G.col_idx[G_col_new] : 0;
+                // mark which child in the loop below it's examining
+                w[N + head] = G_col_new < 0 || G_col_new >= N ? 0 : G.col_idx[G_col_new];
             }
 
+            // See if there are any children which have yet to be examined
             boolean done = true;
-            int idx0 = w[N + head];
-            int idx1 = G_col_new >= 0 && G_col_new < N ? G.col_idx[G_col_new + 1] : 0;
 
-            for (int j = idx0; j < idx1; ++j) {
+            // The Right side after || is used to handle tall matrices. There will be no nodes matching
+            int idx0 = w[N + head];
+            int idx1 = G_col_new < 0 || G_col_new >= N ? 0 : G.col_idx[G_col_new + 1];
+
+            for (int j = idx0; j < idx1; j++) {
                 int jrow = G.nz_rows[j];
                 if (jrow < N && w[jrow] == 0) {
-                    w[N + head] = j + 1;
-                    ++head;
-                    xi[head] = jrow;
+                    w[N + head] = j + 1; // mark that it has processed up to this point
+                    xi[++head] = jrow;
                     done = false;
-                    break;
+                    break;          // It's a DFS so break and continue down
                 }
             }
 
             if (done) {
-                --head;
-                --top;
-                xi[top] = G_col;
+                head--;
+                xi[--top] = G_col;
             }
         }
-
         return top;
     }
 
