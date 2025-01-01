@@ -151,13 +151,87 @@ public class LUDecompositionSparse extends LUDecomposition<MatrixSparse> {
         solveU(U, x);
 
         double[][] xmat = new double[b.length][1];
-        for(int i = 0; i < b.length; i++) {
+        for (int i = 0; i < b.length; i++) {
             xmat[i][0] = x[i];
         }
         return MatrixSparse.from2DArray(xmat, 0);
     }
 
-    private static int solveColB(MatrixSparse G, boolean lower, MatrixSparse B, int colB, double[] x, int[] pinv, IGrowArray g_xi, int[] w) {
+    // TODO add bound checks for solve for QR and LU
+    // TODO merge tests into matrix tests?
+    // TODO create utility classes to hold static methods
+    // TODO Tridiagonal solver add solve L and U
+    public MatrixSparse solve(MatrixSparse B) {
+//        if (B.length != this.rows) {
+//            int var10002 = b.length;
+//            throw new IllegalArgumentException("Unexpected number of rows in B based on shape of A. Found=" + var10002 + " Expected=" + this.rows);
+//        }
+        MatrixSparse X = new MatrixSparse(0, 0, 0);
+        X.reshape(cols, B.cols, X.rows);
+
+        MatrixSparse tmp = new MatrixSparse(1, 1, 1);
+        X.reshape(cols, B.cols, X.rows);
+
+        MatrixSparse L = this.L;
+        MatrixSparse U = this.U;
+
+        MatrixSparse Bp = new MatrixSparse(1, 1, 1);
+
+        // these are row pivots
+        Bp.reshape(B.rows, B.cols, B.nz_length);
+        int[] Pinv = this.getPinv();
+        permute(Pinv, B, null, Bp);
+        DGrowArray gx = this.gx;
+        IGrowArray gw = this.gw;
+        IGrowArray gw1 = this.gxi;
+
+        tmp.reshape(L.rows, B.cols, 1);
+
+        QRDecompositionSparse.solve(L, true, Bp, tmp, null, gx, gw, gw1);
+        QRDecompositionSparse.solve(U, false, tmp, X, null, gx, gw, gw1);
+        return X;
+    }
+
+    /**
+     * Applies the forward column and inverse row permutation specified by the two vector to the input matrix
+     * and save the results in the output matrix. output[permRow[j],permCol[i]] = input[j,i]
+     *
+     * @param permRowInv (Input) Inverse row permutation vector. Null is the same as passing in identity.
+     * @param input      (Input) Matrix which is to be permuted
+     * @param permCol    (Input) Column permutation vector. Null is the same as passing in identity.
+     * @param output     (Output) Matrix which has the permutation stored in it. Is reshaped.
+     */
+    public static void permute(int[] permRowInv, MatrixSparse input, int[] permCol,
+                               MatrixSparse output) {
+        if (permRowInv != null && input.rows > permRowInv.length)
+            throw new IllegalArgumentException("rowInv permutation vector must have at least as many elements as input has columns");
+        if (permCol != null && input.cols > permCol.length)
+            throw new IllegalArgumentException("permCol permutation vector must have at least as many elements as input has rows");
+
+        output.reshape(input.rows, input.cols, input.nz_length);
+        output.indicesSorted = false;
+        output.nz_length = input.nz_length;
+
+        int N = input.cols;
+
+        // traverse through in order for the output columns
+        int outputNZ = 0;
+        for (int i = 0; i < N; i++) {
+            int inputCol = permCol != null ? permCol[i] : i; // column of input to source from
+            int inputNZ = input.col_idx[inputCol];
+            int total = input.col_idx[inputCol + 1] - inputNZ; // total nz in this column
+
+            output.col_idx[i + 1] = output.col_idx[i] + total;
+
+            for (int j = 0; j < total; j++) {
+                int row = input.nz_rows[inputNZ];
+                output.nz_rows[outputNZ] = permRowInv != null ? permRowInv[row] : row;
+                output.nz_values[outputNZ++] = input.nz_values[inputNZ++];
+            }
+        }
+    }
+
+    static int solveColB(MatrixSparse G, boolean lower, MatrixSparse B, int colB, double[] x, int[] pinv, IGrowArray g_xi, int[] w) {
         int X_rows = G.cols;
         int[] xi = adjust(g_xi, X_rows);
         int top = searchNzRowsInX(G, B, colB, pinv, xi, w);
@@ -230,40 +304,42 @@ public class LUDecompositionSparse extends LUDecomposition<MatrixSparse> {
     }
 
     private static int searchNzRowsInX_DFS(int rowB, MatrixSparse G, int top, int[] pinv, int[] xi, int[] w) {
-        int N = G.cols;
-        int head = 0;
-        xi[head] = rowB;
-
+        int N = G.cols;  // first N elements in w is the length of X
+        int head = 0; // put the selected row into the FILO stack
+        xi[head] = rowB; // use the head of xi to store where the stack it's searching. The tail is where
+        // the graph ordered list of rows in B is stored.
         while (head >= 0) {
+            // the column in G being examined
             int G_col = xi[head];
             int G_col_new = pinv != null ? pinv[G_col] : G_col;
             if (w[G_col] == 0) {
                 w[G_col] = 1;
-                w[N + head] = G_col_new >= 0 && G_col_new < N ? G.col_idx[G_col_new] : 0;
+                // mark which child in the loop below it's examining
+                w[N + head] = G_col_new < 0 || G_col_new >= N ? 0 : G.col_idx[G_col_new];
             }
 
+            // See if there are any children which have yet to be examined
             boolean done = true;
-            int idx0 = w[N + head];
-            int idx1 = G_col_new >= 0 && G_col_new < N ? G.col_idx[G_col_new + 1] : 0;
 
-            for (int j = idx0; j < idx1; ++j) {
+            // The Right side after || is used to handle tall matrices. There will be no nodes matching
+            int idx0 = w[N + head];
+            int idx1 = G_col_new < 0 || G_col_new >= N ? 0 : G.col_idx[G_col_new + 1];
+
+            for (int j = idx0; j < idx1; j++) {
                 int jrow = G.nz_rows[j];
                 if (jrow < N && w[jrow] == 0) {
-                    w[N + head] = j + 1;
-                    ++head;
-                    xi[head] = jrow;
+                    w[N + head] = j + 1; // mark that it has processed up to this point
+                    xi[++head] = jrow;
                     done = false;
-                    break;
+                    break;          // It's a DFS so break and continue down
                 }
             }
 
             if (done) {
-                --head;
-                --top;
-                xi[top] = G_col;
+                head--;
+                xi[--top] = G_col;
             }
         }
-
         return top;
     }
 

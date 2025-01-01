@@ -398,9 +398,18 @@ public final class DoubleArrays {
     }
 
     /**
+     * Norm two of array. This method is an alias for {@link DoubleArrays#norm2(double[])}
+     * @param a The array whose norm needs to be found.
+     * @return &radic;&Sigma;a<sup>2</sup>.
+     */
+    public static double norm(double[] a) {
+        return norm2(a);
+    }
+
+    /**
      * Norm two of array.
      * @param a The array whose norm needs to be found.
-     * @return {@code sum(abs(a)<sup>2</sup>)<sup>1/2</sup>}.
+     * @return &radic;&Sigma;a<sup>2</sup>.
      */
     public static double norm2(double[] a) {
         double max = normInf(a);
@@ -409,8 +418,8 @@ public final class DoubleArrays {
         }
         double tmp = Math.pow(1.0 / max, 2);
         double norm = 0.0;
-        for (int i = 0; i < a.length; ++i) {
-            norm += a[i] * a[i] * tmp;
+        for (double v : a) {
+            norm += v * v * tmp;
         }
         return Math.sqrt(norm) * max;
     }
