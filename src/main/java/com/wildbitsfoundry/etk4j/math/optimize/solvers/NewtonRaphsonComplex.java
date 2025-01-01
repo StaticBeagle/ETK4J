@@ -122,7 +122,7 @@ public final class NewtonRaphsonComplex {
         if (derivative != null) {
             while (currentIteration++ < maxNumberOfIterations) {
                 Complex funcValue = func.evaluateAt(xCurrent);
-                if (Objects.equals(funcValue, new Complex())) {
+                if (funcValue.abs() == 0) {
                     double error = xFinal.subtract(xCurrent).abs();
                     SolverResults<Complex> solverResults = new SolverResults<>();
                     solverResults.setSolverStatus("Converged");
@@ -134,7 +134,7 @@ public final class NewtonRaphsonComplex {
                     return solverResults;
                 }
                 Complex funcDerivativeValue = derivative.evaluateAt(xCurrent);
-                if (Objects.equals(funcDerivativeValue, new Complex())) {
+                if (funcDerivativeValue.abs() == 0) {
                     double error = xFinal.subtract(xCurrent).abs();
                     SolverResults<Complex> solverResults = new SolverResults<>();
                     solverResults.setSolverStatus("Derivative was zero");
