@@ -1,9 +1,11 @@
 package com.wildbitsfoundry.etk4j.math.optimize.solvers;
 
-import com.wildbitsfoundry.etk4j.math.calculus.CalculusUtil;
+import com.wildbitsfoundry.etk4j.math.calculus.JacobianCalculation5PointStencilStrategy;
+import com.wildbitsfoundry.etk4j.math.calculus.JacobianCalculationStrategy;
 import com.wildbitsfoundry.etk4j.math.functions.MultivariateFunction;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.LUDecompositionDense;
 import com.wildbitsfoundry.etk4j.math.linearalgebra.MatrixDense;
+import com.wildbitsfoundry.etk4j.math.optimize.OptimizerStatusType;
 import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 
 import java.util.Arrays;
@@ -20,6 +22,7 @@ public class NewtonRaphsonMultiDimensional {
     private double c2 = 0.9;
     private int lineSearchMaxNumberOfIterations = 100;
     private double h = 1e-6;
+    private JacobianCalculationStrategy jacobianCalculationStrategy = new JacobianCalculation5PointStencilStrategy();
 
     public NewtonRaphsonMultiDimensional(MultivariateFunction[] functions, double[] x0) {
         this.functions = functions;
@@ -66,18 +69,31 @@ public class NewtonRaphsonMultiDimensional {
         return this;
     }
 
-    public double[] solve() {
+    public NewtonRaphsonMultiDimensional setJacobianCalculationStrategy(JacobianCalculationStrategy jacobianCalculationStrategy) {
+        this.jacobianCalculationStrategy = jacobianCalculationStrategy;
+        return this;
+    }
+
+    public SolverResults<double[]> solve() {
         double[] x = Arrays.copyOf(x0, x0.length); // Current estimate
         double[] f = Arrays.stream(functions).mapToDouble(fn -> fn.evaluateAt(x)).toArray(); // Evaluate F(x)
         int n = x.length;
+        double normF = Double.NaN;
         for (int iter = 0; iter < maxNumberOfIterations; iter++) {
-            double normF = DoubleArrays.norm(f);
+            normF = DoubleArrays.norm(f);
             // Check convergence
             if (normF < tol) {
-                return x;
+                SolverResults<double[]> solverResults = new SolverResults<>();
+                solverResults.setSolverStatus("Converged");
+                solverResults.setOptimizerStatusType(OptimizerStatusType.CONVERGED);
+                solverResults.setHasConverged(true);
+                solverResults.setError(normF);
+                solverResults.setValue(x);
+                solverResults.setNumberOfIterations(iter);
+                return solverResults;
             }
             // Compute the Jacobian matrix at current x
-            double[][] J = jacobian != null ? evaluateJacobian(jacobian, x) : CalculusUtil.computeJacobian(functions, x, h);
+            double[][] J = jacobian != null ? evaluateJacobian(jacobian, x) : jacobianCalculationStrategy.calculateJacobian(functions, x, h);
             // Solve for the Newton step: J(x) * dx = -F(x)
             double[] dx = new LUDecompositionDense(MatrixDense.from2DArray(J))
                     .solve(DoubleArrays.multiplyElementWise(f, -1))
@@ -95,7 +111,14 @@ public class NewtonRaphsonMultiDimensional {
             // Recompute F(x)
             f = Arrays.stream(functions).mapToDouble(fn -> fn.evaluateAt(x)).toArray();
         }
-        throw new RuntimeException("Newton's method did not converge after " + maxNumberOfIterations + " iterations.");
+        SolverResults<double[]> solverResults = new SolverResults<>();
+        solverResults.setSolverStatus("Maximum number of iterations exceeded");
+        solverResults.setOptimizerStatusType(OptimizerStatusType.MAXIMUM_NUMBER_OF_ITERATIONS_EXCEEDED);
+        solverResults.setHasConverged(true);
+        solverResults.setError(normF);
+        solverResults.setValue(x);
+        solverResults.setNumberOfIterations(maxNumberOfIterations);
+        return solverResults;
     }
 
     private static double lineSearch(MultivariateFunction[] functions, double[] x, double[] dx, double[] f, double alpha0, double c1, double c2, int maxIter) {
@@ -154,7 +177,7 @@ public class NewtonRaphsonMultiDimensional {
         double[] x0 = {1, 5, 5, 10};
         // Solve using the Newton-Raphson method
 
-        double[] solution = new NewtonRaphsonMultiDimensional(functions, x0)
+        SolverResults<double[]> solution = new NewtonRaphsonMultiDimensional(functions, x0)
                 .jacobian(null)
                 .tolerance(1e-6)
                 .iterationLimit(100)
@@ -169,6 +192,6 @@ public class NewtonRaphsonMultiDimensional {
         // [1.2941176469347337, 5.352941176593359, 4.941176470863833, 10.176470588557908]
         // [1.29411764689683, 5.352941176655849, 4.941176470937592, 10.176470588632691] 5 point difference
         // [1.2941176470588236, 5.352941176470588, 4.9411764705882355, 10.176470588235293] jacobian
-        System.out.println("Solution: " + Arrays.toString(solution));
+        System.out.println("Solution: " + Arrays.toString(solution.getValue()));
     }
 }

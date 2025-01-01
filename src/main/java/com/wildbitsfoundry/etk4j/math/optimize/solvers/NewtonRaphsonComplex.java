@@ -5,6 +5,8 @@ import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.functions.ComplexUnivariateFunction;
 import com.wildbitsfoundry.etk4j.math.optimize.OptimizerStatusType;
 
+import java.util.Objects;
+
 /*
 Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
 All rights reserved. see https://github.com/StaticBeagle/ETK4J/blob/master/SciPy.
@@ -120,7 +122,7 @@ public final class NewtonRaphsonComplex {
         if (derivative != null) {
             while (currentIteration++ < maxNumberOfIterations) {
                 Complex funcValue = func.evaluateAt(xCurrent);
-                if (funcValue == new Complex()) {
+                if (Objects.equals(funcValue, new Complex())) {
                     double error = xFinal.subtract(xCurrent).abs();
                     SolverResults<Complex> solverResults = new SolverResults<>();
                     solverResults.setSolverStatus("Converged");
@@ -132,7 +134,7 @@ public final class NewtonRaphsonComplex {
                     return solverResults;
                 }
                 Complex funcDerivativeValue = derivative.evaluateAt(xCurrent);
-                if (funcDerivativeValue == new Complex()) {
+                if (Objects.equals(funcDerivativeValue, new Complex())) {
                     double error = xFinal.subtract(xCurrent).abs();
                     SolverResults<Complex> solverResults = new SolverResults<>();
                     solverResults.setSolverStatus("Derivative was zero");
