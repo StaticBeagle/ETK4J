@@ -149,49 +149,4 @@ public class NewtonRaphsonMultiDimensional {
         }
         return J;
     }
-
-    public static void main(String[] args) {
-        // Define the system of equations
-        //Function func = (x) -> new double[]{x[0] * x[0] + x[1] * x[1] - 1, x[0] * x[0] - x[1]}; // f1(x, y) = x^2 + y^2 - 1 x[0] * x[0] - x[1] // f2(x, y) = x^2 - y };
-        // Define the Jacobian matrix
-//        Jacobian jacobian = (x) -> new double[][]{{2 * x[0], 2 * x[1]},
-//                // df1/dx, df1/dy
-//                {2 * x[0], -1}
-//                // df2/dx, df2/dy
-//        };
-        //func = (double[] x) -> new double[]{x[0] + x[1] - 3 * x[2] + x[3] - 2, -5 * x[0] + 3 * x[1] - 4 * x[2] + x[3], x[0] + 2 * x[2] - x[3] - 1, x[0] + 2 * x[1] - 12};
-        MultivariateFunction[] functions = {
-                x -> x[0] + x[1] - 3 * x[2] + x[3] - 2,
-                x -> -5 * x[0] + 3 * x[1] - 4 * x[2] + x[3],
-                x -> x[0] + 2 * x[2] - x[3] - 1,
-                x -> x[0] + 2 * x[1] - 12
-        };
-
-        MultivariateFunction[][] jacobian = {
-                {x -> 1, x -> 1, x -> -3, x -> 1},
-                {x -> -5, x -> 3, x -> -4, x -> 1},
-                {x -> 1, x -> 0, x -> 2, x -> -1},
-                {x -> 1, x -> 2, x -> 0, x -> 0}
-        };
-        //Initial guess
-        double[] x0 = {1, 5, 5, 10};
-        // Solve using the Newton-Raphson method
-
-        SolverResults<double[]> solution = new NewtonRaphsonMultiDimensional(functions, x0)
-                .jacobian(null)
-                .tolerance(1e-6)
-                .iterationLimit(100)
-                .differentiationStepSize(1e-6)
-                .lineSearchArmijoParameter(1e-4)
-                .lineSearchInitialStepSize(1)
-                .lineSearchStepSizeReductionFactor(0.9)
-                .lineSearchIterationLimit(100)
-                .solve();
-        // [0.7861513777574233, 0.6180339887498949]
-        // [0.7861513778721655, 0.6180339887498943]
-        // [1.2941176469347337, 5.352941176593359, 4.941176470863833, 10.176470588557908]
-        // [1.29411764689683, 5.352941176655849, 4.941176470937592, 10.176470588632691] 5 point difference
-        // [1.2941176470588236, 5.352941176470588, 4.9411764705882355, 10.176470588235293] jacobian
-        System.out.println("Solution: " + Arrays.toString(solution.getValue()));
-    }
 }
