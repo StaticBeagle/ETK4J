@@ -1,6 +1,6 @@
 package com.wildbitsfoundry.etk4j.math.polynomials;
 
-import static com.wildbitsfoundry.etk4j.math.polynomials.Polynomial.polyvalFromRoots;
+import static com.wildbitsfoundry.etk4j.math.polynomials.Polynomial.polyValFromRoots;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
@@ -422,13 +422,13 @@ public class PolynomialTest {
     }
 
     @Test
-    public void testPolyvalFromRoots() {
+    public void testPolyValFromRoots() {
         Polynomial poly = new Polynomial(1, 2, 1);
         Complex[] roots = poly.calculateRoots();
-		assertEquals(new Complex(5, 12), polyvalFromRoots(roots, new Complex(2, 2)));
+		assertEquals(new Complex(5, 12), polyValFromRoots(roots, new Complex(2, 2)));
 
         poly = new Polynomial(3, 1, 2, 0);
         roots = poly.calculateRoots();
-		assertEquals(new Complex(-14.666666666666668, 19.999999999999996), polyvalFromRoots(roots, new Complex(2, 2)));
+		assertEquals(new Complex(-14.666666666666668, 19.999999999999996), polyValFromRoots(roots, new Complex(2, 2)));
     }
 }
