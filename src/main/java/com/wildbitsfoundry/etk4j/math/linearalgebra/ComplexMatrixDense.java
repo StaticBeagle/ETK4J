@@ -59,7 +59,7 @@ public class ComplexMatrixDense extends ComplexMatrix {
         System.arraycopy(matrix.data, 0, this.data, 0, this.rows * this.cols);
     }
 
-    public ComplexMatrixDense(int rows, int cols, double val) {
+    public ComplexMatrixDense(int rows, int cols, Complex val) {
         this.rows = rows;
         this.cols = cols;
         data = new Complex[this.rows * this.cols];
@@ -361,6 +361,39 @@ public class ComplexMatrixDense extends ComplexMatrix {
     /***
      * Get sub-matrix
      *
+     * @param row0 The initial row index.
+     * @param row1 The final row index
+     * @param col0 The initial column index.
+     * @param col1 The final column index.
+     * @return {@code A(rows(:), col0 : col1)}.
+     */
+    public ComplexMatrixDense subMatrix(int row0, int row1, int col0, int col1) {
+        if (row0 < 0 || row1 < 0) {
+            throw new IllegalArgumentException("The row indexes row0 and row1 must be greater than zero.");
+        }
+        if (col0 < 0 || col1 < 0) {
+            throw new IllegalArgumentException("The column indexes col0 and col1 must be greater than zero.");
+        }
+        if (row1 >= rows) {
+            throw new ArrayIndexOutOfBoundsException("The final row index cannot be greater than the number of rows in the Matrix.");
+        }
+        if (col1 >= cols) {
+            throw new ArrayIndexOutOfBoundsException("The final column index cannot be greater than the number of columns in the Matrix.");
+        }
+        int rowDim = row1 - row0 + 1;
+        int colDim = col1 - col0 + 1;
+        Complex[] data = new Complex[rowDim * colDim];
+        for (int i = row0; i <= row1; ++i) {
+            for (int j = col0; j <= col1; ++j) {
+                data[(i - row0) * colDim + (j - col0)] = this.data[i * cols + j];
+            }
+        }
+        return new ComplexMatrixDense(data, rowDim, colDim);
+    }
+
+    /***
+     * Get sub-matrix
+     *
      * @param rows The array of row indices.
      * @param col0 The initial column index.
      * @param col1 The final column index.
@@ -449,5 +482,52 @@ public class ComplexMatrixDense extends ComplexMatrix {
             }
             return new ComplexMatrixDense(data, rows, cols);
         }
+    }
+
+    public double normFrob() {
+        int i, j;
+        double fac, nrm, scale;
+
+        scale = 0.0;
+        for (i = 0; i < rows; i++) {
+            for (j = 0; j < cols; j++) {
+                scale = Math.max(scale,
+                        Math.abs(unsafeGet(i, j).real()) + Math.abs(unsafeGet(i, j).imag()));
+            }
+        }
+        if (scale == 0) {
+            return 0.0;
+        }
+        if (scale < 1) {
+            scale = scale * 1.0e20;
+        }
+        scale = 1 / scale;
+        nrm = 0;
+        for (i = 0; i < rows; i++) {
+            for (j = 0; j < cols; j++) {
+                fac = scale * unsafeGet(i, j).real();
+                nrm = nrm + fac * fac;
+                fac = scale * unsafeGet(i, j).imag();
+                nrm = nrm + fac * fac;
+            }
+        }
+        return Math.sqrt(nrm) / scale;
+    }
+
+    public static void main(String[] args) {
+        Complex[][] matrix = {
+                {new Complex(65, 24), new Complex(35, 55), new Complex(40, 89), new Complex(69, 64)},
+                {new Complex(99, 66), new Complex(64, 87), new Complex(37, 27), new Complex(2, 32)},
+                {new Complex(39, 50), new Complex(48, 45), new Complex(35, 69), new Complex(90, 3)},
+                {new Complex(30, 82), new Complex(93, 40), new Complex(87, 99), new Complex(17, 44)}
+        };
+//        Complex[][] matrix = {
+//                {new Complex(1, 3), new Complex(2, 4)},
+//                {new Complex(5, 7), new Complex(6, 8)}
+//        };
+        ComplexMatrixDense A = ComplexMatrixDense.from2DArray(matrix);
+        ComplexEigenvalueDecompositionDense eig = new ComplexEigenvalueDecompositionDense(A);
+        System.out.println(eig.X);
+        System.out.println(eig.D);
     }
 }

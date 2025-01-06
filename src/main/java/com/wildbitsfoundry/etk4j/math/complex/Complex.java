@@ -40,6 +40,14 @@ public class Complex implements Comparable<Complex> {
     }
 
     /**
+     * Copy Constructor
+     * @return a copy of the current Complex number
+     */
+    public Complex copy() {
+        return new Complex(real, imag);
+    }
+
+    /**
      * Constructs a complex number with only real part and zero imaginary port.
      *
      * @param d The real part of the complex number.
@@ -188,6 +196,15 @@ public class Complex implements Comparable<Complex> {
      */
     public double norm() {
         return real * real + imag * imag;
+    }
+
+    /***
+     * Norm of the complex number.
+     *
+     * @return The magnitude squared, {@code real * real + imag * imag}.
+     */
+    public double norm1() {
+        return Math.abs(real) + Math.abs(imag);
     }
 
     /**
