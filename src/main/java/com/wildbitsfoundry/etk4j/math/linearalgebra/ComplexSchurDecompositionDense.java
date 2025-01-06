@@ -61,15 +61,15 @@ public class ComplexSchurDecompositionDense {
         while (true) {
             // Locate the range in which to iterate.
 
-            while (iu > 0) {
+            while (iu > 1) {
                 d = T.get(iu - 1, iu - 1).norm1() + T.get(iu - 2, iu - 2).norm1();
                 sd = T.get(iu - 1, iu - 2).norm1();
                 if (sd >= 1.0e-16 * d) break;
                 T.set(iu - 1, iu - 2, new Complex());
                 iter = 0;
-                iu = iu - 2;
+                iu = iu - 1;
             }
-            if (iu == 0) break;
+            if (iu == 1) break;
 
             iter = iter + 1;
             if (iter >= MAXITER) {
@@ -77,14 +77,14 @@ public class ComplexSchurDecompositionDense {
 //                        ("Maximum number of iterations exceeded."); TODO
             }
             il = iu - 1;
-            while (il > 0) {
-                d = T.get(il, il).norm1() + T.get(il - 1, il - 1).norm1();
-                sd = T.get(il, il - 1).norm1();
+            while (il > 1) {
+                d = T.get(il - 1, il - 1).norm1() + T.get(il - 2, il - 2).norm1();
+                sd = T.get(il - 1, il - 2).norm1();
                 if (sd < 1.0e-16 * d) break;
                 il = il - 1;
             }
-            if (il != 0) {
-                T.set(il, il - 1, new Complex());
+            if (il != 1) {
+                T.set(il - 1, il - 2, new Complex());
             }
 
             // Compute the shift.
@@ -123,17 +123,17 @@ public class ComplexSchurDecompositionDense {
             } else {
                 kappa = r2.multiply(sf);
             }
-
+            System.out.println(kappa);
             // Perform the QR step.
-            p = T.get(il, il).subtract(kappa).copy();
-            q = T.get(il + 1, il).copy();
+            p = T.get(il - 1, il - 1).subtract(kappa).copy();
+            q = T.get(il, il - 1).copy();
             ComplexPlaneRotationDense.genc(p, q, P);
-            for (i = il; i < iu - 1; i++) {
-                ComplexPlaneRotationDense.pa(P, T, i, i + 1, i, T.getColumnCount() - 1);
-                ComplexPlaneRotationDense.aph(T, P, 0, Math.min(i + 2, iu - 1), i, i + 1);
-                ComplexPlaneRotationDense.aph(U, P, 0, U.getRowCount() - 1, i, i + 1);
-                if (i != iu - 2) {
-                    ComplexPlaneRotationDense.genc(T, i + 1, i + 2, i, P);
+            for (i = il; i < iu; i++) {
+                ComplexPlaneRotationDense.pa(P, T, i - 1, i, i - 1, T.getColumnCount() - 1);
+                ComplexPlaneRotationDense.aph(T, P, 0, Math.min(i + 3, iu) - 1, i - 1, i);
+                ComplexPlaneRotationDense.aph(U, P, 0, U.getRowCount() - 1, i - 1, i);
+                if (i != iu - 1) {
+                    ComplexPlaneRotationDense.genc(T, i, i + 1, i - 1, P);
                 }
             }
         }

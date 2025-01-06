@@ -241,13 +241,9 @@ public class ComplexPlaneRotationDense {
      */
     public static void genc(ComplexMatrixDense A, int ii1, int ii2, int jj, ComplexPlaneRotationDense P) {
 
-        int i1 = ii1;
-        int i2 = ii2;
-        int j = jj;
-
-        ComplexPlaneRotationDense.genc(A.unsafeGet(i1, j), A.unsafeGet(i2, j), P);
-        A.unsafeSet(i1, j, new Complex(P.zr, P.zi));
-        A.unsafeSet(i2, j, new Complex());
+        ComplexPlaneRotationDense.genc(A.unsafeGet(ii1, jj), A.unsafeGet(ii2, jj), P);
+        A.unsafeSet(ii1, jj, new Complex(P.zr, P.zi));
+        A.unsafeSet(ii2, jj, new Complex());
     }
 
     /* TODO
