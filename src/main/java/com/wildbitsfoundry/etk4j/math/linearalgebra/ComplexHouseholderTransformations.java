@@ -98,15 +98,15 @@ public class ComplexHouseholderTransformations {
         int j, cu;
         double norm, s;
         Complex scale;
-        Complex t = new Complex();
-        Complex t1 = new Complex();
+        Complex t;
+        Complex t1;
 
         cu = c2 - c1 + 1;
 
         Complex[] u = new Complex[cu];
 
         for (j = c1; j <= c2; j++) {
-            u[j - c1] = new Complex(A.unsafeGet(r, j));
+            u[j - c1] = A.unsafeGet(r, j).copy();
             A.unsafeSet(r, j, new Complex());
         }
 
@@ -122,16 +122,16 @@ public class ComplexHouseholderTransformations {
 
         if (u[0].real() != 0 || u[0].imag() != 0) {
             t = u[0];
-            // TODO
-            //scale.multiplyEquals();
-            //scale.Times(scale, t.Div(t1.Conj(t), Complex.abs(t)));
+            t1 = t.conj();
+            t = t1.divide(t.abs());
+            scale.multiplyEquals(t);
         }
 
-
-        //A.unsafeSet(r, c1, t.Minus(t.Div(Complex.ONE, scale)));
+        t = Complex.fromReal(1).divide(scale).uminus();
+        A.unsafeSet(r, c1, t);
 
         for (j = 0; j < cu; j++) {
-            //u.Times(j, scale);
+            u[j].multiplyEquals(scale);
         }
 
         u[0] = Complex.fromReal(u[0].real() + 1);

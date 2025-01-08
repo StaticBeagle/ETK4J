@@ -123,7 +123,7 @@ public class ComplexSchurDecompositionDense {
             } else {
                 kappa = r2.multiply(sf);
             }
-            System.out.println(kappa);
+
             // Perform the QR step.
             p = T.get(il - 1, il - 1).subtract(kappa).copy();
             q = T.get(il, il - 1).copy();
