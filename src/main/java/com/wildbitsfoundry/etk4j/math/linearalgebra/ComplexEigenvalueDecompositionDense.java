@@ -21,7 +21,7 @@ import com.wildbitsfoundry.etk4j.math.complex.Complex;
  * @version Pre-alpha
  */
 public class ComplexEigenvalueDecompositionDense {
-
+    // TODO clean-up
     /**
      * The matrix of eigevectors
      */
@@ -115,6 +115,14 @@ public class ComplexEigenvalueDecompositionDense {
         X = S.U.multiply(X);
     }
 
+    public ComplexMatrixDense getD() {
+        return D;
+    }
+
+    public ComplexMatrixDense getV() {
+        return X;
+    }
+
     /**
      * Computes the Frobenius norm of a the submatrix (ii1:ii2, jj1,jj2)
      * of a Zmat.
@@ -126,7 +134,7 @@ public class ComplexEigenvalueDecompositionDense {
      * @param jj2 The upper column index
      * @return The Frobenius norm of A(ii1:ii2, jj1:jj2)
      */
-    public static double normFro(ComplexMatrixDense A, int ii1, int ii2, int jj1, int jj2) {
+    private static double normFro(ComplexMatrixDense A, int ii1, int ii2, int jj1, int jj2) {
         int i, i1, i2, j, j1, j2;
         double fac, nrm, scale;
 

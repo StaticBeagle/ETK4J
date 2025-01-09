@@ -2,6 +2,7 @@ package com.wildbitsfoundry.etk4j.math.linearalgebra;
 
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.util.ComplexArrays;
+import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -17,7 +18,7 @@ public class ComplexMatrixDense extends ComplexMatrix {
 
         this.data = new Complex[rows * cols];
     }
-
+    // TODO add balance algo
     // TODO javadoc all file. Clean up the check in get set
     // add unsafe set and get
     public ComplexMatrixDense(Complex[] data, int rows) {
@@ -190,6 +191,36 @@ public class ComplexMatrixDense extends ComplexMatrix {
             result[i] = this.data[i].subtract(data[i]);
         }
         return new ComplexMatrixDense(result, rows, cols);
+    }
+
+    public ComplexMatrixDense subtract(ComplexMatrixDense m) {
+        Complex[] data = m.getArray();
+        checkMatrixDimensions(m);
+        Complex[] result = new Complex[this.rows * this.cols];
+        for (int i = 0; i < this.rows * this.cols; ++i) {
+            result[i] = this.data[i].subtract(data[i]);
+        }
+        return new ComplexMatrixDense(result, rows, cols);
+    }
+
+    /**
+     * Multiply a matrix by a scalar, C = s*A
+     *
+     * @param s scalar
+     * @return s*A
+     */
+    public ComplexMatrixDense multiply(double s) {
+        return new ComplexMatrixDense(ComplexArrays.multiplyElementWise(data, s), rows, cols);
+    }
+
+    /**
+     * Multiply a matrix by a complex scalar, C = s*A
+     *
+     * @param s scalar
+     * @return s*A
+     */
+    public ComplexMatrixDense multiply(Complex s) {
+        return new ComplexMatrixDense(ComplexArrays.multiplyElementWise(data, s), rows, cols);
     }
 
     public ComplexMatrixDense multiply(MatrixDense matrix) {
@@ -512,22 +543,5 @@ public class ComplexMatrixDense extends ComplexMatrix {
             }
         }
         return Math.sqrt(nrm) / scale;
-    }
-
-    public static void main(String[] args) {
-        Complex[][] matrix = {
-                {new Complex(65, 24), new Complex(35, 55), new Complex(40, 89), new Complex(69, 64)},
-                {new Complex(99, 66), new Complex(64, 87), new Complex(37, 27), new Complex(2, 32)},
-                {new Complex(39, 50), new Complex(48, 45), new Complex(35, 69), new Complex(90, 3)},
-                {new Complex(30, 82), new Complex(93, 40), new Complex(87, 99), new Complex(17, 44)}
-        };
-//        Complex[][] matrix = {
-//                {new Complex(1, 3), new Complex(2, 4)},
-//                {new Complex(5, 7), new Complex(6, 8)}
-//        };
-        ComplexMatrixDense A = ComplexMatrixDense.from2DArray(matrix);
-        ComplexEigenvalueDecompositionDense eig = new ComplexEigenvalueDecompositionDense(A);
-        System.out.println(eig.X);
-        System.out.println(eig.D);
     }
 }
