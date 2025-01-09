@@ -252,6 +252,20 @@ public final class ComplexArrays {
 
     /**
      * Multiply and array of Complex values times a Complex value.
+     * @param a The left-hand side array.
+     * @param b The Complex value to multiply with.
+     * @return {@code a * b}
+     */
+    public static Complex[] multiplyElementWise(Complex[] a, Complex b) {
+        Complex[] result = new Complex[a.length];
+        for (int i = 0; i < a.length; ++i) {
+            result[i] = a[i].multiply(b);
+        }
+        return result;
+    }
+
+    /**
+     * Multiply and array of Complex values times a Complex value.
      * @param a The input array.
      * @param c The Complex value to multiply.
      * @return {@code a * b}
@@ -407,5 +421,35 @@ public final class ComplexArrays {
             nrm = MathETK.hypot(nrm, x[i].abs());
         }
         return nrm;
+    }
+
+    public static double normFro(Complex[] a) {
+        int i;
+        double fac, nrm, scale;
+
+        int n = a.length;
+
+        scale = 0.0;
+        for (i = 0; i < n; i++) {
+            scale = Math.max(scale,
+                    Math.abs(a[i].real()) + Math.abs(a[i].imag()));
+        }
+        if (scale == 0) {
+            return 0.0;
+        }
+        if (scale < 1) {
+            scale = scale * 1.0e20;
+        }
+        scale = 1 / scale;
+        nrm = 0;
+
+        for (i = 0; i < n; i++) {
+            fac = scale * a[i].real();
+            nrm = nrm + fac * fac;
+            fac = scale * a[i].imag();
+            nrm = nrm + fac * fac;
+        }
+
+        return Math.sqrt(nrm) / scale;
     }
 }
