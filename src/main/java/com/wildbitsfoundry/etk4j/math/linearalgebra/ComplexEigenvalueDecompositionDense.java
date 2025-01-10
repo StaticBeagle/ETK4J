@@ -59,11 +59,7 @@ public class ComplexEigenvalueDecompositionDense {
 
         D = new ComplexMatrixDense(T.getRowCount(), T.getColumnCount(), new Complex());
         for(i = 0; i < T.getRowCount(); i++) {
-            for(j = 0; j < T.getColumnCount(); j++) {
-                if(i == j) {
-                    D.unsafeSet(i, j, T.unsafeGet(i, j));
-                }
-            }
+            D.unsafeSet(i, i, T.unsafeGet(i, i));
         }
 
         norm = A.normFrob();

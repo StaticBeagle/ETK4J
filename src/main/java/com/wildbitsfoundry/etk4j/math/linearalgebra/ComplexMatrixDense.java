@@ -540,6 +540,10 @@ public class ComplexMatrixDense extends ComplexMatrix {
             return new ComplexMatrixDense(data, rows, cols);
         }
 
+        public static ComplexMatrixDense zeros(int dim) {
+            return new ComplexMatrixDense(dim, dim, new Complex());
+        }
+
         public static ComplexMatrixDense zeros(int rows, int cols) {
             return new ComplexMatrixDense(rows, cols, new Complex());
         }
