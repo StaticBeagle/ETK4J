@@ -73,9 +73,6 @@ public class ComplexMatrixTest {
         String[] real = Arrays.stream(result.getArray()).map(re -> String.valueOf(re.real())).toArray(String[]::new);
         String[] imag = Arrays.stream(result.getArray()).map(re -> String.valueOf(re.imag())).toArray(String[]::new);
 
-        System.out.println(Arrays.toString(real));
-        System.out.println(Arrays.toString(imag));
-
         String[] expectedReal = {"-3.552713678800501E-15", "6.039613253960852E-14", "-1.9539925233402755E-14",
                 "-1.0436096431476471E-14", "-8.171241461241152E-14", "5.6843418860808015E-14", "0.0",
                 "6.039613253960852E-14", "2.8421709430404007E-14", "4.440892098500626E-14", "2.8421709430404007E-14",
