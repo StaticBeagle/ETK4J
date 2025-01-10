@@ -29,7 +29,7 @@ public final class MathETK {
 	/***
 	 * Inverse hyperbolic sine.
 	 * @param x The value at where to calculate the function
-	 * @return
+	 * @return the inverse hyperbolic sine
 	 */
 	public static double asinh(double x) {
 		return x >= 0 ? Math.log(x + Math.sqrt(x * x + 1.0)) : -Math.log(-x + Math.sqrt(x * x + 1.0));

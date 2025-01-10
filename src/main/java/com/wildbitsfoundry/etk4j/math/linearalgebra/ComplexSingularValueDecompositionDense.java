@@ -3,7 +3,7 @@ package com.wildbitsfoundry.etk4j.math.linearalgebra;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 
-/**
+/*
  * Zsvd implements the singular value decomposion of a ComplexMatrixDense.
  * Specifically if X is an mxn matrix with m&gt;=n there are unitary
  * matrices U and V such that

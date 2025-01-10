@@ -542,7 +542,7 @@ public class MatrixSparse extends Matrix {
         }
     }
 
-    /**
+    /*
      * Performs the operation x = x + A(:,i)*alpha
      *
      * <p>NOTE: This is the same as cs_scatter() in csparse.</p>

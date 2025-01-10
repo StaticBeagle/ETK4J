@@ -40,7 +40,8 @@ public final class NewtonRaphson {
     /**
      * Second initial guess.
      *
-     * @param secondInitialGuess The second guess of there the where the root migth be.
+     * @param secondInitialGuess The second guess of there the where the root might be.
+     * @return {@code this} instance
      */
     public NewtonRaphson secondInitialGuess(double secondInitialGuess) {
         this.x1 = secondInitialGuess;
