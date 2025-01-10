@@ -113,7 +113,8 @@ public class Complex implements Comparable<Complex> {
     /**
      * Checks whether a Complex Number is close to another Complex Number within a given tolerance
      * @param c The complex number to compare to
-     * @return {@code true} if the difference between real and the difference imaginary parts of both number are < tol.
+     * @param tol Tolerance
+     * @return {@code true} if the difference between real and the difference imaginary parts of both number are &le; tol.
      * Otherwise, {@code false}
      */
     public boolean isClose(Complex c, double tol) {
