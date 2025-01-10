@@ -107,9 +107,19 @@ public class Complex implements Comparable<Complex> {
         Complex other = (Complex) obj;
         if (Double.doubleToLongBits(imag) != Double.doubleToLongBits(other.imag))
             return false;
-        if (Double.doubleToLongBits(real) != Double.doubleToLongBits(other.real))
+        return Double.doubleToLongBits(real) == Double.doubleToLongBits(other.real);
+    }
+    // TODO write test
+    /**
+     * Checks whether a Complex Number is close to another Complex Number within a given tolerance
+     * @param c The complex number to compare to
+     * @return {@code true} if the difference between real and the difference imaginary parts of both number are < tol.
+     * Otherwise, {@code false}
+     */
+    public boolean isClose(Complex c, double tol) {
+        if (!MathETK.isClose(this.imag, c.imag, tol, 0))
             return false;
-        return true;
+        return MathETK.isClose(this.real, c.real, tol, 0);
     }
 
     /**
@@ -635,48 +645,48 @@ public class Complex implements Comparable<Complex> {
         return this.divide(this.abs());
     }
 
-    private static final void invertOp(Complex c) {
+    private static void invertOp(Complex c) {
         double mag = 1.0 / c.norm();
         c.real *= mag;
         c.imag *= -mag;
     }
 
-    private static final void addOp(Complex c, double d) {
+    private static void addOp(Complex c, double d) {
         c.real += d;
     }
 
-    private static final void addOp(Complex c, double real, double imag) {
+    private static void addOp(Complex c, double real, double imag) {
         c.real += real;
         c.imag += imag;
     }
 
-    private static final void addOp(Complex c1, Complex c2) {
+    private static void addOp(Complex c1, Complex c2) {
         c1.real += c2.real;
         c1.imag += c2.imag;
     }
 
-    private static final void subtractOp(Complex c, double d) {
+    private static void subtractOp(Complex c, double d) {
         c.real -= d;
     }
 
-    private static final void subtractOp(Complex c1, Complex c2) {
+    private static void subtractOp(Complex c1, Complex c2) {
         c1.real -= c2.real;
         c1.imag -= c2.imag;
     }
 
-    private static final void multiplyOp(Complex c1, Complex c2) {
+    private static void multiplyOp(Complex c1, Complex c2) {
         double re = c1.real * c2.real - c1.imag * c2.imag;
         c1.imag = c1.real * c2.imag + c1.imag * c2.real;
         c1.real = re;
     }
 
-    private static final void multiplyOp(Complex c1, double real, double imag) {
+    private static void multiplyOp(Complex c1, double real, double imag) {
         double re = c1.real * real - c1.imag * imag;
         c1.imag = c1.real * imag + c1.imag * real;
         c1.real = re;
     }
 
-    private static final void multiplyOp(Complex c, double d) {
+    private static void multiplyOp(Complex c, double d) {
         c.real *= d;
         c.imag *= d;
     }

@@ -82,7 +82,7 @@ public class NewtonRaphsonMultivariate {
         for (int iter = 0; iter < maxNumberOfIterations; iter++) {
             normF = DoubleArrays.norm(f);
             // Check convergence
-            if (normF < tol) {
+            if (normF <= tol) {
                 SolverResults<double[]> solverResults = new SolverResults<>();
                 solverResults.setSolverStatus("Converged");
                 solverResults.setOptimizerStatusType(OptimizerStatusType.CONVERGED);

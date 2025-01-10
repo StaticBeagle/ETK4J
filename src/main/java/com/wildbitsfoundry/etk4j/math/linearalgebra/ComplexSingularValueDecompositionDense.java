@@ -1,7 +1,6 @@
 package com.wildbitsfoundry.etk4j.math.linearalgebra;
 
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
-import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 
 /*
  * Zsvd implements the singular value decomposion of a ComplexMatrixDense.
@@ -75,8 +74,8 @@ public class ComplexSingularValueDecompositionDense {
 
         /*    Initialization */
 
-        Complex scale = new Complex();
-        Complex zr = new Complex();
+        Complex scale;
+        Complex zr;
 
         ComplexMatrixDense X = new ComplexMatrixDense(XX);
 
@@ -87,7 +86,7 @@ public class ComplexSingularValueDecompositionDense {
         double[] d = new double[mc];
         double[] e = new double[mc];
 
-        S = ComplexMatrixDense.Factory.zeros(mc, mc);
+        S = ComplexMatrixDense.Factory.zeros(mc);
         U = ComplexMatrixDense.Factory.identity(X.getRowCount());
         V = ComplexMatrixDense.Factory.identity(X.getColumnCount());
 
@@ -302,11 +301,7 @@ public class ComplexSingularValueDecompositionDense {
       Return the decompostion;
 */
         for(i = 0; i < S.getRowCount(); i++) {
-            for(j = 0; j < S.getColumnCount(); j++) {
-                if(i == j) {
-                    S.unsafeSet(i, j, Complex.fromReal(d[i]));
-                }
-            }
+            S.unsafeSet(i, i, Complex.fromReal(d[i]));
         }
     }
 
