@@ -4,11 +4,9 @@ import com.wildbitsfoundry.etk4j.math.functions.MultivariateFunction;
 import com.wildbitsfoundry.etk4j.math.optimize.OptimizerStatusType;
 import org.junit.Test;
 
-import java.util.Arrays;
-
 import static org.junit.Assert.*;
 
-public class NewtonRaphsonMultidimensionalTest {
+public class NewtonRaphsonMultivariateTest {
 
     @Test
     public void testNewtonRaphsonMethodPreComputedJacobianDefaultConditions() {
@@ -30,7 +28,7 @@ public class NewtonRaphsonMultidimensionalTest {
         double[] x0 = {1, 5, 5, 10};
 
         // Solve using the Newton-Raphson method
-        SolverResults<double[]> nr = new NewtonRaphsonMultiDimensional(functions, x0)
+        SolverResults<double[]> nr = new NewtonRaphsonMultivariate(functions, x0)
                 .jacobian(jacobian)
                 .solve();
         double[] expected = {1.2941176470588236, 5.352941176470588, 4.9411764705882355, 10.176470588235293};
@@ -62,7 +60,7 @@ public class NewtonRaphsonMultidimensionalTest {
         double[] x0 = {1, 5, 5, 10};
 
         // Solve using the Newton-Raphson method
-        SolverResults<double[]> nr = new NewtonRaphsonMultiDimensional(functions, x0)
+        SolverResults<double[]> nr = new NewtonRaphsonMultivariate(functions, x0)
                 .jacobian(jacobian)
                 .tolerance(1e-6)
                 .iterationLimit(100)
@@ -94,7 +92,7 @@ public class NewtonRaphsonMultidimensionalTest {
         double[] x0 = {1, 5, 5, 10};
         // Solve using the Newton-Raphson method
 
-        SolverResults<double[]> nr = new NewtonRaphsonMultiDimensional(functions, x0)
+        SolverResults<double[]> nr = new NewtonRaphsonMultivariate(functions, x0)
                 .jacobian(null)
                 .tolerance(1e-6)
                 .iterationLimit(100)

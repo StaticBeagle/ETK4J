@@ -86,8 +86,8 @@ public class ZeroPoleGain extends LinearTimeInvariantSystem {
      */
     @Override
     public Complex evaluateAt(double w) {
-        Complex num = Polynomial.polyvalFromRoots(zeros, Complex.fromImaginary(w));
-        Complex den = Polynomial.polyvalFromRoots(poles, Complex.fromImaginary(w));
+        Complex num = Polynomial.polyValFromRoots(zeros, Complex.fromImaginary(w));
+        Complex den = Polynomial.polyValFromRoots(poles, Complex.fromImaginary(w));
         num.divideEquals(den);
         num.multiplyEquals(gain);
         return num;

@@ -123,7 +123,7 @@ public abstract class ComplexMatrix {
      */
     public Complex[] diag() {
         if (!this.isSquared()) {
-            throw new RuntimeException("Matrix is not squared");
+            throw new RuntimeException("Matrix is not squared"); // TODO throw better exceptino0
         }
         final int dim = rows;
         Complex[] diag = new Complex[dim];

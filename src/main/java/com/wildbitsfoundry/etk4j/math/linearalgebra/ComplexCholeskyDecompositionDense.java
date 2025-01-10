@@ -64,8 +64,7 @@ public class ComplexCholeskyDecompositionDense extends ComplexCholeskyDecomposit
      */
 
     public ComplexMatrixDense solve(ComplexMatrixDense B) {
-        final int n = rows;
-        if (B.getRowCount() != n) {
+        if (B.getRowCount() != rows) {
             throw new IllegalArgumentException("Matrix row dimensions must agree.");
         }
         if (!isSPD) {

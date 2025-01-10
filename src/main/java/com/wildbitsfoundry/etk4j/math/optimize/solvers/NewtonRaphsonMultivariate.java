@@ -10,7 +10,7 @@ import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 
 import java.util.Arrays;
 
-public class NewtonRaphsonMultiDimensional {
+public class NewtonRaphsonMultivariate {
 
     private final MultivariateFunction[] functions;
     private MultivariateFunction[][] jacobian;
@@ -24,52 +24,52 @@ public class NewtonRaphsonMultiDimensional {
     private double h = 1e-6;
     private JacobianCalculationStrategy jacobianCalculationStrategy = new JacobianCalculation5PointStencilStrategy();
 
-    public NewtonRaphsonMultiDimensional(MultivariateFunction[] functions, double[] x0) {
+    public NewtonRaphsonMultivariate(MultivariateFunction[] functions, double[] x0) {
         this.functions = functions;
         this.x0 = x0;
     }
 
-    public NewtonRaphsonMultiDimensional jacobian(MultivariateFunction[][] jacobian) {
+    public NewtonRaphsonMultivariate jacobian(MultivariateFunction[][] jacobian) {
         this.jacobian = jacobian;
         return this;
     }
 
-    public NewtonRaphsonMultiDimensional iterationLimit(int iterationLimit) {
+    public NewtonRaphsonMultivariate iterationLimit(int iterationLimit) {
         this.maxNumberOfIterations = iterationLimit;
         return this;
     }
 
-    public NewtonRaphsonMultiDimensional tolerance(double tol) {
+    public NewtonRaphsonMultivariate tolerance(double tol) {
         this.tol = tol;
         return this;
     }
 
-    public NewtonRaphsonMultiDimensional lineSearchInitialStepSize(double alpha0) {
+    public NewtonRaphsonMultivariate lineSearchInitialStepSize(double alpha0) {
         this.alpha0 = alpha0;
         return this;
     }
 
-    public NewtonRaphsonMultiDimensional lineSearchArmijoParameter(double c1) {
+    public NewtonRaphsonMultivariate lineSearchArmijoParameter(double c1) {
         this.c1 = c1;
         return this;
     }
 
-    public NewtonRaphsonMultiDimensional lineSearchStepSizeReductionFactor(double c2) {
+    public NewtonRaphsonMultivariate lineSearchStepSizeReductionFactor(double c2) {
         this.c2 = c2;
         return this;
     }
 
-    public NewtonRaphsonMultiDimensional lineSearchIterationLimit(int iterationLimit) {
+    public NewtonRaphsonMultivariate lineSearchIterationLimit(int iterationLimit) {
         this.lineSearchMaxNumberOfIterations = iterationLimit;
         return this;
     }
 
-    public NewtonRaphsonMultiDimensional differentiationStepSize(double h) {
+    public NewtonRaphsonMultivariate differentiationStepSize(double h) {
         this.h = h;
         return this;
     }
 
-    public NewtonRaphsonMultiDimensional setJacobianCalculationStrategy(JacobianCalculationStrategy jacobianCalculationStrategy) {
+    public NewtonRaphsonMultivariate setJacobianCalculationStrategy(JacobianCalculationStrategy jacobianCalculationStrategy) {
         this.jacobianCalculationStrategy = jacobianCalculationStrategy;
         return this;
     }
@@ -82,7 +82,7 @@ public class NewtonRaphsonMultiDimensional {
         for (int iter = 0; iter < maxNumberOfIterations; iter++) {
             normF = DoubleArrays.norm(f);
             // Check convergence
-            if (normF < tol) {
+            if (normF <= tol) {
                 SolverResults<double[]> solverResults = new SolverResults<>();
                 solverResults.setSolverStatus("Converged");
                 solverResults.setOptimizerStatusType(OptimizerStatusType.CONVERGED);

@@ -602,13 +602,13 @@ public class Polynomial implements UnivariateFunction, ComplexUnivariateFunction
     /**
      * Evaluate a {@link Polynomial}.
      *
-     * @param roots The roots of teh polynomial.
+     * @param roots The roots of the polynomial.
      * @param x     Argument at which to evaluate the polynomial.
      * @return The value of the polynomial at {@code x}.
      * @see <a href="https://numpy.org/doc/stable/reference/generated/numpy.polynomial.polynomial.polyfromroots.html">
      * polyfromroots</a>
      */
-    public static Complex polyvalFromRoots(Complex[] roots, Complex x) {
+    public static Complex polyValFromRoots(Complex[] roots, Complex x) {
         return ComplexArrays.product(ComplexArrays.subtractElementWise(x, roots));
     }
 }

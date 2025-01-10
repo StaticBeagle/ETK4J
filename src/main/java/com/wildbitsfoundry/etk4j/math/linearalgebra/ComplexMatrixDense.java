@@ -2,22 +2,19 @@ package com.wildbitsfoundry.etk4j.math.linearalgebra;
 
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.util.ComplexArrays;
+import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 
 import java.util.Arrays;
 import java.util.Random;
 // TODO add balance method
 public class ComplexMatrixDense extends ComplexMatrix {
     private Complex[] data;
-    private int rows;
-    private int cols;
 
     public ComplexMatrixDense(int rows, int cols) {
-        this.rows = rows;
-        this.cols = cols;
-
+        super(rows, cols);
         this.data = new Complex[rows * cols];
     }
-
+    // TODO add balance algo
     // TODO javadoc all file. Clean up the check in get set
     // add unsafe set and get
     public ComplexMatrixDense(Complex[] data, int rows) {
@@ -59,7 +56,7 @@ public class ComplexMatrixDense extends ComplexMatrix {
         System.arraycopy(matrix.data, 0, this.data, 0, this.rows * this.cols);
     }
 
-    public ComplexMatrixDense(int rows, int cols, double val) {
+    public ComplexMatrixDense(int rows, int cols, Complex val) {
         this.rows = rows;
         this.cols = cols;
         data = new Complex[this.rows * this.cols];
@@ -190,6 +187,36 @@ public class ComplexMatrixDense extends ComplexMatrix {
             result[i] = this.data[i].subtract(data[i]);
         }
         return new ComplexMatrixDense(result, rows, cols);
+    }
+
+    public ComplexMatrixDense subtract(ComplexMatrixDense m) {
+        Complex[] data = m.getArray();
+        checkMatrixDimensions(m);
+        Complex[] result = new Complex[this.rows * this.cols];
+        for (int i = 0; i < this.rows * this.cols; ++i) {
+            result[i] = this.data[i].subtract(data[i]);
+        }
+        return new ComplexMatrixDense(result, rows, cols);
+    }
+
+    /**
+     * Multiply a matrix by a scalar, C = s*A
+     *
+     * @param s scalar
+     * @return s*A
+     */
+    public ComplexMatrixDense multiply(double s) {
+        return new ComplexMatrixDense(ComplexArrays.multiplyElementWise(data, s), rows, cols);
+    }
+
+    /**
+     * Multiply a matrix by a complex scalar, C = s*A
+     *
+     * @param s scalar
+     * @return s*A
+     */
+    public ComplexMatrixDense multiply(Complex s) {
+        return new ComplexMatrixDense(ComplexArrays.multiplyElementWise(data, s), rows, cols);
     }
 
     public ComplexMatrixDense multiply(MatrixDense matrix) {
@@ -361,6 +388,69 @@ public class ComplexMatrixDense extends ComplexMatrix {
     /***
      * Get sub-matrix
      *
+     * @param row0 The initial row index.
+     * @param row1 The final row index
+     * @param col0 The initial column index.
+     * @param col1 The final column index.
+     * @return {@code A(rows(:), col0 : col1)}.
+     */
+    public ComplexMatrixDense subMatrix(int row0, int row1, int col0, int col1) {
+        if (row0 < 0 || row1 < 0) {
+            throw new IllegalArgumentException("The row indexes row0 and row1 must be greater than zero.");
+        }
+        if (col0 < 0 || col1 < 0) {
+            throw new IllegalArgumentException("The column indexes col0 and col1 must be greater than zero.");
+        }
+        if (row1 >= rows) {
+            throw new ArrayIndexOutOfBoundsException("The final row index cannot be greater than the number of rows in the Matrix.");
+        }
+        if (col1 >= cols) {
+            throw new ArrayIndexOutOfBoundsException("The final column index cannot be greater than the number of columns in the Matrix.");
+        }
+        int rowDim = row1 - row0 + 1;
+        int colDim = col1 - col0 + 1;
+        Complex[] data = new Complex[rowDim * colDim];
+        for (int i = row0; i <= row1; ++i) {
+            for (int j = col0; j <= col1; ++j) {
+                data[(i - row0) * colDim + (j - col0)] = this.data[i * cols + j];
+            }
+        }
+        return new ComplexMatrixDense(data, rowDim, colDim);
+    }
+
+    public double normFrob() {
+        int i, j;
+        double fac, nrm, scale;
+
+        scale = 0.0;
+        for (i = 0; i < rows; i++) {
+            for (j = 0; j < cols; j++) {
+                scale = Math.max(scale,
+                        Math.abs(unsafeGet(i, j).real()) + Math.abs(unsafeGet(i, j).imag()));
+            }
+        }
+        if (scale == 0) {
+            return 0.0;
+        }
+        if (scale < 1) {
+            scale = scale * 1.0e20;
+        }
+        scale = 1 / scale;
+        nrm = 0;
+        for (i = 0; i < rows; i++) {
+            for (j = 0; j < cols; j++) {
+                fac = scale * unsafeGet(i, j).real();
+                nrm = nrm + fac * fac;
+                fac = scale * unsafeGet(i, j).imag();
+                nrm = nrm + fac * fac;
+            }
+        }
+        return Math.sqrt(nrm) / scale;
+    }
+
+    /***
+     * Get sub-matrix
+     *
      * @param rows The array of row indices.
      * @param col0 The initial column index.
      * @param col1 The final column index.
@@ -448,6 +538,14 @@ public class ComplexMatrixDense extends ComplexMatrix {
                 data[i] = new Complex(real, imag);
             }
             return new ComplexMatrixDense(data, rows, cols);
+        }
+
+        public static ComplexMatrixDense zeros(int dim) {
+            return new ComplexMatrixDense(dim, dim, new Complex());
+        }
+
+        public static ComplexMatrixDense zeros(int rows, int cols) {
+            return new ComplexMatrixDense(rows, cols, new Complex());
         }
     }
 }
