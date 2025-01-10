@@ -9,13 +9,9 @@ import java.util.Random;
 
 public class ComplexMatrixDense extends ComplexMatrix {
     private Complex[] data;
-    private int rows;
-    private int cols;
 
     public ComplexMatrixDense(int rows, int cols) {
-        this.rows = rows;
-        this.cols = cols;
-
+        super(rows, cols);
         this.data = new Complex[rows * cols];
     }
     // TODO add balance algo
@@ -422,6 +418,36 @@ public class ComplexMatrixDense extends ComplexMatrix {
         return new ComplexMatrixDense(data, rowDim, colDim);
     }
 
+    public double normFrob() {
+        int i, j;
+        double fac, nrm, scale;
+
+        scale = 0.0;
+        for (i = 0; i < rows; i++) {
+            for (j = 0; j < cols; j++) {
+                scale = Math.max(scale,
+                        Math.abs(unsafeGet(i, j).real()) + Math.abs(unsafeGet(i, j).imag()));
+            }
+        }
+        if (scale == 0) {
+            return 0.0;
+        }
+        if (scale < 1) {
+            scale = scale * 1.0e20;
+        }
+        scale = 1 / scale;
+        nrm = 0;
+        for (i = 0; i < rows; i++) {
+            for (j = 0; j < cols; j++) {
+                fac = scale * unsafeGet(i, j).real();
+                nrm = nrm + fac * fac;
+                fac = scale * unsafeGet(i, j).imag();
+                nrm = nrm + fac * fac;
+            }
+        }
+        return Math.sqrt(nrm) / scale;
+    }
+
     /***
      * Get sub-matrix
      *
@@ -513,35 +539,9 @@ public class ComplexMatrixDense extends ComplexMatrix {
             }
             return new ComplexMatrixDense(data, rows, cols);
         }
-    }
 
-    public double normFrob() {
-        int i, j;
-        double fac, nrm, scale;
-
-        scale = 0.0;
-        for (i = 0; i < rows; i++) {
-            for (j = 0; j < cols; j++) {
-                scale = Math.max(scale,
-                        Math.abs(unsafeGet(i, j).real()) + Math.abs(unsafeGet(i, j).imag()));
-            }
+        public static ComplexMatrixDense zeros(int rows, int cols) {
+            return new ComplexMatrixDense(rows, cols, new Complex());
         }
-        if (scale == 0) {
-            return 0.0;
-        }
-        if (scale < 1) {
-            scale = scale * 1.0e20;
-        }
-        scale = 1 / scale;
-        nrm = 0;
-        for (i = 0; i < rows; i++) {
-            for (j = 0; j < cols; j++) {
-                fac = scale * unsafeGet(i, j).real();
-                nrm = nrm + fac * fac;
-                fac = scale * unsafeGet(i, j).imag();
-                nrm = nrm + fac * fac;
-            }
-        }
-        return Math.sqrt(nrm) / scale;
     }
 }

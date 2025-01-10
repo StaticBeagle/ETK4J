@@ -52,10 +52,9 @@ public class MatrixSparse extends Matrix {
      * @param arrayLength Initial maximum number of non-zero elements that can be in the matrix
      */
     public MatrixSparse(int rows, int cols, int arrayLength) {
+        super(rows, cols);
         if (rows < 0 || cols < 0 || arrayLength < 0)
             throw new IllegalArgumentException("Rows, columns, and arrayLength must be not be negative");
-        this.rows = rows;
-        this.cols = cols;
         this.nz_length = 0;
         col_idx = new int[cols + 1];
         growMaxLength(arrayLength, false);

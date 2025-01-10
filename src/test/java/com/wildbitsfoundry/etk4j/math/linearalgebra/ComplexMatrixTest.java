@@ -1,12 +1,15 @@
 package com.wildbitsfoundry.etk4j.math.linearalgebra;
 
+import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.util.ComplexArrays;
+import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 import org.junit.Test;
 
 import java.util.Arrays;
 
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertTrue;
 
 public class ComplexMatrixTest {
 
@@ -85,5 +88,43 @@ public class ComplexMatrixTest {
         // Test eigenvalues
         assertArrayEquals(expectedReal, real);
         assertArrayEquals(expectedImag, imag);
+    }
+
+    @Test
+    public void testSingularValueDecompositionSingularValues() {
+        Complex[][] matrix = {
+                {new Complex(65, 24), new Complex(35, 55), new Complex(40, 89), new Complex(69, 64)},
+                {new Complex(99, 66), new Complex(64, 87), new Complex(37, 27), new Complex(2, 32)},
+                {new Complex(39, 50), new Complex(48, 45), new Complex(35, 69), new Complex(90, 3)},
+                {new Complex(30, 82), new Complex(93, 40), new Complex(87, 99), new Complex(17, 44)}
+        };
+        ComplexMatrixDense A = new ComplexMatrixDense(matrix);
+        ComplexSingularValueDecompositionDense svd = new ComplexSingularValueDecompositionDense(A);
+        Complex[] expected = {Complex.fromReal(312.12634848312956), Complex.fromReal(106.49976593122118),
+                Complex.fromReal(79.32524103615428), Complex.fromReal(35.10624693326205)};
+        Complex[] actual = svd.S.diag();
+        assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void testVerifySingularValueDecomposition() {
+        Complex[][] matrix = {
+                {new Complex(65, 24), new Complex(35, 55), new Complex(40, 89), new Complex(69, 64)},
+                {new Complex(99, 66), new Complex(64, 87), new Complex(37, 27), new Complex(2, 32)},
+                {new Complex(39, 50), new Complex(48, 45), new Complex(35, 69), new Complex(90, 3)},
+                {new Complex(30, 82), new Complex(93, 40), new Complex(87, 99), new Complex(17, 44)}
+        };
+        ComplexMatrixDense A = new ComplexMatrixDense(matrix);
+        ComplexSingularValueDecompositionDense svd = new ComplexSingularValueDecompositionDense(A);
+        // U * S * VH
+        Complex[] actual = svd.getU().multiply(svd.getS()).multiply(svd.getV().conjugateTranspose()).getArray();
+        Complex[] expected = A.getArray();
+
+        boolean isClose = true;
+        for(int i = 0; i < expected.length; i++) {
+            isClose &= MathETK.isClose(expected[i].real(), actual[i].real(), 1e-12, 0) &&
+                    MathETK.isClose(expected[i].imag(), actual[i].imag(), 1e-12, 0);
+        }
+        assertTrue(isClose);
     }
 }
