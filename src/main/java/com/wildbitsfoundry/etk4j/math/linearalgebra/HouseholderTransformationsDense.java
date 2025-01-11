@@ -4,7 +4,7 @@ import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 
-public class HouseholderTransformations {
+public class HouseholderTransformationsDense {
 
     /**
      * Generates a Householder transformation from within the part of

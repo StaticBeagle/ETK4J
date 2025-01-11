@@ -99,14 +99,14 @@ public class ComplexSingularValueDecompositionDense {
 
         for (k = 0; k <= m; k++) {
 
-            h = ComplexHouseholderTransformations.genc(X, k, X.getRowCount() - 1, k);
-            ComplexHouseholderTransformations.ua(h, X, k, X.getRowCount() - 1, k + 1, X.getColumnCount() - 1, temp);
-            ComplexHouseholderTransformations.au(U, h, 0, U.getRowCount() - 1, k, U.getColumnCount() - 1, temp);
+            h = ComplexHouseholderTransformationsDense.genc(X, k, X.getRowCount() - 1, k);
+            ComplexHouseholderTransformationsDense.ua(h, X, k, X.getRowCount() - 1, k + 1, X.getColumnCount() - 1, temp);
+            ComplexHouseholderTransformationsDense.au(U, h, 0, U.getRowCount() - 1, k, U.getColumnCount() - 1, temp);
 
             if (k != X.getColumnCount() - 1) {
-                h = ComplexHouseholderTransformations.genr(X, k, k + 1, X.getColumnCount() - 1);
-                ComplexHouseholderTransformations.au(X, h, k + 1, X.getRowCount() - 1, k + 1, X.getColumnCount() - 1, temp);
-                ComplexHouseholderTransformations.au(V, h, 0, V.getRowCount() - 1, k + 1, V.getColumnCount() - 1, temp);
+                h = ComplexHouseholderTransformationsDense.genr(X, k, k + 1, X.getColumnCount() - 1);
+                ComplexHouseholderTransformationsDense.au(X, h, k + 1, X.getRowCount() - 1, k + 1, X.getColumnCount() - 1, temp);
+                ComplexHouseholderTransformationsDense.au(V, h, 0, V.getRowCount() - 1, k + 1, V.getColumnCount() - 1, temp);
             }
         }
 

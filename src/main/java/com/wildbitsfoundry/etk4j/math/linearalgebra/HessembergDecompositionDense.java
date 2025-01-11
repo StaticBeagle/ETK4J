@@ -1,8 +1,5 @@
 package com.wildbitsfoundry.etk4j.math.linearalgebra;
 
-import com.wildbitsfoundry.etk4j.math.complex.Complex;
-import com.wildbitsfoundry.etk4j.util.ComplexArrays;
-
 /**
  * Zhess implements the unitary reduction to Hessenberg form
  * by a unitary similarity transformation. Specifically, given
@@ -42,10 +39,10 @@ public class HessembergDecompositionDense {
         double[] work = new double[H.getRowCount()];
 
         for (int k = 0; k < H.getColumnCount() - 2; k++) {
-            double[] u = HouseholderTransformations.genc(H, k + 1, H.getRowCount() - 1, k);
-            HouseholderTransformations.ua(u, H, k + 1, H.getRowCount() - 1, k + 1, H.getColumnCount() - 1, work);
-            HouseholderTransformations.au(H, u, 0, H.getRowCount() - 1, k + 1, H.getColumnCount() - 1, work);
-            HouseholderTransformations.au(U, u, 0, U.getRowCount() - 1, k + 1, U.getColumnCount() - 1, work);
+            double[] u = HouseholderTransformationsDense.genc(H, k + 1, H.getRowCount() - 1, k);
+            HouseholderTransformationsDense.ua(u, H, k + 1, H.getRowCount() - 1, k + 1, H.getColumnCount() - 1, work);
+            HouseholderTransformationsDense.au(H, u, 0, H.getRowCount() - 1, k + 1, H.getColumnCount() - 1, work);
+            HouseholderTransformationsDense.au(U, u, 0, U.getRowCount() - 1, k + 1, U.getColumnCount() - 1, work);
         }
     }
 
