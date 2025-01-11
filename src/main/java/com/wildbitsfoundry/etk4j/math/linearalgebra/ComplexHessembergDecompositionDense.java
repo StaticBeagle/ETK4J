@@ -48,4 +48,12 @@ public class ComplexHessembergDecompositionDense {
             ComplexHouseholderTransformations.au(U, u, 0, U.getRowCount() - 1, k + 1, U.getColumnCount() - 1, work);
         }
     }
+
+    public ComplexMatrixDense getH() {
+        return H;
+    }
+
+    public ComplexMatrixDense getU() {
+        return U;
+    }
 }

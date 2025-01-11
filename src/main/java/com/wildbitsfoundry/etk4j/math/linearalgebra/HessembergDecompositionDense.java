@@ -49,18 +49,11 @@ public class HessembergDecompositionDense {
         }
     }
 
-    public static void main(String[] args) {
-        double[][] matrix = {
-                {65, 35, 40, 69},
-                {99, 64, 37, 2},
-                {39, 48,35, 90},
-                {30, 93, 87, 17}
-        };
+    public MatrixDense getH() {
+        return H;
+    }
 
-        MatrixDense A = MatrixDense.from2DArray(matrix);
-        HessembergDecompositionDense hess = new HessembergDecompositionDense(A);
-        System.out.println(hess.H);
-        System.out.println();
-        System.out.println(hess.U); // TODO do we have getters for the complex case?
+    public MatrixDense getU() {
+        return U;
     }
 }

@@ -81,6 +81,28 @@ public class MatrixDenseTest {
     }
 
     @Test
+    public void testHessembergDecomposition() {
+        double[][] matrix = {
+                {65, 35, 40, 69},
+                {99, 64, 37, 2},
+                {39, 48,35, 90},
+                {30, 93, 87, 17}
+        };
+
+        MatrixDense A = MatrixDense.from2DArray(matrix);
+        HessembergDecompositionDense hess = new HessembergDecompositionDense(A);
+
+        double[] expectedH = {65.0, -64.17727312578465, -58.72784396012248, 4.279948356457808, -110.55315463612966,
+                123.81148748159052, 17.486023979786594, 22.14752145860223, 0.0, 100.60648832932314, 36.36015423097008,
+                26.39970581394131, 0.0, 0.0, 58.20341156591577, -44.17164171256066};
+        assertArrayEquals(expectedH, hess.getH().getArray(), 1e-12);
+        double[] expectedU = {1.0, 0.0, 0.0, 0.0, 0.0, -0.8954968343132741, 0.39724801290719464, 0.2006973741138373,
+                0.0, -0.3527714801840171, -0.3585884935028961, -0.8642722806477718, 0.0, -0.2713626770646286,
+                -0.8447534010399773, 0.46125263026644026};
+        assertArrayEquals(expectedU, hess.getU().getArray(), 1e-12);
+    }
+
+    @Test
     public void allTests() {
         MatrixDense A, B, C, Z, O, I, R, S, X, SUB, M, T, SQ, DEF, SOL;
         // Uncomment this to test IO in a different locale.
