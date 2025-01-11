@@ -23,7 +23,7 @@ import com.wildbitsfoundry.etk4j.math.MathETK;
 /**
  * Class transforming a general real matrix to Schur form.
  * <p>A m × m matrix A can be written as the product of three matrices: A = P
- * × T × P<sup>T with P an orthogonal matrix and T an quasi-triangular
+ * × T × P<sup>T</sup> with P an orthogonal matrix and T an quasi-triangular
  * matrix. Both P and T are m × m matrices.</p>
  * <p>Transformation to Schur form is often not a goal by itself, but it is an
  * intermediate step in more general decomposition algorithms like
@@ -32,7 +32,7 @@ import com.wildbitsfoundry.etk4j.math.MathETK;
  * of this explicitly limited scope, many methods directly returns references to
  * internal arrays, not copies.</p>
  * <p>This class is based on the method hqr2 in class EigenvalueDecomposition
- * from the <a href="http://math.nist.gov/javanumerics/jama/">JAMA library.
+ * from the <a href="http://math.nist.gov/javanumerics/jama/">JAMA library</a>.
  * */
 public class SchurDecompositionDense {
 
