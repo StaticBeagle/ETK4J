@@ -2,8 +2,9 @@ package com.wildbitsfoundry.etk4j.math.linearalgebra;
 
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.util.ComplexArrays;
+import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 
-public class ComplexHouseholderTransformations {
+public class HouseholderTransformationsDense {
 
     /**
      * Generates a Householder transformation from within the part of
@@ -22,54 +23,54 @@ public class ComplexHouseholderTransformations {
      * containing the Householder vector
      * @throws RuntimeException Passed from below.
      */
-    public static Complex[] genc(ComplexMatrixDense A, int r1, int r2, int c)
+    public static double[] genc(MatrixDense A, int r1, int r2, int c)
             throws RuntimeException {
 
         int i, ru;
         double norm;
         double s;
-        Complex scale;
-        Complex t;
-        Complex t1;
+        double scale;
+        double t;
+        double t1;
 
         ru = r2 - r1 + 1;
 
-        Complex[] u = new Complex[r2 - r1 + 1];
+        double[] u = new double[r2 - r1 + 1];
 
         for (i = r1; i <= r2; i++) {
-            u[i - r1] = new Complex(A.unsafeGet(i, c));
-            A.unsafeSet(i, c, new Complex());
+            u[i - r1] = A.unsafeGet(i, c);
+            A.unsafeSet(i, c, 0);
         }
 
-        norm = ComplexArrays.normFro(u);
+        norm = DoubleArrays.normFro(u);
 
         if (r1 == r2 || norm == 0) {
-            A.unsafeSet(r1, c, u[0].uminus());
-            u[0] =  Complex.fromReal(Math.sqrt(2));
+            A.unsafeSet(r1, c, -u[0]);
+            u[0] =  Math.sqrt(2);
             return u;
         }
 
-        scale = new Complex(1 / norm, 0);
+        scale =  1 / norm;
 
-        if (u[0].real() != 0 || u[0].imag() != 0) {
-            t = u[0].copy();
-            t1 = t.conj();
-            t = t1.divide(t.abs());
-            scale.multiplyEquals(t);
+        if (u[0] != 0) {
+            t = u[0];
+            t1 = t;
+            t = t1 / Math.abs(t);
+            scale *= t;
         }
 
-        t = Complex.fromReal(1).divide(scale).uminus();;
+        t = -1 / scale;
         A.unsafeSet(r1, c, t);
 
         for (i = 0; i < ru; i++) {
-            u[i].multiplyEquals(scale);
+            u[i] *= scale;
         }
 
-        u[0] = new Complex(u[0].real() + 1, 0);
-        s = Math.sqrt(1 / u[0].real());
+        u[0] = u[0] + 1;
+        s = Math.sqrt(1 / u[0]);
 
         for (i = 0; i < ru; i++) {
-            u[i] = new Complex(s * u[i].real(), s * u[i].imag());
+            u[i] = s * u[i];
         }
 
         return u;
@@ -165,7 +166,7 @@ public class ComplexHouseholderTransformations {
      * @return The transformed ComplexMatrixDense A
      * @throws RuntimeException Thrown if either u or v is too short.
      */
-    public static ComplexMatrixDense ua(Complex[] u, ComplexMatrixDense A, int r1, int r2, int c1, int c2, Complex[] v)
+    public static MatrixDense ua(double[] u, MatrixDense A, int r1, int r2, int c1, int c2, double[] v)
             throws RuntimeException {
 
         int i, j;
@@ -186,40 +187,27 @@ public class ComplexHouseholderTransformations {
         }
 
         for (j = c1; j <= c2; j++) {
-            v[j - c1] = new Complex();
+            v[j - c1] = 0;
         }
 
         for (i = r1; i <= r2; i++) {
             for (j = c1; j <= c2; j++) {
-                double a = v[j - c1].real();
-                double b = u[i - r1].real();
-                double c = A.unsafeGet(i, j).real();
-                double d = u[i - r1].imag();
-                double e = A.unsafeGet(i, j).imag();
+                double a = v[j - c1];
+                double b = u[i - r1];
+                double c = A.unsafeGet(i, j);
 
-                double aa = v[j - c1].imag();
-                double bb = u[i - r1].real();
-                double cc = A.unsafeGet(i, j).imag();
-                double dd = u[i - r1].imag();
-                double ee = A.unsafeGet(i, j).real();
-                v[j - c1] = new Complex(a + b * c + d * e, aa + bb * cc - dd * ee);
+                v[j - c1] = a + b * c;
             }
         }
 
         for (i = r1; i <= r2; i++) {
             for (j = c1; j <= c2; j++) {
-                double a = A.unsafeGet(i, j).real();
-                double b = u[i - r1].real();
-                double c = v[j - c1].real();
-                double d = u[i - r1].imag();
-                double e = v[j - c1].imag();
+                double a = A.unsafeGet(i, j);
+                double b = u[i - r1];
+                double c = v[j - c1];
 
-                double aa = A.unsafeGet(i, j).imag();
-                double bb = u[i - r1].real();
-                double cc = v[j - c1].imag();
-                double dd = u[i - r1].imag();
-                double ee= v[j - c1].real();
-                A.unsafeSet(i, j, new Complex(a - b * c + d * e, aa - bb * cc - dd * ee));
+
+                A.unsafeSet(i, j, a - b * c);
             }
         }
         return A;
@@ -245,14 +233,14 @@ public class ComplexHouseholderTransformations {
      * @return The transformed ComplexMatrixDense A
      * @throws RuntimeException Passed from below.
      */
-    public static ComplexMatrixDense ua(Complex[] u, ComplexMatrixDense A, int r1, int r2, int c1, int c2)
+    public static MatrixDense ua(double[] u, MatrixDense A, int r1, int r2, int c1, int c2)
             throws RuntimeException {
 
         if (c1 > c2) {
             return A;
         }
 
-        return ua(u, A, r1, r2, c1, c2, new Complex[c2 - c1 + 1]);
+        return ua(u, A, r1, r2, c1, c2, new double[c2 - c1 + 1]);
     }
 
 
@@ -277,7 +265,7 @@ public class ComplexHouseholderTransformations {
      * @return The transformed ComplexMatrixDense A
      * @throws RuntimeException Thrown if either u or v is too short.
      */
-    public static ComplexMatrixDense au(ComplexMatrixDense A, Complex[] u, int r1, int r2, int c1, int c2, Complex[] v)
+    public static MatrixDense au(MatrixDense A, double[] u, int r1, int r2, int c1, int c2, double[] v)
             throws RuntimeException {
 
         int i, j, cu;
@@ -297,36 +285,22 @@ public class ComplexHouseholderTransformations {
         }
 
         for (i = r1; i <= r2; i++) {
-            v[i - r1] = new Complex();
+            v[i - r1] = 0;
             for (j = c1; j <= c2; j++) {
-                double a = v[i - r1].real();
-                double b = A.unsafeGet(i, j).real();
-                double c = u[j - c1].real();
-                double d = A.unsafeGet(i, j).imag();
-                double e = u[j - c1].imag();
+                double a = v[i - r1];
+                double b = A.unsafeGet(i, j);
+                double c = u[j - c1];
 
-                double aa = v[i - r1].imag();
-                double bb = A.unsafeGet(i, j).real();
-                double cc = u[j - c1].imag();
-                double dd = A.unsafeGet(i, j).imag();
-                double ee = u[j - c1].real();
-                v[i - r1] = new Complex(a + b * c - d * e, aa + bb * cc + dd * ee);
+                v[i - r1] = a + b * c;
             }
         }
         for (i = r1; i <= r2; i++) {
             for (j = c1; j <= c2; j++) {
-                double a = A.unsafeGet(i, j).real();
-                double b = v[i - r1].real();
-                double c = u[j - c1].real();
-                double d = v[i - r1].imag();
-                double e = u[j - c1].imag();
+                double a = A.unsafeGet(i, j);
+                double b = v[i - r1];
+                double c = u[j - c1];
 
-                double aa = A.unsafeGet(i, j).imag();
-                double bb = v[i - r1].real();
-                double cc = u[j - c1].imag();
-                double dd = v[i - r1].imag();
-                double ee = u[j - c1].real();
-                A.unsafeSet(i, j, new Complex(a - b * c - d * e, aa + bb * cc - dd * ee));
+                A.unsafeSet(i, j, a - b * c);
             }
         }
         return A;
@@ -354,14 +328,14 @@ public class ComplexHouseholderTransformations {
      * @throws RuntimeException Passed from below.
      */
 
-    public static ComplexMatrixDense au(ComplexMatrixDense A, Complex[] u, int r1, int r2, int c1, int c2)
+    public static MatrixDense au(MatrixDense A, double[] u, int r1, int r2, int c1, int c2)
             throws RuntimeException {
 
         if (r2 < r1) {
             return A;
         }
 
-        return au(A, u, r1, r2, c1, c2, new Complex[r2 - r1 + 1]);
+        return au(A, u, r1, r2, c1, c2, new double[r2 - r1 + 1]);
     }
 
 }

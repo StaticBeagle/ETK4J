@@ -42,10 +42,18 @@ public class ComplexHessembergDecompositionDense {
         Complex[] work = ComplexArrays.zeros(H.getRowCount());
 
         for (int k = 0; k < H.getColumnCount() - 2; k++) {
-            Complex[] u = ComplexHouseholderTransformations.genc(H, k + 1, H.getRowCount() - 1, k);
-            ComplexHouseholderTransformations.ua(u, H, k + 1, H.getRowCount() - 1, k + 1, H.getColumnCount() - 1, work);
-            ComplexHouseholderTransformations.au(H, u, 0, H.getRowCount() - 1, k + 1, H.getColumnCount() - 1, work);
-            ComplexHouseholderTransformations.au(U, u, 0, U.getRowCount() - 1, k + 1, U.getColumnCount() - 1, work);
+            Complex[] u = ComplexHouseholderTransformationsDense.genc(H, k + 1, H.getRowCount() - 1, k);
+            ComplexHouseholderTransformationsDense.ua(u, H, k + 1, H.getRowCount() - 1, k + 1, H.getColumnCount() - 1, work);
+            ComplexHouseholderTransformationsDense.au(H, u, 0, H.getRowCount() - 1, k + 1, H.getColumnCount() - 1, work);
+            ComplexHouseholderTransformationsDense.au(U, u, 0, U.getRowCount() - 1, k + 1, U.getColumnCount() - 1, work);
         }
+    }
+
+    public ComplexMatrixDense getH() {
+        return H;
+    }
+
+    public ComplexMatrixDense getU() {
+        return U;
     }
 }
