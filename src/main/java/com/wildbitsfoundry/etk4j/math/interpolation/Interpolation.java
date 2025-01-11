@@ -29,7 +29,7 @@ public final class Interpolation {
 		double t = (xi - x0) / hx;
 		return (y1 - y0) * t + y0;
 	}
-	// TODO check all the See in the project and change to @see if needed
+
 	/**
 	 * Neville's interpolation algorithm. This array must be monotonically increasing.
 	 * @param x Array of x coordinates.

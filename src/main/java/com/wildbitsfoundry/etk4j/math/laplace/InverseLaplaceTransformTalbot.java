@@ -3,7 +3,6 @@ package com.wildbitsfoundry.etk4j.math.laplace;
 import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.math.functions.ComplexUnivariateFunction;
-import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
 import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 
 /**
@@ -11,16 +10,16 @@ import com.wildbitsfoundry.etk4j.util.ComplexArrays;
  * <pre>
  *     References:
  *     Tucker McClure (2022). Numerical Inverse Laplace Transform
- *     (https://www.mathworks.com/matlabcentral/fileexchange/39035-numerical-inverse-laplace-transform),
+ *     <a href="https://www.mathworks.com/matlabcentral/fileexchange/39035-numerical-inverse-laplace-transform">Numerical inverse Laplace transform</a>,
  *     MATLAB Central File Exchange. Retrieved February 16, 2022.
  * </pre>
- * See <a href="http://www.columbia.edu/~ww2040/UnifiedDraft.pdf">Unified Framework pages 17-18</a>
+ * @see <a href="http://www.columbia.edu/~ww2040/UnifiedDraft.pdf">Unified Framework pages 17-18</a>
  */
 public class InverseLaplaceTransformTalbot {
 
-    private int M;
-    private Complex[] delta;
-    private Complex[] gamma;
+    private final int M;
+    private final Complex[] delta;
+    private final Complex[] gamma;
 
     public InverseLaplaceTransformTalbot() {
         this(64);
@@ -56,7 +55,7 @@ public class InverseLaplaceTransformTalbot {
      * @return {@code L<sup>-1</sup>{Y(s)} = y(t) evaluated at t = time.}
      */
     public double inverseTransform(ComplexUnivariateFunction function, double time) {
-        if (time == 0.0 || time == -0.0) {
+        if (Math.abs(time) == 0.0) {
             time = ConstantsETK.DOUBLE_EPS;
         }
         double fb = 0.0;

@@ -276,7 +276,7 @@ public final class DoubleArrays {
             a[i] *= b[i];
         }
     }
-//TODO test
+
     /**
      * Array division element wise.
      * @param a The left-hand array.
@@ -300,7 +300,7 @@ public final class DoubleArrays {
         divideElementWiseInPlace(result, b);
         return result;
     }
-// TODO test
+
     /**
      * Array division element wise in place. The result of the division is stored in array a.
      * @param a The left-hand array.

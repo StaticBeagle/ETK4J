@@ -1,5 +1,10 @@
 package com.wildbitsfoundry.etk4j.signals.smoothing;
-// TODO tests and javadocs
+
+/**
+ * An &alpha;-&beta; filter (also called alpha-beta filter, f-g filter or g-h filter) is a simplified form of observer
+ * for estimation, data smoothing and control applications. It is closely related to Kalman filters and to linear state
+ * observers used in control theory. Its principal advantage is that it does not require a detailed system model.
+ */
 public class AlphaBetaFilter {
     private double position; // Estimated position
     private double velocity; // Estimated velocity

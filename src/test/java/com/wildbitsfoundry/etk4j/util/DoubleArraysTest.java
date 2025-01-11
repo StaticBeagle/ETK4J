@@ -198,4 +198,14 @@ public class DoubleArraysTest {
         double expected = 110;
         assertEquals(expected, DoubleArrays.dot(a, b), 1e-12);
     }
+
+    @Test
+    public void testDivideElementWise() {
+        double[] a = {2, 4, 6, 8};
+        double d = 2;
+
+        double[] expected = {1, 2, 3, 4};
+        double[] actual = DoubleArrays.divideElementWise(a, d);
+        assertArrayEquals(expected, actual, 0);
+    }
 }
