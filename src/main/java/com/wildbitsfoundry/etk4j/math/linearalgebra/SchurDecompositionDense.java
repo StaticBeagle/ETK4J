@@ -1,20 +1,39 @@
 package com.wildbitsfoundry.etk4j.math.linearalgebra;
 
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
 import com.wildbitsfoundry.etk4j.math.MathETK;
-import com.wildbitsfoundry.etk4j.math.complex.Complex;
 
 /**
- * Schur implements the Schur decomposition of a matrix.  Specifically,
- * given a square matrix A, there is a unitary matrix U such that
- * <pre>
- *      T = U^H AU
- * </pre>
- * is upper triangular.  Schur represents T as a Zutmat and U as a Zmat.
- *
- * @author G. W. Stewart
- * @version Pre-alpha
- */
+ * Class transforming a general real matrix to Schur form.
+ * <p>A m × m matrix A can be written as the product of three matrices: A = P
+ * × T × P<sup>T with P an orthogonal matrix and T an quasi-triangular
+ * matrix. Both P and T are m × m matrices.</p>
+ * <p>Transformation to Schur form is often not a goal by itself, but it is an
+ * intermediate step in more general decomposition algorithms like
+ * {@link EigenvalueDecompositionDense eigen decomposition}. This class is therefore
+ * intended for internal use by the library and is not public. As a consequence
+ * of this explicitly limited scope, many methods directly returns references to
+ * internal arrays, not copies.</p>
+ * <p>This class is based on the method hqr2 in class EigenvalueDecomposition
+ * from the <a href="http://math.nist.gov/javanumerics/jama/">JAMA library.
+ * */
 public class SchurDecompositionDense {
 
     /**
@@ -25,11 +44,11 @@ public class SchurDecompositionDense {
     /**
      * P matrix.
      */
-    private final double matrixP[][];
+    private final double[][] matrixP;
     /**
      * T matrix.
      */
-    private final double matrixT[][];
+    private final double[][] matrixT;
     /**
      * Cached value of P.
      */
@@ -449,21 +468,4 @@ public class SchurDecompositionDense {
     }
 
     // TODO align return matrices name with Octave, Matlab
-    public static void main(String[] args) {
-        double[][] matrix = {
-                {65, 35, 40, 69},
-                {99, 64, 37, 2},
-                {39, 48, 35, 90},
-                {30, 93, 87, 17}
-        };
-
-        MatrixDense A = MatrixDense.from2DArray(matrix);
-        SchurDecompositionDense schur = new SchurDecompositionDense(A);
-
-        System.out.println(schur.getT());
-        System.out.println();
-        System.out.println(schur.getP());
-        System.out.println();
-        System.out.println(schur.getP().multiply(schur.getT()).multiply(schur.getPT()));
-    }
 }

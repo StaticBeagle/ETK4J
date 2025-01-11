@@ -68,9 +68,9 @@ public class MatrixDenseTest {
     @Test
     public void testSetRow() {
         MatrixDense m = MatrixDense.Factory.magic(3);
-		double[] row = {-1, -1, -1};
+        double[] row = {-1, -1, -1};
         m.setRow(1, row);
-		assertArrayEquals(row, m.getRow(1), 1e-12);
+        assertArrayEquals(row, m.getRow(1), 1e-12);
     }
 
     @Test
@@ -100,6 +100,46 @@ public class MatrixDenseTest {
                 0.0, -0.3527714801840171, -0.3585884935028961, -0.8642722806477718, 0.0, -0.2713626770646286,
                 -0.8447534010399773, 0.46125263026644026};
         assertArrayEquals(expectedU, hess.getU().getArray(), 1e-12);
+    }
+
+    @Test
+    public void testSchurDecomposition() {
+        double[][] matrix = {
+                {65, 35, 40, 69},
+                {99, 64, 37, 2},
+                {39, 48, 35, 90},
+                {30, 93, 87, 17}
+        };
+
+        MatrixDense A = MatrixDense.from2DArray(matrix);
+        SchurDecompositionDense schur = new SchurDecompositionDense(A);
+
+        double[] expectedT = {211.53821949564204, 27.963104879902804, 11.529192222479173, -11.83821931259974,
+                -2.8398992587956425E-29, 27.374680489564316, 64.83795403092125, 3.6006930114899935, 0.0,
+                -31.22064867637267, -13.419034896325854, 61.10465539906722, 0.0, 0.0, 2.2836324137572356E-24,
+                -44.49386508888031};
+        assertArrayEquals(expectedT, schur.getT().getArray(), 1e-12);
+        double[] expectedP = {0.49782038512887483, 0.15442410294358475, 0.7718547804323013, 0.3640992426578396,
+                0.4680103341616455, 0.7666501603471897, -0.30669802271073127, -0.3148812182758139, 0.505725691055896,
+                -0.5430518840085535, 0.0954550851000274, -0.6634941623023844, 0.5266713554713984, -0.3057701413553275,
+                -0.5486937647884095, 0.5727626528185856};
+        assertArrayEquals(expectedP, schur.getP().getArray(), 1e-12);
+    }
+
+    @Test
+    public void testVerifySchurDecomposition() {
+        double[][] matrix = {
+                {65, 35, 40, 69},
+                {99, 64, 37, 2},
+                {39, 48, 35, 90},
+                {30, 93, 87, 17}
+        };
+
+        MatrixDense A = MatrixDense.from2DArray(matrix);
+        SchurDecompositionDense schur = new SchurDecompositionDense(A);
+        MatrixDense actual = schur.getP().multiply(schur.getT()).multiply(schur.getPT());
+
+        assertArrayEquals(A.getArray(), actual.getArray(), 1e-12);
     }
 
     @Test
