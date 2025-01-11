@@ -3,7 +3,7 @@ package com.wildbitsfoundry.etk4j.math.linearalgebra;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 
-public class ComplexHouseholderTransformations {
+public class ComplexHouseholderTransformationsDense {
 
     /**
      * Generates a Householder transformation from within the part of
