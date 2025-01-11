@@ -16,13 +16,13 @@ import com.wildbitsfoundry.etk4j.util.ComplexArrays;
  * @version Pre-alpha
  * @author G. W. Stewart
  */
-public class ComplexHessembergDecompositionDense {
+public class HessembergDecompositionDense {
 
     /** The upper Hessenberg matrix */
-    public ComplexMatrixDense H;
+    public MatrixDense H;
 
     /** The unitary matrix */
-    public ComplexMatrixDense U;
+    public MatrixDense U;
 
     /** Creates a Zhess from a square Zmat. Throws a
      * JampackException for nonsquare matrx.
@@ -30,30 +30,30 @@ public class ComplexHessembergDecompositionDense {
      * @param A A Zmat
      * Thrown if A is not square.
      */
-    public ComplexHessembergDecompositionDense(ComplexMatrixDense A) {
+    public HessembergDecompositionDense(MatrixDense A) {
 
         if (A.getRowCount() != A.getColumnCount()) {
             //throw new JampackException("Matrix not square"); TODO
         }
 
-        H = new ComplexMatrixDense(A);
-        U = ComplexMatrixDense.Factory.identity(H.getRowCount());
+        H = new MatrixDense(A);
+        U = MatrixDense.Factory.identity(H.getRowCount());
 
-        Complex[] work = ComplexArrays.zeros(H.getRowCount());
+        double[] work = new double[H.getRowCount()];
 
         for (int k = 0; k < H.getColumnCount() - 2; k++) {
-            Complex[] u = ComplexHouseholderTransformations.genc(H, k + 1, H.getRowCount() - 1, k);
-            ComplexHouseholderTransformations.ua(u, H, k + 1, H.getRowCount() - 1, k + 1, H.getColumnCount() - 1, work);
-            ComplexHouseholderTransformations.au(H, u, 0, H.getRowCount() - 1, k + 1, H.getColumnCount() - 1, work);
-            ComplexHouseholderTransformations.au(U, u, 0, U.getRowCount() - 1, k + 1, U.getColumnCount() - 1, work);
+            double[] u = HouseholderTransformations.genc(H, k + 1, H.getRowCount() - 1, k);
+            HouseholderTransformations.ua(u, H, k + 1, H.getRowCount() - 1, k + 1, H.getColumnCount() - 1, work);
+            HouseholderTransformations.au(H, u, 0, H.getRowCount() - 1, k + 1, H.getColumnCount() - 1, work);
+            HouseholderTransformations.au(U, u, 0, U.getRowCount() - 1, k + 1, U.getColumnCount() - 1, work);
         }
     }
 
-    public ComplexMatrixDense getH() {
+    public MatrixDense getH() {
         return H;
     }
 
-    public ComplexMatrixDense getU() {
+    public MatrixDense getU() {
         return U;
     }
 }
