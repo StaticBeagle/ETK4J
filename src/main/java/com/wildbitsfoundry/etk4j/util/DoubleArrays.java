@@ -910,4 +910,30 @@ public final class DoubleArrays {
         }
         return result;
     }
+
+    public static double normFro(double[] a) {
+        int i;
+        double fac, nrm, scale;
+
+        int n = a.length;
+
+        scale = 0.0;
+        for (i = 0; i < n; i++) {
+            scale = Math.max(scale, Math.abs(a[i]));
+        }
+        if (scale == 0) {
+            return 0.0;
+        }
+        if (scale < 1) {
+            scale = scale * 1.0e20;
+        }
+        scale = 1 / scale;
+        nrm = 0;
+
+        for (i = 0; i < n; i++) {
+            fac = scale * a[i];
+            nrm = nrm + fac * fac;
+        }
+        return Math.sqrt(nrm) / scale;
+    }
 }
