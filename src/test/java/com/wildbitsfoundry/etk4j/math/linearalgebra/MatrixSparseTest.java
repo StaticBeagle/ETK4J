@@ -33,6 +33,87 @@ public class MatrixSparseTest {
     }
 
     @Test
+    public void testAdd() {
+        double[][] matrixA = {
+                {1, 4, 7},
+                {2, 5, 8},
+                {3, 6, 10},
+        };
+
+        double[][] matrixB = {
+                {5, 9, 13},
+                {3, 6, 7},
+                {1, 8, 10},
+        };
+
+        MatrixSparse A = MatrixSparse.from2DArray(matrixA, ConstantsETK.DOUBLE_EPS);
+        MatrixSparse B = MatrixSparse.from2DArray(matrixB, ConstantsETK.DOUBLE_EPS);
+        MatrixDense C = A.add(B).toDense();
+
+        double[] expected = {6, 13, 20, 5, 11, 15, 4, 14, 20};
+        assertArrayEquals(expected, C.getArray(), 1e-12);
+    }
+
+    @Test
+    public void testSubtract() {
+        double[][] matrixA = {
+                {1, 4, 7},
+                {2, 5, 8},
+                {3, 6, 10},
+        };
+
+        double[][] matrixB = {
+                {5, 9, 13},
+                {3, 6, 7},
+                {1, 8, 10},
+        };
+
+        MatrixSparse A = MatrixSparse.from2DArray(matrixA, ConstantsETK.DOUBLE_EPS);
+        MatrixSparse B = MatrixSparse.from2DArray(matrixB, ConstantsETK.DOUBLE_EPS);
+        MatrixDense C = A.subtract(B).toDense();
+
+        double[] expected = {-4, -5, -6, -1, -1, 1, 2, -2, 0};
+        assertArrayEquals(expected, C.getArray(), 1e-12);
+    }
+
+    @Test
+    public void testMultiply() {
+        double[][] matrixA = {
+                {1, 4, 7},
+                {2, 5, 8},
+                {3, 6, 10},
+        };
+
+        double[][] matrixB = {
+                {5, 9, 13},
+                {3, 6, 7},
+                {1, 8, 10},
+        };
+
+        MatrixSparse A = MatrixSparse.from2DArray(matrixA, ConstantsETK.DOUBLE_EPS);
+        MatrixSparse B = MatrixSparse.from2DArray(matrixB, ConstantsETK.DOUBLE_EPS);
+        MatrixDense C = A.multiply(B).toDense();
+
+        double[] expected = {24, 89, 111, 33, 112, 141, 43, 143, 181};
+        assertArrayEquals(expected, C.getArray(), 1e-12);
+    }
+
+    @Test
+    public void testMultiplyScalar() {
+        double[][] matrixA = {
+                {1, 4, 7},
+                {2, 5, 8},
+                {3, 6, 10},
+        };
+
+        MatrixSparse A = MatrixSparse.from2DArray(matrixA, ConstantsETK.DOUBLE_EPS);
+        MatrixDense C = A.multiply(2).toDense();
+
+        double[] expected = {2, 8, 14, 4, 10, 16, 6, 12, 20};
+        assertArrayEquals(expected, C.getArray(), 1e-12);
+    }
+
+    @Test
     public void testLUDecomposition() {
         double[][] matrix = {
                 {1, 4, 7},

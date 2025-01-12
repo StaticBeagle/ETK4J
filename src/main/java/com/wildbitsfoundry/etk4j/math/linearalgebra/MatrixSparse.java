@@ -4,7 +4,7 @@ import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
 
 import java.util.Arrays;
 import java.util.Iterator;
-// TODO add arithmetic operations
+
 import static com.wildbitsfoundry.etk4j.math.linearalgebra.ColumnCounts.adjust;
 
 public class MatrixSparse extends Matrix {
@@ -415,7 +415,7 @@ public class MatrixSparse extends Matrix {
         return from2DArray(array, ConstantsETK.DOUBLE_EPS);
     }
 
-    public static MatrixSparse from2DArray(double array[][], double tol) {
+    public static MatrixSparse from2DArray(double[][] array, double tol) {
         int nonzero = 0;
         for (int i = 0; i != array.length; i++)
             for (int j = 0; j != array[i].length; j++) {
@@ -489,20 +489,152 @@ public class MatrixSparse extends Matrix {
         };
     }
 
-    public MatrixSparse multiply(MatrixSparse A) {
-        MatrixSparse C = new MatrixSparse(this.rows, A.cols);
-        mult(this, A, C);
+    /**
+     * Performs matrix addition:<br>
+     * C = this + B
+     *
+     * @param B Matrix
+     * @return this + B
+     */
+    public MatrixSparse add(MatrixSparse B) {
+        MatrixSparse outputC = new MatrixSparse(rows, cols);
+        if (rows != B.rows || cols != B.cols)
+            throw new IllegalArgumentException("Inconsistent matrix shapes.");
+        outputC = reshapeOrDeclare(outputC, this, rows, cols);
+
+        addOp(this, B, outputC);
+
+        return outputC;
+    }
+
+    public static MatrixSparse reshapeOrDeclare(MatrixSparse target, MatrixSparse reference, int rows, int cols) {
+        if (target == null)
+            return reference.create(rows, cols);
+        else if (target.rows != rows || target.cols != cols)
+            target.reshape(rows, cols);
+        return target;
+    }
+
+    /**
+     * Performs matrix addition:<br>
+     * C = A + B
+     *
+     * @param A Matrix
+     * @param B Matrix
+     * @param C Output matrix.
+     */
+    private static void addOp(MatrixSparse A, MatrixSparse B, MatrixSparse C) {
+        double[] x = adjust(new DGrowArray(), A.rows);
+        int[] w = adjust(new IGrowArray(), A.rows, A.rows);
+
+        C.indicesSorted = false;
+        C.nz_length = 0;
+
+        for (int col = 0; col < A.cols; col++) {
+            C.col_idx[col] = C.nz_length;
+
+            multiplyAddColA(A, col, 1, C, col + 1, x, w);
+            multiplyAddColA(B, col, 1, C, col + 1, x, w);
+
+            // take the values in the dense vector 'x' and put them into 'C'
+            int idxC0 = C.col_idx[col];
+            int idxC1 = C.col_idx[col + 1];
+
+            for (int i = idxC0; i < idxC1; i++) {
+                C.nz_values[i] = x[C.nz_rows[i]];
+            }
+        }
+        C.col_idx[A.cols] = C.nz_length;
+    }
+
+    /**
+     * Performs matrix addition:<br>
+     * C = this - B
+     *
+     * @param B Matrix
+     * @return this - B
+     */
+    public MatrixSparse subtract(MatrixSparse B) {
+        MatrixSparse outputC = new MatrixSparse(rows, cols);
+        if (rows != B.rows || cols != B.cols)
+            throw new IllegalArgumentException("Inconsistent matrix shapes.");
+        outputC = reshapeOrDeclare(outputC, this, rows, cols);
+
+        subtractOp(this, B, outputC);
+
+        return outputC;
+    }
+
+    /**
+     * Performs A - B
+     * @param A Matrix
+     * @param B Matrix
+     * @param C Output matrix.
+     */
+    private static void subtractOp(MatrixSparse A, MatrixSparse B, MatrixSparse C) {
+        double[] x = adjust(new DGrowArray(), A.rows);
+        int[] w = adjust(new IGrowArray(), A.rows, A.rows);
+
+        C.indicesSorted = false;
+        C.nz_length = 0;
+
+        for (int col = 0; col < A.cols; col++) {
+            C.col_idx[col] = C.nz_length;
+
+            multiplyAddColA(A, col, 1, C, col + 1, x, w);
+            multiplyAddColA(B, col, -1, C, col + 1, x, w);
+
+            // take the values in the dense vector 'x' and put them into 'C'
+            int idxC0 = C.col_idx[col];
+            int idxC1 = C.col_idx[col + 1];
+
+            for (int i = idxC0; i < idxC1; i++) {
+                C.nz_values[i] = x[C.nz_rows[i]];
+            }
+        }
+        C.col_idx[A.cols] = C.nz_length;
+    }
+
+    /**
+     * Performs matrix multiplication. C = this * B
+     *
+     * @param B Matrix
+     * @return this * B
+     */
+    public MatrixSparse multiply(MatrixSparse B) {
+        MatrixSparse C = new MatrixSparse(this.rows, B.cols);
+        multiplyOp(this, B, C);
         return C;
     }
 
     /**
-     * Performs matrix multiplication. C = A*B
+     * Performs matrix multiplication. C = this * scalar
+     *
+     * @param scalar value
+     * @return this * scalar
+     */
+    public MatrixSparse multiply(double scalar) {
+        MatrixSparse C = new MatrixSparse(rows, cols);
+        for (int col = 0; col < cols; col++) {
+            int start = col_idx[col];
+            int end = col_idx[col + 1];
+            for (int idx = start; idx < end; idx++) {
+                int row = nz_rows[idx];
+                double value = nz_values[idx];
+                C.unsafeSet(row, col, value * scalar);
+            }
+        }
+        return C;
+    }
+
+    /**
+     * Performs matrix multiplication. C = A * B
      *
      * @param A Matrix
      * @param B Matrix
      * @param C Storage for results. Array size is increased if needed.
      */
-    public static void mult(MatrixSparse A, MatrixSparse B, MatrixSparse C) {
+    private static void multiplyOp(MatrixSparse A, MatrixSparse B, MatrixSparse C) {
 
         double[] x = adjust(new DGrowArray(), A.rows);
         int[] w = adjust(new IGrowArray(), A.rows, A.rows);
@@ -527,7 +659,7 @@ public class MatrixSparse extends Matrix {
                 int rowB = B.nz_rows[bi];
                 double valB = B.nz_values[bi];  // B(k,j)  k=rowB j=colB
 
-                multAddColA(A, rowB, valB, C, colB + 1, x, w);
+                multiplyAddColA(A, rowB, valB, C, colB + 1, x, w);
             }
 
             // take the values in the dense vector 'x' and put them into 'C'
@@ -547,10 +679,10 @@ public class MatrixSparse extends Matrix {
      *
      * <p>NOTE: This is the same as cs_scatter() in csparse.</p>
      */
-    public static void multAddColA(MatrixSparse A, int colA,
-                                   double alpha,
-                                   MatrixSparse C, int mark,
-                                   double[] x, int[] w) {
+    private static void multiplyAddColA(MatrixSparse A, int colA,
+                                        double alpha,
+                                        MatrixSparse C, int mark,
+                                        double[] x, int[] w) {
         int idxA0 = A.col_idx[colA];
         int idxA1 = A.col_idx[colA + 1];
 
@@ -579,7 +711,7 @@ public class MatrixSparse extends Matrix {
      */
     public MatrixSparse transpose() {
         MatrixSparse A_t = reshapeOrDeclare(null, cols, rows, nz_length);
-        transposeOp(this, A_t, null);
+        transposeOp(this, A_t);
         return A_t;
     }
 
@@ -591,8 +723,8 @@ public class MatrixSparse extends Matrix {
         return target;
     }
 
-    private static void transposeOp(MatrixSparse A, MatrixSparse C, IGrowArray gw) {
-        int[] work = adjust(gw, A.cols, A.rows);
+    private static void transposeOp(MatrixSparse A, MatrixSparse C) {
+        int[] work = adjust((IGrowArray) null, A.cols, A.rows);
         C.reshape(A.cols, A.rows, A.nz_length);
 
         // compute the histogram for each row in 'a'
@@ -619,22 +751,17 @@ public class MatrixSparse extends Matrix {
         }
     }
 
-    public static void main(String[] args) {
-        double[][] matrix = {
-                {1, 0, 0},
-                {0, 5, 0},
-                {0, 0, 10},
-        };
-
-        MatrixSparse sparseCSC = MatrixSparse.from2DArray(matrix, ConstantsETK.DOUBLE_EPS);
-        for (int col = 0; col < sparseCSC.cols; col++) {
-            int start = sparseCSC.col_idx[col];
-            int end = sparseCSC.col_idx[col + 1];
+    public MatrixDense toDense() {
+        MatrixDense matrixDense = new MatrixDense(rows, cols);
+        for (int col = 0; col < cols; col++) {
+            int start = col_idx[col];
+            int end = col_idx[col + 1];
             for (int idx = start; idx < end; idx++) {
-                int row = sparseCSC.nz_rows[idx];
-                double value = sparseCSC.nz_values[idx];
-                System.out.println("Non-zero element at (" + row + ", " + col + "): " + value);
+                int row = nz_rows[idx];
+                double value = nz_values[idx];
+                matrixDense.unsafeSet(row, col, value);
             }
         }
+        return matrixDense;
     }
 }
