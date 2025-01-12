@@ -3,6 +3,7 @@ package com.wildbitsfoundry.etk4j.math.linearalgebra;
 import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
 
 import java.util.Arrays;
+import java.util.Iterator;
 // TODO add arithmetic operations
 import static com.wildbitsfoundry.etk4j.math.linearalgebra.ColumnCounts.adjust;
 
@@ -47,8 +48,8 @@ public class MatrixSparse extends Matrix {
     /**
      * Specifies shape and number of non-zero elements that can be stored.
      *
-     * @param rows     Number of rows
-     * @param cols     Number of columns
+     * @param rows        Number of rows
+     * @param cols        Number of columns
      * @param arrayLength Initial maximum number of non-zero elements that can be in the matrix
      */
     public MatrixSparse(int rows, int cols, int arrayLength) {
@@ -441,52 +442,52 @@ public class MatrixSparse extends Matrix {
         return dst;
     }
 
-//    /**
-//     * Value of an element in a sparse matrix
-//     */
-//    class CoordinateRealValue {
-//        /**
-//         * The coordinate
-//         */
-//        public int row, col;
-//        /**
-//         * The value of the coordinate
-//         */
-//        public double value;
-//    }
-//
-//    public Iterator<CoordinateRealValue> createCoordinateIterator() {
-//        return new Iterator<CoordinateRealValue>() {
-//            final CoordinateRealValue coordinate = new CoordinateRealValue();
-//            int nz_index = 0; // the index of the non-zero value and row
-//            int column = 0; // which column it's in
-//
-//            {
-//                incrementColumn();
-//            }
-//
-//
-//            public boolean hasNext() {
-//                return nz_index < nz_length;
-//            }
-//
-//
-//            public CoordinateRealValue next() {
-//                coordinate.row = nz_rows[nz_index];
-//                coordinate.col = column;
-//                coordinate.value = nz_values[nz_index];
-//                nz_index++;
-//                incrementColumn();
-//                return coordinate;
-//            }
-//
-//            private void incrementColumn() {
-//                while (column + 1 <= cols && nz_index >= col_idx[column + 1]) {
-//                    column++;
-//                }
-//            }
-//        };
-//    }
+    /**
+     * Value of an element in a sparse matrix
+     */
+    public static class CoordinateRealValue {
+        /**
+         * The coordinate
+         */
+        public int row, col;
+        /**
+         * The value of the coordinate
+         */
+        public double value;
+    }
+
+    public Iterator<CoordinateRealValue> createCoordinateIterator() {
+        return new Iterator<CoordinateRealValue>() {
+            final CoordinateRealValue coordinate = new CoordinateRealValue();
+            int nz_index = 0; // the index of the non-zero value and row
+            int column = 0; // which column it's in
+
+            {
+                incrementColumn();
+            }
+
+
+            public boolean hasNext() {
+                return nz_index < nz_length;
+            }
+
+
+            public CoordinateRealValue next() {
+                coordinate.row = nz_rows[nz_index];
+                coordinate.col = column;
+                coordinate.value = nz_values[nz_index];
+                nz_index++;
+                incrementColumn();
+                return coordinate;
+            }
+
+            private void incrementColumn() {
+                while (column + 1 <= cols && nz_index >= col_idx[column + 1]) {
+                    column++;
+                }
+            }
+        };
+    }
 
     public MatrixSparse multiply(MatrixSparse A) {
         MatrixSparse C = new MatrixSparse(this.rows, A.cols);
@@ -497,12 +498,11 @@ public class MatrixSparse extends Matrix {
     /**
      * Performs matrix multiplication. C = A*B
      *
-     *
      * @param A Matrix
      * @param B Matrix
      * @param C Storage for results. Array size is increased if needed.
      */
-    public static void mult( MatrixSparse A, MatrixSparse B, MatrixSparse C) {
+    public static void mult(MatrixSparse A, MatrixSparse B, MatrixSparse C) {
 
         double[] x = adjust(new DGrowArray(), A.rows);
         int[] w = adjust(new IGrowArray(), A.rows, A.rows);
@@ -547,10 +547,10 @@ public class MatrixSparse extends Matrix {
      *
      * <p>NOTE: This is the same as cs_scatter() in csparse.</p>
      */
-    public static void multAddColA( MatrixSparse A, int colA,
-                                    double alpha,
-                                    MatrixSparse C, int mark,
-                                    double[] x, int[] w ) {
+    public static void multAddColA(MatrixSparse A, int colA,
+                                   double alpha,
+                                   MatrixSparse C, int mark,
+                                   double[] x, int[] w) {
         int idxA0 = A.col_idx[colA];
         int idxA1 = A.col_idx[colA + 1];
 
@@ -559,15 +559,15 @@ public class MatrixSparse extends Matrix {
 
             if (w[row] < mark) {
                 if (C.nz_length >= C.nz_rows.length) {
-                    C.growMaxLength(C.nz_length*2 + 1, true);
+                    C.growMaxLength(C.nz_length * 2 + 1, true);
                 }
 
                 w[row] = mark;
                 C.nz_rows[C.nz_length] = row;
                 C.col_idx[mark] = ++C.nz_length;
-                x[row] = A.nz_values[j]*alpha;
+                x[row] = A.nz_values[j] * alpha;
             } else {
-                x[row] += A.nz_values[j]*alpha;
+                x[row] += A.nz_values[j] * alpha;
             }
         }
     }
@@ -583,7 +583,7 @@ public class MatrixSparse extends Matrix {
         return A_t;
     }
 
-    public static MatrixSparse reshapeOrDeclare(MatrixSparse target, int rows, int cols, int nz_length ) {
+    public static MatrixSparse reshapeOrDeclare(MatrixSparse target, int rows, int cols, int nz_length) {
         if (target == null)
             return new MatrixSparse(rows, cols, nz_length);
         else
@@ -591,7 +591,7 @@ public class MatrixSparse extends Matrix {
         return target;
     }
 
-    private static void transposeOp( MatrixSparse A, MatrixSparse C, IGrowArray gw ) {
+    private static void transposeOp(MatrixSparse A, MatrixSparse C, IGrowArray gw) {
         int[] work = adjust(gw, A.cols, A.rows);
         C.reshape(A.cols, A.rows, A.nz_length);
 
@@ -616,6 +616,25 @@ public class MatrixSparse extends Matrix {
                 C.nz_values[index] = A.nz_values[i];
             }
             idx0 = idx1;
+        }
+    }
+
+    public static void main(String[] args) {
+        double[][] matrix = {
+                {1, 0, 0},
+                {0, 5, 0},
+                {0, 0, 10},
+        };
+
+        MatrixSparse sparseCSC = MatrixSparse.from2DArray(matrix, ConstantsETK.DOUBLE_EPS);
+        for (int col = 0; col < sparseCSC.cols; col++) {
+            int start = sparseCSC.col_idx[col];
+            int end = sparseCSC.col_idx[col + 1];
+            for (int idx = start; idx < end; idx++) {
+                int row = sparseCSC.nz_rows[idx];
+                double value = sparseCSC.nz_values[idx];
+                System.out.println("Non-zero element at (" + row + ", " + col + "): " + value);
+            }
         }
     }
 }

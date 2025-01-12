@@ -1,14 +1,14 @@
 package com.wildbitsfoundry.etk4j.math.linearalgebra;
 
 /**
- * Zhess implements the unitary reduction to Hessenberg form
+ * HessembergDecompositionDense implements the unitary reduction to Hessenberg form
  * by a unitary similarity transformation. Specifically, given
  * a square matrix A, there is a unitary matrix U such that
  * <pre>
  *      H = U^H AU
  * </pre>
  * is upper Hessenberg.
- * Zhess represents U and H as Zmats.
+ * HessembergDecompositionDense represents U and H as {@link ComplexMatrix}.
  *
  * @version Pre-alpha
  * @author G. W. Stewart
@@ -21,16 +21,16 @@ public class HessembergDecompositionDense {
     /** The unitary matrix */
     public MatrixDense U;
 
-    /** Creates a Zhess from a square Zmat. Throws a
-     * JampackException for nonsquare matrx.
+    /** Creates a Hessemberg Matrix  from a square Complex Matrix. Throws a
+     * {@link NonSquareMatrixException} for nonsquare matrx.
      *
-     * @param A A Zmat
-     * Thrown if A is not square.
+     * @param A A {@link ComplexMatrix}
+     * @throws NonSquareMatrixException Thrown if A is not square.
      */
     public HessembergDecompositionDense(MatrixDense A) {
 
         if (A.getRowCount() != A.getColumnCount()) {
-            //throw new JampackException("Matrix not square"); TODO
+            throw new NonSquareMatrixException("Matrix not square");
         }
 
         H = new MatrixDense(A);
@@ -46,10 +46,18 @@ public class HessembergDecompositionDense {
         }
     }
 
+    /**
+     * The upper Hessemberg Matrix
+     * @return The upper Hessemberg Matrix
+     */
     public MatrixDense getH() {
         return H;
     }
 
+    /**
+     * THe unitary Matrix
+     * @return The unitary Matrix
+     */
     public MatrixDense getU() {
         return U;
     }

@@ -207,7 +207,6 @@ public class LUDecompositionDense extends LUDecomposition<MatrixDense> {
 		return Xmat;
 	}
 
-	// TODO write test
 	@Override
 	public MatrixDense solve(double[] b) {
 		return solve(new MatrixDense(b, b.length));

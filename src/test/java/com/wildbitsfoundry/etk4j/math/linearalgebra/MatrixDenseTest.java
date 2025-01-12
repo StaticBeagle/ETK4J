@@ -143,6 +143,26 @@ public class MatrixDenseTest {
     }
 
     @Test
+    public void testSolveLUwithDoubleArray() {
+        double[][] matrix = {
+                {65, 35, 40, 69},
+                {99, 64, 37, 2},
+                {39, 48, 35, 90},
+                {30, 93, 87, 17}
+        };
+
+        double[] solution = {12, 78, 43, 90};
+
+        MatrixDense A = MatrixDense.from2DArray(matrix);
+        LUDecompositionDense lu = new LUDecompositionDense(A);
+        MatrixDense actual = lu.solve(solution);
+
+        double[] expected = {-0.11092718204309689, 1.9871655612968555, -1.025029713920478, -0.1353527428372395};
+
+        assertArrayEquals(expected, actual.getArray(), 1e-12);
+    }
+
+    @Test
     public void allTests() {
         MatrixDense A, B, C, Z, O, I, R, S, X, SUB, M, T, SQ, DEF, SOL;
         // Uncomment this to test IO in a different locale.

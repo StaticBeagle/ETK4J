@@ -7,6 +7,5 @@ public class CholeskyDecomposition<T extends Matrix> {
     public CholeskyDecomposition(T matrix) {
         this.rows = matrix.getRowCount();
         this.cols = matrix.getColumnCount();
-        // TODO
     }
 }
