@@ -46,8 +46,7 @@ public class ComplexSchurDecompositionDense {
         ComplexPlaneRotationDense P = new ComplexPlaneRotationDense();
 
         if (A.getRowCount() != A.getColumnCount()) {
-//            throw new JampackException // TODO
-//                    ("Nonsquare matrix");
+            throw new NonSquareMatrixException("Matrix must be squared");
         }
 
         /* Reduce to Hessenberg form and set up T and U */

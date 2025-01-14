@@ -17,17 +17,21 @@ public class ComplexCholeskyDecompositionDense extends ComplexCholeskyDecomposit
         final int m = matrix.getRowCount();
         final int n = matrix.getColumnCount();
 
-        isSPD = (n == m);
-        for(int k = 0; k < n; k++) {
+        if(m != n) {
+            throw new NonSquareMatrixException("Matrix must be squared");
+        }
+
+        isSPD = true;
+        for (int k = 0; k < n; k++) {
             isSPD = isSPD & A[k * n + k].real() > 0 & A[k * n + k].imag() == 0;
             A[k * n + k] = Complex.fromReal(Math.sqrt(A[k * n + k].real()));
             double mu = 1.0 / A[k * n + k].real();
-            for(int j = k + 1; j < n; j++) {
+            for (int j = k + 1; j < n; j++) {
                 isSPD = isSPD & ARef[k * n + j].equals(ARef[j * n + k].conj());
                 A[k * n + j] = A[k * n + j].multiply(mu);
             }
-            for(int i = k + 1; i < n; i++) {
-                for(int j = i; j < n; j++) {
+            for (int i = k + 1; i < n; i++) {
+                for (int j = i; j < n; j++) {
                     double real = A[i * n + j].real()
                             - A[k * n + i].real() * A[k * n + j].real() - A[k * n + i].imag() * A[k * n + j].imag();
                     double imag = A[i * n + j].imag()
@@ -36,7 +40,7 @@ public class ComplexCholeskyDecompositionDense extends ComplexCholeskyDecomposit
                 }
                 A[i * n + i] = new Complex(A[i * n + i].real(), 0.0);
             }
-            for(int j = 0; j < k; j++) {
+            for (int j = 0; j < k; j++) {
                 A[k * n + j] = new Complex();
             }
         }
@@ -47,6 +51,10 @@ public class ComplexCholeskyDecompositionDense extends ComplexCholeskyDecomposit
         return R.copy();
     }
 
+    public ComplexMatrixDense getL() {
+        return R.conjugateTranspose();
+    }
+
     public boolean isSPD() {
         return isSPD;
     }
@@ -54,13 +62,10 @@ public class ComplexCholeskyDecompositionDense extends ComplexCholeskyDecomposit
     /**
      * Solve A*X = B
      *
-     * @param B
-     *            A Matrix with as many rows as A and any number of columns.
+     * @param B A Matrix with as many rows as A and any number of columns.
      * @return X so that L*L'*X = B
-     * @exception IllegalArgumentException
-     *                Matrix row dimensions must agree.
-     * @exception RuntimeException
-     *                Matrix is not symmetric positive definite.
+     * @throws IllegalArgumentException Matrix row dimensions must agree.
+     * @throws RuntimeException         Matrix is not symmetric positive definite.
      */
 
     public ComplexMatrixDense solve(ComplexMatrixDense B) {

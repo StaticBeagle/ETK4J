@@ -47,7 +47,7 @@ public class ComplexEigenvalueDecompositionDense {
         Complex z, d;
 
         if (A.getRowCount() != A.getColumnCount()) {
-            // throw new matrix is not squared TODO
+            throw new NonSquareMatrixException("Matrix must be squared");
         }
 
         int n = A.getRowCount();

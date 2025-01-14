@@ -3,6 +3,7 @@ package com.wildbitsfoundry.etk4j.math.linearalgebra;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 
 import static com.wildbitsfoundry.etk4j.math.linearalgebra.ColumnCounts.adjust;
+import static com.wildbitsfoundry.etk4j.math.linearalgebra.ColumnCounts.transpose;
 import static com.wildbitsfoundry.etk4j.math.linearalgebra.QrStructuralCounts.eliminationTree;
 import static com.wildbitsfoundry.etk4j.math.linearalgebra.QrStructuralCounts.postorder;
 
@@ -34,8 +35,9 @@ public class CholeskyDecompositionSparse extends CholeskyDecomposition<MatrixSpa
     }
 
     public boolean decompose(MatrixSparse orig) {
-        if (orig.cols != orig.rows) // TODO add this to other Cholesky decompositions
-            throw new IllegalArgumentException("Must be a square matrix");
+        if (orig.cols != orig.rows) {
+            throw new NonSquareMatrixException("Must be a square matrix");
+        }
 
         if (!locked || !decomposed)
             performSymbolic(orig);
@@ -205,6 +207,8 @@ public class CholeskyDecompositionSparse extends CholeskyDecomposition<MatrixSpa
     public MatrixSparse getL() {
         return L;
     }
+
+    public MatrixSparse getR() { return L.transpose(); }
 
     IGrowArray getGw() {
         return gw;

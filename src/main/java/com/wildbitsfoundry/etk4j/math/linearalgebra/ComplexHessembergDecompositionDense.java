@@ -33,7 +33,7 @@ public class ComplexHessembergDecompositionDense {
     public ComplexHessembergDecompositionDense(ComplexMatrixDense A) {
 
         if (A.getRowCount() != A.getColumnCount()) {
-            //throw new JampackException("Matrix not square"); TODO
+            throw new NonSquareMatrixException("Matrix must be squared");
         }
 
         H = new ComplexMatrixDense(A);

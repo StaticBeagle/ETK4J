@@ -83,15 +83,6 @@ public class ComplexMatrixDense extends ComplexMatrix {
 
     // endregion
 
-    // region getters and setter
-    public int getRowCount() {
-        return rows;
-    }
-
-    public int getColumnCount() {
-        return cols;
-    }
-
     public Complex get(int i, int j) {
         // TODO clean up all these checks
         if (i < 0) {
