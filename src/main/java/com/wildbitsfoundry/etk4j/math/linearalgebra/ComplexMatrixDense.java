@@ -3,12 +3,12 @@ package com.wildbitsfoundry.etk4j.math.linearalgebra;
 import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.util.ComplexArrays;
-import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 
 import java.util.Arrays;
 import java.util.Random;
 
-import static com.wildbitsfoundry.etk4j.math.linearalgebra.ComplexQRDecompositionDense.zeros;
+import static com.wildbitsfoundry.etk4j.util.ComplexArrays.zeros;
+
 
 // TODO add balance method
 public class ComplexMatrixDense extends ComplexMatrix {
@@ -290,10 +290,7 @@ public class ComplexMatrixDense extends ComplexMatrix {
     // endregion
 
     public boolean isEmpty() {
-        if ((rows == 0 && cols == 0) || data == null || data.length == 0) {
-            return true;
-        }
-        return false;
+        return (rows == 0 && cols == 0) || data == null || data.length == 0;
     }
 
     public ComplexMatrixDense transpose() {
@@ -567,7 +564,7 @@ public class ComplexMatrixDense extends ComplexMatrix {
             return null;
         }
 
-        double[] singularValues = svdX.getS();
+        double[] singularValues = svdX.getS().diag();
         double tol = Math.max(rows, cols) * singularValues[0] * ConstantsETK.DOUBLE_EPS;
         double[] singularValueReciprocals = new double[singularValues.length];
         for (int i = 0; i < singularValues.length; i++) {

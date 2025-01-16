@@ -1040,13 +1040,12 @@ public class MatrixDense extends Matrix {
         return new EigenvalueDecompositionDense(this, balance);
     }
 
-    // TODO maybe add iteration limit to balance?
     /**
      * Balances the matrix using the algorithm by Parlett and Reinsch with norm -1.
      * References:
      * <pre>
-     * http://www.netlib.org/eispack/balanc.f
-     * https://arxiv.org/pdf/1401.5766.pdf algorithm #2
+     * <a href="http://www.netlib.org/eispack/balanc.f">http://www.netlib.org/eispack/balanc.f</a>
+     * <a href="https://arxiv.org/pdf/1401.5766.pdf">https://arxiv.org/pdf/1401.5766.pdf - Algorithm #2</a>
      * </pre>
      *
      * @return A balanced copy of the {@code Matrix}.

@@ -2,6 +2,7 @@ package com.wildbitsfoundry.etk4j.math.linearalgebra;
 
 import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
+import com.wildbitsfoundry.etk4j.signals.filters.MaximumNumberOfIterationsExceededException;
 
 /*
  * Zsvd implements the singular value decomposion of a ComplexMatrixDense.
@@ -48,12 +49,11 @@ public class ComplexSingularValueDecompositionDense {
      * The diagonal matrix of singular values
      */
 
-    public double[] S;
+    public MatrixDense S;
 
-    private int rows;
-
-    private int cols;
-
+    private final int rows;
+    private final int cols;
+    private final double[] d;
     /*
      Computes the SVD of a ComplexMatrixDense XX.  Throws a JampackException
      if the maximum number of iterations is exceeded.
@@ -91,10 +91,10 @@ public class ComplexSingularValueDecompositionDense {
         Complex[] temp = new Complex[Math.max(X.getRowCount(), X.getColumnCount())];
 
         mc = Math.min(X.getRowCount(), X.getColumnCount());
-        double[] d = new double[mc];
+        d = new double[mc];
         double[] e = new double[mc];
 
-        S = new double[] {};
+        S = new MatrixDense(mc, mc);
         U = ComplexMatrixDense.Factory.identity(X.getRowCount());
         V = ComplexMatrixDense.Factory.identity(X.getColumnCount());
 
@@ -196,9 +196,8 @@ public class ComplexSingularValueDecompositionDense {
                 iu = iu - 1;
             }
             iter = iter + 1;
-            if (iter > MAXITER) { //TODO
-//                throw new JampackException
-//                        ("Maximum number of iterations exceeded.");
+            if (iter > MAXITER) {
+                throw new MaximumNumberOfIterationsExceededException("Maximum number of iterations exceeded.");
             }
             if (iu == 0) break;
 
@@ -308,15 +307,21 @@ public class ComplexSingularValueDecompositionDense {
 /*
       Return the decompostion;
 */
-        S = d;
+        for(i = 0; i < mc; i++) {
+            S.unsafeSet(i, i, d[i]);
+        }
     }
 
     public ComplexMatrixDense getU() {
         return U;
     }
 
-    public double[] getS() {
+    public MatrixDense getS() {
         return S;
+    }
+
+    public double[] getSingularValues() {
+        return d;
     }
 
     public ComplexMatrixDense getV() {
@@ -331,9 +336,10 @@ public class ComplexSingularValueDecompositionDense {
 
     public int rank() {
         double eps = ConstantsETK.DOUBLE_EPS;
-        double tol = Math.max(rows, cols) * S[0] * eps;
+        double[] values = S.diag();
+        double tol = Math.max(rows, cols) * values[0] * eps;
         int r = 0;
-        for (double v : S) {
+        for (double v : values) {
             if (v > tol) {
                 r++;
             }

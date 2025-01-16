@@ -21,7 +21,7 @@ import com.wildbitsfoundry.etk4j.math.complex.Complex;
  * @version Pre-alpha
  */
 public class ComplexEigenvalueDecompositionDense {
-    // TODO clean-up
+
     /**
      * The matrix of eigevectors
      */

@@ -1,7 +1,10 @@
 package com.wildbitsfoundry.etk4j.math.linearalgebra;
 
 import com.wildbitsfoundry.etk4j.util.DoubleArrays;
-// TODO javadocs
+
+/**
+ * This class implements the Jacobi iterative method to solve a system of equations
+ */
 public class JacobiMethodSolver {
 
     private double[] b;
@@ -15,21 +18,40 @@ public class JacobiMethodSolver {
         this.b = b;
     }
 
+    /**
+     * Sets the maximum number of iterations allowed
+     * @param iterationLimit the maximum number of iterations allowed
+     * @return {@code this}
+     */
     public JacobiMethodSolver iterationLimit(int iterationLimit) {
         this.iterationLimit = iterationLimit;
         return this;
     }
 
+    /**
+     * Sets absolute tolerance that determines when to stop the algorithm
+     * @param tolerance the absolute tolerance
+     * @return {@code this}
+     */
     public JacobiMethodSolver tolerance(double tolerance) {
         this.tol = tolerance;
         return this;
     }
 
+    /**
+     * Sets the initial guess to the solution of the system of equations
+     * @param x0 the initial guess of the solutions. All zeros if not set.
+     * @return {@code this}
+     */
     public JacobiMethodSolver initialGuess(double[] x0) {
         this.x0 = x0;
         return this;
     }
 
+    /**
+     * Solves A * x = b
+     * @return An {@link IterativeSolverResults} with the solutions of the system A * x  = b
+     */
     public IterativeSolverResults<double[]> solve() {
         double[] x = x0 == null ? new double[b.length] : x0;
         int n = A.getRowCount();

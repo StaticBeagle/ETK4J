@@ -5,6 +5,8 @@ import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 
 import java.util.Arrays;
 
+import static com.wildbitsfoundry.etk4j.util.ComplexArrays.zeros;
+
 /***
  * References https://blogs.mathworks.com/cleve/2016/10/03/householder-reflections-and-the-qr-decomposition/
  */
@@ -29,25 +31,6 @@ public class ComplexQRDecompositionDense extends ComplexQRDecomposition<ComplexM
             u[1] = Complex.fromReal(Math.sqrt(2));
             return u;
         }
-    }
-
-    // TODO Add this to util class
-    public static Complex[][] zeros(int m, int n) {
-        Complex[][] zeros = new Complex[m][n];
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n; j++) {
-                zeros[i][j] = new Complex();
-            }
-        }
-        return zeros;
-    }
-
-    private static Complex[] zeros(int dim) {
-        Complex[] zeros = new Complex[dim];
-        for (int i = 0; i < dim; i++) {
-            zeros[i] = new Complex();
-        }
-        return zeros;
     }
 
     private static Complex[][] calculateReflector(Complex[] u, Complex[][] x) {
@@ -324,7 +307,7 @@ public class ComplexQRDecompositionDense extends ComplexQRDecomposition<ComplexM
             if (i > 0 && i % cols == 0) {
                 sb.append(System.lineSeparator());
             }
-            sb.append(String.format("%.4f", _data[i])).append(" ");
+            sb.append(_data[i]).append(" ");
         }
         return sb.toString();
     }

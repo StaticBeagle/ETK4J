@@ -453,8 +453,8 @@ public class Bessel extends Filter {
             if (done) {
                 break;
             }
-            if (++iter >= maxIter) {
-                throw new MaximumNumberOfIterationsReachedException("Aberth maximum number of iterations reached.");
+            if (++iter > maxIter) {
+                throw new MaximumNumberOfIterationsExceededException("Aberth maximum number of iterations exceeded.");
             }
         }
         return x;

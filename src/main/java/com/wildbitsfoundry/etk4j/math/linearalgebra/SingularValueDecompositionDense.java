@@ -527,12 +527,8 @@ public class SingularValueDecompositionDense {
 	public MatrixDense getS() {
 		final int n = _cols;
 		MatrixDense X = new MatrixDense(n, n);
-		double[] S = X.getArray();
 		for (int i = 0; i < n; i++) {
-			for (int j = 0; j < n; j++) {
-				S[i * n + j] = 0.0;
-			}
-			S[i * n + i] = this.s[i];
+			X.unsafeSet(i, i, s[i]);
 		}
 		return X;
 	}
