@@ -99,7 +99,7 @@ public class ComplexMatrixTest {
         ComplexSingularValueDecompositionDense svd = new ComplexSingularValueDecompositionDense(A);
         Complex[] expected = {Complex.fromReal(312.12634848312956), Complex.fromReal(106.49976593122118),
                 Complex.fromReal(79.32524103615428), Complex.fromReal(35.10624693326205)};
-        Complex[] actual = svd.S.diag();
+        Complex[] actual = Arrays.stream(svd.getS()).mapToObj(Complex::fromReal).toArray(Complex[]::new);
         assertArrayEquals(expected, actual);
     }
 
@@ -113,15 +113,36 @@ public class ComplexMatrixTest {
         };
         ComplexMatrixDense A = new ComplexMatrixDense(matrix);
         ComplexSingularValueDecompositionDense svd = new ComplexSingularValueDecompositionDense(A);
+        ComplexMatrixDense S = ComplexMatrixDense.Factory.zeros(A.getRowCount(), A.getColumnCount());
+        for (int i = 0; i < A.getRowCount(); i++) {
+            S.unsafeSet(i, i, Complex.fromReal(svd.getS()[i]));
+        }
         // U * S * VH
-        Complex[] actual = svd.getU().multiply(svd.getS()).multiply(svd.getV().conjugateTranspose()).getArray();
+        Complex[] actual = svd.getU().multiply(S).multiply(svd.getV().conjugateTranspose()).getArray();
         Complex[] expected = A.getArray();
 
         boolean isClose = true;
-        for(int i = 0; i < expected.length; i++) {
+        for (int i = 0; i < expected.length; i++) {
             isClose &= MathETK.isClose(expected[i].real(), actual[i].real(), 1e-12, 0) &&
                     MathETK.isClose(expected[i].imag(), actual[i].imag(), 1e-12, 0);
         }
         assertTrue(isClose);
+    }
+
+    @Test
+    public void testPinv() {
+        Complex[][] matrix = {
+                {new Complex(65, 24), new Complex(35, 55), new Complex(40, 89), new Complex(69, 64)},
+                {new Complex(99, 66), new Complex(64, 87), new Complex(37, 27), new Complex(2, 32)},
+                {new Complex(39, 50), new Complex(48, 45), new Complex(35, 69), new Complex(90, 3)},
+                {new Complex(30, 82), new Complex(93, 40), new Complex(87, 99), new Complex(17, 44)}
+        };
+        ComplexMatrixDense A = new ComplexMatrixDense(matrix).pinv();
+        Complex[] expected = {new Complex(0.006606693008411897, 0.009028508690222058), new Complex(0.002241973628372189, -6.870241561510043E-4), new Complex(6.829853667463159E-4, -0.009483921279180879), new Complex(-0.005191153135118873, -0.0021323448816482748),
+                new Complex(-0.011923334824432807, -0.0013132817812679708), new Complex(0.0030095244065256287, -0.008449216190560736), new Complex(0.00566933955476279, 0.005288234410094314), new Complex(0.005318529482423536, 0.0027846535437693197),
+                new Complex(0.007083552797055823, -0.009010143220009651), new Complex(-3.468097572918551E-4, 0.007069615992465642), new Complex(-0.011046620188996124, 6.392546417408912E-4), new Complex(0.003990987778538757, -0.002040313883993867),
+                new Complex(-0.0018998860419538865, -0.002784104098995203), new Complex(-0.0016404826783108246, -3.750688769298307E-4), new Complex(0.010151354796239605, 0.005957299401032975), new Complex(-0.0035784315548526803, -0.0024834440642732356)
+        };
+        assertArrayEquals(expected, A.getArray());
     }
 }

@@ -567,11 +567,11 @@ public class SingularValueDecompositionDense {
 		double eps = Math.pow(2.0, -52.0);
 		double tol = Math.max(_rows, _cols) * s[0] * eps;
 		int r = 0;
-		for (int i = 0; i < s.length; i++) {
-			if (s[i] > tol) {
-				r++;
-			}
-		}
+        for (double v : s) {
+            if (v > tol) {
+                r++;
+            }
+        }
 		return r;
 	}
 }

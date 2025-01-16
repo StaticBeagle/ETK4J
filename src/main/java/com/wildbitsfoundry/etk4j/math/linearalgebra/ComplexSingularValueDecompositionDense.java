@@ -1,5 +1,6 @@
 package com.wildbitsfoundry.etk4j.math.linearalgebra;
 
+import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 
 /*
@@ -47,7 +48,11 @@ public class ComplexSingularValueDecompositionDense {
      * The diagonal matrix of singular values
      */
 
-    public ComplexMatrixDense S;
+    public double[] S;
+
+    private int rows;
+
+    private int cols;
 
     /*
      Computes the SVD of a ComplexMatrixDense XX.  Throws a JampackException
@@ -62,6 +67,9 @@ public class ComplexSingularValueDecompositionDense {
      */
 
     public ComplexSingularValueDecompositionDense(ComplexMatrixDense XX) {
+
+        rows = XX.getRowCount();
+        cols = XX.getColumnCount();
 
         int i, il, iu, iter, j, k, kk, m, mc;
 
@@ -86,7 +94,7 @@ public class ComplexSingularValueDecompositionDense {
         double[] d = new double[mc];
         double[] e = new double[mc];
 
-        S = ComplexMatrixDense.Factory.zeros(mc);
+        S = new double[] {};
         U = ComplexMatrixDense.Factory.identity(X.getRowCount());
         V = ComplexMatrixDense.Factory.identity(X.getColumnCount());
 
@@ -300,20 +308,36 @@ public class ComplexSingularValueDecompositionDense {
 /*
       Return the decompostion;
 */
-        for(i = 0; i < S.getRowCount(); i++) {
-            S.unsafeSet(i, i, Complex.fromReal(d[i]));
-        }
+        S = d;
     }
 
     public ComplexMatrixDense getU() {
         return U;
     }
 
-    public ComplexMatrixDense getS() {
+    public double[] getS() {
         return S;
     }
 
     public ComplexMatrixDense getV() {
         return V;
+    }
+
+    /**
+     * Effective numerical matrix rank
+     *
+     * @return Number of nonnegligible singular values.
+     */
+
+    public int rank() {
+        double eps = ConstantsETK.DOUBLE_EPS;
+        double tol = Math.max(rows, cols) * S[0] * eps;
+        int r = 0;
+        for (double v : S) {
+            if (v > tol) {
+                r++;
+            }
+        }
+        return r;
     }
 }

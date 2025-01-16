@@ -1,11 +1,15 @@
 package com.wildbitsfoundry.etk4j.math.linearalgebra;
 
+import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 
 import java.util.Arrays;
 import java.util.Random;
+
+import static com.wildbitsfoundry.etk4j.math.linearalgebra.ComplexQRDecompositionDense.zeros;
+
 // TODO add balance method
 public class ComplexMatrixDense extends ComplexMatrix {
     private Complex[] data;
@@ -253,7 +257,7 @@ public class ComplexMatrixDense extends ComplexMatrix {
         int bRows = b.getRowCount();
         int bCols = b.getColumnCount();
         if (bRows != a.cols) {
-            throw new IllegalArgumentException("Matrix inner dimensions must agree. Check that the number of" +
+            throw new IllegalArgumentException("Matrix inner dimensions must agree. Check that the number of " +
                     "columns of the first matrix equal the number of rows of the second matrix.");
         }
         Complex[] result = new Complex[a.rows * bCols];
@@ -323,7 +327,9 @@ public class ComplexMatrixDense extends ComplexMatrix {
         } else if (rows > cols) { // Matrix is tall and narrow (Overdetermined system)
             return new ComplexQRDecompositionDense(this).solve(B);
         } else { // Matrix is short and wide (Under-determined system)
-            throw new UnsupportedOperationException("Method not implemented yet for short and wide Matrices");
+            // Could use QR for matrices that are not rank deficient. Let's go
+            // with pinv since we don't know what the input matrix looks like
+            return this.pinv().multiply(B);
         }
     }
 
@@ -538,5 +544,48 @@ public class ComplexMatrixDense extends ComplexMatrix {
         public static ComplexMatrixDense zeros(int rows, int cols) {
             return new ComplexMatrixDense(rows, cols, new Complex());
         }
+    }
+
+    public ComplexSingularValueDecompositionDense SVD() {
+        return new ComplexSingularValueDecompositionDense(this);
+    }
+
+    public ComplexMatrixDense pinv() {
+        int rows = this.rows;
+        int cols = this.cols;
+
+        if (rows < cols) {
+            ComplexMatrixDense result = this.transpose().pinv();
+            if (result != null) {
+                result = result.transpose();
+            }
+            return result;
+        }
+
+        ComplexSingularValueDecompositionDense svdX = this.SVD();
+        if (svdX.rank() < 1) {
+            return null;
+        }
+
+        double[] singularValues = svdX.getS();
+        double tol = Math.max(rows, cols) * singularValues[0] * ConstantsETK.DOUBLE_EPS;
+        double[] singularValueReciprocals = new double[singularValues.length];
+        for (int i = 0; i < singularValues.length; i++) {
+            if (Math.abs(singularValues[i]) >= tol) {
+                singularValueReciprocals[i] = 1.0 / singularValues[i];
+            }
+        }
+        ComplexMatrixDense U = svdX.getU();
+        ComplexMatrixDense V = svdX.getV();
+        int min = Math.min(cols, U.cols);
+        Complex[][] inverse = zeros(rows, cols);
+        for (int i = 0; i < cols; i++) {
+            for (int j = 0; j < U.rows; j++) {
+                for (int k = 0; k < min; k++) {
+                    inverse[i][j].addEquals(V.unsafeGet(i, k).multiply(singularValueReciprocals[k]).multiply(U.unsafeGet(j, k).conj()));
+                }
+            }
+        }
+        return new ComplexMatrixDense(inverse);
     }
 }

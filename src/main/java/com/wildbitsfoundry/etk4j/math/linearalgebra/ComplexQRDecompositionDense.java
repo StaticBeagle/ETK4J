@@ -31,7 +31,8 @@ public class ComplexQRDecompositionDense extends ComplexQRDecomposition<ComplexM
         }
     }
 
-    private static Complex[][] zeros(int m, int n) {
+    // TODO Add this to util class
+    public static Complex[][] zeros(int m, int n) {
         Complex[][] zeros = new Complex[m][n];
         for (int i = 0; i < m; i++) {
             for (int j = 0; j < n; j++) {

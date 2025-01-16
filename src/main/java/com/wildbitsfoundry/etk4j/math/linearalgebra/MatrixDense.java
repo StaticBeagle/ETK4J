@@ -934,6 +934,8 @@ public class MatrixDense extends Matrix {
         } else if (rows > cols) { // Matrix is tall and narrow (Overdetermined system)
             return new QRDecompositionDense(this).solve(b);
         } else { // Matrix is short and wide (Under-determined system)
+            // Could use QR for matrices that are not rank deficient. Let's go
+            // with pinv since we don't know what the input matrix looks like
             return this.pinv().multiply(b);
         }
     }
