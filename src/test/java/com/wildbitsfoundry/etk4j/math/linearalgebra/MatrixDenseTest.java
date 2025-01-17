@@ -163,6 +163,20 @@ public class MatrixDenseTest {
     }
 
     @Test
+    public void testUnderDeterminedSVDDecomposition() {
+        double[][] matrix = {
+                {65, 35, 40, 69},
+                {99, 64, 37, 2}
+        };
+
+        MatrixDense A = MatrixDense.from2DArray(matrix);
+        SingularValueDecompositionDense svd = new SingularValueDecompositionDense(A);
+        MatrixDense actual = svd.getU().multiply(svd.getS()).multiply(svd.getV().transpose());
+
+        assertArrayEquals(A.getArray(), actual.getArray(), 1e-12);
+    }
+
+    @Test
     public void allTests() {
         MatrixDense A, B, C, Z, O, I, R, S, X, SUB, M, T, SQ, DEF, SOL;
         // Uncomment this to test IO in a different locale.

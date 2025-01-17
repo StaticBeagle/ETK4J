@@ -863,7 +863,7 @@ public class MatrixDense extends Matrix {
 
     private static void multiplyOp(MatrixDense a, MatrixDense b, MatrixDense c) {
         if (b.rows != a.cols) {
-            throw new IllegalArgumentException("Matrix inner dimensions must agree. Check that the number of" +
+            throw new IllegalArgumentException("Matrix inner dimensions must agree. Check that the number of " +
                     "columns of the first matrix equal the number of rows of the second matrix.");
         }
         double[] result = new double[a.rows * b.cols];

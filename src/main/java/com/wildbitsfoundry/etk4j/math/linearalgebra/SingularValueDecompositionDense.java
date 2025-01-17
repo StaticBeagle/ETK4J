@@ -26,7 +26,7 @@ public class SingularValueDecompositionDense {
 
 	/**
 	 * Arrays for internal storage of U and V.
-	 * 
+	 *
 	 * @serial internal storage of U.
 	 * @serial internal storage of V.
 	 */
@@ -34,14 +34,14 @@ public class SingularValueDecompositionDense {
 
 	/**
 	 * Array for internal storage of singular values.
-	 * 
+	 *
 	 * @serial internal storage of singular values.
 	 */
 	private double[] s;
 
 	/**
 	 * Row and column dimensions.
-	 * 
+	 *
 	 * @serial row dimension.
 	 * @serial column dimension.
 	 */
@@ -54,13 +54,37 @@ public class SingularValueDecompositionDense {
 	/**
 	 * Construct the singular value decomposition Structure to access U, S and
 	 * V.
-	 * 
+	 *
 	 * @param Arg
 	 *            Rectangular matrix
 	 */
 
 	public SingularValueDecompositionDense(MatrixDense Arg) {
+		final int m = Arg.getRowCount();
+		final int n = Arg.getColumnCount();
+		if(m >= n) {
+			this.performRealSingularValueDecomposition(Arg);
+		} else {
+			ComplexSingularValueDecompositionDense svd = new ComplexSingularValueDecompositionDense(ComplexMatrixDense.fromRealMatrix(Arg));
+			U = new double[svd.getU().getRowCount()][svd.getU().getColumnCount()];
+			for(int i = 0; i < svd.getU().getRowCount(); i++) {
+				for(int j = 0; j < svd.getU().getColumnCount(); j++) {
+					U[i][j] = svd.getU().unsafeGet(i, j).real();
+				}
+			}
+			V = new double[svd.getV().getRowCount()][svd.getV().getColumnCount()];
+			for(int i = 0; i < svd.getV().getRowCount(); i++) {
+				for(int j = 0; j < svd.getV().getColumnCount(); j++) {
+					V[i][j] = svd.getV().unsafeGet(i, j).real();
+				}
+			}
+			s = svd.getSingularValues();
+			_rows = m;
+			_cols = n;
+		}
+	}
 
+	private void performRealSingularValueDecomposition(MatrixDense Arg) {
 		// Derived from LINPACK code.
 		// Initialize.
 		double[] A = Arg.getArrayCopy();
@@ -320,165 +344,165 @@ public class SingularValueDecompositionDense {
 
 			switch (kase) {
 
-			// Deflate negligible s(p).
+				// Deflate negligible s(p).
 
-			case 1: {
-				double f = e[p - 2];
-				e[p - 2] = 0.0;
-				for (int j = p - 2; j >= k; j--) {
-					double t = MathETK.hypot(s[j], f);
-					double cs = s[j] / t;
-					double sn = f / t;
-					s[j] = t;
-					if (j != k) {
-						f = -sn * e[j - 1];
-						e[j - 1] = cs * e[j - 1];
-					}
-					if (wantv) {
-						for (int i = 0; i < n; i++) {
-							t = cs * V[i][j] + sn * V[i][p - 1];
-							V[i][p - 1] = -sn * V[i][j] + cs * V[i][p - 1];
-							V[i][j] = t;
+				case 1: {
+					double f = e[p - 2];
+					e[p - 2] = 0.0;
+					for (int j = p - 2; j >= k; j--) {
+						double t = MathETK.hypot(s[j], f);
+						double cs = s[j] / t;
+						double sn = f / t;
+						s[j] = t;
+						if (j != k) {
+							f = -sn * e[j - 1];
+							e[j - 1] = cs * e[j - 1];
+						}
+						if (wantv) {
+							for (int i = 0; i < n; i++) {
+								t = cs * V[i][j] + sn * V[i][p - 1];
+								V[i][p - 1] = -sn * V[i][j] + cs * V[i][p - 1];
+								V[i][j] = t;
+							}
 						}
 					}
 				}
-			}
 				break;
 
-			// Split at negligible s(k).
+				// Split at negligible s(k).
 
-			case 2: {
-				double f = e[k - 1];
-				e[k - 1] = 0.0;
-				for (int j = k; j < p; j++) {
-					double t = MathETK.hypot(s[j], f);
-					double cs = s[j] / t;
-					double sn = f / t;
-					s[j] = t;
-					f = -sn * e[j];
-					e[j] = cs * e[j];
-					if (wantu) {
-						for (int i = 0; i < m; i++) {
-							t = cs * U[i][j] + sn * U[i][k - 1];
-							U[i][k - 1] = -sn * U[i][j] + cs * U[i][k - 1];
-							U[i][j] = t;
+				case 2: {
+					double f = e[k - 1];
+					e[k - 1] = 0.0;
+					for (int j = k; j < p; j++) {
+						double t = MathETK.hypot(s[j], f);
+						double cs = s[j] / t;
+						double sn = f / t;
+						s[j] = t;
+						f = -sn * e[j];
+						e[j] = cs * e[j];
+						if (wantu) {
+							for (int i = 0; i < m; i++) {
+								t = cs * U[i][j] + sn * U[i][k - 1];
+								U[i][k - 1] = -sn * U[i][j] + cs * U[i][k - 1];
+								U[i][j] = t;
+							}
 						}
 					}
 				}
-			}
 				break;
 
-			// Perform one qr step.
+				// Perform one qr step.
 
-			case 3: {
+				case 3: {
 
-				// Calculate the shift.
+					// Calculate the shift.
 
-				double scale = Math
-						.max(Math.max(Math.max(Math.max(Math.abs(s[p - 1]), Math.abs(s[p - 2])), Math.abs(e[p - 2])),
-								Math.abs(s[k])), Math.abs(e[k]));
-				double sp = s[p - 1] / scale;
-				double spm1 = s[p - 2] / scale;
-				double epm1 = e[p - 2] / scale;
-				double sk = s[k] / scale;
-				double ek = e[k] / scale;
-				double b = ((spm1 + sp) * (spm1 - sp) + epm1 * epm1) / 2.0;
-				double c = (sp * epm1) * (sp * epm1);
-				double shift = 0.0;
-				if ((b != 0.0) | (c != 0.0)) {
-					shift = Math.sqrt(b * b + c);
-					if (b < 0.0) {
-						shift = -shift;
+					double scale = Math
+							.max(Math.max(Math.max(Math.max(Math.abs(s[p - 1]), Math.abs(s[p - 2])), Math.abs(e[p - 2])),
+									Math.abs(s[k])), Math.abs(e[k]));
+					double sp = s[p - 1] / scale;
+					double spm1 = s[p - 2] / scale;
+					double epm1 = e[p - 2] / scale;
+					double sk = s[k] / scale;
+					double ek = e[k] / scale;
+					double b = ((spm1 + sp) * (spm1 - sp) + epm1 * epm1) / 2.0;
+					double c = (sp * epm1) * (sp * epm1);
+					double shift = 0.0;
+					if ((b != 0.0) | (c != 0.0)) {
+						shift = Math.sqrt(b * b + c);
+						if (b < 0.0) {
+							shift = -shift;
+						}
+						shift = c / (b + shift);
 					}
-					shift = c / (b + shift);
-				}
-				double f = (sk + sp) * (sk - sp) + shift;
-				double g = sk * ek;
+					double f = (sk + sp) * (sk - sp) + shift;
+					double g = sk * ek;
 
-				// Chase zeros.
+					// Chase zeros.
 
-				for (int j = k; j < p - 1; j++) {
-					double t = MathETK.hypot(f, g);
-					double cs = f / t;
-					double sn = g / t;
-					if (j != k) {
-						e[j - 1] = t;
-					}
-					f = cs * s[j] + sn * e[j];
-					e[j] = cs * e[j] - sn * s[j];
-					g = sn * s[j + 1];
-					s[j + 1] = cs * s[j + 1];
-					if (wantv) {
-						for (int i = 0; i < n; i++) {
-							t = cs * V[i][j] + sn * V[i][j + 1];
-							V[i][j + 1] = -sn * V[i][j] + cs * V[i][j + 1];
-							V[i][j] = t;
+					for (int j = k; j < p - 1; j++) {
+						double t = MathETK.hypot(f, g);
+						double cs = f / t;
+						double sn = g / t;
+						if (j != k) {
+							e[j - 1] = t;
+						}
+						f = cs * s[j] + sn * e[j];
+						e[j] = cs * e[j] - sn * s[j];
+						g = sn * s[j + 1];
+						s[j + 1] = cs * s[j + 1];
+						if (wantv) {
+							for (int i = 0; i < n; i++) {
+								t = cs * V[i][j] + sn * V[i][j + 1];
+								V[i][j + 1] = -sn * V[i][j] + cs * V[i][j + 1];
+								V[i][j] = t;
+							}
+						}
+						t = MathETK.hypot(f, g);
+						cs = f / t;
+						sn = g / t;
+						s[j] = t;
+						f = cs * e[j] + sn * s[j + 1];
+						s[j + 1] = -sn * e[j] + cs * s[j + 1];
+						g = sn * e[j + 1];
+						e[j + 1] = cs * e[j + 1];
+						if (wantu && (j < m - 1)) {
+							for (int i = 0; i < m; i++) {
+								t = cs * U[i][j] + sn * U[i][j + 1];
+								U[i][j + 1] = -sn * U[i][j] + cs * U[i][j + 1];
+								U[i][j] = t;
+							}
 						}
 					}
-					t = MathETK.hypot(f, g);
-					cs = f / t;
-					sn = g / t;
-					s[j] = t;
-					f = cs * e[j] + sn * s[j + 1];
-					s[j + 1] = -sn * e[j] + cs * s[j + 1];
-					g = sn * e[j + 1];
-					e[j + 1] = cs * e[j + 1];
-					if (wantu && (j < m - 1)) {
-						for (int i = 0; i < m; i++) {
-							t = cs * U[i][j] + sn * U[i][j + 1];
-							U[i][j + 1] = -sn * U[i][j] + cs * U[i][j + 1];
-							U[i][j] = t;
-						}
-					}
+					e[p - 2] = f;
+					iter = iter + 1;
 				}
-				e[p - 2] = f;
-				iter = iter + 1;
-			}
 				break;
 
-			// Convergence.
+				// Convergence.
 
-			case 4: {
+				case 4: {
 
-				// Make the singular values positive.
+					// Make the singular values positive.
 
-				if (s[k] <= 0.0) {
-					s[k] = (s[k] < 0.0 ? -s[k] : 0.0);
-					if (wantv) {
-						for (int i = 0; i <= pp; i++) {
-							V[i][k] = -V[i][k];
+					if (s[k] <= 0.0) {
+						s[k] = (s[k] < 0.0 ? -s[k] : 0.0);
+						if (wantv) {
+							for (int i = 0; i <= pp; i++) {
+								V[i][k] = -V[i][k];
+							}
 						}
 					}
+
+					// Order the singular values.
+
+					while (k < pp) {
+						if (s[k] >= s[k + 1]) {
+							break;
+						}
+						double t = s[k];
+						s[k] = s[k + 1];
+						s[k + 1] = t;
+						if (wantv && (k < n - 1)) {
+							for (int i = 0; i < n; i++) {
+								t = V[i][k + 1];
+								V[i][k + 1] = V[i][k];
+								V[i][k] = t;
+							}
+						}
+						if (wantu && (k < m - 1)) {
+							for (int i = 0; i < m; i++) {
+								t = U[i][k + 1];
+								U[i][k + 1] = U[i][k];
+								U[i][k] = t;
+							}
+						}
+						k++;
+					}
+					iter = 0;
+					p--;
 				}
-
-				// Order the singular values.
-
-				while (k < pp) {
-					if (s[k] >= s[k + 1]) {
-						break;
-					}
-					double t = s[k];
-					s[k] = s[k + 1];
-					s[k + 1] = t;
-					if (wantv && (k < n - 1)) {
-						for (int i = 0; i < n; i++) {
-							t = V[i][k + 1];
-							V[i][k + 1] = V[i][k];
-							V[i][k] = t;
-						}
-					}
-					if (wantu && (k < m - 1)) {
-						for (int i = 0; i < m; i++) {
-							t = U[i][k + 1];
-							U[i][k + 1] = U[i][k];
-							U[i][k] = t;
-						}
-					}
-					k++;
-				}
-				iter = 0;
-				p--;
-			}
 				break;
 			}
 		}
@@ -490,27 +514,27 @@ public class SingularValueDecompositionDense {
 
 	/**
 	 * Return the left singular vectors
-	 * 
+	 *
 	 * @return U
 	 */
 
 	public MatrixDense getU() {
-		return new MatrixDense(DoubleArrays.flatten(U), _rows, Math.min(_rows + 1, _cols));
+		return new MatrixDense(DoubleArrays.flatten(U), U.length, U[0].length);
 	}
 
 	/**
 	 * Return the right singular vectors
-	 * 
+	 *
 	 * @return V
 	 */
 
 	public MatrixDense getV() {
-		return new MatrixDense(DoubleArrays.flatten(V), _cols, _cols);
+		return new MatrixDense(DoubleArrays.flatten(V), V[0].length, V.length);
 	}
 
 	/**
 	 * Return the one-dimensional array of singular values
-	 * 
+	 *
 	 * @return diagonal of S.
 	 */
 
@@ -520,14 +544,14 @@ public class SingularValueDecompositionDense {
 
 	/**
 	 * Return the diagonal matrix of singular values
-	 * 
+	 *
 	 * @return S
 	 */
 
 	public MatrixDense getS() {
 		final int n = _cols;
-		MatrixDense X = new MatrixDense(n, n);
-		for (int i = 0; i < n; i++) {
+		MatrixDense X = new MatrixDense(s.length, n);
+		for (int i = 0; i < s.length; i++) {
 			X.unsafeSet(i, i, s[i]);
 		}
 		return X;
@@ -535,7 +559,7 @@ public class SingularValueDecompositionDense {
 
 	/**
 	 * Two norm
-	 * 
+	 *
 	 * @return max(S)
 	 */
 
@@ -545,7 +569,7 @@ public class SingularValueDecompositionDense {
 
 	/**
 	 * Two norm condition number
-	 * 
+	 *
 	 * @return max(S)/min(S)
 	 */
 
@@ -555,7 +579,7 @@ public class SingularValueDecompositionDense {
 
 	/**
 	 * Effective numerical matrix rank
-	 * 
+	 *
 	 * @return Number of nonnegligible singular values.
 	 */
 
@@ -563,11 +587,11 @@ public class SingularValueDecompositionDense {
 		double eps = Math.pow(2.0, -52.0);
 		double tol = Math.max(_rows, _cols) * s[0] * eps;
 		int r = 0;
-        for (double v : s) {
-            if (v > tol) {
-                r++;
-            }
-        }
+		for (double v : s) {
+			if (v > tol) {
+				r++;
+			}
+		}
 		return r;
 	}
 }

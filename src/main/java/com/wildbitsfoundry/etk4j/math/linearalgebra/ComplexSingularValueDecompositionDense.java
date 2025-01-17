@@ -41,7 +41,7 @@ public class ComplexSingularValueDecompositionDense {
     public ComplexMatrixDense U;
 
     /**
-     * The matrix of right singular vectore
+     * The matrix of right singular vectors
      */
     public ComplexMatrixDense V;
 

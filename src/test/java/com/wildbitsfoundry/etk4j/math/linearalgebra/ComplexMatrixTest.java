@@ -233,6 +233,30 @@ public class ComplexMatrixTest {
     }
 
     @Test
+    public void testUnderDeterminedSingularValueDecomposition() {
+        double[][] matrix = {
+                {65, 35, 40, 69},
+                {99, 64, 37, 2}
+        };
+        ComplexMatrixDense A = ComplexMatrixDense.fromRealMatrix(MatrixDense.from2DArray(matrix));
+        ComplexSingularValueDecompositionDense svd = new ComplexSingularValueDecompositionDense(A);
+        ComplexMatrixDense S = ComplexMatrixDense.Factory.zeros(A.getRowCount(), A.getColumnCount());
+        for (int i = 0; i < A.getRowCount(); i++) {
+            S.unsafeSet(i, i, Complex.fromReal(svd.getS().diag()[i]));
+        }
+        // U * S * VH
+        Complex[] actual = svd.getU().multiply(S).multiply(svd.getV().conjugateTranspose()).getArray();
+        Complex[] expected = A.getArray();
+
+        boolean isClose = true;
+        for (int i = 0; i < expected.length; i++) {
+            isClose &= MathETK.isClose(expected[i].real(), actual[i].real(), 1e-12, 0) &&
+                    MathETK.isClose(expected[i].imag(), actual[i].imag(), 1e-12, 0);
+        }
+        assertTrue(isClose);
+    }
+
+    @Test
     public void testPinv() {
         Complex[][] matrix = {
                 {new Complex(65, 24), new Complex(35, 55), new Complex(40, 89), new Complex(69, 64)},
