@@ -18,7 +18,7 @@ public class RungeKutta23 extends RungeKutta {
             {0, -1, 1}
     };
 
-    public RungeKutta23(ODESystemOfEquations systemOfEquations, double t0, double[] y0, Double tBound) {
+    public RungeKutta23(OdeSystemOfEquations systemOfEquations, double t0, double[] y0, Double tBound) {
         super(systemOfEquations, t0, y0, tBound, 2, 3, A, B, C, E, P);
     }
 
@@ -26,7 +26,7 @@ public class RungeKutta23 extends RungeKutta {
         super(func, t0, y0, tBound, 2, 3, A, B, C, E, P);
     }
 
-    public RungeKutta23(ODESystemOfEquations systemOfEquations, double t0, double[] y0, Double tBound, double maxStep,
+    public RungeKutta23(OdeSystemOfEquations systemOfEquations, double t0, double[] y0, Double tBound, double maxStep,
                         double rTol, double aTol, Double firstStep) {
         super(systemOfEquations, t0, y0, tBound, maxStep, rTol, aTol, firstStep, 2, 3, A, B, C, E, P);
     }

@@ -32,7 +32,7 @@ public abstract class RungeKutta extends OdeSolver {
     protected double errorExponent;
     protected Double hPrevious;
 
-    public RungeKutta(ODESystemOfEquations systemOfEquations, double t0, double[] y0, Double tBound,
+    public RungeKutta(OdeSystemOfEquations systemOfEquations, double t0, double[] y0, Double tBound,
                       int errorEstimatorOrder, int nStages, double[][] A, double[] B, double[] C, double[] E, double[][] P) {
         this(systemOfEquations, t0, y0, tBound, Double.POSITIVE_INFINITY, 0.001, 1e-6, null,
                 errorEstimatorOrder, nStages, A, B, C, E, P);
@@ -44,7 +44,7 @@ public abstract class RungeKutta extends OdeSolver {
                 errorEstimatorOrder, nStages, A, B, C, E, P);
     }
 
-    public RungeKutta(ODESystemOfEquations systemOfEquations, double t0, double[] y0, Double tBound,
+    public RungeKutta(OdeSystemOfEquations systemOfEquations, double t0, double[] y0, Double tBound,
                       double maxStep, double rTol, double aTol, Double firstStep, int errorEstimatorOrder, int nStages,
                       double[][] A, double[] B, double[] C, double[] E, double[][] P) {
         super(systemOfEquations, t0, y0, tBound);
@@ -79,7 +79,7 @@ public abstract class RungeKutta extends OdeSolver {
                 firstStep, errorEstimatorOrder, nStages, A, B, C, E, P);
     }
 
-    protected double selectInitialStep(ODESystemOfEquations systemOfEquations, double t0, double[] y0, Double tBound, double maxStep,
+    protected double selectInitialStep(OdeSystemOfEquations systemOfEquations, double t0, double[] y0, Double tBound, double maxStep,
                                        double[] f0, double direction, double order, double rTol, double aTol) {
         double internalLength = Math.abs(tBound - t0);
         if (internalLength == 0) {
@@ -222,7 +222,7 @@ public abstract class RungeKutta extends OdeSolver {
         return new Tuples.Tuple2<>(true, null);
     }
 
-    private Tuples.Tuple2<double[], double[]> rkStep(ODESystemOfEquations systemOfEquations, double t, double[] y, double[] f, double h, double[][] A,
+    private Tuples.Tuple2<double[], double[]> rkStep(OdeSystemOfEquations systemOfEquations, double t, double[] y, double[] f, double h, double[][] A,
                                                      double[] B, double[] C, double[][] K) {
         K[0] = f;
         for (int i = 1; i < A.length; i++) {
@@ -261,5 +261,11 @@ public abstract class RungeKutta extends OdeSolver {
 
     private double[] estimateError(double[][] K, double h) {
         return DoubleArrays.multiplyElementWise(DoubleArrays.dot(DoubleArrays.transpose(K), this.E), h);
+    }
+
+    @Override
+    public RungeKuttaDenseOutput getDenseOutput() {
+        double[][] Q = DoubleArrays.dot(DoubleArrays.transpose(this.K), P);
+        return new RungeKuttaDenseOutput(this.tOld, this.t, this.yOld, Q);
     }
 }

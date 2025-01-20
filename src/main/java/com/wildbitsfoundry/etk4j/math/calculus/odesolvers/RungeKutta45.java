@@ -1,6 +1,11 @@
 package com.wildbitsfoundry.etk4j.math.calculus.odesolvers;
 
 import com.wildbitsfoundry.etk4j.math.functions.BivariateFunction;
+import com.wildbitsfoundry.etk4j.util.DoubleArrays;
+
+import java.util.ArrayList;
+import java.util.List;
+
 // TODO document this class
 public class RungeKutta45 extends RungeKutta {
 
@@ -25,7 +30,7 @@ public class RungeKutta45 extends RungeKutta {
             {0, 40617522 / 29380423d, -110615467 / 29380423d, 69997945 / 29380423d}
     };
 
-    public RungeKutta45(ODESystemOfEquations systemOfEquations, double t0, double[] y0, Double tBound) {
+    public RungeKutta45(OdeSystemOfEquations systemOfEquations, double t0, double[] y0, Double tBound) {
         super(systemOfEquations, t0, y0, tBound, 4, 6, A, B, C, E, P);
     }
 
@@ -33,7 +38,7 @@ public class RungeKutta45 extends RungeKutta {
         super(func, t0, y0, tBound, 4, 6, A, B, C, E, P);
     }
 
-    public RungeKutta45(ODESystemOfEquations systemOfEquations, double t0, double[] y0, Double tBound, double maxStep,
+    public RungeKutta45(OdeSystemOfEquations systemOfEquations, double t0, double[] y0, Double tBound, double maxStep,
                         double rTol, double aTol, Double firstStep) {
         super(systemOfEquations, t0, y0, tBound, maxStep, rTol, aTol, firstStep, 4, 6, A, B, C, E, P);
     }
@@ -41,5 +46,32 @@ public class RungeKutta45 extends RungeKutta {
     public RungeKutta45(BivariateFunction func, double t0, double y0, Double tBound, double maxStep,
                         double rTol, double aTol, Double firstStep) {
         super(func, t0, y0, tBound, maxStep, rTol, aTol, firstStep, 4, 6, A, B, C, E, P);
+    }
+
+    public static void main(String[] args) {
+        double[][] a = {
+                {1, 2},
+                {3, 4}
+        };
+
+        double[][] b = {
+                {5, 6},
+                {7, 8}
+        };
+
+        BivariateFunction func = (t, x) -> -x;
+        RungeKutta rungeKutta = new RungeKutta45(func, 0.0, 1.0, 10.0);
+
+        List<Double> tValues = new ArrayList<>();
+        List<Double> yValues = new ArrayList<>();
+        while (!rungeKutta.status.equals("finished")) {
+            rungeKutta.step();
+            tValues.add(rungeKutta.t);
+            yValues.add(rungeKutta.y[0]);
+        }
+        System.out.println(tValues);
+        System.out.println(yValues);
+        RungeKuttaDenseOutput rungeKuttaDenseOutput = rungeKutta.getDenseOutput();
+        double[] hh = rungeKuttaDenseOutput.evaluateAt(new double[] {5, 6});
     }
 }

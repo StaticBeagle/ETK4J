@@ -1,5 +1,5 @@
 package com.wildbitsfoundry.etk4j.math.calculus.odesolvers;
 
-public interface ODESystemOfEquations {
+public interface OdeSystemOfEquations {
     double[] evaluateAt(double t, double[] y);
 }

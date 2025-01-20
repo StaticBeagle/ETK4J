@@ -11,13 +11,13 @@ public abstract class OdeSolver {
     protected double t;
     protected Double tOld;
     protected double[] y;
-    protected ODESystemOfEquations systemOfEquations;
+    protected OdeSystemOfEquations systemOfEquations;
     protected double tBound;
     protected double direction;
     protected String status; // TODO change to enum
     protected int n;
 
-    public OdeSolver(ODESystemOfEquations systemOfEquations, double t0, double[] y0, Double tBound) {
+    public OdeSolver(OdeSystemOfEquations systemOfEquations, double t0, double[] y0, Double tBound) {
         this.t = t0;
         if (!Arrays.stream(y0).allMatch(Double::isFinite)) {
             throw new IllegalArgumentException("All components of the initial state y0 must be finite.");
@@ -47,12 +47,13 @@ public abstract class OdeSolver {
             this.status = "finished";
             return null;
         }
+        double t = this.t;
         Tuples.Tuple2<Boolean, String> result = stepImpl();
 
         if (!result.getItem1()) {
             this.status = "failed";
         } else {
-            this.tOld = this.t;
+            this.tOld = t;
             if (this.direction * (this.t - this.tBound) >= 0) {
                 status = "finished";
             }
@@ -61,6 +62,8 @@ public abstract class OdeSolver {
     }
 
     protected abstract Tuples.Tuple2<Boolean, String> stepImpl();
+
+    public abstract DenseOutput getDenseOutput();
 
     // TODO dense output
 //    public Object getDenseOutput() {

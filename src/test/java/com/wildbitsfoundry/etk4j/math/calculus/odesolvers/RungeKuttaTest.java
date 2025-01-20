@@ -69,7 +69,7 @@ public class RungeKuttaTest {
 
     @Test
     public void testRungeKutta23MultipleInitialConditions() {
-        ODESystemOfEquations odeSystemOfEquations = (t, y) -> {
+        OdeSystemOfEquations odeSystemOfEquations = (t, y) -> {
             double dxdt = y[0] - y[1];
             double dydt = y[0] + y[1];
             return new double[] {dxdt, dydt};
@@ -127,7 +127,7 @@ public class RungeKuttaTest {
 
     @Test
     public void testRungeKutta23MultipleInitialConditionsDefaultConditions() {
-        ODESystemOfEquations odeSystemOfEquations = (t, y) -> {
+        OdeSystemOfEquations odeSystemOfEquations = (t, y) -> {
             double dxdt = y[0] - y[1];
             double dydt = y[0] + y[1];
             return new double[] {dxdt, dydt};
@@ -240,7 +240,7 @@ public class RungeKuttaTest {
 
     @Test
     public void testRungeKutta45MultipleInitialConditions() {
-        ODESystemOfEquations odeSystemOfEquations = (t, y) -> {
+        OdeSystemOfEquations odeSystemOfEquations = (t, y) -> {
             double dxdt = y[0] - y[1];
             double dydt = y[0] + y[1];
             return new double[] {dxdt, dydt};
@@ -277,7 +277,7 @@ public class RungeKuttaTest {
 
     @Test
     public void testRungeKutta45MultipleInitialConditionsDefaultConditions() {
-        ODESystemOfEquations odeSystemOfEquations = (t, y) -> {
+        OdeSystemOfEquations odeSystemOfEquations = (t, y) -> {
             double dxdt = y[0] - y[1];
             double dydt = y[0] + y[1];
             return new double[] {dxdt, dydt};

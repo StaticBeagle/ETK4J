@@ -604,6 +604,21 @@ public final class DoubleArrays {
     }
 
     /**
+     * Cumulative product.
+     * @param a The array whose cumulative product needs to found.
+     * @return The cumulative product of a.
+     */
+    public static double[] cumulativeProduct(double[] a) {
+        final int length = a.length;
+        double[] result = new double[length];
+        result[0] = a[0];
+        for (int i = 1; i < length; ++i) {
+            result[i] = result[i - 1] * a[i];
+        }
+        return result;
+    }
+
+    /**
      * Root Mean Square.
      * @param a The array whose RMS value needs to be found.
      * @return {@code rms(a)}.
@@ -786,6 +801,36 @@ public final class DoubleArrays {
     }
 
     /**
+     * Matrix multiplication between two arrays.
+     * @param a Array of arrays.
+     * @param b Array of arrays
+     * @return Matrix multiplication between the two arrays.
+     */
+    public static double[][] dot(double[][] a, double[][] b) {
+        int m = a.length;
+        int n = a[0].length;
+        if (b.length != n) {
+            throw new IllegalArgumentException("Matrix inner dimensions must agree.");
+        }
+        double[][] X = new double[m][b[0].length];
+        double[] Bcolj = new double[n];
+        for (int j = 0; j < b[0].length; j++) {
+            for (int k = 0; k < n; k++) {
+                Bcolj[k] = b[k][j];
+            }
+            for (int i = 0; i < m; i++) {
+                double[] Arowi = a[i];
+                double s = 0;
+                for (int k = 0; k < n; k++) {
+                    s += Arowi[k]*Bcolj[k];
+                }
+                X[i][j] = s;
+            }
+        }
+        return X;
+    }
+
+    /**
      * Array product.
      * @param a The input array.
      * @return The product of multiplying all the elements in the array.
@@ -935,5 +980,18 @@ public final class DoubleArrays {
             nrm = nrm + fac * fac;
         }
         return Math.sqrt(nrm) / scale;
+    }
+
+    /**
+     * Multiplies the 2D array by a scalar element-wise and overwrites the input array a with the result
+     * @param a the input array
+     * @param b the scalar
+     */
+    public static void multiplyElementWiseInPlace(double[][] a, double b) {
+        for(int i = 0; i < a.length; i++) {
+            for(int j = 0; j < a[0].length; j++) {
+                a[i][j] = a[i][j] * b;
+            }
+        }
     }
 }

@@ -10,12 +10,12 @@ import com.wildbitsfoundry.etk4j.math.extrapolation.Extrapolators;
  * other words, a function comprised of segments which are functions themselves.
  */
 public abstract class PiecewiseFunction implements UnivariateFunction {
-	private int numberOfSegments;
+	private final int numberOfSegments;
 	protected double[] x;
-	protected double[] coefficients = null;
 	Extrapolator extrapolator;
 
-	private double x0, xn;
+	private final double x0;
+    private final double xn;
 
 	protected PiecewiseFunction(double[] x) {
 		this.x = x;
