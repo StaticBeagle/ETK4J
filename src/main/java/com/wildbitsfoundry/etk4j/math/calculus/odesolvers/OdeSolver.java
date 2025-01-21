@@ -63,29 +63,15 @@ public abstract class OdeSolver {
 
     protected abstract Tuples.Tuple2<Boolean, String> stepImpl();
 
-    public abstract DenseOutput getDenseOutput();
+    public DenseOutput getDenseOutput() {
+        if(tOld == null) {
+            throw new RuntimeException("Dense output is available after a successful step was made.");
+        }
+        if(n == 0 || t == tOld) {
+            return new ConstantDenseOutput(tOld, t, y);
+        }
+        return getDenseOutputImpl();
+    }
 
-    // TODO dense output
-//    public Object getDenseOutput() {
-//        if (tOld == null) {
-//            throw new RuntimeException("Dense output is available after a successful step was made.");
-//        }
-//
-//        if (n == 0 || t == tOld) {
-//            // return ConstantDenseOutput(told, t, y);
-//            return null; // TODO
-//        } else {
-//            return getDenseOutputImpl();
-//        }
-//    }
-//
-//    protected abstract DenseOutput getDenseOutputImpl();
-//
-//    public static class DenseOutput {
-//
-//    }
-//
-//    public static class ConstantDenseOutput extends DenseOutput {
-//
-//    }
+    protected abstract DenseOutput getDenseOutputImpl();
 }

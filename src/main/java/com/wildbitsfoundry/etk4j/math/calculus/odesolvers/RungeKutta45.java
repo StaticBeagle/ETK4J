@@ -1,10 +1,8 @@
 package com.wildbitsfoundry.etk4j.math.calculus.odesolvers;
 
 import com.wildbitsfoundry.etk4j.math.functions.BivariateFunction;
-import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
 // TODO document this class
 public class RungeKutta45 extends RungeKutta {
@@ -34,6 +32,10 @@ public class RungeKutta45 extends RungeKutta {
         super(systemOfEquations, t0, y0, tBound, 4, 6, A, B, C, E, P);
     }
 
+    public RungeKutta45(OdeSystemOfEquations systemOfEquations, double t0, double[] y0, int tBound) {
+        this(systemOfEquations, t0, y0, 1.0 * tBound);
+    }
+
     public RungeKutta45(BivariateFunction func, double t0, double y0, Double tBound) {
         super(func, t0, y0, tBound, 4, 6, A, B, C, E, P);
     }
@@ -49,29 +51,22 @@ public class RungeKutta45 extends RungeKutta {
     }
 
     public static void main(String[] args) {
-        double[][] a = {
-                {1, 2},
-                {3, 4}
-        };
 
-        double[][] b = {
-                {5, 6},
-                {7, 8}
-        };
-
+//        OdeSystemOfEquations odeSystemOfEquations = (t, y) -> {
+//            double dxdt = y[0] - y[1];
+//            double dydt = y[0] + y[1];
+//            double dzdt = 0;
+//            return new double[] {dxdt, dydt, dzdt};
+//        };
+//        RungeKutta rungeKutta = new RungeKutta45(odeSystemOfEquations, 0, new double[] {1, 0, 0}, 10);
         BivariateFunction func = (t, x) -> -x;
         RungeKutta rungeKutta = new RungeKutta45(func, 0.0, 1.0, 10.0);
-
-        List<Double> tValues = new ArrayList<>();
-        List<Double> yValues = new ArrayList<>();
+//
         while (!rungeKutta.status.equals("finished")) {
             rungeKutta.step();
-            tValues.add(rungeKutta.t);
-            yValues.add(rungeKutta.y[0]);
         }
-        System.out.println(tValues);
-        System.out.println(yValues);
-        RungeKuttaDenseOutput rungeKuttaDenseOutput = rungeKutta.getDenseOutput();
-        double[] hh = rungeKuttaDenseOutput.evaluateAt(new double[] {5, 6});
+        DenseOutput rungeKuttaDenseOutput = rungeKutta.getDenseOutput();
+        double[][] hh = rungeKuttaDenseOutput.evaluateAt(new double[] {5, 6, 7});
+//        System.out.println(Arrays.toString(hh));
     }
 }

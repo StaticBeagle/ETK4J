@@ -13,4 +13,6 @@ public abstract class DenseOutput {
         this.tMin = Math.min(t, tOld);
         this.tMax = Math.max(t, tOld);
     }
+
+    public abstract double[][] evaluateAt(double[] t);
 }

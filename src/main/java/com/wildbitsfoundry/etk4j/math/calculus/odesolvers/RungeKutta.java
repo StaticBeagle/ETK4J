@@ -81,8 +81,8 @@ public abstract class RungeKutta extends OdeSolver {
 
     protected double selectInitialStep(OdeSystemOfEquations systemOfEquations, double t0, double[] y0, Double tBound, double maxStep,
                                        double[] f0, double direction, double order, double rTol, double aTol) {
-        double internalLength = Math.abs(tBound - t0);
-        if (internalLength == 0) {
+        double intervalLength = Math.abs(tBound - t0);
+        if (intervalLength == 0) {
             return 0;
         }
         double[] allAbs = Arrays.stream(y0).map(Math::abs).toArray();
@@ -96,7 +96,7 @@ public abstract class RungeKutta extends OdeSolver {
             h0 = 0.01 * d0 / d1;
         }
 
-        h0 = Math.min(h0, internalLength);
+        h0 = Math.min(h0, intervalLength);
         double[] y1 = DoubleArrays.addElementWise(DoubleArrays.multiplyElementWise(f0, h0 * direction), y0);
         double[] f1 = systemOfEquations.evaluateAt(t0 + h0 * direction, y1);
         double d2 = DoubleArrays.rms(DoubleArrays.divideElementWise(DoubleArrays.subtractElementWise(f1, f0), scale)) / h0;
@@ -107,7 +107,7 @@ public abstract class RungeKutta extends OdeSolver {
         } else {
             h1 = Math.pow(0.01 / Math.max(d1, d2), 1 / (order + 1));
         }
-        return DoubleArrays.min(100 * h0, h1, internalLength, maxStep);
+        return DoubleArrays.min(100 * h0, h1, intervalLength, maxStep);
     }
 
     protected double validateMaxStep(double maxStep) {
@@ -264,7 +264,7 @@ public abstract class RungeKutta extends OdeSolver {
     }
 
     @Override
-    public RungeKuttaDenseOutput getDenseOutput() {
+    protected DenseOutput getDenseOutputImpl() {
         double[][] Q = DoubleArrays.dot(DoubleArrays.transpose(this.K), P);
         return new RungeKuttaDenseOutput(this.tOld, this.t, this.yOld, Q);
     }
