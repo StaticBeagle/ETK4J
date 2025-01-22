@@ -52,21 +52,20 @@ public class RungeKutta45 extends RungeKutta {
 
     public static void main(String[] args) {
 
-//        OdeSystemOfEquations odeSystemOfEquations = (t, y) -> {
-//            double dxdt = y[0] - y[1];
-//            double dydt = y[0] + y[1];
-//            double dzdt = 0;
-//            return new double[] {dxdt, dydt, dzdt};
-//        };
-//        RungeKutta rungeKutta = new RungeKutta45(odeSystemOfEquations, 0, new double[] {1, 0, 0}, 10);
-        BivariateFunction func = (t, x) -> -x;
-        RungeKutta rungeKutta = new RungeKutta45(func, 0.0, 1.0, 10.0);
+        OdeSystemOfEquations odeSystemOfEquations = (t, y) -> {
+            double dxdt = y[0] - y[1];
+            double dydt = y[0] + y[1];
+            return new double[] {dxdt, dydt};
+        };
+        RungeKutta rungeKutta = new RungeKutta45(odeSystemOfEquations, 10, new double[] {1, 0}, 10);
+//        BivariateFunction func = (t, x) -> -x;
+//        RungeKutta rungeKutta = new RungeKutta45(func, 0.0, 1.0, 10.0);
 //
         while (!rungeKutta.status.equals("finished")) {
             rungeKutta.step();
         }
         DenseOutput rungeKuttaDenseOutput = rungeKutta.getDenseOutput();
-        double[][] hh = rungeKuttaDenseOutput.evaluateAt(new double[] {5, 6, 7});
+        double[][] hh = rungeKuttaDenseOutput.evaluateAt(new double[] {5, 6});
 //        System.out.println(Arrays.toString(hh));
     }
 }

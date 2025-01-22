@@ -1,5 +1,7 @@
 package com.wildbitsfoundry.etk4j.math.calculus.odesolvers;
 
+import java.util.Arrays;
+
 public class ConstantDenseOutput extends DenseOutput {
 
     private final double[] value;
@@ -11,6 +13,12 @@ public class ConstantDenseOutput extends DenseOutput {
 
     @Override
     public double[][] evaluateAt(double[] t) {
-        return null;
+        double[][] result = new double[value.length][t.length];
+        for(int i = 0; i < value.length; i++) {
+            double[] tmp = new double[t.length];
+            Arrays.fill(tmp, value[i]);
+            result[i] = tmp;
+        }
+        return result;
     }
 }
