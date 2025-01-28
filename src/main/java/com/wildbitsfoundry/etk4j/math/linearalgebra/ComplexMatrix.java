@@ -86,7 +86,7 @@ public abstract class ComplexMatrix {
      *
      * @return {@code true} if the matrix is squared (same number of rows and columns) or {@code false} otherwise.
      */
-    public boolean isSquared() {
+    public boolean isSquare() {
         return rows == cols;
     }
 
@@ -122,7 +122,7 @@ public abstract class ComplexMatrix {
      * @return Array containing the diagonal of the matrix
      */
     public Complex[] diag() {
-        if (!this.isSquared()) {
+        if (!this.isSquare()) {
             throw new NonSquareMatrixException("Matrix is not squared");
         }
         final int dim = rows;

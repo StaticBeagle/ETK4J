@@ -441,7 +441,7 @@ public class MatrixDense extends Matrix {
      */
     public MatrixDense cofactor() {
         int dim = this.rows;
-        if (!this.isSquared()) {
+        if (!this.isSquare()) {
             throw new NonSquareMatrixException("Matrix must be a square Matrix.");
         }
         double[][] cofactor = new double[dim][dim];
@@ -454,15 +454,6 @@ public class MatrixDense extends Matrix {
             }
         }
         return new MatrixDense(cofactor);
-    }
-
-    /**
-     * Is the {@code Matrix} squared.
-     *
-     * @return {@code true} if the matrix is squared (same number of rows and columns) or {@code false} otherwise.
-     */
-    public boolean isSquared() {
-        return rows == cols;
     }
 
     /**
@@ -547,7 +538,7 @@ public class MatrixDense extends Matrix {
      * @return Array containing the diagonal of the matrix
      */
     public double[] diag() {
-        if (!this.isSquared()) {
+        if (!this.isSquare()) {
             throw new RuntimeException("Matrix is not squared");
         }
         final int dim = rows;
@@ -1053,7 +1044,7 @@ public class MatrixDense extends Matrix {
      * @see <a href="https://www.mathworks.com/help/matlab/ref/balance.html">Matrix balance</a>
      */
     public MatrixDense balance() {
-        if (!this.isSquared()) {
+        if (!this.isSquare()) {
             throw new NonSquareMatrixException("Matrix must be a square Matrix.");
         }
         int rows = this.rows;
@@ -1342,7 +1333,7 @@ public class MatrixDense extends Matrix {
      * @return {@code A<sup>n</n>}.
      */
     public MatrixDense pow(int n) {
-        if (!this.isSquared()) {
+        if (!this.isSquare()) {
             throw new IllegalArgumentException("Matrix must be a square matrix.");
         }
         n = Math.abs(n);
@@ -1387,7 +1378,7 @@ public class MatrixDense extends Matrix {
      * @return {@code A<sup>n</n>}.
      */
     public MatrixDense pow(double n) {
-        if (!this.isSquared()) {
+        if (!this.isSquare()) {
             throw new IllegalArgumentException("Matrix must be squared");
         }
         n = Math.abs(n);

@@ -74,11 +74,9 @@ public class SchurDecompositionDense {
      * @throws NonSquareMatrixException if the matrix is not square
      */
     SchurDecompositionDense(final MatrixDense matrix) {
-        //TODO
-//        if (!matrix.isSquare()) {
-//            throw new NonSquareMatrixException(matrix.getRowDimension(),
-//                    matrix.getColumnDimension());
-//        }
+        if (!matrix.isSquare()) {
+            throw new NonSquareMatrixException("Matrix must be a square matrix");
+        }
 
         HessembergDecompositionDense hess = new HessembergDecompositionDense(matrix);
         matrixT = hess.getH().getAs2DArray();

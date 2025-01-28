@@ -126,7 +126,7 @@ public class StateSpace extends LinearTimeInvariantSystem {
         double[][] num;
         double[] den;
 
-        if(!A.isSquared()) {
+        if(!A.isSquare()) {
             throw new NonSquareMatrixException("Matrix A must be a square Matrix.");
         }
         den = A.poly();
