@@ -14,7 +14,7 @@ public abstract class OdeSolver {
     protected OdeSystemOfEquations systemOfEquations;
     protected double tBound;
     protected double direction;
-    protected String status; // TODO change to enum
+    protected OdeSolverStatus status;
     protected int n;
 
     public OdeSolver(OdeSystemOfEquations systemOfEquations, double t0, double[] y0, Double tBound) {
@@ -26,7 +26,7 @@ public abstract class OdeSolver {
         this.direction = (int) Math.signum(tBound - t0);
         this.y = y0;
         this.n = y0.length;
-        this.status = "running";
+        this.status = OdeSolverStatus.RUNNING;
         // nfev
         // njev
         // nlu
@@ -37,25 +37,25 @@ public abstract class OdeSolver {
     }
 
     public String step() {
-        if (!this.status.equals("running")) {
+        if (this.status != OdeSolverStatus.RUNNING) {
             throw new RuntimeException("Attempt to step on a failed or finished solver.");
         }
 
         if (this.n == 0 || this.t == this.tBound) {
             this.tOld = this.t;
             this.t = this.tBound;
-            this.status = "finished";
+            this.status = OdeSolverStatus.FINISHED;
             return null;
         }
         double t = this.t;
         Tuples.Tuple2<Boolean, String> result = stepImpl();
 
         if (!result.getItem1()) {
-            this.status = "failed";
+            this.status = OdeSolverStatus.FAILED;
         } else {
             this.tOld = t;
             if (this.direction * (this.t - this.tBound) >= 0) {
-                status = "finished";
+                status = OdeSolverStatus.FINISHED;
             }
         }
         return result.getItem2();

@@ -18,7 +18,7 @@ public class RungeKuttaTest {
 
         List<Double> tValues = new ArrayList<>();
         List<Double> yValues = new ArrayList<>();
-        while (!rungeKutta.status.equals("finished")) {
+        while (rungeKutta.status != OdeSolverStatus.FINISHED) {
             rungeKutta.step();
             tValues.add(rungeKutta.t);
             yValues.add(rungeKutta.y[0]);
@@ -44,7 +44,7 @@ public class RungeKuttaTest {
 
         List<Double> tValues = new ArrayList<>();
         List<Double> yValues = new ArrayList<>();
-        while (!rungeKutta.status.equals("finished")) {
+        while (rungeKutta.status != OdeSolverStatus.FINISHED) {
             rungeKutta.step();
             tValues.add(rungeKutta.t);
             yValues.add(rungeKutta.y[0]);
@@ -80,7 +80,7 @@ public class RungeKuttaTest {
         List<Double> tValues = new ArrayList<>();
         List<Double> yValues0 = new ArrayList<>();
         List<Double> yValues1 = new ArrayList<>();
-        while (!rungeKutta.status.equals("finished")) {
+        while (rungeKutta.status != OdeSolverStatus.FINISHED) {
             rungeKutta.step();
             tValues.add(rungeKutta.t);
             yValues0.add(rungeKutta.y[0]);
@@ -137,7 +137,7 @@ public class RungeKuttaTest {
         List<Double> tValues = new ArrayList<>();
         List<Double> yValues0 = new ArrayList<>();
         List<Double> yValues1 = new ArrayList<>();
-        while (!rungeKutta.status.equals("finished")) {
+        while (rungeKutta.status != OdeSolverStatus.FINISHED) {
             rungeKutta.step();
             tValues.add(rungeKutta.t);
             yValues0.add(rungeKutta.y[0]);
@@ -195,7 +195,7 @@ public class RungeKuttaTest {
 
         List<Double> tValues = new ArrayList<>();
         List<Double> yValues = new ArrayList<>();
-        while (!rungeKutta.status.equals("finished")) {
+        while (rungeKutta.status != OdeSolverStatus.FINISHED) {
             rungeKutta.step();
             tValues.add(rungeKutta.t);
             yValues.add(rungeKutta.y[0]);
@@ -220,7 +220,7 @@ public class RungeKuttaTest {
 
         List<Double> tValues = new ArrayList<>();
         List<Double> yValues = new ArrayList<>();
-        while (!rungeKutta.status.equals("finished")) {
+        while (rungeKutta.status != OdeSolverStatus.FINISHED) {
             rungeKutta.step();
             tValues.add(rungeKutta.t);
             yValues.add(rungeKutta.y[0]);
@@ -251,7 +251,7 @@ public class RungeKuttaTest {
         List<Double> tValues = new ArrayList<>();
         List<Double> yValues0 = new ArrayList<>();
         List<Double> yValues1 = new ArrayList<>();
-        while (!rungeKutta.status.equals("finished")) {
+        while (rungeKutta.status != OdeSolverStatus.FINISHED) {
             rungeKutta.step();
             tValues.add(rungeKutta.t);
             yValues0.add(rungeKutta.y[0]);
@@ -287,7 +287,7 @@ public class RungeKuttaTest {
         List<Double> tValues = new ArrayList<>();
         List<Double> yValues0 = new ArrayList<>();
         List<Double> yValues1 = new ArrayList<>();
-        while (!rungeKutta.status.equals("finished")) {
+        while (rungeKutta.status != OdeSolverStatus.FINISHED) {
             rungeKutta.step();
             tValues.add(rungeKutta.t);
             yValues0.add(rungeKutta.y[0]);

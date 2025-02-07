@@ -108,7 +108,7 @@ public class QRDecompositionDense extends QRDecomposition<MatrixDense> {
 	}
 	
 	/**
-	 * Return the upper triangular factor transpose
+	 * Return the upper transpose triangular factor
 	 * 
 	 * @return R
 	 */
