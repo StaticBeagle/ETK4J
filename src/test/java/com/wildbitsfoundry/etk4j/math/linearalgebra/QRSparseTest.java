@@ -20,7 +20,7 @@ public class QRSparseTest {
 
         // Perform Householder QR decomposition
         QRDecompositionSparse qrDecompositionSparse = new QRDecompositionSparse(sparseCSC);
-        MatrixSparse A = qrDecompositionSparse.getQ(false);
+        MatrixSparse A = qrDecompositionSparse.getQ();
 
         double[] expected = {-0.2672612419124243, 0.8728715609439696, -0.4082482904638629, -0.5345224838248488,
                 0.2182178902359924, 0.816496580927726, -0.8017837257372732, -0.4364357804719846, -0.4082482904638631};
@@ -60,8 +60,27 @@ public class QRSparseTest {
     }
 
     @Test
-    public void testGetV() {
-        // TODO and decide on name V vs H
+    public void testGetH() {
+        double[][] matrix = {
+                {1, 4, 7},
+                {2, 5, 8},
+                {3, 6, 10},
+        };
+        MatrixSparse sparseCSC = MatrixSparse.from2DArray(matrix, ConstantsETK.DOUBLE_EPS);
+
+        // Perform Householder QR decomposition
+        QRDecompositionSparse qrDecompositionSparse = new QRDecompositionSparse(sparseCSC);
+        MatrixSparse A = qrDecompositionSparse.getH();
+
+        double[] expected = {1.0, 0.0, 0.0, 0.42179344411906794, 1.0, 0.0, 0.632690166178602, 0.8597677535291113, 1.0};
+        double[] actual = new double[expected.length];
+
+        for(int i = 0; i < A.getRowCount(); i++) {
+            for(int j = 0; j < A.getColumnCount(); j++) {
+                actual[A.getRowCount() * i + j] = A.unsafeGet(i, j);
+            }
+        }
+        assertArrayEquals(expected, actual, 1e-12);
     }
 
     @Test
@@ -77,7 +96,7 @@ public class QRSparseTest {
         double[] actual = new double[expected.length];
 
         QRDecompositionSparse qrDecompositionSparse = new QRDecompositionSparse(sparseCSC);
-        MatrixSparse A = qrDecompositionSparse.getQ(false).multiply(qrDecompositionSparse.getR());
+        MatrixSparse A = qrDecompositionSparse.getQ().multiply(qrDecompositionSparse.getR());
         for(int i = 0; i < A.getRowCount(); i++) {
             for(int j = 0; j < A.getColumnCount(); j++) {
                 actual[A.getRowCount() * i + j] = A.unsafeGet(i, j);

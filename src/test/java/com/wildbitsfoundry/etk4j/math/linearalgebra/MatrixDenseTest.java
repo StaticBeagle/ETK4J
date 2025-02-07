@@ -114,16 +114,16 @@ public class MatrixDenseTest {
         MatrixDense A = MatrixDense.from2DArray(matrix);
         SchurDecompositionDense schur = new SchurDecompositionDense(A);
 
-        double[] expectedT = {211.53821949564204, 27.963104879902804, 11.529192222479173, -11.83821931259974,
+        double[] expectedS = {211.53821949564204, 27.963104879902804, 11.529192222479173, -11.83821931259974,
                 -2.8398992587956425E-29, 27.374680489564316, 64.83795403092125, 3.6006930114899935, 0.0,
                 -31.22064867637267, -13.419034896325854, 61.10465539906722, 0.0, 0.0, 2.2836324137572356E-24,
                 -44.49386508888031};
-        assertArrayEquals(expectedT, schur.getT().getArray(), 1e-12);
-        double[] expectedP = {0.49782038512887483, 0.15442410294358475, 0.7718547804323013, 0.3640992426578396,
+        assertArrayEquals(expectedS, schur.getT().getArray(), 1e-12);
+        double[] expectedU = {0.49782038512887483, 0.15442410294358475, 0.7718547804323013, 0.3640992426578396,
                 0.4680103341616455, 0.7666501603471897, -0.30669802271073127, -0.3148812182758139, 0.505725691055896,
                 -0.5430518840085535, 0.0954550851000274, -0.6634941623023844, 0.5266713554713984, -0.3057701413553275,
                 -0.5486937647884095, 0.5727626528185856};
-        assertArrayEquals(expectedP, schur.getP().getArray(), 1e-12);
+        assertArrayEquals(expectedU, schur.getU().getArray(), 1e-12);
     }
 
     @Test
@@ -137,7 +137,7 @@ public class MatrixDenseTest {
 
         MatrixDense A = MatrixDense.from2DArray(matrix);
         SchurDecompositionDense schur = new SchurDecompositionDense(A);
-        MatrixDense actual = schur.getP().multiply(schur.getT()).multiply(schur.getPT());
+        MatrixDense actual = schur.getU().multiply(schur.getT()).multiply(schur.getUT());
 
         assertArrayEquals(A.getArray(), actual.getArray(), 1e-12);
     }
@@ -845,7 +845,7 @@ public class MatrixDenseTest {
         QRDecompositionDense QR = A.QR();
         R = QR.getR();
         try {
-            check(A, QR.getQThin().multiply(R));
+            check(A, QR.getQEconomy().multiply(R));
             try_success("QRDecomposition...", "");
         } catch (java.lang.RuntimeException e) {
             errorCount = try_failure(errorCount, "QRDecomposition...", "incorrect QR decomposition calculation");

@@ -19,7 +19,7 @@ public class ComplexMatrixDense extends ComplexMatrix {
         this.data = new Complex[rows * cols];
     }
     // TODO add balance algo
-    // TODO javadoc all file. Clean up the check in get set
+    // TODO javadoc all file
     // add unsafe set and get
     public ComplexMatrixDense(Complex[] data, int rows) {
         this.rows = rows;
@@ -87,21 +87,10 @@ public class ComplexMatrixDense extends ComplexMatrix {
 
     // endregion
 
-    public Complex get(int i, int j) {
-        // TODO clean up all these checks
-        if (i < 0) {
-            throw new ArrayIndexOutOfBoundsException("Index i cannot be less thant zero.");
-        }
-        if (i >= rows) {
-            throw new ArrayIndexOutOfBoundsException(String.format("Index i: %d >= than number of rows: %d.", i, rows));
-        }
-        if (j < 0) {
-            throw new ArrayIndexOutOfBoundsException("Index j cannot be less thant zero.");
-        }
-        if (j >= cols) {
-            throw new ArrayIndexOutOfBoundsException(String.format("Index j: %d >= than number of columns: %d.", j, cols));
-        }
-        return data[i * cols + j];
+    public Complex get(int row, int col) {
+        if (row < 0 || row >= rows || col < 0 || col >= cols)
+            throw new ArrayIndexOutOfBoundsException("Outside of matrix bounds");
+        return data[row * cols + col];
     }
 
     @Override
@@ -109,21 +98,10 @@ public class ComplexMatrixDense extends ComplexMatrix {
         return data[row * cols + col];
     }
 
-    public void set(int i, int j, Complex val) {
-        // TODO clean up all these checks
-        if (i < 0) {
-            throw new ArrayIndexOutOfBoundsException("Index i cannot be less thant zero.");
-        }
-        if (i >= rows) {
-            throw new ArrayIndexOutOfBoundsException(String.format("Index i: %d >= than number of rows: %d.", i, rows));
-        }
-        if (j < 0) {
-            throw new ArrayIndexOutOfBoundsException("Index j cannot be less thant zero.");
-        }
-        if (j >= cols) {
-            throw new ArrayIndexOutOfBoundsException(String.format("Index j: %d >= than number of columns: %d.", j, cols));
-        }
-        data[i * cols + j] = val;
+    public void set(int row, int col, Complex val) {
+        if (row < 0 || row >= rows || col < 0 || col >= cols)
+            throw new ArrayIndexOutOfBoundsException("Outside of matrix bounds");
+        data[row * cols + col] = val;
     }
 
     @Override

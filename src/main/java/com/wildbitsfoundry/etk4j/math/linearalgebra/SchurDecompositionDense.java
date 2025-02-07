@@ -20,7 +20,8 @@ package com.wildbitsfoundry.etk4j.math.linearalgebra;
 import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
 import com.wildbitsfoundry.etk4j.math.MathETK;
 
-/**
+// TODO fix javadoc
+/*
  * Class transforming a general real matrix to Schur form.
  * <p>A m × m matrix A can be written as the product of three matrices: A = P
  * × T × P<sup>T</sup> with P an orthogonal matrix and T an quasi-triangular
@@ -42,9 +43,9 @@ public class SchurDecompositionDense {
     private static final int MAX_ITERATIONS = 100;
 
     /**
-     * P matrix.
+     * U matrix.
      */
-    private final double[][] matrixP;
+    private final double[][] matrixU;
     /**
      * T matrix.
      */
@@ -52,7 +53,7 @@ public class SchurDecompositionDense {
     /**
      * Cached value of P.
      */
-    private MatrixDense cachedP;
+    private MatrixDense cachedU;
     /**
      * Cached value of T.
      */
@@ -60,7 +61,7 @@ public class SchurDecompositionDense {
     /**
      * Cached value of PT.
      */
-    private MatrixDense cachedPt;
+    private MatrixDense cachedUt;
 
     /**
      * Epsilon criteria taken from JAMA code (originally was 2^-52).
@@ -80,10 +81,10 @@ public class SchurDecompositionDense {
 
         HessembergDecompositionDense hess = new HessembergDecompositionDense(matrix);
         matrixT = hess.getH().getAs2DArray();
-        matrixP = hess.getU().getAs2DArray();
+        matrixU = hess.getU().getAs2DArray();
         cachedT = null;
-        cachedP = null;
-        cachedPt = null;
+        cachedU = null;
+        cachedUt = null;
 
         // transform matrix
         transform();
@@ -95,11 +96,11 @@ public class SchurDecompositionDense {
      *
      * @return the P matrix
      */
-    public MatrixDense getP() {
-        if (cachedP == null) {
-            cachedP = MatrixDense.from2DArray(matrixP);
+    public MatrixDense getU() {
+        if (cachedU == null) {
+            cachedU = MatrixDense.from2DArray(matrixU);
         }
-        return cachedP;
+        return cachedU;
     }
 
     /**
@@ -108,13 +109,13 @@ public class SchurDecompositionDense {
      *
      * @return the transpose of the P matrix
      */
-    public MatrixDense getPT() {
-        if (cachedPt == null) {
-            cachedPt = getP().transpose();
+    public MatrixDense getUT() {
+        if (cachedUt == null) {
+            cachedUt = getU().transpose();
         }
 
         // return the cached matrix
-        return cachedPt;
+        return cachedUt;
     }
 
     /**
@@ -195,9 +196,9 @@ public class SchurDecompositionDense {
 
                     // Accumulate transformations
                     for (int i = 0; i <= n - 1; i++) {
-                        z = matrixP[i][iu - 1];
-                        matrixP[i][iu - 1] = q * z + p * matrixP[i][iu];
-                        matrixP[i][iu] = q * matrixP[i][iu] - p * z;
+                        z = matrixU[i][iu - 1];
+                        matrixU[i][iu - 1] = q * z + p * matrixU[i][iu];
+                        matrixU[i][iu] = q * matrixU[i][iu] - p * z;
                     }
                 }
                 iu -= 2;
@@ -418,13 +419,13 @@ public class SchurDecompositionDense {
                 // Accumulate transformations
                 final int high = matrixT.length - 1;
                 for (int i = 0; i <= high; i++) {
-                    p = shift.x * matrixP[i][k] + shift.y * matrixP[i][k + 1];
+                    p = shift.x * matrixU[i][k] + shift.y * matrixU[i][k + 1];
                     if (notlast) {
-                        p += z * matrixP[i][k + 2];
-                        matrixP[i][k + 2] -= p * r;
+                        p += z * matrixU[i][k + 2];
+                        matrixU[i][k + 2] -= p * r;
                     }
-                    matrixP[i][k] -= p;
-                    matrixP[i][k + 1] -= p * q;
+                    matrixU[i][k] -= p;
+                    matrixU[i][k + 1] -= p * q;
                 }
             }  // (s != 0)
         }  // k loop
@@ -464,6 +465,4 @@ public class SchurDecompositionDense {
 
         // CHECKSTYLE: resume all
     }
-
-    // TODO align return matrices name with Octave, Matlab
 }

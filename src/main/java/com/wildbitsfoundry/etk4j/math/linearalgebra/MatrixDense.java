@@ -913,7 +913,7 @@ public class MatrixDense extends Matrix {
      * <pre>
      *     LU Decomposition if the matrix is squared.
      *     QR if the matrix is thin in other words it has more rows than columns. (Overdetermined system)
-     *     Transpose QR if the matrix is short and wide in other words it has more columns than rows. (Under-determined system)
+     *     Pseudo inverse * b if the matrix is short and wide in other words it has more columns than rows. (Under-determined system)
      * </pre>
      *
      * @param b The solution {@link Matrix}.
@@ -931,7 +931,17 @@ public class MatrixDense extends Matrix {
         }
     }
 
-    // TODO document and write test
+    /**
+     * Solve system of linear equations. Three different algorithms are used depending on the shape of the matrix:
+     * <pre>
+     *     LU Decomposition if the matrix is squared.
+     *     QR if the matrix is thin in other words it has more rows than columns. (Overdetermined system)
+     *     Pseudo inverse * b if the matrix is short and wide in other words it has more columns than rows. (Under-determined system)
+     * </pre>
+     *
+     * @param b The solution {@link Matrix}.
+     * @return The solution to {@code Ax = b}
+     */
     public MatrixDense solve(double[] b) {
         return solve(new MatrixDense(b, b.length));
     }
@@ -946,6 +956,10 @@ public class MatrixDense extends Matrix {
         return transpose().solve(B.transpose());
     }
 
+    /**
+     * Append rows to the matrix
+     * @param count The number of rows to append
+     */
     public void appendRows(int count) {
         rows += count;
         final int newSize = rows * cols;
