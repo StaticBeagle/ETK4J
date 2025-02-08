@@ -5,7 +5,6 @@ import com.wildbitsfoundry.etk4j.util.RefValue;
 import java.util.Arrays;
 
 import static com.wildbitsfoundry.etk4j.math.linearalgebra.ColumnCounts.adjust;
-import static com.wildbitsfoundry.etk4j.math.linearalgebra.LUDecompositionSparse.solveColB;
 
 public class QRDecompositionSparse extends QRDecomposition<MatrixSparse> {
     int m, n, m2;

@@ -1,7 +1,6 @@
 package com.wildbitsfoundry.etk4j.math.linearalgebra;
 
 import static com.wildbitsfoundry.etk4j.math.linearalgebra.ColumnCounts.adjust;
-import static com.wildbitsfoundry.etk4j.math.linearalgebra.LUDecompositionSparse.solveColB;
 
 class TriangularSystemSolver {
 
@@ -33,7 +32,7 @@ class TriangularSystemSolver {
         X.indicesSorted = false;
 
         for (int colB = 0; colB < B.cols; colB++) {
-            int top = solveColB(G, lower, B, colB, x, pinv, g_xi, w);
+            int top = MatrixSparseUtils.solveColB(G, lower, B, colB, x, pinv, g_xi, w);
 
             int nz_count = X.rows - top;
             if (X.nz_values.length < X.nz_length + nz_count) {
