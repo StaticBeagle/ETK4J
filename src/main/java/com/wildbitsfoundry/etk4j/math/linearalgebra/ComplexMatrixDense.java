@@ -18,9 +18,8 @@ public class ComplexMatrixDense extends ComplexMatrix {
         super(rows, cols);
         this.data = new Complex[rows * cols];
     }
-    // TODO add balance algo
+
     // TODO javadoc all file
-    // add unsafe set and get
     public ComplexMatrixDense(Complex[] data, int rows) {
         this.rows = rows;
         cols = (this.rows != 0 ? data.length / this.rows : 0);

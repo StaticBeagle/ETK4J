@@ -3,7 +3,6 @@ package com.wildbitsfoundry.etk4j.math.linearalgebra;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 
 import static com.wildbitsfoundry.etk4j.math.linearalgebra.ColumnCounts.adjust;
-import static com.wildbitsfoundry.etk4j.math.linearalgebra.ColumnCounts.transpose;
 import static com.wildbitsfoundry.etk4j.math.linearalgebra.QrStructuralCounts.eliminationTree;
 import static com.wildbitsfoundry.etk4j.math.linearalgebra.QrStructuralCounts.postorder;
 
@@ -34,7 +33,7 @@ public class CholeskyDecompositionSparse extends CholeskyDecomposition<MatrixSpa
         decompose(matrix);
     }
 
-    public boolean decompose(MatrixSparse orig) {
+    private boolean decompose(MatrixSparse orig) {
         if (orig.cols != orig.rows) {
             throw new NonSquareMatrixException("Must be a square matrix");
         }
@@ -51,7 +50,7 @@ public class CholeskyDecompositionSparse extends CholeskyDecomposition<MatrixSpa
         }
     }
 
-    public void performSymbolic(MatrixSparse A) {
+    private void performSymbolic(MatrixSparse A) {
         init(A.cols);
 
         eliminationTree(A, false, parent, gw);
@@ -140,7 +139,7 @@ public class CholeskyDecompositionSparse extends CholeskyDecomposition<MatrixSpa
      * @param w      workspace array used internally. All elements must be &ge; 0 on input. Must be of size A.cols
      * @return Returns the index of the first element in the xi list. Also known as top.
      */
-    public static int searchNzRowsElim(MatrixSparse A, int k, int[] parent, int[] s, int[] w) {
+    private static int searchNzRowsElim(MatrixSparse A, int k, int[] parent, int[] s, int[] w) {
         int top = A.cols;
 
         // Traversing through the column in A is the same as the row in A since it's symmetric
@@ -172,26 +171,6 @@ public class CholeskyDecompositionSparse extends CholeskyDecomposition<MatrixSpa
         return top;
     }
 
-//    @Override
-//    public boolean inputModified() {
-//        return false;
-//    }
-//
-//    @Override
-//    public boolean isLower() {
-//        return true;
-//    }
-
-    //    @Override
-    public MatrixSparse getT(MatrixSparse T) {
-        if (T == null) {
-            T = new MatrixSparse(L.rows, L.cols, L.nz_length);
-        }
-        T.setTo(L);
-        return T;
-    }
-
-    //@Override
     public Complex computeDeterminant() {
         double value = 1;
         for (int i = 0; i < N; i++) {
@@ -210,10 +189,6 @@ public class CholeskyDecompositionSparse extends CholeskyDecomposition<MatrixSpa
 
     public MatrixSparse getR() { return L.transpose(); }
 
-    IGrowArray getGw() {
-        return gw;
-    }
-
     public MatrixSparse solve(MatrixSparse B) {
         MatrixSparse X = new MatrixSparse(1, 1, 1);
         X.reshape(cols, B.cols, X.rows);
@@ -225,108 +200,17 @@ public class CholeskyDecompositionSparse extends CholeskyDecomposition<MatrixSpa
         MatrixSparse tmp = new MatrixSparse(1, 1, 1);
         tmp.reshape(L.rows, B.cols, 1);
 
-        QRDecompositionSparse.solve(L, true, B, tmp, null, new DGrowArray(), new IGrowArray(), gw1);
-        solveTran(L, true, tmp, X, null, new DGrowArray(), new IGrowArray(), gw1);
+        TriangularSystemSolver.solve(L, true, B, tmp, null, new DGrowArray(), new IGrowArray(), gw1);
+        TriangularSystemSolver.solveTran(L, tmp, X, null, new DGrowArray(), new IGrowArray(), gw1);
         return X;
     }
 
-    /**
-     * Solution to a sparse transposed triangular system with sparse B and sparse X
-     *
-     * <p>G<sup>T</sup>*X = B</p>
-     *
-     * @param G     (Input) Lower or upper triangular matrix. diagonal elements must be non-zero. Not modified.
-     * @param lower true for lower triangular and false for upper
-     * @param B     (Input) Matrix. Not modified.
-     * @param X     (Output) Solution
-     * @param pinv  (Input, Optional) Permutation vector. Maps col j to G. Null if no pivots.
-     * @param g_x   (Optional) Storage for workspace.
-     * @param g_xi  (Optional) Storage for workspace.
-     * @param g_w   (Optional) Storage for workspace.
-     */
-    public static void solveTran(MatrixSparse G, boolean lower,
-                                 MatrixSparse B, MatrixSparse X,
-                                 int[] pinv,
-                                 DGrowArray g_x, IGrowArray g_xi, IGrowArray g_w) {
-        double[] x = adjust(g_x, G.rows);
-
-        X.zero();
-        X.indicesSorted = false;
-
-        // storage for the index of non-zero rows in X
-        int[] xi = adjust(g_xi, G.rows);
-        // Used to mark nodes as non-zero or not. Fill with zero initially
-        int[] w = adjust(g_w, G.cols, G.cols); // Dense fill makes adds O(N) to runtime
-
-        for (int colB = 0; colB < B.cols; colB++) {
-            int idx0 = B.col_idx[colB];
-            int idx1 = B.col_idx[colB + 1];
-
-            // Sparse copy into X and mark elements are non-zero
-            int X_nz_count = 0;
-            for (int i = idx0; i < idx1; i++) {
-                int row = B.nz_rows[i];
-                x[row] = B.nz_values[i];
-                w[row] = 1;
-                xi[X_nz_count++] = row;
-            }
-
-            if (lower) {
-                for (int col = G.rows - 1; col >= 0; col--) {
-                    X_nz_count = solveTranColumn(G, x, xi, w, pinv, X_nz_count, col);
-                }
-            } else {
-                for (int col = 0; col < G.rows; col++) {
-                    X_nz_count = solveTranColumn(G, x, xi, w, pinv, X_nz_count, col);
-                }
-            }
-
-            // set everything back to zero for the next column
-            if (colB + 1 < B.cols) {
-                for (int i = 0; i < X_nz_count; i++) {
-                    w[xi[i]] = 0;
-                }
-            }
-
-            // Copy results into X
-            if (X.nz_values.length < X.nz_length + X_nz_count) {
-                X.growMaxLength(X.nz_length * 2 + X_nz_count, true);
-            }
-            for (int p = 0; p < X_nz_count; p++, X.nz_length++) {
-                X.nz_rows[X.nz_length] = xi[p];
-                X.nz_values[X.nz_length] = x[xi[p]];
-            }
-            X.col_idx[colB + 1] = X.nz_length;
+    public MatrixSparse solve(double[] b) {
+        double[][] matrix = new double[b.length][1];
+        for(int i = 0; i < b.length; i++) {
+            matrix[i][0] = b[i];
         }
-    }
-
-    private static int solveTranColumn(MatrixSparse G, double[] x, int[] xi, int[] w,
-                                       int[] pinv, int x_nz_count, int col) {
-        int idxG0 = G.col_idx[col];
-        int idxG1 = G.col_idx[col + 1];
-
-        int indexDiagonal = -1;
-        double total = 0;
-        for (int j = idxG0; j < idxG1; j++) {
-            int J = pinv != null ? pinv[j] : j;
-            int row = G.nz_rows[J];
-
-            if (row == col) {
-                // order matters and this operation needs to be done last
-                indexDiagonal = j;
-            } else if (w[row] == 1) {
-                // L'[ col , row]*x[row]
-                total += G.nz_values[J] * x[row];
-            }
-        }
-        if (w[col] == 1) {
-            x[col] = (x[col] - total) / G.nz_values[indexDiagonal];
-        } else if (total != 0) {
-            // This element in B was zero. Mark it as non-zero and add to list
-            w[col] = 1;
-            x[col] = -total / G.nz_values[indexDiagonal];
-            xi[x_nz_count++] = col;
-        }
-        return x_nz_count;
+        MatrixSparse B = MatrixSparse.from2DArray(matrix);
+        return solve(B);
     }
 }

@@ -1,7 +1,12 @@
 package com.wildbitsfoundry.etk4j.math.calculus.odesolvers;
 
 import com.wildbitsfoundry.etk4j.math.functions.BivariateFunction;
-// TODO document this class
+
+/**
+ * Explicit Runge-Kutta 2(3)
+ * The error is controlled assuming accuracy of the second-order method accuracy,
+ * but steps are taken using the third-order accurate formula
+ */
 public class RungeKutta23 extends RungeKutta {
 
     private static final double[][] A = {

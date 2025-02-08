@@ -4,7 +4,11 @@ import com.wildbitsfoundry.etk4j.math.functions.BivariateFunction;
 
 import java.util.Arrays;
 
-// TODO document this class
+/**
+ * Explicit Runge-Kutta 4(5)
+ * The error is controlled assuming accuracy of the fourth-order method accuracy,
+ * but steps are taken using the fifth-order accurate formula
+ */
 public class RungeKutta45 extends RungeKutta {
 
     private static final double[][] A = {

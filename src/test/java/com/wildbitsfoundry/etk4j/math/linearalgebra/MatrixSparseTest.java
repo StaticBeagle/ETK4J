@@ -7,8 +7,6 @@ import static org.junit.Assert.*;
 
 public class MatrixSparseTest {
 
-    // TODO write tests for constructors
-
     @Test
     public void testGet() {
         double[][] matrix = {

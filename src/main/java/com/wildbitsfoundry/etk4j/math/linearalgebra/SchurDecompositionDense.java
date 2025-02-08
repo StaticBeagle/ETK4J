@@ -19,6 +19,7 @@ package com.wildbitsfoundry.etk4j.math.linearalgebra;
 
 import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
 import com.wildbitsfoundry.etk4j.math.MathETK;
+import com.wildbitsfoundry.etk4j.signals.filters.MaximumNumberOfIterationsExceededException;
 
 // TODO fix javadoc
 /*
@@ -208,9 +209,8 @@ public class SchurDecompositionDense {
                 computeShift(il, iu, iteration, shift);
 
                 // stop transformation after too many iterations
-                if (++iteration > MAX_ITERATIONS) { // TODO
-//                    throw new MaxCountExceededException(LocalizedFormats.CONVERGENCE_FAILED,
-//                            MAX_ITERATIONS);
+                if (++iteration > MAX_ITERATIONS) {
+                    throw new MaximumNumberOfIterationsExceededException("Maximum number of iterations exceeded");
                 }
 
                 // the initial houseHolder vector for the QR step

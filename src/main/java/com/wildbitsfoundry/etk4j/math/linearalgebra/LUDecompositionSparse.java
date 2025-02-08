@@ -147,8 +147,8 @@ public class LUDecompositionSparse extends LUDecomposition<MatrixSparse> {
 
         permuteInv(pinv, rhs, x, b.length);
 
-        solveL(L, x);
-        solveU(U, x);
+        TriangularSystemSolver.solveL(L, x);
+        TriangularSystemSolver.solveU(U, x);
 
         double[][] xmat = new double[b.length][1];
         for (int i = 0; i < b.length; i++) {
@@ -160,7 +160,6 @@ public class LUDecompositionSparse extends LUDecomposition<MatrixSparse> {
     // TODO add bound checks for solve for QR and LU
     // TODO merge tests into matrix tests?
     // TODO create utility classes to hold static methods
-    // TODO Tridiagonal solver add solve L and U
     public MatrixSparse solve(MatrixSparse B) {
 //        if (B.length != this.rows) {
 //            int var10002 = b.length;
@@ -187,8 +186,8 @@ public class LUDecompositionSparse extends LUDecomposition<MatrixSparse> {
 
         tmp.reshape(L.rows, B.cols, 1);
 
-        QRDecompositionSparse.solve(L, true, Bp, tmp, null, gx, gw, gw1);
-        QRDecompositionSparse.solve(U, false, tmp, X, null, gx, gw, gw1);
+        TriangularSystemSolver.solve(L, true, Bp, tmp, null, gx, gw, gw1);
+        TriangularSystemSolver.solve(U, false, tmp, X, null, gx, gw, gw1);
         return X;
     }
 
@@ -201,7 +200,7 @@ public class LUDecompositionSparse extends LUDecomposition<MatrixSparse> {
      * @param permCol    (Input) Column permutation vector. Null is the same as passing in identity.
      * @param output     (Output) Matrix which has the permutation stored in it. Is reshaped.
      */
-    public static void permute(int[] permRowInv, MatrixSparse input, int[] permCol,
+    private static void permute(int[] permRowInv, MatrixSparse input, int[] permCol,
                                MatrixSparse output) {
         if (permRowInv != null && input.rows > permRowInv.length)
             throw new IllegalArgumentException("rowInv permutation vector must have at least as many elements as input has columns");
@@ -341,42 +340,6 @@ public class LUDecompositionSparse extends LUDecomposition<MatrixSparse> {
             }
         }
         return top;
-    }
-
-    private static void solveL(MatrixSparse L, double[] x) {
-        int N = L.cols;
-        int idx0 = L.col_idx[0];
-
-        for (int col = 0; col < N; ++col) {
-            int idx1 = L.col_idx[col + 1];
-            double x_j = x[col] /= L.nz_values[idx0];
-
-            for (int i = idx0 + 1; i < idx1; ++i) {
-                int row = L.nz_rows[i];
-                x[row] -= L.nz_values[i] * x_j;
-            }
-
-            idx0 = idx1;
-        }
-
-    }
-
-    private static void solveU(MatrixSparse U, double[] x) {
-        int N = U.cols;
-        int idx1 = U.col_idx[N];
-
-        for (int col = N - 1; col >= 0; --col) {
-            int idx0 = U.col_idx[col];
-            double x_j = x[col] /= U.nz_values[idx1 - 1];
-
-            for (int i = idx0; i < idx1 - 1; ++i) {
-                int row = U.nz_rows[i];
-                x[row] -= U.nz_values[i] * x_j;
-            }
-
-            idx1 = idx0;
-        }
-
     }
 
     private static int[] adjust(IGrowArray gwork, int desired, int zeroToM) {

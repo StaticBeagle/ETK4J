@@ -638,48 +638,8 @@ public class QRDecompositionSparse extends QRDecomposition<MatrixSparse> {
         }
 
         // Solve for X
-        solve(R, false, B, X, null, gx, gw, gw1);
+        TriangularSystemSolver.solve(R, false, B, X, null, gx, gw, gw1);
 		return X;
     }
 
-    /*
-     * Computes the solution to the triangular system.
-     *
-     * @param G (Input) Lower or upper triangular matrix. diagonal elements must be non-zero. Not modified.
-     * @param lower true for lower triangular and false for upper
-     * @param B (Input) Matrix. Not modified.
-     * @param X (Output) Solution
-     * @param pinv (Input, Optional) Permutation vector. Maps col j to G. Null if no pivots.
-     * @param g_x (Optional) Storage for workspace.
-     * @param g_xi (Optional) Storage for workspace.
-     * @param g_w (Optional) Storage for workspace.
-     */
-    static void solve(MatrixSparse G, boolean lower,
-                      MatrixSparse B, MatrixSparse X,
-                      int[] pinv,
-                      DGrowArray g_x, IGrowArray g_xi, IGrowArray g_w) {
-        double[] x = adjust(g_x, G.rows);
-        if (g_xi == null) g_xi = new IGrowArray();
-        int[] xi = adjust(g_xi, G.rows);
-        int[] w = adjust(g_w, G.cols * 2, G.cols);
-
-        X.nz_length = 0;
-        X.col_idx[0] = 0;
-        X.indicesSorted = false;
-
-        for (int colB = 0; colB < B.cols; colB++) {
-            int top = solveColB(G, lower, B, colB, x, pinv, g_xi, w);
-
-            int nz_count = X.rows - top;
-            if (X.nz_values.length < X.nz_length + nz_count) {
-                X.growMaxLength(X.nz_length * 2 + nz_count, true);
-            }
-
-            for (int p = top; p < X.rows; p++, X.nz_length++) {
-                X.nz_rows[X.nz_length] = xi[p];
-                X.nz_values[X.nz_length] = x[xi[p]];
-            }
-            X.col_idx[colB + 1] = X.nz_length;
-        }
-    }
 }

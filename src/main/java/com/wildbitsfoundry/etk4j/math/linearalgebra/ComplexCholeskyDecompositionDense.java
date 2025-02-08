@@ -7,7 +7,7 @@ import static com.wildbitsfoundry.etk4j.math.linearalgebra.ComplexQRDecompositio
 
 public class ComplexCholeskyDecompositionDense extends ComplexCholeskyDecomposition<ComplexMatrixDense> {
 
-    private ComplexMatrixDense R;
+    private final ComplexMatrixDense R;
     boolean isSPD;
 
     public ComplexCholeskyDecompositionDense(ComplexMatrixDense matrix) {

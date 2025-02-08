@@ -6,7 +6,7 @@ import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 import com.wildbitsfoundry.etk4j.util.Tuples;
 
 import java.util.Arrays;
-// TODO document this class
+
 public abstract class RungeKutta extends OdeSolver {
 
     //Multiply steps computed from asymptotic behaviour of errors by this.
@@ -32,19 +32,19 @@ public abstract class RungeKutta extends OdeSolver {
     protected double errorExponent;
     protected Double hPrevious;
 
-    public RungeKutta(OdeSystemOfEquations systemOfEquations, double t0, double[] y0, Double tBound,
+    protected RungeKutta(OdeSystemOfEquations systemOfEquations, double t0, double[] y0, Double tBound,
                       int errorEstimatorOrder, int nStages, double[][] A, double[] B, double[] C, double[] E, double[][] P) {
         this(systemOfEquations, t0, y0, tBound, Double.POSITIVE_INFINITY, 0.001, 1e-6, null,
                 errorEstimatorOrder, nStages, A, B, C, E, P);
     }
 
-    public RungeKutta(BivariateFunction func, double t0, double y0, Double tBound,
+    protected RungeKutta(BivariateFunction func, double t0, double y0, Double tBound,
                       int errorEstimatorOrder, int nStages, double[][] A, double[] B, double[] C, double[] E, double[][] P) {
         this((t, y) -> new double[]{func.evaluateAt(t, y[0])}, t0, new double[]{y0}, tBound, Double.POSITIVE_INFINITY, 0.001, 1e-6, null,
                 errorEstimatorOrder, nStages, A, B, C, E, P);
     }
 
-    public RungeKutta(OdeSystemOfEquations systemOfEquations, double t0, double[] y0, Double tBound,
+    protected RungeKutta(OdeSystemOfEquations systemOfEquations, double t0, double[] y0, Double tBound,
                       double maxStep, double rTol, double aTol, Double firstStep, int errorEstimatorOrder, int nStages,
                       double[][] A, double[] B, double[] C, double[] E, double[][] P) {
         super(systemOfEquations, t0, y0, tBound);
@@ -72,7 +72,7 @@ public abstract class RungeKutta extends OdeSolver {
         this.errorExponent = -1.0 / (this.errorEstimatorOrder + 1);
     }
 
-    public RungeKutta(BivariateFunction func, double t0, double y0, Double tBound, double maxStep, double rTol,
+    protected RungeKutta(BivariateFunction func, double t0, double y0, Double tBound, double maxStep, double rTol,
                       double aTol, Double firstStep, int errorEstimatorOrder, int nStages, double[][] A, double[] B,
                       double[] C, double[] E, double[][] P) {
         this((t, y) -> new double[]{func.evaluateAt(t, y[0])}, t0, new double[]{y0}, tBound, maxStep, rTol, aTol,

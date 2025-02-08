@@ -4,7 +4,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertTrue;
-// TODO add calculate R and L for all Cholesky decompositions
+
 public class CholeskySparseTest {
 
     @Test
@@ -80,7 +80,6 @@ public class CholeskySparseTest {
         Arg = Arg.multiply(Arg.transpose());
         CholeskyDecompositionSparse choleskyDecompositionSparse = new CholeskyDecompositionSparse(Arg);
 
-        // TODO add solve method for double[]
         MatrixSparse B = MatrixSparse.from2DArray(new double[][]{
                 {90},
                 {80},
@@ -89,6 +88,29 @@ public class CholeskySparseTest {
         });
 
         MatrixSparse X = choleskyDecompositionSparse.solve(B);
+
+        double[] expected = {110.8752235125764, -31.42490731167088, 209.5953908930501, -260.8458452894825};
+        assertArrayEquals(expected, X.getNonZeroValues(), 1e-12);
+    }
+
+    @Test
+    public void testSolveUseArray() {
+        double[][] matrix = {
+                {0.9767407521087846, 0.2794308404798361, 0.1685348957730604, 0.8646965674039528},
+                {0.7198733467511716, 0.01506799866339292, 0.750545968546426, 0.8173900466200722},
+                {0.3444764277139777, 0.8429046576872399, 0.6191817846917982, 0.1931980127831494},
+                {0.2529620785541479, 0.7385598627121508, 0.3669833799842998, 0.4630012679866645}
+        };
+
+        MatrixSparse Arg = MatrixSparse.from2DArray(matrix);
+
+        // Making it symmetric
+        Arg = Arg.multiply(Arg.transpose());
+        CholeskyDecompositionSparse choleskyDecompositionSparse = new CholeskyDecompositionSparse(Arg);
+
+        double[] b = {90, 80, 60, 40};
+
+        MatrixSparse X = choleskyDecompositionSparse.solve(b);
 
         double[] expected = {110.8752235125764, -31.42490731167088, 209.5953908930501, -260.8458452894825};
         assertArrayEquals(expected, X.getNonZeroValues(), 1e-12);
