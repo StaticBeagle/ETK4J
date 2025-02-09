@@ -157,12 +157,10 @@ public class LUDecompositionSparse extends LUDecomposition<MatrixSparse> {
         return MatrixSparse.from2DArray(xmat, 0);
     }
 
-    // TODO add bound checks for solve for QR and LU
     public MatrixSparse solve(MatrixSparse B) {
-//        if (B.length != this.rows) {
-//            int var10002 = b.length;
-//            throw new IllegalArgumentException("Unexpected number of rows in B based on shape of A. Found=" + var10002 + " Expected=" + this.rows);
-//        }
+        if (B.getRowCount() != this.rows) {
+            throw new IllegalArgumentException("Matrix row dimensions must agree.");
+        }
         MatrixSparse X = new MatrixSparse(0, 0, 0);
         X.reshape(cols, B.cols, X.rows);
 
