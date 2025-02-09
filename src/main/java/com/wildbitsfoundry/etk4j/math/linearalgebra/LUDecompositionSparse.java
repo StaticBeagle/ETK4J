@@ -158,8 +158,6 @@ public class LUDecompositionSparse extends LUDecomposition<MatrixSparse> {
     }
 
     // TODO add bound checks for solve for QR and LU
-    // TODO merge tests into matrix tests?
-    // TODO create utility classes to hold static methods
     public MatrixSparse solve(MatrixSparse B) {
 //        if (B.length != this.rows) {
 //            int var10002 = b.length;

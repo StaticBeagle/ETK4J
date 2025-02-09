@@ -25,12 +25,18 @@ public class ComplexEigenvalueDecompositionDense {
     /**
      * The matrix of eigevectors
      */
-    public ComplexMatrixDense X;
+    private ComplexMatrixDense V;
 
     /**
      * The diagonal matrix of eigenvalues
      */
-    public ComplexMatrixDense D;
+    private ComplexMatrixDense D;
+
+    private boolean isSymmetric;
+
+    public ComplexEigenvalueDecompositionDense(ComplexMatrixDense A) {
+        this(A, true);
+    }
 
     /**
      * Creates an eigenvalue-vector decomposition of a square matrix A.
@@ -40,7 +46,19 @@ public class ComplexEigenvalueDecompositionDense {
      *          Thrown if A is not square. <br>
      *          Passed from below.
      */
-    public ComplexEigenvalueDecompositionDense(ComplexMatrixDense A) {
+    public ComplexEigenvalueDecompositionDense(ComplexMatrixDense A, boolean balance) {
+
+        Complex[] data = A.getArray();
+        int dim = A.getColumnCount();
+        isSymmetric = true;
+        for (int j = 0; (j < dim) & isSymmetric; j++) {
+            for (int i = 0; (i < dim) & isSymmetric; i++) {
+                isSymmetric = (data[i * dim + j].equals(data[j * dim + i]));
+            }
+        }
+        if(balance && !isSymmetric) {
+            A = new ComplexMatrixDense(A.balance());
+        }
 
         int i, j, k;
         double norm, scale;
@@ -64,33 +82,33 @@ public class ComplexEigenvalueDecompositionDense {
 
         norm = A.normFrob();
 
-        X = new ComplexMatrixDense(n, n, new Complex());
+        V = new ComplexMatrixDense(n, n, new Complex());
 
         /* Compute the eigenvectors of T */
         for (k = n - 1; k >= 0; k--) {
 
             d = T.unsafeGet(k, k).copy();
 
-            X.set(k, k, Complex.fromReal(1));
+            V.set(k, k, Complex.fromReal(1));
             for (i = k - 1; i >= 0; i--) {
 
-                X.unsafeSet(i, k, T.unsafeGet(i, k).uminus());
+                V.unsafeSet(i, k, T.unsafeGet(i, k).uminus());
 
                 for (j = i + 1; j < k; j++) {
 
-                    double a = X.unsafeGet(i, k).real();
+                    double a = V.unsafeGet(i, k).real();
                     double b = T.unsafeGet(i, j).real();
-                    double c = X.unsafeGet(j, k).real();
+                    double c = V.unsafeGet(j, k).real();
                     double e = T.unsafeGet(i, j).imag();
-                    double f = X.unsafeGet(j, k).imag();
+                    double f = V.unsafeGet(j, k).imag();
 
-                    double aa = X.unsafeGet(i, k).imag();
+                    double aa = V.unsafeGet(i, k).imag();
                     double bb = T.unsafeGet(i, j).real();
-                    double cc = X.unsafeGet(j, k).imag();
+                    double cc = V.unsafeGet(j, k).imag();
                     double ee = T.unsafeGet(i, j).imag();
-                    double ff = X.unsafeGet(j, k).real();
+                    double ff = V.unsafeGet(j, k).real();
                     Complex val = new Complex(a - b * c + e * f, aa - bb * cc - ee * ff);
-                    X.unsafeSet(i, k, val);
+                    V.unsafeSet(i, k, val);
                 }
 
                 z = T.unsafeGet(i, i).copy();
@@ -98,17 +116,17 @@ public class ComplexEigenvalueDecompositionDense {
                 if (z.real() == 0.0 && z.imag() == 0.0) { // perturb zero diagonal
                     z = Complex.fromReal(1.0e-16).multiply(norm);      // to avoid division by zero
                 }
-                z = (X.unsafeGet(i, k).divide(z));
-                X.unsafeSet(i, k, z);
+                z = (V.unsafeGet(i, k).divide(z));
+                V.unsafeSet(i, k, z);
             }
 
             /* Scale the vector so its norm is one. */
-            scale = 1.0 / normFro(X, 0, X.getRowCount() - 1, k, k);
-            for (i = 0; i < X.getRowCount(); i++) {
-                X.unsafeSet(i, k, X.unsafeGet(i, k).multiply(scale));
+            scale = 1.0 / normFro(V, 0, V.getRowCount() - 1, k, k);
+            for (i = 0; i < V.getRowCount(); i++) {
+                V.unsafeSet(i, k, V.unsafeGet(i, k).multiply(scale));
             }
         }
-        X = S.U.multiply(X);
+        V = S.U.multiply(V);
     }
 
     public ComplexMatrixDense getD() {
@@ -116,7 +134,7 @@ public class ComplexEigenvalueDecompositionDense {
     }
 
     public ComplexMatrixDense getV() {
-        return X;
+        return V;
     }
 
     /**

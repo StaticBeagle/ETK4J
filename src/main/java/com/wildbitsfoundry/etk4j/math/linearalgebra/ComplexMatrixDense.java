@@ -9,8 +9,6 @@ import java.util.Random;
 
 import static com.wildbitsfoundry.etk4j.util.ComplexArrays.zeros;
 
-
-// TODO add balance method
 public class ComplexMatrixDense extends ComplexMatrix {
     private Complex[] data;
 
@@ -448,76 +446,67 @@ public class ComplexMatrixDense extends ComplexMatrix {
         return new ComplexMatrixDense(data, rowDim, colDim);
     }
 
-    public static final class Factory {
-        private Factory() {}
 
+    public ComplexMatrixDense balance() {
+        if (!this.isSquare()) {
+            throw new NonSquareMatrixException("Matrix must be a square Matrix.");
+        }
+        double radix = 2.0; // Base for scaling
+        boolean converged;
 
-        /**
-         * Identity {@code Matrix}.
-         *
-         * @param rows The number of rows.
-         * @param cols The number of columns.
-         * @return {@code identity(rows, cols)}.
-         */
-        public static ComplexMatrixDense identity(int rows, int cols) {
-            Complex[] data = new Complex[rows * cols];
-            for (int i = 0; i < rows; ++i) {
-                for (int j = 0; j < cols; ++j) {
-                    if (i == j) {
-                        data[i * cols + j] = new Complex(1, 0);
-                    } else {
-                        data[i * cols + j] = new Complex(0, 0);
+        Complex[] data = this.getArrayCopy();
+
+        // Diagonal scaling factors
+        double[] scale = new double[rows];
+        for (int i = 0; i < rows; i++) {
+            scale[i] = 1.0;
+        }
+
+        do {
+            converged = true;
+
+            for (int i = 0; i < rows; i++) {
+                double rowSum = 0.0;
+                double colSum = 0.0;
+
+                // Calculate row and column sums (using magnitudes of complex numbers)
+                for (int j = 0; j < rows; j++) {
+                    if (i != j) {
+                        rowSum += data[i * rows + j].abs(); // Magnitude of each element in the row
+                        colSum += data[j * rows + i].abs(); // Magnitude of each element in the column
+                    }
+                }
+
+                // Skip scaling if the row or column is already balanced
+                if (rowSum == 0 || colSum == 0) continue;
+
+                // Calculate the scaling factor
+                double g = rowSum / radix;
+                double f = 1.0;
+                double c = colSum;
+
+                while (c < g) {
+                    f *= radix;
+                    c *= radix;
+                }
+                while (c >= g * radix) {
+                    f /= radix;
+                    c /= radix;
+                }
+
+                if ((rowSum + colSum) / f < 0.95 * (rowSum + colSum)) {
+                    converged = false;
+
+                    // Apply scaling
+                    scale[i] *= f;
+                    for (int j = 0; j < rows; j++) {
+                        data[i * rows + j].divideEquals(f); // scale row
+                        data[j * rows + i].multiplyEquals(f); // scale column
                     }
                 }
             }
-            return new ComplexMatrixDense(data, rows, cols);
-        }
-
-        /**
-         * Identity {@code Matrix.}
-         *
-         * @param n The number of rows and columns.
-         * @return {@code identity(n, n)}.
-         */
-        public static ComplexMatrixDense identity(int n) {
-            return ComplexMatrixDense.Factory.identity(n, n);
-        }
-
-        /**
-         * Random {@code Matrix.}
-         * @param n The number of rows and columns.
-         * @return {@code random(n, n)}.
-         */
-        public static ComplexMatrixDense random(int n) {
-            return random(n, n);
-        }
-
-        /**
-         * Random {@code Matrix.}
-         *
-         * @param rows The number of rows
-         * @param cols The number of columns.
-         * @return {@code random(rows, cols)}.
-         */
-        public static ComplexMatrixDense random(int rows, int cols) {
-            Random rand = new Random();
-            Complex[] data = new Complex[rows * cols];
-
-            for (int i = 0; i < data.length; ++i) {
-                double real = rand.nextDouble() * 100.0;
-                double imag = rand.nextDouble() * 100.0;
-                data[i] = new Complex(real, imag);
-            }
-            return new ComplexMatrixDense(data, rows, cols);
-        }
-
-        public static ComplexMatrixDense zeros(int dim) {
-            return new ComplexMatrixDense(dim, dim, new Complex());
-        }
-
-        public static ComplexMatrixDense zeros(int rows, int cols) {
-            return new ComplexMatrixDense(rows, cols, new Complex());
-        }
+        } while (!converged);
+        return new ComplexMatrixDense(data, rows, cols);
     }
 
     public ComplexSingularValueDecompositionDense SVD() {
@@ -561,5 +550,79 @@ public class ComplexMatrixDense extends ComplexMatrix {
             }
         }
         return new ComplexMatrixDense(inverse);
+    }
+
+    public static final class Factory {
+        private Factory() {
+        }
+
+
+        /**
+         * Identity {@code Matrix}.
+         *
+         * @param rows The number of rows.
+         * @param cols The number of columns.
+         * @return {@code identity(rows, cols)}.
+         */
+        public static ComplexMatrixDense identity(int rows, int cols) {
+            Complex[] data = new Complex[rows * cols];
+            for (int i = 0; i < rows; ++i) {
+                for (int j = 0; j < cols; ++j) {
+                    if (i == j) {
+                        data[i * cols + j] = new Complex(1, 0);
+                    } else {
+                        data[i * cols + j] = new Complex(0, 0);
+                    }
+                }
+            }
+            return new ComplexMatrixDense(data, rows, cols);
+        }
+
+        /**
+         * Identity {@code Matrix.}
+         *
+         * @param n The number of rows and columns.
+         * @return {@code identity(n, n)}.
+         */
+        public static ComplexMatrixDense identity(int n) {
+            return ComplexMatrixDense.Factory.identity(n, n);
+        }
+
+        /**
+         * Random {@code Matrix.}
+         *
+         * @param n The number of rows and columns.
+         * @return {@code random(n, n)}.
+         */
+        public static ComplexMatrixDense random(int n) {
+            return random(n, n);
+        }
+
+        /**
+         * Random {@code Matrix.}
+         *
+         * @param rows The number of rows
+         * @param cols The number of columns.
+         * @return {@code random(rows, cols)}.
+         */
+        public static ComplexMatrixDense random(int rows, int cols) {
+            Random rand = new Random();
+            Complex[] data = new Complex[rows * cols];
+
+            for (int i = 0; i < data.length; ++i) {
+                double real = rand.nextDouble() * 100.0;
+                double imag = rand.nextDouble() * 100.0;
+                data[i] = new Complex(real, imag);
+            }
+            return new ComplexMatrixDense(data, rows, cols);
+        }
+
+        public static ComplexMatrixDense zeros(int dim) {
+            return new ComplexMatrixDense(dim, dim, new Complex());
+        }
+
+        public static ComplexMatrixDense zeros(int rows, int cols) {
+            return new ComplexMatrixDense(rows, cols, new Complex());
+        }
     }
 }

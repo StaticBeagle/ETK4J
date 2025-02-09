@@ -439,7 +439,7 @@ public class EigenvalueDecompositionDense {
 		double exshift = 0.0;
 		double p = 0, q = 0, r = 0, s = 0, z = 0, t, w, x, y;
 
-		// Store roots isolated by balanc and compute matrix norm
+		// Store roots isolated by balance and compute matrix norm
 
 		double norm = 0.0;
 		for (int i = 0; i < nn; i++) {

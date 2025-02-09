@@ -4,8 +4,6 @@ import com.wildbitsfoundry.etk4j.util.Tuples;
 
 import java.util.Arrays;
 // TODO document this class
-// TODO implement 8
-// TODO implement BDF
 public abstract class OdeSolver {
 
     protected double t;

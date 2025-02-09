@@ -96,4 +96,19 @@ public class ComplexCholeskyDenseTest {
                 new Complex(1602.853981799121, 3633.4514965471276), new Complex(1604.0632231016468, -3737.3817702615556)};
         assertArrayEquals(expected, X.getArray());
     }
+
+    @Test
+    public void testBalance() {
+        ComplexMatrixDense Arg = ComplexMatrixDense.from2DArray(new Complex[][]{
+                {new Complex(1, 50), new Complex(100, 150), new Complex(10000, 50000)},
+                {new Complex(0.1, 0.1), new Complex(1, 1), new Complex(100, 500)},
+                {new Complex(0.0001, 0.0001), new Complex(0.1, 0.5), new Complex(1, 15)}
+        });
+
+        Complex[] expected = new Complex[] {new Complex(1, 50), new Complex(1.5625, 2.34375), new Complex(2.44140625, 12.20703125),
+        new Complex(6.4, 6.4), new Complex(1, 1), new Complex(1.5625, 7.8125),
+        new Complex(0.4096, 0.4096), new Complex(6.4, 32), new Complex(1, 15)};
+
+        assertArrayEquals(expected, Arg.balance().getArray());
+    }
 }
