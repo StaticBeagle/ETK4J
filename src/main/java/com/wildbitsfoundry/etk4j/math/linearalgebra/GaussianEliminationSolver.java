@@ -1,14 +1,30 @@
 package com.wildbitsfoundry.etk4j.math.linearalgebra;
-// TODO javadocs
+
+/**
+ * This class implements the Gaussian Elimination method to solve a linear system of equations
+ */
 public final class GaussianEliminationSolver {
 
     private GaussianEliminationSolver() {}
 
+    /**
+     * Solves a linear system of equations {@code A*x = b} using Gauss method with a tolerance of 1e-10.
+     * @param A The coefficient matrix
+     * @param b The solution vector
+     * @return x = A<sup>-1</sup>*b
+     */
     public static double[] solve(MatrixDense A, double[] b) {
         return solve(A, b, 1e-10);
     }
 
-    public static double[] solve(MatrixDense A, double[] b, double EPSILON) {
+    /**
+     * Solves a linear system of equations {@code A*x = b} using Gauss method to a specified tolerance.
+     * @param A The coefficient matrix
+     * @param b The solution vector
+     * @param tol The tolerance used to stop the algorithm
+     * @return x = A<sup>-1</sup>*b
+     */
+    public static double[] solve(MatrixDense A, double[] b, double tol) {
         int n = b.length;
 
         for (int p = 0; p < n; p++) {
@@ -25,7 +41,7 @@ public final class GaussianEliminationSolver {
             double t = b[p]; b[p] = b[max]; b[max] = t;
 
             // Check for singular or nearly singular matrix
-            if (Math.abs(A.unsafeGet(p, p)) <= EPSILON) {
+            if (Math.abs(A.unsafeGet(p, p)) <= tol) {
                 throw new ArithmeticException("Matrix is singular or nearly singular");
             }
 

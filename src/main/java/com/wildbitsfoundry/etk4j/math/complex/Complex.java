@@ -109,7 +109,7 @@ public class Complex implements Comparable<Complex> {
             return false;
         return Double.doubleToLongBits(real) == Double.doubleToLongBits(other.real);
     }
-    // TODO write test
+
     /**
      * Checks whether a Complex Number is close to another Complex Number within a given tolerance
      * @param c The complex number to compare to

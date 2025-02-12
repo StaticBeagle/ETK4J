@@ -441,7 +441,7 @@ public class MatrixDense extends Matrix {
      */
     public MatrixDense cofactor() {
         int dim = this.rows;
-        if (!this.isSquared()) {
+        if (!this.isSquare()) {
             throw new NonSquareMatrixException("Matrix must be a square Matrix.");
         }
         double[][] cofactor = new double[dim][dim];
@@ -454,15 +454,6 @@ public class MatrixDense extends Matrix {
             }
         }
         return new MatrixDense(cofactor);
-    }
-
-    /**
-     * Is the {@code Matrix} squared.
-     *
-     * @return {@code true} if the matrix is squared (same number of rows and columns) or {@code false} otherwise.
-     */
-    public boolean isSquared() {
-        return rows == cols;
     }
 
     /**
@@ -547,7 +538,7 @@ public class MatrixDense extends Matrix {
      * @return Array containing the diagonal of the matrix
      */
     public double[] diag() {
-        if (!this.isSquared()) {
+        if (!this.isSquare()) {
             throw new RuntimeException("Matrix is not squared");
         }
         final int dim = rows;
@@ -863,7 +854,7 @@ public class MatrixDense extends Matrix {
 
     private static void multiplyOp(MatrixDense a, MatrixDense b, MatrixDense c) {
         if (b.rows != a.cols) {
-            throw new IllegalArgumentException("Matrix inner dimensions must agree. Check that the number of" +
+            throw new IllegalArgumentException("Matrix inner dimensions must agree. Check that the number of " +
                     "columns of the first matrix equal the number of rows of the second matrix.");
         }
         double[] result = new double[a.rows * b.cols];
@@ -922,7 +913,7 @@ public class MatrixDense extends Matrix {
      * <pre>
      *     LU Decomposition if the matrix is squared.
      *     QR if the matrix is thin in other words it has more rows than columns. (Overdetermined system)
-     *     Transpose QR if the matrix is short and wide in other words it has more columns than rows. (Under-determined system)
+     *     Pseudo inverse * b if the matrix is short and wide in other words it has more columns than rows. (Under-determined system)
      * </pre>
      *
      * @param b The solution {@link Matrix}.
@@ -934,11 +925,23 @@ public class MatrixDense extends Matrix {
         } else if (rows > cols) { // Matrix is tall and narrow (Overdetermined system)
             return new QRDecompositionDense(this).solve(b);
         } else { // Matrix is short and wide (Under-determined system)
+            // Could use QR for matrices that are not rank deficient. Let's go
+            // with pinv since we don't know what the input matrix looks like
             return this.pinv().multiply(b);
         }
     }
 
-    // TODO document and write test
+    /**
+     * Solve system of linear equations. Three different algorithms are used depending on the shape of the matrix:
+     * <pre>
+     *     LU Decomposition if the matrix is squared.
+     *     QR if the matrix is thin in other words it has more rows than columns. (Overdetermined system)
+     *     Pseudo inverse * b if the matrix is short and wide in other words it has more columns than rows. (Under-determined system)
+     * </pre>
+     *
+     * @param b The solution {@link Matrix}.
+     * @return The solution to {@code Ax = b}
+     */
     public MatrixDense solve(double[] b) {
         return solve(new MatrixDense(b, b.length));
     }
@@ -953,6 +956,10 @@ public class MatrixDense extends Matrix {
         return transpose().solve(B.transpose());
     }
 
+    /**
+     * Append rows to the matrix
+     * @param count The number of rows to append
+     */
     public void appendRows(int count) {
         rows += count;
         final int newSize = rows * cols;
@@ -1042,8 +1049,8 @@ public class MatrixDense extends Matrix {
      * Balances the matrix using the algorithm by Parlett and Reinsch with norm -1.
      * References:
      * <pre>
-     * http://www.netlib.org/eispack/balanc.f
-     * https://arxiv.org/pdf/1401.5766.pdf algorithm #2
+     * <a href="http://www.netlib.org/eispack/balanc.f">http://www.netlib.org/eispack/balanc.f</a>
+     * <a href="https://arxiv.org/pdf/1401.5766.pdf">https://arxiv.org/pdf/1401.5766.pdf - Algorithm #2</a>
      * </pre>
      *
      * @return A balanced copy of the {@code Matrix}.
@@ -1051,7 +1058,7 @@ public class MatrixDense extends Matrix {
      * @see <a href="https://www.mathworks.com/help/matlab/ref/balance.html">Matrix balance</a>
      */
     public MatrixDense balance() {
-        if (!this.isSquared()) {
+        if (!this.isSquare()) {
             throw new NonSquareMatrixException("Matrix must be a square Matrix.");
         }
         int rows = this.rows;
@@ -1340,7 +1347,7 @@ public class MatrixDense extends Matrix {
      * @return {@code A<sup>n</n>}.
      */
     public MatrixDense pow(int n) {
-        if (!this.isSquared()) {
+        if (!this.isSquare()) {
             throw new IllegalArgumentException("Matrix must be a square matrix.");
         }
         n = Math.abs(n);
@@ -1385,7 +1392,7 @@ public class MatrixDense extends Matrix {
      * @return {@code A<sup>n</n>}.
      */
     public MatrixDense pow(double n) {
-        if (!this.isSquared()) {
+        if (!this.isSquare()) {
             throw new IllegalArgumentException("Matrix must be squared");
         }
         n = Math.abs(n);

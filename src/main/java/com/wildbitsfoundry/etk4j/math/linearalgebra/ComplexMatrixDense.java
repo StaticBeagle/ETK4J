@@ -1,11 +1,13 @@
 package com.wildbitsfoundry.etk4j.math.linearalgebra;
 
+import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 import com.wildbitsfoundry.etk4j.util.ComplexArrays;
-import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 
 import java.util.Arrays;
 import java.util.Random;
+
+import static com.wildbitsfoundry.etk4j.util.ComplexArrays.zeros;
 
 public class ComplexMatrixDense extends ComplexMatrix {
     private Complex[] data;
@@ -14,9 +16,8 @@ public class ComplexMatrixDense extends ComplexMatrix {
         super(rows, cols);
         this.data = new Complex[rows * cols];
     }
-    // TODO add balance algo
-    // TODO javadoc all file. Clean up the check in get set
-    // add unsafe set and get
+
+    // TODO javadoc all file
     public ComplexMatrixDense(Complex[] data, int rows) {
         this.rows = rows;
         cols = (this.rows != 0 ? data.length / this.rows : 0);
@@ -83,30 +84,10 @@ public class ComplexMatrixDense extends ComplexMatrix {
 
     // endregion
 
-    // region getters and setter
-    public int getRowCount() {
-        return rows;
-    }
-
-    public int getColumnCount() {
-        return cols;
-    }
-
-    public Complex get(int i, int j) {
-        // TODO clean up all these checks
-        if (i < 0) {
-            throw new ArrayIndexOutOfBoundsException("Index i cannot be less thant zero.");
-        }
-        if (i >= rows) {
-            throw new ArrayIndexOutOfBoundsException(String.format("Index i: %d >= than number of rows: %d.", i, rows));
-        }
-        if (j < 0) {
-            throw new ArrayIndexOutOfBoundsException("Index j cannot be less thant zero.");
-        }
-        if (j >= cols) {
-            throw new ArrayIndexOutOfBoundsException(String.format("Index j: %d >= than number of columns: %d.", j, cols));
-        }
-        return data[i * cols + j];
+    public Complex get(int row, int col) {
+        if (row < 0 || row >= rows || col < 0 || col >= cols)
+            throw new ArrayIndexOutOfBoundsException("Outside of matrix bounds");
+        return data[row * cols + col];
     }
 
     @Override
@@ -114,21 +95,10 @@ public class ComplexMatrixDense extends ComplexMatrix {
         return data[row * cols + col];
     }
 
-    public void set(int i, int j, Complex val) {
-        // TODO clean up all these checks
-        if (i < 0) {
-            throw new ArrayIndexOutOfBoundsException("Index i cannot be less thant zero.");
-        }
-        if (i >= rows) {
-            throw new ArrayIndexOutOfBoundsException(String.format("Index i: %d >= than number of rows: %d.", i, rows));
-        }
-        if (j < 0) {
-            throw new ArrayIndexOutOfBoundsException("Index j cannot be less thant zero.");
-        }
-        if (j >= cols) {
-            throw new ArrayIndexOutOfBoundsException(String.format("Index j: %d >= than number of columns: %d.", j, cols));
-        }
-        data[i * cols + j] = val;
+    public void set(int row, int col, Complex val) {
+        if (row < 0 || row >= rows || col < 0 || col >= cols)
+            throw new ArrayIndexOutOfBoundsException("Outside of matrix bounds");
+        data[row * cols + col] = val;
     }
 
     @Override
@@ -262,7 +232,7 @@ public class ComplexMatrixDense extends ComplexMatrix {
         int bRows = b.getRowCount();
         int bCols = b.getColumnCount();
         if (bRows != a.cols) {
-            throw new IllegalArgumentException("Matrix inner dimensions must agree. Check that the number of" +
+            throw new IllegalArgumentException("Matrix inner dimensions must agree. Check that the number of " +
                     "columns of the first matrix equal the number of rows of the second matrix.");
         }
         Complex[] result = new Complex[a.rows * bCols];
@@ -295,10 +265,7 @@ public class ComplexMatrixDense extends ComplexMatrix {
     // endregion
 
     public boolean isEmpty() {
-        if ((rows == 0 && cols == 0) || data == null || data.length == 0) {
-            return true;
-        }
-        return false;
+        return (rows == 0 && cols == 0) || data == null || data.length == 0;
     }
 
     public ComplexMatrixDense transpose() {
@@ -332,7 +299,9 @@ public class ComplexMatrixDense extends ComplexMatrix {
         } else if (rows > cols) { // Matrix is tall and narrow (Overdetermined system)
             return new ComplexQRDecompositionDense(this).solve(B);
         } else { // Matrix is short and wide (Under-determined system)
-            throw new UnsupportedOperationException("Method not implemented yet for short and wide Matrices");
+            // Could use QR for matrices that are not rank deficient. Let's go
+            // with pinv since we don't know what the input matrix looks like
+            return this.pinv().multiply(B);
         }
     }
 
@@ -477,8 +446,115 @@ public class ComplexMatrixDense extends ComplexMatrix {
         return new ComplexMatrixDense(data, rowDim, colDim);
     }
 
+
+    public ComplexMatrixDense balance() {
+        if (!this.isSquare()) {
+            throw new NonSquareMatrixException("Matrix must be a square Matrix.");
+        }
+        double radix = 2.0; // Base for scaling
+        boolean converged;
+
+        Complex[] data = this.getArrayCopy();
+
+        // Diagonal scaling factors
+        double[] scale = new double[rows];
+        for (int i = 0; i < rows; i++) {
+            scale[i] = 1.0;
+        }
+
+        do {
+            converged = true;
+
+            for (int i = 0; i < rows; i++) {
+                double rowSum = 0.0;
+                double colSum = 0.0;
+
+                // Calculate row and column sums (using magnitudes of complex numbers)
+                for (int j = 0; j < rows; j++) {
+                    if (i != j) {
+                        rowSum += data[i * rows + j].abs(); // Magnitude of each element in the row
+                        colSum += data[j * rows + i].abs(); // Magnitude of each element in the column
+                    }
+                }
+
+                // Skip scaling if the row or column is already balanced
+                if (rowSum == 0 || colSum == 0) continue;
+
+                // Calculate the scaling factor
+                double g = rowSum / radix;
+                double f = 1.0;
+                double c = colSum;
+
+                while (c < g) {
+                    f *= radix;
+                    c *= radix;
+                }
+                while (c >= g * radix) {
+                    f /= radix;
+                    c /= radix;
+                }
+
+                if ((rowSum + colSum) / f < 0.95 * (rowSum + colSum)) {
+                    converged = false;
+
+                    // Apply scaling
+                    scale[i] *= f;
+                    for (int j = 0; j < rows; j++) {
+                        data[i * rows + j].divideEquals(f); // scale row
+                        data[j * rows + i].multiplyEquals(f); // scale column
+                    }
+                }
+            }
+        } while (!converged);
+        return new ComplexMatrixDense(data, rows, cols);
+    }
+
+    public ComplexSingularValueDecompositionDense SVD() {
+        return new ComplexSingularValueDecompositionDense(this);
+    }
+
+    public ComplexMatrixDense pinv() {
+        int rows = this.rows;
+        int cols = this.cols;
+
+        if (rows < cols) {
+            ComplexMatrixDense result = this.transpose().pinv();
+            if (result != null) {
+                result = result.transpose();
+            }
+            return result;
+        }
+
+        ComplexSingularValueDecompositionDense svdX = this.SVD();
+        if (svdX.rank() < 1) {
+            return null;
+        }
+
+        double[] singularValues = svdX.getS().diag();
+        double tol = Math.max(rows, cols) * singularValues[0] * ConstantsETK.DOUBLE_EPS;
+        double[] singularValueReciprocals = new double[singularValues.length];
+        for (int i = 0; i < singularValues.length; i++) {
+            if (Math.abs(singularValues[i]) >= tol) {
+                singularValueReciprocals[i] = 1.0 / singularValues[i];
+            }
+        }
+        ComplexMatrixDense U = svdX.getU();
+        ComplexMatrixDense V = svdX.getV();
+        int min = Math.min(cols, U.cols);
+        Complex[][] inverse = zeros(rows, cols);
+        for (int i = 0; i < cols; i++) {
+            for (int j = 0; j < U.rows; j++) {
+                for (int k = 0; k < min; k++) {
+                    inverse[i][j].addEquals(V.unsafeGet(i, k).multiply(singularValueReciprocals[k]).multiply(U.unsafeGet(j, k).conj()));
+                }
+            }
+        }
+        return new ComplexMatrixDense(inverse);
+    }
+
     public static final class Factory {
-        private Factory() {}
+        private Factory() {
+        }
 
 
         /**
@@ -514,6 +590,7 @@ public class ComplexMatrixDense extends ComplexMatrix {
 
         /**
          * Random {@code Matrix.}
+         *
          * @param n The number of rows and columns.
          * @return {@code random(n, n)}.
          */

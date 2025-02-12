@@ -136,9 +136,9 @@ public final class ComplexArrays {
         double realMean = 0.0;
         double imagMean = 0.0;
 
-        for (int i = 0; i < a.length; ++i) {
-            realMean += a[i].real();
-            imagMean += a[i].imag();
+        for (Complex complex : a) {
+            realMean += complex.real();
+            imagMean += complex.imag();
         }
         return new Complex(realMean / a.length, imagMean / a.length);
     }
@@ -230,8 +230,8 @@ public final class ComplexArrays {
     public static Complex sum(Complex[] a) {
         final int length = a.length;
         Complex sum = new Complex();
-        for (int i = 0; i < length; ++i) {
-            sum.addEquals(a[i]);
+        for (Complex complex : a) {
+            sum.addEquals(complex);
         }
         return sum;
     }
@@ -297,8 +297,8 @@ public final class ComplexArrays {
      * @param d The real value to multiply.
      */
     public static void multiplyElementWiseInPlace(Complex[] a, double d) {
-        for (int i = 0; i < a.length; ++i) {
-            a[i].multiplyEquals(d);
+        for (Complex complex : a) {
+            complex.multiplyEquals(d);
         }
     }
 
@@ -353,8 +353,8 @@ public final class ComplexArrays {
      */
     public static Complex product(Complex[] a) {
         Complex prod = Complex.fromReal(1.0);
-        for (int i = 0; i < a.length; ++i) {
-            prod.multiplyEquals(a[i]);
+        for (Complex complex : a) {
+            prod.multiplyEquals(complex);
         }
         return prod;
     }
@@ -367,7 +367,7 @@ public final class ComplexArrays {
      * @return {@code a - b}.
      **/
     public static Complex[] subtractElementWise(Complex[] a, Complex[] b) {
-        // TODO check dimensions
+        checkXYDimensions(a, b);
         Complex[] result = new Complex[a.length];
         for (int i = 0; i < a.length; ++i) {
             result[i] = a[i].subtract(b[i]);
@@ -405,6 +405,13 @@ public final class ComplexArrays {
         return result;
     }
 
+    /**
+     * Subtract an array of Complex values from a Complex number element wise.
+     *
+     * @param c The Complex number.
+     * @param a The right-hand array to be subtracted.
+     * @return {@code c - a}.
+     **/
     public static Complex[] subtractElementWise(Complex c, Complex[] a) {
         Complex[] result = new Complex[a.length];
         for (int i = 0; i < a.length; ++i) {
@@ -413,12 +420,17 @@ public final class ComplexArrays {
         return result;
     }
 
-    // TODO document
+    /**
+     * Norm 2 of the Complex array.
+     *
+     * @param x The Complex array.
+     * @return (&Sigma;|x<sub>i</sub>|)<sup>½</sup>
+     **/
     public static double norm(Complex[] x) {
         double nrm = 0.0;
-        // Compute 2-norm of k-th column without under/overflow.
-        for (int i = 0; i < x.length; ++i) {
-            nrm = MathETK.hypot(nrm, x[i].abs());
+        // Compute 2-norm without under/overflow.
+        for (Complex complex : x) {
+            nrm = MathETK.hypot(nrm, complex.abs());
         }
         return nrm;
     }
@@ -451,5 +463,15 @@ public final class ComplexArrays {
         }
 
         return Math.sqrt(nrm) / scale;
+    }
+    
+    public static Complex[][] zeros(int rows, int cols) {
+        Complex[][] zeros = new Complex[rows][cols];
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                zeros[i][j] = new Complex();
+            }
+        }
+        return zeros;
     }
 }

@@ -1,9 +1,8 @@
 package com.wildbitsfoundry.etk4j.math.complex;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 public class ComplexTest {
 
@@ -34,7 +33,7 @@ public class ComplexTest {
 		assertNotEquals(a, c.toString());
 
 		c = null;
-		assertNotEquals(a, c);
+		assertNotEquals(c, a);
 		
 		c = a.add(1);
 		assertNotEquals(a, c);
@@ -375,11 +374,19 @@ public class ComplexTest {
 		assertEquals(1.3070443537632264, c.real(), 1e-12);
 		assertEquals(0.05716427993519685, c.imag(), 1e-12);
 	}
-	
-	
+
 	@Test
 	public void testToString() {
 		Complex a = new Complex(-2.0, 3.0);
 		assertEquals("(-2.0000 + 3.0000j)", a.toString());
+	}
+
+	@Test
+	public void testIsClose() {
+		Complex a = new Complex(1.23, 4.56);
+		Complex b = new Complex(1.234, 4.567);
+
+		assertTrue(a.isClose(b, 1e-2));
+		assertFalse(a.isClose(b, 1e-3));
 	}
 }

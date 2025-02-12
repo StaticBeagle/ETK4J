@@ -5,14 +5,144 @@ import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 
 import java.util.Arrays;
 
+import static com.wildbitsfoundry.etk4j.math.linearalgebra.ComplexTriangularSolverDense.backSubstitutionSolve;
+import static com.wildbitsfoundry.etk4j.util.ComplexArrays.zeros;
+
 /***
- * References https://blogs.mathworks.com/cleve/2016/10/03/householder-reflections-and-the-qr-decomposition/
+ * References <a href="https://blogs.mathworks.com/cleve/2016/10/03/householder-reflections-and-the-qr-decomposition/">Mathworks blog</a>
  */
 public class ComplexQRDecompositionDense extends ComplexQRDecomposition<ComplexMatrixDense> {
     protected Complex[] _data;
 
-    private int m = 0;
-    private int n = 0;
+    private final int m;
+    private final int n;
+
+
+    private final ComplexMatrixDense H;
+    private final ComplexMatrixDense R;
+
+    public ComplexQRDecompositionDense(ComplexMatrixDense matrix) {
+        super(matrix);
+
+        this.m = matrix.getColumnCount();
+        this.n = matrix.getRowCount();
+        ComplexMatrixDense R = matrix.copy();
+        ComplexMatrixDense U = new ComplexMatrixDense(zeros(m, n));
+        for (int i = 0; i < Math.min(m, n); i++) {
+            Complex[] rCol = Arrays.copyOfRange(getColumn(R, i), i, m);
+            Complex[] u = houseGen(rCol);
+            setColumn(U, u, i, i);
+            Complex[][] subR = getSubMatrix(R, i, m, i, n);
+            Complex[][] H = calculateReflector(u, subR);
+            setSubMatrix(R, H, i, m, i, n);
+            for (int j = i + 1; j < m; j++) {
+                R.unsafeSet(j, i, new Complex());
+            }
+        }
+        this.R = R;
+        this.H = U;
+    }
+
+    /*
+     * ------------------------ Public Methods ------------------------
+     */
+
+    /**
+     * Is the matrix full rank?
+     *
+     * @return true if R, and hence A, has full rank.
+     */
+    public boolean isFullRank() {
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (i == j && R.unsafeGet(i, j).abs() == 0) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+
+    /**
+     * Return the Householder vectors
+     *
+     * @return Lower trapezoidal matrix whose columns define the reflections
+     */
+    public ComplexMatrixDense getH() {
+        return H.copy();
+    }
+
+    /**
+     * Return the upper triangular factor
+     *
+     * @return R
+     */
+
+    public ComplexMatrixDense getR() {
+        return R.copy();
+    }
+
+    /**
+     * Generate and return the unitary orthogonal factor
+     *
+     * @return Q
+     */
+    public ComplexMatrixDense getQ() {
+        ComplexMatrixDense I = ComplexMatrixDense.Factory.identity(H.getRowCount(), H.getColumnCount());
+        return houseApply(H, I);
+    }
+
+    public ComplexMatrixDense QmultiplyX(ComplexMatrixDense X) {
+        return houseApply(H, X);
+    }
+
+    /**
+     * Generate and return the conjugate transpose of the orthogonal factor
+     *
+     * @return transpose(Q)
+     */
+    public ComplexMatrixDense getQH() {
+        ComplexMatrixDense I = ComplexMatrixDense.Factory.identity(H.getRowCount(), H.getColumnCount());
+        return houseApplyTranspose(H, I);
+    }
+
+    /**
+     * Least squares solution of A*X = B
+     *
+     * @param B A Matrix with as many rows as A and any number of columns.
+     * @return X that minimizes the two norm of Q*R*X-B.
+     * @throws IllegalArgumentException Matrix row dimensions must agree.
+     * @throws RuntimeException         Matrix is rank deficient.
+     */
+
+    public ComplexMatrixDense solve(ComplexMatrixDense B) {
+        if (B.getRowCount() != rows) {
+            throw new IllegalArgumentException("Matrix row dimensions must agree.");
+        }
+        if (!this.isFullRank()) {
+            throw new RuntimeException("Matrix is rank deficient.");
+        }
+        // Compute Y = transpose(Q) * B
+        ComplexMatrixDense Y = houseApplyTranspose(H, B);
+
+        // Solve R * X = Y;
+        // Back Substitution
+        return backSubstitutionSolve(R, Y);
+    }
+
+    /**
+     * Least squares solution of A*X = B
+     *
+     * @param B A Matrix with as many rows as A and any number of columns.
+     * @return X that minimizes the two norm of Q*R*X-B.
+     * @throws IllegalArgumentException Matrix row dimensions must agree.
+     * @throws RuntimeException         Matrix is rank deficient.
+     */
+
+    public ComplexMatrixDense solve(MatrixDense B) {
+        return solve(ComplexMatrixDense.fromRealMatrix(B));
+    }
 
     private static Complex sig(Complex u) {
         return u.sign().add(u.equals(new Complex()) ? 1 : 0);
@@ -31,26 +161,8 @@ public class ComplexQRDecompositionDense extends ComplexQRDecomposition<ComplexM
         }
     }
 
-    private static Complex[][] zeros(int m, int n) {
-        Complex[][] zeros = new Complex[m][n];
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n; j++) {
-                zeros[i][j] = new Complex();
-            }
-        }
-        return zeros;
-    }
-
-    private static Complex[] zeros(int dim) {
-        Complex[] zeros = new Complex[dim];
-        for (int i = 0; i < dim; i++) {
-            zeros[i] = new Complex();
-        }
-        return zeros;
-    }
-
     private static Complex[][] calculateReflector(Complex[] u, Complex[][] x) {
-        Complex[] uH = Arrays.stream(u).map(c -> c.conj()).toArray(Complex[]::new);
+        Complex[] uH = Arrays.stream(u).map(Complex::conj).toArray(Complex[]::new);
         Complex[] uHx = zeros(Math.max(x.length, x[0].length));
         for (int i = 0; i < x[0].length; i++) {
             for (int j = 0; j < x.length; j++) {
@@ -81,17 +193,8 @@ public class ComplexQRDecompositionDense extends ComplexQRDecomposition<ComplexM
     }
 
     private static void setColumn(ComplexMatrixDense A, Complex[] values, int col, int startingRow) {
-        for (int i = 0; i < A.getRowCount() - startingRow; i++) { // TODO could be endRow - startingRow if we pass a param
+        for (int i = 0; i < A.getRowCount() - startingRow; i++) {
             A.set(i + startingRow, col, values[i]);
-        }
-    }
-    private static void setColumn(ComplexMatrixDense A, Complex[] values, int col) {
-        setColumn(A, values, col, 0);
-    }
-
-    private static void setColumn(ComplexMatrixDense A, Complex[] values, int row0, int row1, int col) {
-        for (int i = row0; i < row1; i++) {
-            A.set(i, col, values[i]);
         }
     }
 
@@ -111,7 +214,6 @@ public class ComplexQRDecompositionDense extends ComplexQRDecomposition<ComplexM
                 A.set(i, j, values[i - row0][j - col0]);
             }
         }
-        // TODO check for row0 == row1
     }
 
     /*
@@ -119,11 +221,10 @@ public class ComplexQRDecompositionDense extends ComplexQRDecomposition<ComplexM
     % Z = house_apply(U,X), with U from house_qr
     % computes Q*X without actually computing Q.
      */
-    public static ComplexMatrixDense houseApply(ComplexMatrixDense U, ComplexMatrixDense X) {
+    private static ComplexMatrixDense houseApply(ComplexMatrixDense U, ComplexMatrixDense X) {
         ComplexMatrixDense Z = X.copy();
         int n = U.getColumnCount();
         Complex[][] H = new Complex[X.getRowCount()][X.getColumnCount()];
-        // TODO temporary 2D array method
         for (int i = 0; i < Z.getRowCount(); i++) {
             for (int j = 0; j < Z.getColumnCount(); j++) {
                 H[i][j] = Z.unsafeGet(i, j);
@@ -140,11 +241,10 @@ public class ComplexQRDecompositionDense extends ComplexQRDecomposition<ComplexM
     % Z = house_apply(U,X), with U from house_qr
     % computes Q'*X without actually computing Q'.
      */
-    public static ComplexMatrixDense houseApplyTranspose(ComplexMatrixDense U, ComplexMatrixDense X) {
+    private static ComplexMatrixDense houseApplyTranspose(ComplexMatrixDense U, ComplexMatrixDense X) {
         ComplexMatrixDense Z = X.copy();
         int n = U.getColumnCount();
         Complex[][] H = new Complex[X.getRowCount()][X.getColumnCount()];
-        // TODO temporary 2D array method
         for (int i = 0; i < Z.getRowCount(); i++) {
             for (int j = 0; j < Z.getColumnCount(); j++) {
                 H[i][j] = Z.unsafeGet(i, j);
@@ -156,166 +256,6 @@ public class ComplexQRDecompositionDense extends ComplexQRDecomposition<ComplexM
         return new ComplexMatrixDense(H);
     }
 
-    public static ComplexMatrixDense backSubstitutionSolve(ComplexMatrixDense R, ComplexMatrixDense B) {
-        int n = R.getRowCount();
-        int m = B.getColumnCount();
-
-        Complex[][] X = zeros(n, m);
-        for (int col = 0; col < m; col++) {
-            for (int i = n - 1; i >= 0; i--) {
-                X[i][col] = B.get(i, col);
-                for (int j = i + 1; j < n; j++) {
-                    X[i][col].subtractEquals(R.get(i, j).multiply(X[j][col]));
-                }
-                X[i][col].divideEquals(R.get(i, i));
-            }
-        }
-        return new ComplexMatrixDense(X);
-    }
-
-    public static ComplexMatrixDense forwardSubstitutionSolve(ComplexMatrixDense R, ComplexMatrixDense B) {
-        int n = R.getRowCount();
-        int m = B.getColumnCount();
-
-        Complex[][] X = zeros(n, m);
-        for (int col = 0; col < m; col++) {
-            for (int i = 0; i < n; i++) {
-                X[i][col] = B.get(i, col);
-                for (int j = 0; j < i; j++) {
-                    X[i][col].subtractEquals(R.get(i, j).multiply(X[j][col]));
-                }
-                X[i][col].divideEquals(R.get(i, i));
-            }
-        }
-        return new ComplexMatrixDense(X);
-    }
-
-    private ComplexMatrixDense U;
-    private ComplexMatrixDense R;
-
-    public ComplexQRDecompositionDense(ComplexMatrixDense matrix) {
-        super(matrix);
-
-        this.m = matrix.getColumnCount();
-        this.n = matrix.getRowCount();
-        ComplexMatrixDense R = matrix.copy();
-        ComplexMatrixDense U = new ComplexMatrixDense(zeros(m, n));
-        for (int i = 0; i < Math.min(m, n); i++) {
-            Complex[] rCol = Arrays.copyOfRange(getColumn(R, i), i, m); // TODO get subColumn
-            Complex[] u = houseGen(rCol);
-            setColumn(U, u, i, i); // TODO set subColumn
-            Complex[][] subR = getSubMatrix(R, i, m, i, n);
-            Complex[][] H = calculateReflector(u, subR);
-            setSubMatrix(R, H, i, m, i, n);
-            for (int j = i + 1; j < m; j++) {
-                R.unsafeSet(j, i, new Complex());
-            }
-        }
-        this.R = R;
-        this.U = U;
-    }
-
-    /*
-     * ------------------------ Public Methods ------------------------
-     */
-
-    /**
-     * Is the matrix full rank?
-     *
-     * @return true if R, and hence A, has full rank.
-     */
-    public boolean isFullRank() {
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n; j++) {
-                if (i == j && R.unsafeGet(i, j).abs() == 0) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-
-    /**
-     * Return the Householder vectors
-     *
-     * @return Lower trapezoidal matrix whose columns define the reflections
-     */
-    public ComplexMatrixDense getH() {
-        return U.copy();
-    }
-
-    /**
-     * Return the upper triangular factor
-     *
-     * @return R
-     */
-
-    public ComplexMatrixDense getR() {
-        return R.copy();
-    }
-
-    /**
-     * Generate and return the unitary orthogonal factor
-     *
-     * @return Q
-     */
-    public ComplexMatrixDense getQ() {
-        ComplexMatrixDense I = ComplexMatrixDense.Factory.identity(U.getRowCount(), U.getColumnCount());
-        return houseApply(U, I);
-    }
-
-    public ComplexMatrixDense QmultiplyX(ComplexMatrixDense X) {
-        return houseApply(U, X);
-    }
-
-    /**
-     * Generate and return the conjugate transpose of the orthogonal factor
-     *
-     * @return transpose(Q)
-     */
-    public ComplexMatrixDense getQH() {
-        ComplexMatrixDense I = ComplexMatrixDense.Factory.identity(U.getRowCount(), U.getColumnCount());
-        return houseApplyTranspose(U, I);
-    }
-
-    /**
-     * Least squares solution of A*X = B
-     *
-     * @param B A Matrix with as many rows as A and any number of columns.
-     * @return X that minimizes the two norm of Q*R*X-B.
-     * @throws IllegalArgumentException Matrix row dimensions must agree.
-     * @throws RuntimeException         Matrix is rank deficient.
-     */
-
-    public ComplexMatrixDense solve(ComplexMatrixDense B) {
-        if (B.getRowCount() != rows) {
-            throw new IllegalArgumentException("Matrix row dimensions must agree.");
-        }
-        if (!this.isFullRank()) {
-            throw new RuntimeException("Matrix is rank deficient.");
-        }
-        // Compute Y = transpose(Q) * B
-        ComplexMatrixDense Y = houseApplyTranspose(U, B);
-
-        // Solve R * X = Y;
-        // Back Substitution
-        return backSubstitutionSolve(R, Y);
-    }
-
-    /**
-     * Least squares solution of A*X = B
-     *
-     * @param B A Matrix with as many rows as A and any number of columns.
-     * @return X that minimizes the two norm of Q*R*X-B.
-     * @throws IllegalArgumentException Matrix row dimensions must agree.
-     * @throws RuntimeException         Matrix is rank deficient.
-     */
-
-    public ComplexMatrixDense solve(MatrixDense B) {
-        return solve(ComplexMatrixDense.fromRealMatrix(B));
-    }
-
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -323,7 +263,7 @@ public class ComplexQRDecompositionDense extends ComplexQRDecomposition<ComplexM
             if (i > 0 && i % cols == 0) {
                 sb.append(System.lineSeparator());
             }
-            sb.append(String.format("%.4f", _data[i])).append(" ");
+            sb.append(_data[i]).append(" ");
         }
         return sb.toString();
     }

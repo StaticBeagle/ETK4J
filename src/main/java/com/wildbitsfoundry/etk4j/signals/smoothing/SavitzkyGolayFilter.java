@@ -5,7 +5,7 @@ import com.wildbitsfoundry.etk4j.math.linearalgebra.MatrixDense;
 import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
 import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 
-import java.util.Arrays;
+import java.util.Objects;
 
 
 /***
@@ -68,14 +68,12 @@ public class SavitzkyGolayFilter {
         MatrixDense A = MatrixDense.Factory.vandermonde(x, windowSize, polyOrder + 1);
         double[] coefficients = LeastSquaresSolver.solve(A, MatrixDense.Factory.identity(A.getRowCount())).getRow(0);
 
-        switch (mode) {
-            case INTERPOLATION:
-                double[] smoothed =  convolve1d(data, coefficients, windowSize, Mode.MIRROR, constant);
-                fitEdgesPolyFit(smoothed, windowSize, polyOrder, data);
-                return smoothed;
-            default:
-                return convolve1d(data, coefficients, windowSize, mode, constant);
+        if (Objects.requireNonNull(mode) == Mode.INTERPOLATION) {
+            double[] smoothed = convolve1d(data, coefficients, windowSize, Mode.MIRROR, constant);
+            fitEdgesPolyFit(smoothed, windowSize, polyOrder, data);
+            return smoothed;
         }
+        return convolve1d(data, coefficients, windowSize, mode, constant);
     }
 
     private static void fitEdgesPolyFit(double[] smoothed, int windowSize, int polyOrder, double[] data) {

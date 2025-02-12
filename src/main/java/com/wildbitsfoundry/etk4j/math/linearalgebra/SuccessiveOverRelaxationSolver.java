@@ -1,10 +1,12 @@
 package com.wildbitsfoundry.etk4j.math.linearalgebra;
 
-// TODO javadocs
+/**
+ * This class implements the SOR (Successive-Over-Relaxation) iterative method to solve a system of equations
+ */
 public class SuccessiveOverRelaxationSolver {
-    private double w;
-    private double[] b;
-    private MatrixDense A;
+    private final double w;
+    private final double[] b;
+    private final MatrixDense A;
     private int iterationLimit = 100;
     private double tol = 1e-9;
     private double[] x0 = null;
@@ -15,21 +17,40 @@ public class SuccessiveOverRelaxationSolver {
         this.w = w;
     }
 
+    /**
+     * Sets the maximum number of iterations allowed
+     * @param iterationLimit the maximum number of iterations allowed
+     * @return {@code this}
+     */
     public SuccessiveOverRelaxationSolver iterationLimit(int iterationLimit) {
         this.iterationLimit = iterationLimit;
         return this;
     }
 
+    /**
+     * Sets absolute tolerance that determines when to stop the algorithm
+     * @param tolerance the absolute tolerance
+     * @return {@code this}
+     */
     public SuccessiveOverRelaxationSolver tolerance(double tolerance) {
         this.tol = tolerance;
         return this;
     }
 
+    /**
+     * Sets the initial guess to the solution of the system of equations
+     * @param x0 the initial guess of the solutions. All zeros if not set.
+     * @return {@code this}
+     */
     public SuccessiveOverRelaxationSolver initialGuess(double[] x0) {
         this.x0 = x0;
         return this;
     }
 
+    /**
+     * Solves A * x = b
+     * @return An {@link IterativeSolverResults} with the solutions of the system A * x  = b
+     */
     public IterativeSolverResults<double[]> solve() {
         double[] x = x0 == null ? new double[b.length] : x0;
         int n = b.length;

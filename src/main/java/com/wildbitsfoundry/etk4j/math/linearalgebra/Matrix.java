@@ -84,7 +84,7 @@ public abstract class Matrix {
      *
      * @return {@code true} if the matrix is squared (same number of rows and columns) or {@code false} otherwise.
      */
-    public boolean isSquared() {
+    public boolean isSquare() {
         return rows == cols;
     }
 
@@ -120,7 +120,7 @@ public abstract class Matrix {
      * @return Array containing the diagonal of the matrix
      */
     public double[] diag() {
-        if (!this.isSquared()) {
+        if (!this.isSquare()) {
             throw new RuntimeException("Matrix is not squared");
         }
         final int dim = rows;

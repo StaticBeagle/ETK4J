@@ -108,7 +108,7 @@ public class QRDecompositionDense extends QRDecomposition<MatrixDense> {
 	}
 	
 	/**
-	 * Return the upper triangular factor
+	 * Return the upper transpose triangular factor
 	 * 
 	 * @return R
 	 */
@@ -136,7 +136,7 @@ public class QRDecompositionDense extends QRDecomposition<MatrixDense> {
 	 * @return Q
 	 */
 
-	public MatrixDense getQThin() {
+	public MatrixDense getQEconomy() {
 		MatrixDense X = new MatrixDense(rows, cols);
 		double[] Q = X.getArray();
 		for (int k = cols - 1; k >= 0; k--) {

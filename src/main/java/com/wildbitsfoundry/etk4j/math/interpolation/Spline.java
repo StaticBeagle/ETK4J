@@ -13,8 +13,9 @@ import java.util.Arrays;
 
 public abstract class Spline extends PiecewiseFunction implements DifferentiableFunction, IntegrableFunction {
 	
-	private int order;
+	private final int order;
 	private double[] _indefiniteIntegral = null;
+	protected double[] coefficients = null;
 
 	protected Spline(double[] x, int order) {
 		super(x);

@@ -1,6 +1,7 @@
 package com.wildbitsfoundry.etk4j.math.linearalgebra;
 
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
+import com.wildbitsfoundry.etk4j.signals.filters.MaximumNumberOfIterationsExceededException;
 
 /**
  * Schur implements the Schur decomposition of a matrix.  Specifically,
@@ -46,8 +47,7 @@ public class ComplexSchurDecompositionDense {
         ComplexPlaneRotationDense P = new ComplexPlaneRotationDense();
 
         if (A.getRowCount() != A.getColumnCount()) {
-//            throw new JampackException // TODO
-//                    ("Nonsquare matrix");
+            throw new NonSquareMatrixException("Matrix must be squared");
         }
 
         /* Reduce to Hessenberg form and set up T and U */
@@ -73,8 +73,7 @@ public class ComplexSchurDecompositionDense {
 
             iter = iter + 1;
             if (iter >= MAXITER) {
-//                throw new JampackException
-//                        ("Maximum number of iterations exceeded."); TODO
+                throw new MaximumNumberOfIterationsExceededException("Maximum number of iterations exceeded");
             }
             il = iu - 1;
             while (il > 1) {
