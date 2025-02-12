@@ -21,8 +21,8 @@ import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
 import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.signals.filters.MaximumNumberOfIterationsExceededException;
 
-// TODO fix javadoc
-/*
+
+/**
  * Class transforming a general real matrix to Schur form.
  * <p>A m × m matrix A can be written as the product of three matrices: A = P
  * × T × P<sup>T</sup> with P an orthogonal matrix and T an quasi-triangular

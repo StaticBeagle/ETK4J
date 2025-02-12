@@ -4,7 +4,7 @@ import com.wildbitsfoundry.etk4j.math.complex.Complex;
 
 /**
  * Rot generates and manipulates plane rotations.  Given a 2-vector
- * compontents are x and y, there is a unitary matrix P such that
+ * components are x and y, there is a unitary matrix P such that
  * <pre>
  *      P|x| =  |   c      s||x| = |z|
  *       |y|    |-conj(s)  c||y|   |0|
@@ -43,7 +43,7 @@ public class ComplexPlaneRotationDense {
      */
     public double zi;
 
-    /* // TODO fix the javadocs
+    /**
      * Given the real and imaginary parts of a 2-vector, genc returns
      * a plane rotation P such that
      * <pre>
@@ -51,10 +51,8 @@ public class ComplexPlaneRotationDense {
      *       |y|    |-conj(s)  c||y|   |0|
      * </pre>
      *
-     * @param xr The real part of the first component of the 2-vector
-     * @param xi The imaginary part of the first component of the 2-vector
-     * @param yr The real part of the second component of the 2-vector
-     * @param yi The imaginary part of the second component of the 2-vector
+     * @param x The first component of the 2-vector
+     * @param y The second component of the 2-vector
      * @return The rotation
      */
 
@@ -92,7 +90,7 @@ public class ComplexPlaneRotationDense {
         return P;
     }
 
-    /* TODO
+    /**
      * Given the real and imaginary parts of a 2-vector, genc generates
      * a plane rotation P such that
      * <pre>
@@ -100,10 +98,8 @@ public class ComplexPlaneRotationDense {
      *       |y|    |-conj(s)  c||y|   |0|
      * </pre>
      *
-     * @param xr The real part of the first component of the 2-vector
-     * @param xi The imaginary part of the first component of the 2-vector
-     * @param yr The real part of the second component of the 2-vector
-     * @param yi The imaginary part of the second component of the 2-vector
+     * @param x The first component of the 2-vector
+     * @param y The second component of the 2-vector
      * @param P  The rotation (must be initialized)
      */
 
@@ -215,13 +211,9 @@ public class ComplexPlaneRotationDense {
      */
     public static ComplexPlaneRotationDense genc(ComplexMatrixDense A, int ii1, int ii2, int jj) {
 
-        int i1 = ii1;
-        int i2 = ii2;
-        int j = jj;
-
-        ComplexPlaneRotationDense P = ComplexPlaneRotationDense.genc(A.unsafeGet(i1, j), A.unsafeGet(i2, j));
-        A.unsafeSet(i1, j, new Complex(P.zr, P.zi));
-        A.unsafeSet(i2, j, new Complex());
+        ComplexPlaneRotationDense P = ComplexPlaneRotationDense.genc(A.unsafeGet(ii1, jj), A.unsafeGet(ii2, jj));
+        A.unsafeSet(ii1, jj, new Complex(P.zr, P.zi));
+        A.unsafeSet(ii2, jj, new Complex());
         return P;
     }
 
@@ -246,7 +238,7 @@ public class ComplexPlaneRotationDense {
         A.unsafeSet(ii2, jj, new Complex());
     }
 
-    /* TODO
+    /**
      * Given the real and imaginary parts of a 2-vector, genr returns
      * a plane rotation such that
      * <pre>
@@ -254,10 +246,8 @@ public class ComplexPlaneRotationDense {
      *                    |-conj(s)  c||y|
      * </pre>
      *
-     * @param xr The real part of the first component of the 2-vector
-     * @param xi The imaginary part of the first component of the 2-vector
-     * @param yr The real part of the second component of the 2-vector
-     * @param yi The imaginary part of the second component of the 2-vector
+     * @param x The first component of the 2-vector
+     * @param y The second component of the 2-vector
      * @return The rotation
      */
 
@@ -294,7 +284,7 @@ public class ComplexPlaneRotationDense {
         return P;
     }
 
-    /* TODO
+    /**
      * Given the real and imaginary parts of a 2-vector, genr generates
      * a plane rotation such that
      * <pre>
@@ -302,13 +292,10 @@ public class ComplexPlaneRotationDense {
      *                    |-conj(s)  c||y|
      * </pre>
      *
-     * @param xr The real part of the first component of the 2-vector
-     * @param xi The imaginary part of the first component of the 2-vector
-     * @param yr The real part of the second component of the 2-vector
-     * @param yi The imaginary part of the second component of the 2-vector
+     * @param x The first component of the 2-vector
+     * @param y The second component of the 2-vector
      * @param P  The plane rotation (must be initialized)
      */
-
     public static void genr(Complex x, Complex y, ComplexPlaneRotationDense P) {
 
         double s, absx, absxy;
@@ -356,13 +343,9 @@ public class ComplexPlaneRotationDense {
 
     public static ComplexPlaneRotationDense genr(ComplexMatrixDense A, int ii, int jj1, int jj2) {
 
-        int i = ii;
-        int j1 = jj1;
-        int j2 = jj2;
-
-        ComplexPlaneRotationDense P = ComplexPlaneRotationDense.genr(A.unsafeGet(i, j1), A.unsafeGet(i, j2));
-        A.unsafeSet(i, j1, new Complex(P.zr, P.zi));
-        A.unsafeSet(i, j2, new Complex());
+        ComplexPlaneRotationDense P = ComplexPlaneRotationDense.genr(A.unsafeGet(ii, jj1), A.unsafeGet(ii, jj2));
+        A.unsafeSet(ii, jj1, new Complex(P.zr, P.zi));
+        A.unsafeSet(ii, jj2, new Complex());
         return P;
     }
 
@@ -497,19 +480,13 @@ public class ComplexPlaneRotationDense {
 
         double t1r, t1i, t2r, t2i;
 
-        int i1 = ii1;
-        int i2 = ii2;
-        int j1 = jj1;
-        int j2 = jj2;
-
-
-        for (int j = j1; j <= j2; j++) {
-            t1r = P.c * A.unsafeGet(i1, j).real() - P.sr * A.unsafeGet(i2, j).real() + P.si * A.unsafeGet(i2, j).imag();
-            t1i = P.c * A.unsafeGet(i1, j).imag() - P.sr * A.unsafeGet(i2, j).imag() - P.si * A.unsafeGet(i2, j).real();
-            t2r = P.c * A.unsafeGet(i2, j).real() + P.sr * A.unsafeGet(i1, j).real() + P.si * A.unsafeGet(i1, j).imag();
-            t2i = P.c * A.unsafeGet(i2, j).imag() + P.sr * A.unsafeGet(i1, j).imag() - P.si * A.unsafeGet(i1, j).real();
-            A.unsafeSet(i1, j, new Complex(t1r, t1i));
-            A.unsafeSet(i2, j, new Complex(t2r, t2i));
+        for (int j = jj1; j <= jj2; j++) {
+            t1r = P.c * A.unsafeGet(ii1, j).real() - P.sr * A.unsafeGet(ii2, j).real() + P.si * A.unsafeGet(ii2, j).imag();
+            t1i = P.c * A.unsafeGet(ii1, j).imag() - P.sr * A.unsafeGet(ii2, j).imag() - P.si * A.unsafeGet(ii2, j).real();
+            t2r = P.c * A.unsafeGet(ii2, j).real() + P.sr * A.unsafeGet(ii1, j).real() + P.si * A.unsafeGet(ii1, j).imag();
+            t2i = P.c * A.unsafeGet(ii2, j).imag() + P.sr * A.unsafeGet(ii1, j).imag() - P.si * A.unsafeGet(ii1, j).real();
+            A.unsafeSet(ii1, j, new Complex(t1r, t1i));
+            A.unsafeSet(ii2, j, new Complex(t2r, t2i));
         }
     }
 

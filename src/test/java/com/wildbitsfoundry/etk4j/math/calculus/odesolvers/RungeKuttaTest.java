@@ -313,4 +313,45 @@ public class RungeKuttaTest {
         assertArrayEquals(ySolution0, yValues0.stream().mapToDouble(Double::doubleValue).toArray(), 1e-12);
         assertArrayEquals(ySolution1, yValues1.stream().mapToDouble(Double::doubleValue).toArray(), 1e-12);
     }
+
+    @Test
+    public void testRungeKutta45MultipleInitialConditionsPassingInitialStep() {
+        OdeSystemOfEquations odeSystemOfEquations = (t, y) -> {
+            double dxdt = y[0] - y[1];
+            double dydt = y[0] + y[1];
+            return new double[] {dxdt, dydt};
+        };
+
+        RungeKutta rungeKutta = new RungeKutta45(odeSystemOfEquations, 0, new double[] {1, 0}, 10.0,
+                Double.POSITIVE_INFINITY, 0.001, 1.0E-6, 9.990005004983772E-4);
+
+        List<Double> tValues = new ArrayList<>();
+        List<Double> yValues0 = new ArrayList<>();
+        List<Double> yValues1 = new ArrayList<>();
+        while (rungeKutta.status != OdeSolverStatus.FINISHED) {
+            rungeKutta.step();
+            tValues.add(rungeKutta.t);
+            yValues0.add(rungeKutta.y[0]);
+            yValues1.add(rungeKutta.y[1]);
+        }
+
+        double[] tSolution = {9.990005004983772E-4, 0.010989005505482149, 0.11088905555531987, 0.6192045497806424,
+                1.382089669508035, 2.1886745264776577, 3.0409220232001117, 3.8501444997495904, 4.692302440222046,
+                5.510387390403902, 6.344081991514867, 7.1729079897274906, 7.997421142566754, 8.83984498857466,
+                9.653412819353544, 10.0};
+
+        double[] ySolution0 = {1.0009990001679976, 1.010988560732053, 1.1104087852762166, 1.5125820051873267,
+                0.7470111209360931, -5.167845858987864, -20.804657732388993, -35.64746907319375, -2.1524508872690618,
+                176.83697390542918, 567.0902130903308, 818.6482261522492, -425.9739197360036, -5744.841661123295,
+                -15126.160705018545, -18422.824726566276};
+
+        double[] ySolution1 = {9.999988348331724E-4, 0.01111020607978034, 0.12363936767105335, 1.0780116837890694,
+                3.911819597071353, 7.270270005658339, 2.0977357114784674, -30.56513520016031, -108.95380182618516,
+                -172.29763512402243, 34.85277945958623, 1011.2949360599736, 2936.0785250135714, 3798.42024655396,
+                -3532.6044379477817, -11965.423911921906};
+
+        assertArrayEquals(tSolution, tValues.stream().mapToDouble(Double::doubleValue).toArray(), 1e-12);
+        assertArrayEquals(ySolution0, yValues0.stream().mapToDouble(Double::doubleValue).toArray(), 1e-12);
+        assertArrayEquals(ySolution1, yValues1.stream().mapToDouble(Double::doubleValue).toArray(), 1e-12);
+    }
 }

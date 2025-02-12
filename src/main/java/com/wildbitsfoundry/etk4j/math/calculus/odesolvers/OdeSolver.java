@@ -29,11 +29,15 @@ public abstract class OdeSolver {
         // njev
         // nlu
     }
-// TODO test this
+
     private Double stepSize() {
         return tOld == null ? null : Math.abs(t - tOld);
     }
 
+    /**
+     * Perform one integration step.
+     * @return A String containing the status of the solver typically for failures. Null otherwise
+     */
     public String step() {
         if (this.status != OdeSolverStatus.RUNNING) {
             throw new RuntimeException("Attempt to step on a failed or finished solver.");

@@ -66,7 +66,7 @@ public abstract class RungeKutta extends OdeSolver {
             this.hAbs = selectInitialStep(systemOfEquations, this.t, this.y, tBound, maxStep, this.f,
                     this.direction, this.errorEstimatorOrder, this.rTol, this.aTol);
         } else {
-            this.hAbs = validateFirstStep(firstStep, t0, tBound); // TODO test with firstStep not null
+            this.hAbs = validateFirstStep(firstStep, t0, tBound);
         }
         this.K = new double[this.nStages + 1][this.n];
         this.errorExponent = -1.0 / (this.errorEstimatorOrder + 1);

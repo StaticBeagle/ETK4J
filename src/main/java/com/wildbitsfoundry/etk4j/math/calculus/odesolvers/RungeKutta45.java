@@ -44,6 +44,11 @@ public class RungeKutta45 extends RungeKutta {
         super(func, t0, y0, tBound, 4, 6, A, B, C, E, P);
     }
 
+    public RungeKutta45(OdeSystemOfEquations systemOfEquations, double t0, double[] y0, int tBound, double maxStep,
+                        double rTol, double aTol, Double firstStep) {
+        this(systemOfEquations, t0, y0, 1.0 * tBound, maxStep, rTol, aTol, firstStep);
+    }
+
     public RungeKutta45(OdeSystemOfEquations systemOfEquations, double t0, double[] y0, Double tBound, double maxStep,
                         double rTol, double aTol, Double firstStep) {
         super(systemOfEquations, t0, y0, tBound, maxStep, rTol, aTol, firstStep, 4, 6, A, B, C, E, P);

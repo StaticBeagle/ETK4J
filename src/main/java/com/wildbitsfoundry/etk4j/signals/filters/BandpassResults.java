@@ -1,9 +1,9 @@
 package com.wildbitsfoundry.etk4j.signals.filters;
 
 public class BandpassResults {
-    private int n;
-    private double wn0;
-    private double wn1;
+    private final int n;
+    private final double wn0;
+    private final double wn1;
 
     BandpassResults(int n, double wn0, double wn1) {
         this.n = n;
