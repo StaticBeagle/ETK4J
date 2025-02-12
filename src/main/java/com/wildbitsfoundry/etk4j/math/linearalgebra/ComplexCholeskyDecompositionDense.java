@@ -2,8 +2,8 @@ package com.wildbitsfoundry.etk4j.math.linearalgebra;
 
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
 
-import static com.wildbitsfoundry.etk4j.math.linearalgebra.ComplexQRDecompositionDense.backSubstitutionSolve;
-import static com.wildbitsfoundry.etk4j.math.linearalgebra.ComplexQRDecompositionDense.forwardSubstitutionSolve;
+import static com.wildbitsfoundry.etk4j.math.linearalgebra.ComplexTriangularSolverDense.backSubstitutionSolve;
+import static com.wildbitsfoundry.etk4j.math.linearalgebra.ComplexTriangularSolverDense.forwardSubstitutionSolve;
 
 public class ComplexCholeskyDecompositionDense extends ComplexCholeskyDecomposition<ComplexMatrixDense> {
 

@@ -5,6 +5,7 @@ import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 
 import java.util.Arrays;
 
+import static com.wildbitsfoundry.etk4j.math.linearalgebra.ComplexTriangularSolverDense.backSubstitutionSolve;
 import static com.wildbitsfoundry.etk4j.util.ComplexArrays.zeros;
 
 /***
@@ -192,7 +193,7 @@ public class ComplexQRDecompositionDense extends ComplexQRDecomposition<ComplexM
     }
 
     private static void setColumn(ComplexMatrixDense A, Complex[] values, int col, int startingRow) {
-        for (int i = 0; i < A.getRowCount() - startingRow; i++) { // TODO could be endRow - startingRow if we pass a param
+        for (int i = 0; i < A.getRowCount() - startingRow; i++) {
             A.set(i + startingRow, col, values[i]);
         }
     }
@@ -213,7 +214,6 @@ public class ComplexQRDecompositionDense extends ComplexQRDecomposition<ComplexM
                 A.set(i, j, values[i - row0][j - col0]);
             }
         }
-        // TODO check for row0 == row1
     }
 
     /*
@@ -221,11 +221,10 @@ public class ComplexQRDecompositionDense extends ComplexQRDecomposition<ComplexM
     % Z = house_apply(U,X), with U from house_qr
     % computes Q*X without actually computing Q.
      */
-    public static ComplexMatrixDense houseApply(ComplexMatrixDense U, ComplexMatrixDense X) {
+    private static ComplexMatrixDense houseApply(ComplexMatrixDense U, ComplexMatrixDense X) {
         ComplexMatrixDense Z = X.copy();
         int n = U.getColumnCount();
         Complex[][] H = new Complex[X.getRowCount()][X.getColumnCount()];
-        // TODO temporary 2D array method
         for (int i = 0; i < Z.getRowCount(); i++) {
             for (int j = 0; j < Z.getColumnCount(); j++) {
                 H[i][j] = Z.unsafeGet(i, j);
@@ -242,11 +241,10 @@ public class ComplexQRDecompositionDense extends ComplexQRDecomposition<ComplexM
     % Z = house_apply(U,X), with U from house_qr
     % computes Q'*X without actually computing Q'.
      */
-    public static ComplexMatrixDense houseApplyTranspose(ComplexMatrixDense U, ComplexMatrixDense X) {
+    private static ComplexMatrixDense houseApplyTranspose(ComplexMatrixDense U, ComplexMatrixDense X) {
         ComplexMatrixDense Z = X.copy();
         int n = U.getColumnCount();
         Complex[][] H = new Complex[X.getRowCount()][X.getColumnCount()];
-        // TODO temporary 2D array method
         for (int i = 0; i < Z.getRowCount(); i++) {
             for (int j = 0; j < Z.getColumnCount(); j++) {
                 H[i][j] = Z.unsafeGet(i, j);
@@ -256,40 +254,6 @@ public class ComplexQRDecompositionDense extends ComplexQRDecomposition<ComplexM
             H = calculateReflector(getColumn(U, i), H);
         }
         return new ComplexMatrixDense(H);
-    }
-
-    public static ComplexMatrixDense backSubstitutionSolve(ComplexMatrixDense R, ComplexMatrixDense B) {
-        int n = R.getRowCount();
-        int m = B.getColumnCount();
-
-        Complex[][] X = zeros(n, m);
-        for (int col = 0; col < m; col++) {
-            for (int i = n - 1; i >= 0; i--) {
-                X[i][col] = B.get(i, col);
-                for (int j = i + 1; j < n; j++) {
-                    X[i][col].subtractEquals(R.get(i, j).multiply(X[j][col]));
-                }
-                X[i][col].divideEquals(R.get(i, i));
-            }
-        }
-        return new ComplexMatrixDense(X);
-    }
-
-    public static ComplexMatrixDense forwardSubstitutionSolve(ComplexMatrixDense R, ComplexMatrixDense B) {
-        int n = R.getRowCount();
-        int m = B.getColumnCount();
-
-        Complex[][] X = zeros(n, m);
-        for (int col = 0; col < m; col++) {
-            for (int i = 0; i < n; i++) {
-                X[i][col] = B.get(i, col);
-                for (int j = 0; j < i; j++) {
-                    X[i][col].subtractEquals(R.get(i, j).multiply(X[j][col]));
-                }
-                X[i][col].divideEquals(R.get(i, i));
-            }
-        }
-        return new ComplexMatrixDense(X);
     }
 
     @Override
