@@ -216,6 +216,9 @@ public class MatrixSparse extends Matrix {
      */
     public MatrixSparse solve(double[] b) {
         double[][] matrix = new double[b.length][1];
+        for(int i = 0; i < b.length; i++) {
+            matrix[i][0] = b[i];
+        }
         return solve(from2DArray(matrix));
     }
 

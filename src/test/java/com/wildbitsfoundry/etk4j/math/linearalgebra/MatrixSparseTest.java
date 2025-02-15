@@ -128,6 +128,20 @@ public class MatrixSparseTest {
     }
 
     @Test
+    public void testSolveArrayRHS() {
+        double[][] matrix = {
+                {1, 4, 7},
+                {2, 5, 8},
+                {3, 6, 10},
+        };
+        MatrixSparse sparseCSC = MatrixSparse.from2DArray(matrix, ConstantsETK.DOUBLE_EPS);
+        double[] b = {1, 2, 0};
+        MatrixSparse solution = sparseCSC.solve(b);
+        assertArrayEquals(new double[]{-2, 6.000000000000005, -3.0000000000000027}, new double[]{solution.get(0, 0),
+                solution.get(1, 0), solution.get(2, 0)}, 1e-12);
+    }
+
+    @Test
     public void testLUDecompositionSparseMatrixRHS() {
         double[][] matrix = {
                 {1, 4, 7},

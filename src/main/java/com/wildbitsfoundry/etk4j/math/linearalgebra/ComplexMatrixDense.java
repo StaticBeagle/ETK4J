@@ -126,6 +126,29 @@ public class ComplexMatrixDense extends ComplexMatrix {
         return new ComplexCholeskyDecompositionDense(this);
     }
 
+    public ComplexSingularValueDecompositionDense SVD() {
+        return new ComplexSingularValueDecompositionDense(this);
+    }
+
+    /**
+     * Eigenvalue decomposition. The {@link Matrix} is balanced ({@link MatrixDense#balance()}) prior to the decomposition.
+     *
+     * @return The {@link EigenvalueDecompositionDense} of the {@code Matrix}.
+     */
+    public ComplexEigenvalueDecompositionDense eig() {
+        return new ComplexEigenvalueDecompositionDense(this);
+    }
+
+    /**
+     * Schur Decomposition of the {@code Matrix}.
+     *
+     * @return The {@link SchurDecompositionDense} of the {@code Matrix}.
+     * @see <a href="https://en.wikipedia.org/wiki/Schur_decomposition">Schur Decomposition</a>
+     */
+    public ComplexSchurDecompositionDense Schur() {
+        return new ComplexSchurDecompositionDense(this);
+    }
+
     public Complex[] getArray() {
         return this.data;
     }
@@ -512,10 +535,6 @@ public class ComplexMatrixDense extends ComplexMatrix {
             }
         } while (!converged);
         return new ComplexMatrixDense(data, rows, cols);
-    }
-
-    public ComplexSingularValueDecompositionDense SVD() {
-        return new ComplexSingularValueDecompositionDense(this);
     }
 
     public ComplexMatrixDense pinv() {
