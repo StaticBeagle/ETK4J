@@ -112,13 +112,18 @@ public class ComplexMatrixDense extends ComplexMatrix {
     }
 
     @Override
-    public ComplexLUDecomposition<?> LU() {
-        return null;
+    public ComplexLUDecompositionDense LU() {
+        return new ComplexLUDecompositionDense(this);
     }
 
     @Override
-    public ComplexQRDecomposition<?> QR() {
-        return null;
+    public ComplexQRDecompositionDense QR() {
+        return new ComplexQRDecompositionDense(this);
+    }
+
+    @Override
+    public ComplexCholeskyDecompositionDense Chol() {
+        return new ComplexCholeskyDecompositionDense(this);
     }
 
     public Complex[] getArray() {
@@ -285,7 +290,7 @@ public class ComplexMatrixDense extends ComplexMatrix {
     }
 
     public ComplexMatrixDense inv() {
-        return this.solve(MatrixDense.Factory.identity(rows));
+        return this.solve(ComplexMatrixDense.Factory.identity(rows));
     }
 
     // region solve

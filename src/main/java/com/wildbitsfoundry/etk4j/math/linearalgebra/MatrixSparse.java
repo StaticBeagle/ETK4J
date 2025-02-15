@@ -63,7 +63,8 @@ public class MatrixSparse extends Matrix {
 
     public MatrixSparse(MatrixSparse original) {
         this(original.rows, original.cols, original.nz_length);
-
+        nz_values = original.nz_values;
+        nz_rows = original.nz_rows;
         setTo(original);
     }
 
@@ -76,14 +77,13 @@ public class MatrixSparse extends Matrix {
     }
 
     public void setTo(MatrixSparse original) {
-        MatrixSparse o = original;
-        reshape(o.rows, o.cols, o.nz_length);
-        this.nz_length = o.nz_length;
+        reshape(original.rows, original.cols, original.nz_length);
+        this.nz_length = original.nz_length;
 
-        System.arraycopy(o.nz_values, 0, nz_values, 0, nz_length);
-        System.arraycopy(o.nz_rows, 0, nz_rows, 0, nz_length);
-        System.arraycopy(o.col_idx, 0, col_idx, 0, cols + 1);
-        this.indicesSorted = o.indicesSorted;
+        System.arraycopy(original.nz_values, 0, nz_values, 0, nz_length);
+        System.arraycopy(original.nz_rows, 0, nz_rows, 0, nz_length);
+        System.arraycopy(original.col_idx, 0, col_idx, 0, cols + 1);
+        this.indicesSorted = original.indicesSorted;
     }
 
 //    public void print() {
@@ -182,6 +182,43 @@ public class MatrixSparse extends Matrix {
         unsafeSet(row, col, val);
     }
 
+    /**
+     * Solve system of linear equations. Three different algorithms are used depending on the shape of the matrix:
+     * <pre>
+     *     LU Decomposition if the matrix is squared.
+     *     QR if the matrix is thin in other words it has more rows than columns. (Overdetermined system)
+     *     Pseudo inverse * b if the matrix is short and wide in other words it has more columns than rows. (Under-determined system)
+     * </pre>
+     *
+     * @param b The solution {@link Matrix}.
+     * @return The solution to {@code Ax = b}
+     */
+    public MatrixSparse solve(MatrixSparse b) {
+        if (rows == cols) { // Matrix is Squared
+            return new LUDecompositionSparse(this).solve(b);
+        } else if (rows > cols) { // Matrix is tall and narrow (Overdetermined system)
+            return new QRDecompositionSparse(this).solve(b);
+        } else { // Matrix is short and wide (Under-determined system)
+            throw new UnsupportedOperationException("This operation is not supported for system with more columns than rows");
+        }
+    }
+
+    /**
+     * Solve system of linear equations. Three different algorithms are used depending on the shape of the matrix:
+     * <pre>
+     *     LU Decomposition if the matrix is squared.
+     *     QR if the matrix is thin in other words it has more rows than columns. (Overdetermined system)
+     *     Pseudo inverse * b if the matrix is short and wide in other words it has more columns than rows. (Under-determined system)
+     * </pre>
+     *
+     * @param b The solution {@link Matrix}.
+     * @return The solution to {@code Ax = b}
+     */
+    public MatrixSparse solve(double[] b) {
+        double[][] matrix = new double[b.length][1];
+        return solve(from2DArray(matrix));
+    }
+
     @Override
     public double det() {
         throw new UnsupportedOperationException("Not implemented yet");
@@ -198,9 +235,7 @@ public class MatrixSparse extends Matrix {
     }
 
     @Override
-    public CholeskyDecompositionSparse Chol() {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
+    public CholeskyDecompositionSparse Chol() { return new CholeskyDecompositionSparse(this); }
 
     @Override
     public boolean isEmpty() {
