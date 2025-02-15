@@ -123,7 +123,7 @@ public class ComplexLUDecompositionDense extends ComplexLUDecomposition<ComplexM
 
 	@Override
 	public ComplexMatrix solve(double[] b) {
-		return null;
+		return solve(ComplexMatrixDense.fromRealMatrix(new MatrixDense(b, b.length)));
 	}
 
 	/**
