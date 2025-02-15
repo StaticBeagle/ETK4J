@@ -4,16 +4,15 @@ import com.wildbitsfoundry.etk4j.math.complex.Complex;
 
 import java.util.Arrays;
 
-public class ComplexLUDecompositionDense {
+public class ComplexLUDecompositionDense extends ComplexLUDecomposition<ComplexMatrix> {
 	protected Complex[] _data;
-	protected final int _rows;
-	protected final int _cols;
 
 	protected int _pivotsign = 1;
 	protected int[] _pivot;
 
 	public ComplexLUDecompositionDense(ComplexMatrixDense matrix) {
-		final int rows = matrix.getRowCount();
+        super(matrix);
+        final int rows = matrix.getRowCount();
 		final int cols = matrix.getColumnCount();
 		Complex[] data = matrix.getArrayCopy();
 
@@ -67,18 +66,18 @@ public class ComplexLUDecompositionDense {
 			}
 		}
 		_data = data;
-		_rows = rows;
-		_cols = cols;
 	}
 
-	public boolean isNonSingular() {
-		for (int j = 0; j < _cols; ++j) {
-			if (_data[j * _cols + j].equals(new Complex())) {
-				return false;
+	@Override
+	public boolean isSingular() {
+		for (int j = 0; j < cols; ++j) {
+			if (_data[j * cols + j].equals(new Complex())) {
+				return true;
 			}
 		}
-		return true;
+		return false;
 	}
+
 
 	/**
 	 * Return lower triangular factor
@@ -87,8 +86,6 @@ public class ComplexLUDecompositionDense {
 	 */
 
 	public ComplexMatrixDense getL() {
-		final int rows = _rows;
-		final int cols = _cols;
 		Complex[] L = new Complex[rows * cols];
 		for (int i = 0; i < rows; ++i) {
 			for (int j = 0; j < cols; ++j) {
@@ -111,8 +108,6 @@ public class ComplexLUDecompositionDense {
 	 */
 
 	public ComplexMatrixDense getU() {
-		final int rows = _rows;
-		final int cols = _cols;
 		Complex[] U = new Complex[rows * cols];
 		for (int i = 0; i < cols; i++) {
 			for (int j = 0; j < cols; j++) {
@@ -124,6 +119,11 @@ public class ComplexLUDecompositionDense {
 			}
 		}
 		return new ComplexMatrixDense(U, rows, cols);
+	}
+
+	@Override
+	public ComplexMatrix solve(double[] b) {
+		return solve(ComplexMatrixDense.fromRealMatrix(new MatrixDense(b, b.length)));
 	}
 
 	/**
@@ -143,7 +143,6 @@ public class ComplexLUDecompositionDense {
 	 */
 
 	public double[] getPivotAsDouble() {
-		final int rows = _rows;
 		double[] vals = new double[rows];
 		for (int i = 0; i < rows; i++) {
 			vals[i] = (double) _pivot[i];
@@ -152,12 +151,12 @@ public class ComplexLUDecompositionDense {
 	}
 
 	public Complex det() {
-		if (_rows != _cols) {
+		if (rows != cols) {
 			throw new IllegalArgumentException("Matrix must be square.");
 		}
 		Complex det = Complex.fromReal(_pivotsign);
-		for (int i = 0; i < _cols; i++) {
-			det.multiplyEquals(this._data[i * _cols + i]);
+		for (int i = 0; i < cols; i++) {
+			det.multiplyEquals(this._data[i * cols + i]);
 		}
 		return det;
 	}
@@ -190,10 +189,10 @@ public class ComplexLUDecompositionDense {
 	 *                Matrix is singular.
 	 */
 	public ComplexMatrixDense solve(ComplexMatrixDense B) {
-		if (B.getRowCount() != _rows) {
+		if (B.getRowCount() != rows) {
 			throw new IllegalArgumentException("Matrix row dimensions must agree.");
 		}
-		if (!this.isNonSingular()) {
+		if (this.isSingular()) {
 			throw new RuntimeException("Matrix is singular.");
 		}
 
@@ -201,8 +200,6 @@ public class ComplexLUDecompositionDense {
 		int nx = B.getColumnCount();
 		ComplexMatrixDense Xmat = B.subMatrix(_pivot, 0, nx - 1);
 		Complex[] X = Xmat.getArray();
-
-		final int cols = _cols;
 
 		// Solve L * Y = B(_pivot,:)
 		for (int k = 0; k < cols; ++k) {
@@ -229,8 +226,8 @@ public class ComplexLUDecompositionDense {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < _rows * _cols; ++i) {
-			if (i > 0 && i % _cols == 0) {
+		for (int i = 0; i < rows * cols; ++i) {
+			if (i > 0 && i % cols == 0) {
 				sb.append(System.lineSeparator());
 			}
 			sb.append(String.format("%.4f", _data[i])).append(" ");

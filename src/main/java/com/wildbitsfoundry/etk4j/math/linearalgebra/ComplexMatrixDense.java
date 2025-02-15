@@ -112,13 +112,41 @@ public class ComplexMatrixDense extends ComplexMatrix {
     }
 
     @Override
-    public ComplexLUDecomposition<?> LU() {
-        return null;
+    public ComplexLUDecompositionDense LU() {
+        return new ComplexLUDecompositionDense(this);
     }
 
     @Override
-    public ComplexQRDecomposition<?> QR() {
-        return null;
+    public ComplexQRDecompositionDense QR() {
+        return new ComplexQRDecompositionDense(this);
+    }
+
+    @Override
+    public ComplexCholeskyDecompositionDense Chol() {
+        return new ComplexCholeskyDecompositionDense(this);
+    }
+
+    public ComplexSingularValueDecompositionDense SVD() {
+        return new ComplexSingularValueDecompositionDense(this);
+    }
+
+    /**
+     * Eigenvalue decomposition. The {@link Matrix} is balanced ({@link MatrixDense#balance()}) prior to the decomposition.
+     *
+     * @return The {@link EigenvalueDecompositionDense} of the {@code Matrix}.
+     */
+    public ComplexEigenvalueDecompositionDense eig() {
+        return new ComplexEigenvalueDecompositionDense(this);
+    }
+
+    /**
+     * Schur Decomposition of the {@code Matrix}.
+     *
+     * @return The {@link SchurDecompositionDense} of the {@code Matrix}.
+     * @see <a href="https://en.wikipedia.org/wiki/Schur_decomposition">Schur Decomposition</a>
+     */
+    public ComplexSchurDecompositionDense Schur() {
+        return new ComplexSchurDecompositionDense(this);
     }
 
     public Complex[] getArray() {
@@ -285,7 +313,7 @@ public class ComplexMatrixDense extends ComplexMatrix {
     }
 
     public ComplexMatrixDense inv() {
-        return this.solve(MatrixDense.Factory.identity(rows));
+        return this.solve(ComplexMatrixDense.Factory.identity(rows));
     }
 
     // region solve
@@ -507,10 +535,6 @@ public class ComplexMatrixDense extends ComplexMatrix {
             }
         } while (!converged);
         return new ComplexMatrixDense(data, rows, cols);
-    }
-
-    public ComplexSingularValueDecompositionDense SVD() {
-        return new ComplexSingularValueDecompositionDense(this);
     }
 
     public ComplexMatrixDense pinv() {

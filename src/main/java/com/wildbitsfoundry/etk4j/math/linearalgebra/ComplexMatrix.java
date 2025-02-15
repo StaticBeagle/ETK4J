@@ -113,7 +113,7 @@ public abstract class ComplexMatrix {
      * @return The {@link CholeskyDecompositionDense} of the {@code Matrix}.
      * @see <a href="https://en.wikipedia.org/wiki/Cholesky_decomposition">Cholesky Decomposition</a>
      */
-    //public abstract ComplexCholeskyDecomposition<?> Chol();
+    public abstract ComplexCholeskyDecomposition<?> Chol();
     // endregion
 
     /***

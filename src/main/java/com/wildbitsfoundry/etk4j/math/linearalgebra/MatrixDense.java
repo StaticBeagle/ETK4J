@@ -530,6 +530,16 @@ public class MatrixDense extends Matrix {
     public SingularValueDecompositionDense SVD() {
         return new SingularValueDecompositionDense(this);
     }
+
+    /**
+     * Schur Decomposition of the {@code Matrix}.
+     *
+     * @return The {@link SchurDecompositionDense} of the {@code Matrix}.
+     * @see <a href="https://en.wikipedia.org/wiki/Schur_decomposition">Schur Decomposition</a>
+     */
+    public SchurDecompositionDense Schur() {
+        return new SchurDecompositionDense(this);
+    }
     // endregion
 
     /***
