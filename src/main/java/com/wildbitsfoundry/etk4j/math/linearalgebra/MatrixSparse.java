@@ -118,6 +118,21 @@ public class MatrixSparse extends Matrix {
         return result;
     }
 
+    public double[] getArrayDense() {
+        double[] result = new double[rows * cols];
+        for (int col = 0; col < cols; col++) {
+            int start = col_idx[col];
+            int end = col_idx[col + 1];
+            for (int idx = start; idx < end; idx++) {
+                int row = nz_rows[idx];
+                double value = nz_values[idx];
+                result[row * cols + col] = value;
+            }
+        }
+        return result;
+    }
+
+
     public boolean isAssigned(int row, int col) {
         return nz_index(row, col) >= 0;
     }
