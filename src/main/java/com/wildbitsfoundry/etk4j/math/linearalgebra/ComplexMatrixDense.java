@@ -333,6 +333,10 @@ public class ComplexMatrixDense extends ComplexMatrix {
         }
     }
 
+    public ComplexMatrixDense solve(Complex[] b) {
+        return solve(new ComplexMatrixDense(b, b.length));
+    }
+
     // endregion
 
     @Override
@@ -574,6 +578,52 @@ public class ComplexMatrixDense extends ComplexMatrix {
             }
         }
         return new ComplexMatrixDense(inverse);
+    }
+
+    /**
+     * Retrieve a row.
+     *
+     * @param row The index of the column to retrieve.
+     * @return The values of the row at the specified index.
+     */
+    public Complex[] getRow(int row) {
+        Complex[] result = new Complex[cols];
+        int rowIndex = row * cols;
+        System.arraycopy(data, rowIndex, result, 0, cols);
+        return result;
+    }
+
+    /**
+     * Set a row to a predefined set of values.
+     *
+     * @param i   The index of the row to set.
+     * @param row The values to set.
+     */
+    public void setRow(int i, Complex[] row) {
+        if (i < 0 || i >= rows) {
+            throw new IndexOutOfBoundsException("The row index i is out of bounds, it must be greater than zero and less than the number of rows.");
+        }
+        if (row.length != cols) {
+            throw new IllegalArgumentException("The length of the row cannot be greater than the number of columns.");
+        }
+        System.arraycopy(row, 0, data, i * cols, cols);
+    }
+
+    /**
+     * Retrieve a column.
+     *
+     * @param col The index of the column to retrieve.
+     * @return The values of the column at the specified index.
+     */
+    public Complex[] getCol(int col) {
+        if (col < 0 || col >= cols) {
+            throw new IllegalArgumentException("The column index col must be greater than zero and less than the number of columns.");
+        }
+        Complex[] result = new Complex[rows];
+        for (int i = 0; i < rows; ++i) {
+            result[i] = data[i * rows + col];
+        }
+        return result;
     }
 
     public static final class Factory {

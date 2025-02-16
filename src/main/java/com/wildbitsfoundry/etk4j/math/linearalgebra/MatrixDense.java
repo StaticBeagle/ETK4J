@@ -1159,24 +1159,6 @@ public class MatrixDense extends Matrix {
     }
 
     /**
-     * Number of rows.
-     *
-     * @return The number of rows of the {@code Matrix}.
-     */
-    public int getRowCount() {
-        return rows;
-    }
-
-    /**
-     * Number of columns.
-     *
-     * @return The number of columns of the {@code Matrix}.
-     */
-    public int getColumnCount() {
-        return cols;
-    }
-
-    /**
      * Retrieve a row.
      *
      * @param row The index of the column to retrieve.
@@ -1185,7 +1167,7 @@ public class MatrixDense extends Matrix {
     public double[] getRow(int row) {
         double[] result = new double[cols];
         int rowIndex = row * cols;
-        System.arraycopy(data, rowIndex + 0, result, 0, cols);
+        System.arraycopy(data, rowIndex, result, 0, cols);
         return result;
     }
 

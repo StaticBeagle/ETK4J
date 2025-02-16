@@ -121,7 +121,7 @@ public class ComplexMatrixTest {
     }
 
     @Test
-    public void testSolve() {
+    public void testSolveQR() {
         Complex[] x = {new Complex(1, 1), new Complex(2, 2)};
         Complex[] u = {new Complex(3, 3), new Complex(4, 4)};
 
@@ -271,5 +271,43 @@ public class ComplexMatrixTest {
                 new Complex(-0.0018998860419538865, -0.002784104098995203), new Complex(-0.0016404826783108246, -3.750688769298307E-4), new Complex(0.010151354796239605, 0.005957299401032975), new Complex(-0.0035784315548526803, -0.0024834440642732356)
         };
         assertArrayEquals(expected, A.getArray());
+    }
+
+    @Test
+    public void testSolve() {
+        Complex[][] matrix = {
+                {new Complex(65, 24), new Complex(35, 55), new Complex(40, 89), new Complex(69, 64)},
+                {new Complex(99, 66), new Complex(64, 87), new Complex(37, 27), new Complex(2, 32)},
+                {new Complex(39, 50), new Complex(48, 45), new Complex(35, 69), new Complex(90, 3)},
+                {new Complex(30, 82), new Complex(93, 40), new Complex(87, 99), new Complex(17, 44)}
+        };
+        Complex[] b = {new Complex(1, 2), new Complex(3, 4), new Complex(5, 6), new Complex(7, 8)};
+
+        Complex[] expected = {new Complex(0.039062834753859396, -0.07062861669583378), new Complex(0.045098436059981165, 0.08402851766910853),
+                new Complex(-0.01902425727836671, -0.02045917156258777), new Complex(0.01007865883404065, 0.03041205136693267)};
+        ComplexMatrixDense A = ComplexMatrixDense.from2DArray(matrix);
+        ComplexMatrixDense solution = A.solve(b);
+        assertArrayEquals(expected, solution.getArray());
+    }
+
+    @Test
+    public void testGaussianEliminationSolver() {
+        Complex[][] matrix = {
+                {new Complex(65, 24), new Complex(35, 55), new Complex(40, 89), new Complex(69, 64)},
+                {new Complex(99, 66), new Complex(64, 87), new Complex(37, 27), new Complex(2, 32)},
+                {new Complex(39, 50), new Complex(48, 45), new Complex(35, 69), new Complex(90, 3)},
+                {new Complex(30, 82), new Complex(93, 40), new Complex(87, 99), new Complex(17, 44)}
+        };
+        Complex[] b = {new Complex(1, 2), new Complex(3, 4), new Complex(5, 6), new Complex(7, 8)};
+
+        ComplexMatrixDense A = ComplexMatrixDense.from2DArray(matrix);
+        Complex[] solution = ComplexGaussianEliminationSolver.solve(A, b);
+        Complex[] expected = {new Complex(0.039062834753859396, -0.07062861669583378), new Complex(0.045098436059981165, 0.08402851766910853),
+                new Complex(-0.01902425727836671, -0.02045917156258777), new Complex(0.01007865883404065, 0.03041205136693267)};
+        boolean isClose = true;
+        for(int i = 0; i < expected.length; i++) {
+            isClose &= expected[i].isClose(solution[i], 1e-12);
+        }
+        assertTrue(isClose);
     }
 }

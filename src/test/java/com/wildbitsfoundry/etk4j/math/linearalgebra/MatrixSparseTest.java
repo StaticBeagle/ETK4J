@@ -113,6 +113,13 @@ public class MatrixSparseTest {
     }
 
     @Test
+    public void testGetArrayDense() {
+        MatrixSparse identity = MatrixSparse.Factory.identity(4);
+        double[] expected = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
+        assertArrayEquals(expected, identity.getArrayDense(), 1e-12);
+    }
+
+    @Test
     public void testLUDecomposition() {
         double[][] matrix = {
                 {1, 4, 7},
