@@ -118,6 +118,21 @@ public class MatrixSparse extends Matrix {
         return result;
     }
 
+    public double[] getArrayDense() {
+        double[] result = new double[rows * cols];
+        for (int col = 0; col < cols; col++) {
+            int start = col_idx[col];
+            int end = col_idx[col + 1];
+            for (int idx = start; idx < end; idx++) {
+                int row = nz_rows[idx];
+                double value = nz_values[idx];
+                result[row * cols + col] = value;
+            }
+        }
+        return result;
+    }
+
+
     public boolean isAssigned(int row, int col) {
         return nz_index(row, col) >= 0;
     }
@@ -187,7 +202,7 @@ public class MatrixSparse extends Matrix {
      * <pre>
      *     LU Decomposition if the matrix is squared.
      *     QR if the matrix is thin in other words it has more rows than columns. (Overdetermined system)
-     *     Pseudo inverse * b if the matrix is short and wide in other words it has more columns than rows. (Under-determined system)
+     *     Not supported if the matrix is short and wide in other words it has more columns than rows. (Under-determined system)
      * </pre>
      *
      * @param b The solution {@link Matrix}.
@@ -243,6 +258,15 @@ public class MatrixSparse extends Matrix {
     @Override
     public boolean isEmpty() {
         return rows == 0 && cols == 0;
+    }
+
+    /**
+     * Inverse of the {@code Matrix}.
+     *
+     * @return {@code A<sup>-1</sup>}.
+     */
+    public MatrixSparse inv() {
+        return this.solve(MatrixSparse.Factory.identity(rows));
     }
 
     @Override
@@ -801,5 +825,36 @@ public class MatrixSparse extends Matrix {
             }
         }
         return matrixDense;
+    }
+
+    public static class Factory {
+        private Factory() {}
+
+        /**
+         * Identity {@code Matrix}.
+         * @param rows The number of rows.
+         * @param cols The number of columns.
+         * @return {@code identity(rows, cols)}.
+         */
+        public static MatrixSparse identity(int rows, int cols) {
+            MatrixSparse identity = new MatrixSparse(rows, cols);
+            for (int i = 0; i < rows; ++i) {
+                for (int j = 0; j < cols; ++j) {
+                    if (i == j) {
+                        identity.unsafeSet(i, j, 1);
+                    }
+                }
+            }
+            return identity;
+        }
+
+        /**
+         * Identity {@code Matrix.}
+         * @param n The number of rows and columns.
+         * @return {@code identity(n, n)}.
+         */
+        public static MatrixSparse identity(int n) {
+            return Factory.identity(n, n);
+        }
     }
 }
