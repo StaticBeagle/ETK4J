@@ -827,6 +827,11 @@ public class MatrixSparse extends Matrix {
         return matrixDense;
     }
 
+    @Override
+    public String toString() {
+        return toDense().toString().replaceAll("0.000", "");
+    }
+
     public static class Factory {
         private Factory() {}
 
