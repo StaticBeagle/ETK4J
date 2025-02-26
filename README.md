@@ -36,12 +36,12 @@ Maven
 <dependency>
     <groupId>com.wildbitsfoundry</groupId>
     <artifactId>etk4j</artifactId>
-    <version>2.2.1</version>
+    <version>2.2.2</version>
 </dependency>
 ```
 Gradle
 ```bash
-implementation 'com.wildbitsfoundry:etk4j:2.2.1'
+implementation 'com.wildbitsfoundry:etk4j:2.2.2'
 ```
 
 Requirements

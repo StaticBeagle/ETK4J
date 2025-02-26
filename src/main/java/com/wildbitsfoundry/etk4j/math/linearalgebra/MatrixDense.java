@@ -1030,7 +1030,7 @@ public class MatrixDense extends Matrix {
             if (i > 0 && i % cols == 0) {
                 sb.append(System.lineSeparator());
             }
-            sb.append(String.format("%.4g", data[i])).append(" ");
+            sb.append(String.format("%-10.4g", data[i])).append(" ");
         }
         sb.setLength(sb.length() - 1);
         return sb.toString();

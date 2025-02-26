@@ -478,30 +478,19 @@ public class MatrixSparse extends Matrix {
     }
 
     public static MatrixSparse from2DArray(double[][] array, double tol) {
-        int nonzero = 0;
-        for (int i = 0; i != array.length; i++)
-            for (int j = 0; j != array[i].length; j++) {
-                if (array[i][j] != 0) {
-                    nonzero++;
-                }
-            }
-        MatrixSparse dst = new MatrixSparse(array.length, array.length, nonzero);
-        dst.nz_length = 0;
-        dst.col_idx[0] = 0;
-        int i, j;
-        for (i = 0; i != array[0].length; i++) {
-            for (j = 0; j != array.length; j++) {
-                double value = array[j][i];
-                if (Math.abs(value) > tol) {
-                    dst.nz_rows[dst.nz_length] = j;
-                    dst.nz_values[dst.nz_length] = value;
-                    ++dst.nz_length;
-                }
-            }
-            dst.col_idx[i + 1] = dst.nz_length;
-        }
+        int rows = array.length;
+        int cols = array[0].length;
 
-        return dst;
+        MatrixSparse matrixSparse = new MatrixSparse(rows, cols);
+
+        for(int i = 0; i < rows; i++) {
+            for(int j = 0; j < cols; j++) {
+                if(Math.abs(array[i][j]) > tol) {
+                    matrixSparse.unsafeSet(i, j, array[i][j]);
+                }
+            }
+        }
+        return matrixSparse;
     }
 
     /**
@@ -825,6 +814,13 @@ public class MatrixSparse extends Matrix {
             }
         }
         return matrixDense;
+    }
+
+    @Override
+    public String toString() {
+        return toDense().toString()
+                .replaceAll(" {6}0.000 {6}", "                 ")
+                .replaceAll("0.000 {6}", "           ");
     }
 
     public static class Factory {

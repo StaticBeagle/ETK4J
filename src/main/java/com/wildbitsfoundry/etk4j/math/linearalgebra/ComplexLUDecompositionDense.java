@@ -71,7 +71,7 @@ public class ComplexLUDecompositionDense extends ComplexLUDecomposition<ComplexM
 	@Override
 	public boolean isSingular() {
 		for (int j = 0; j < cols; ++j) {
-			if (_data[j * cols + j].equals(new Complex())) {
+			if (_data[j * cols + j].abs() == 0) {
 				return true;
 			}
 		}
