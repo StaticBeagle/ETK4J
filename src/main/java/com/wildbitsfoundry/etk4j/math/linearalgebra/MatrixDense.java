@@ -1316,6 +1316,14 @@ public class MatrixDense extends Matrix {
         }
     }
 
+    public MatrixSparse toSparse(double tol) {
+        return MatrixSparse.from2DArray(getAs2DArray(), tol);
+    }
+
+    public MatrixSparse toSparse() {
+        return MatrixSparse.from2DArray(getAs2DArray());
+    }
+
     /**
      * Set a row to a predefined set of values.
      *
