@@ -1,5 +1,6 @@
 package com.wildbitsfoundry.etk4j.math.linearalgebra;
 
+import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
 import com.wildbitsfoundry.etk4j.math.MathETK;
 import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 
@@ -289,7 +290,7 @@ public class SingularValueDecompositionDense {
 
 		int pp = p - 1;
 		int iter = 0;
-		double eps = Math.pow(2.0, -52.0);
+		double eps = ConstantsETK.DOUBLE_EPS;
 		double tiny = Math.pow(2.0, -966.0);
 		while (p > 0) {
 			int k, kase;
@@ -584,7 +585,7 @@ public class SingularValueDecompositionDense {
 	 */
 
 	public int rank() {
-		double eps = Math.pow(2.0, -52.0);
+		double eps = ConstantsETK.DOUBLE_EPS;
 		double tol = Math.max(_rows, _cols) * s[0] * eps;
 		int r = 0;
 		for (double v : s) {

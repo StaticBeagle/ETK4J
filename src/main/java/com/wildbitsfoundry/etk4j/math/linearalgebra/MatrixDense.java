@@ -1316,6 +1316,22 @@ public class MatrixDense extends Matrix {
         }
     }
 
+    public MatrixSparse toSparse(double tol) {
+        MatrixSparse matrixSparse = new MatrixSparse(rows, cols);
+        for(int i = 0; i < rows; i++) {
+            for(int j = 0; j < cols; j++) {
+                if(Math.abs(data[i * cols + j]) > tol) {
+                    matrixSparse.unsafeSet(i, j, data[i * cols + j]);
+                }
+            }
+        }
+        return matrixSparse;
+    }
+
+    public MatrixSparse toSparse() {
+        return toSparse(ConstantsETK.DOUBLE_EPS);
+    }
+
     /**
      * Set a row to a predefined set of values.
      *

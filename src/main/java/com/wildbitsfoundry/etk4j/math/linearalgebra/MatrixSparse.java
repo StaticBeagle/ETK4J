@@ -819,8 +819,7 @@ public class MatrixSparse extends Matrix {
     @Override
     public String toString() {
         return toDense().toString()
-                .replaceAll(" {6}0.000 {6}", "                 ")
-                .replaceAll("0.000 {6}", "           ");
+                .replaceAll("0.000", "     ");
     }
 
     public static class Factory {
