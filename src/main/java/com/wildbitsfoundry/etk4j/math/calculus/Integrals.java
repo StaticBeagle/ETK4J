@@ -2,7 +2,7 @@ package com.wildbitsfoundry.etk4j.math.calculus;
 
 import java.util.function.BiFunction;
 
-import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
+import com.wildbitsfoundry.etk4j.math.function.UnivariateFunction;
 import com.wildbitsfoundry.etk4j.util.RefValue.RefInteger;
 
 /**

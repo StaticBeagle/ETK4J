@@ -1,7 +1,7 @@
 package com.wildbitsfoundry.etk4j.math.extrapolation;
 
-import com.wildbitsfoundry.etk4j.math.functions.DifferentiableFunction;
-import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
+import com.wildbitsfoundry.etk4j.math.function.DifferentiableFunction;
+import com.wildbitsfoundry.etk4j.math.function.UnivariateFunction;
 
 public final class Extrapolators {
 

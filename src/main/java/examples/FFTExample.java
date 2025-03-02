@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
-import com.wildbitsfoundry.etk4j.signals.fft.FFT;
+import com.wildbitsfoundry.etk4j.signal.fft.FFT;
 
 public class FFTExample {
 	

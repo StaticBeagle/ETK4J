@@ -1,7 +1,6 @@
 package com.wildbitsfoundry.etk4j.math.calculus;
 
-import com.wildbitsfoundry.etk4j.math.functions.MultivariateFunction;
-import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
+import com.wildbitsfoundry.etk4j.math.function.UnivariateFunction;
 
 /**
  * The <code>Derivatives</code> class contains various methods that can be used for

@@ -2,8 +2,7 @@ package com.wildbitsfoundry.etk4j.math.interpolation;
 
 import java.util.Arrays;
 
-import com.wildbitsfoundry.etk4j.math.functions.BivariateFunction;
-import examples.Spline2DExample;
+import com.wildbitsfoundry.etk4j.math.function.BivariateFunction;
 
 /**
  * The {@code Spline2D} class represents bicubic and bilinear interpolation using cubic and linear splines respectively.

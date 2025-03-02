@@ -1,8 +1,6 @@
 package com.wildbitsfoundry.etk4j.math.calculus.odesolvers;
 
-import com.wildbitsfoundry.etk4j.math.functions.BivariateFunction;
-
-import java.util.Arrays;
+import com.wildbitsfoundry.etk4j.math.function.BivariateFunction;
 
 /**
  * Explicit Runge-Kutta 4(5)

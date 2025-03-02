@@ -1,8 +1,7 @@
 package com.wildbitsfoundry.etk4j.math.laplace;
 
-import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
-import com.wildbitsfoundry.etk4j.math.functions.ComplexUnivariateFunction;
-import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
+import com.wildbitsfoundry.etk4j.constant.ConstantsETK;
+import com.wildbitsfoundry.etk4j.math.function.UnivariateFunction;
 
 /**
  * The {@code InverseLaplaceTransformStehfest} implements the inverse laplace transform using Stehfest's method.
