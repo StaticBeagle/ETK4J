@@ -214,14 +214,7 @@ public class MatrixSparseTest {
 
         double[] expected = {-0.2672612419124243, 0.8728715609439696, -0.4082482904638629, -0.5345224838248488,
                 0.2182178902359924, 0.816496580927726, -0.8017837257372732, -0.4364357804719846, -0.4082482904638631};
-        double[] actual = new double[expected.length];
-
-        for(int i = 0; i < A.getRowCount(); i++) {
-            for(int j = 0; j < A.getColumnCount(); j++) {
-                actual[A.getRowCount() * i + j] = A.unsafeGet(i, j);
-            }
-        }
-        assertArrayEquals(expected, actual, 1e-12);
+        assertArrayEquals(expected, A.getArrayDense(), 1e-12);
     }
 
     @Test
@@ -239,14 +232,7 @@ public class MatrixSparseTest {
 
         double[] expected = {-3.741657386773941, -8.552359741197581, -14.16484582135849, 0, 1.963961012123933,
                 3.491486243775882, 0, 0, -0.4082482904638638};
-        double[] actual = new double[expected.length];
-
-        for(int i = 0; i < A.getRowCount(); i++) {
-            for(int j = 0; j < A.getColumnCount(); j++) {
-                actual[A.getRowCount() * i + j] = A.unsafeGet(i, j);
-            }
-        }
-        assertArrayEquals(expected, actual, 1e-12);
+        assertArrayEquals(expected, A.getArrayDense(), 1e-12);
     }
 
     @Test
@@ -263,14 +249,7 @@ public class MatrixSparseTest {
         MatrixSparse A = qrDecompositionSparse.getH();
 
         double[] expected = {1.0, 0.0, 0.0, 0.42179344411906794, 1.0, 0.0, 0.632690166178602, 0.8597677535291113, 1.0};
-        double[] actual = new double[expected.length];
-
-        for(int i = 0; i < A.getRowCount(); i++) {
-            for(int j = 0; j < A.getColumnCount(); j++) {
-                actual[A.getRowCount() * i + j] = A.unsafeGet(i, j);
-            }
-        }
-        assertArrayEquals(expected, actual, 1e-12);
+        assertArrayEquals(expected, A.getArrayDense(), 1e-12);
     }
 
     @Test
@@ -283,16 +262,11 @@ public class MatrixSparseTest {
         MatrixSparse sparseCSC = MatrixSparse.from2DArray(matrix, ConstantsETK.DOUBLE_EPS);
 
         double[] expected = DoubleArrays.flatten(matrix);
-        double[] actual = new double[expected.length];
 
         QRDecompositionSparse qrDecompositionSparse = new QRDecompositionSparse(sparseCSC);
         MatrixSparse A = qrDecompositionSparse.getQ().multiply(qrDecompositionSparse.getR());
-        for(int i = 0; i < A.getRowCount(); i++) {
-            for(int j = 0; j < A.getColumnCount(); j++) {
-                actual[A.getRowCount() * i + j] = A.unsafeGet(i, j);
-            }
-        }
-        assertArrayEquals(expected, actual, 1e-12);
+
+        assertArrayEquals(expected, A.getArrayDense(), 1e-12);
     }
 
     @Test
