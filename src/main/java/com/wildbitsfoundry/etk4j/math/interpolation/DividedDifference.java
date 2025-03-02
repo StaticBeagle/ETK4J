@@ -1,6 +1,6 @@
 package com.wildbitsfoundry.etk4j.math.interpolation;
 
-import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
+import com.wildbitsfoundry.etk4j.math.function.UnivariateFunction;
 
 public class DividedDifference implements UnivariateFunction {
 

@@ -1,8 +1,8 @@
 package com.wildbitsfoundry.etk4j.math.linearalgebra;
 
-import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
+import com.wildbitsfoundry.etk4j.constant.ConstantsETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
-import com.wildbitsfoundry.etk4j.signals.filters.MaximumNumberOfIterationsExceededException;
+import com.wildbitsfoundry.etk4j.signal.filters.MaximumNumberOfIterationsExceededException;
 
 /*
  * Zsvd implements the singular value decomposion of a ComplexMatrixDense.

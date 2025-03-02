@@ -3,8 +3,8 @@ package com.wildbitsfoundry.etk4j.math.interpolation;
 import java.util.Arrays;
 
 import com.wildbitsfoundry.etk4j.math.extrapolation.Extrapolators;
-import com.wildbitsfoundry.etk4j.math.functions.PiecewiseFunction;
-import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
+import com.wildbitsfoundry.etk4j.math.function.PiecewiseFunction;
+import com.wildbitsfoundry.etk4j.math.function.UnivariateFunction;
 
 import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkMinXLength;
 import static com.wildbitsfoundry.etk4j.util.validation.DimensionCheckers.checkXYDimensions;

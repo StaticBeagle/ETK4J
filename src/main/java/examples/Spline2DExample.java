@@ -1,6 +1,6 @@
 package examples;
 
-import com.wildbitsfoundry.etk4j.math.functions.BivariateFunction;
+import com.wildbitsfoundry.etk4j.math.function.BivariateFunction;
 import com.wildbitsfoundry.etk4j.math.interpolation.BiCubicSpline;
 import com.wildbitsfoundry.etk4j.math.interpolation.BiLinearSpline;
 import com.wildbitsfoundry.etk4j.math.interpolation.Spline2D;

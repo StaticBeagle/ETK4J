@@ -1,8 +1,8 @@
 package com.wildbitsfoundry.etk4j.math.laplace;
 
-import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
+import com.wildbitsfoundry.etk4j.constant.ConstantsETK;
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
-import com.wildbitsfoundry.etk4j.math.functions.ComplexUnivariateFunction;
+import com.wildbitsfoundry.etk4j.math.function.ComplexUnivariateFunction;
 import com.wildbitsfoundry.etk4j.util.ComplexArrays;
 
 /**

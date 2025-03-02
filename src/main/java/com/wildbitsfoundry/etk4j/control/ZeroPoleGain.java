@@ -1,7 +1,7 @@
 package com.wildbitsfoundry.etk4j.control;
 
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
-import com.wildbitsfoundry.etk4j.math.polynomials.Polynomial;
+import com.wildbitsfoundry.etk4j.math.polynomial.Polynomial;
 
 import java.util.Arrays;
 

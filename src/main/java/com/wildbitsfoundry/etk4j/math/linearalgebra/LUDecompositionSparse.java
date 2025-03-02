@@ -138,7 +138,7 @@ public class LUDecompositionSparse extends LUDecomposition<MatrixSparse> {
             throw new IllegalArgumentException("Unexpected number of rows in B based on shape of A. Found=" + var10002 + " Expected=" + this.rows);
         }
         if (this.isSingular()) {
-            throw new RuntimeException("Matrix is singular.");
+            throw new SingularMatrixException("Matrix is singular.");
         }
 
         double[] x = MatrixSparseUtils.adjust(this.gx, b.length);
@@ -165,7 +165,7 @@ public class LUDecompositionSparse extends LUDecomposition<MatrixSparse> {
             throw new IllegalArgumentException("Matrix row dimensions must agree.");
         }
         if (this.isSingular()) {
-            throw new RuntimeException("Matrix is singular.");
+            throw new SingularMatrixException("Matrix is singular.");
         }
 
         MatrixSparse X = new MatrixSparse(0, 0, 0);

@@ -17,9 +17,9 @@ package com.wildbitsfoundry.etk4j.math.linearalgebra;
  * limitations under the License.
  */
 
-import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
+import com.wildbitsfoundry.etk4j.constant.ConstantsETK;
 import com.wildbitsfoundry.etk4j.math.MathETK;
-import com.wildbitsfoundry.etk4j.signals.filters.MaximumNumberOfIterationsExceededException;
+import com.wildbitsfoundry.etk4j.signal.filters.MaximumNumberOfIterationsExceededException;
 
 
 /**

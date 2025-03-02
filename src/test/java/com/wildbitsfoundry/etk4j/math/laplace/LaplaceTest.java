@@ -1,7 +1,7 @@
 package com.wildbitsfoundry.etk4j.math.laplace;
 
-import com.wildbitsfoundry.etk4j.math.functions.ComplexUnivariateFunction;
-import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
+import com.wildbitsfoundry.etk4j.math.function.ComplexUnivariateFunction;
+import com.wildbitsfoundry.etk4j.math.function.UnivariateFunction;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

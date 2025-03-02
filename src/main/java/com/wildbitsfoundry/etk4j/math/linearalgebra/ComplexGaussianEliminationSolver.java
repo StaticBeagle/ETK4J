@@ -44,7 +44,7 @@ public final class ComplexGaussianEliminationSolver {
 
             // Check for singular or nearly singular matrix
             if (A.unsafeGet(p, p).abs() <= tol) {
-                throw new ArithmeticException("Matrix is singular or nearly singular");
+                throw new SingularMatrixException("Matrix is singular or nearly singular");
             }
 
             // Pivot within A and b
