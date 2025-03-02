@@ -2,10 +2,10 @@ package com.wildbitsfoundry.etk4j.math.interpolation;
 
 import com.wildbitsfoundry.etk4j.math.extrapolation.ExtrapolationMethod;
 import com.wildbitsfoundry.etk4j.math.extrapolation.Extrapolators;
-import com.wildbitsfoundry.etk4j.math.functions.DifferentiableFunction;
-import com.wildbitsfoundry.etk4j.math.functions.IntegrableFunction;
-import com.wildbitsfoundry.etk4j.math.functions.PiecewiseFunction;
-import com.wildbitsfoundry.etk4j.math.functions.UnivariateFunction;
+import com.wildbitsfoundry.etk4j.math.function.DifferentiableFunction;
+import com.wildbitsfoundry.etk4j.math.function.IntegrableFunction;
+import com.wildbitsfoundry.etk4j.math.function.PiecewiseFunction;
+import com.wildbitsfoundry.etk4j.math.function.UnivariateFunction;
 import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 
 import java.util.Arrays;

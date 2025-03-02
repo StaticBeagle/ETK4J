@@ -1,7 +1,7 @@
 package examples;
 
 import com.wildbitsfoundry.etk4j.control.TransferFunction;
-import com.wildbitsfoundry.etk4j.signals.filters.*;
+import com.wildbitsfoundry.etk4j.signal.filters.*;
 
 public class AnalogFiltersExample {
 

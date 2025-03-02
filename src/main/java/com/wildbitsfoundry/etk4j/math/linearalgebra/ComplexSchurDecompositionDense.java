@@ -1,7 +1,7 @@
 package com.wildbitsfoundry.etk4j.math.linearalgebra;
 
 import com.wildbitsfoundry.etk4j.math.complex.Complex;
-import com.wildbitsfoundry.etk4j.signals.filters.MaximumNumberOfIterationsExceededException;
+import com.wildbitsfoundry.etk4j.signal.filters.MaximumNumberOfIterationsExceededException;
 
 /**
  * Schur implements the Schur decomposition of a matrix.  Specifically,

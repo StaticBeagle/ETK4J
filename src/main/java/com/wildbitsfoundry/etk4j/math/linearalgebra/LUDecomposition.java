@@ -34,7 +34,7 @@ public abstract class LUDecomposition <T extends Matrix> {
      * @return X so that L*U*X = B(piv,:)
      * @exception IllegalArgumentException
      *                Matrix row dimensions must agree.
-     * @exception RuntimeException
+     * @exception SingularMatrixException
      *                Matrix is singular.
      */
     public abstract T solve(double[] b);
@@ -47,7 +47,7 @@ public abstract class LUDecomposition <T extends Matrix> {
      * @return X so that L*U*X = B(piv,:)
      * @exception IllegalArgumentException
      *                Matrix row dimensions must agree.
-     * @exception RuntimeException
+     * @exception SingularMatrixException
      *                Matrix is singular.
      */
     public abstract T solve(T B);

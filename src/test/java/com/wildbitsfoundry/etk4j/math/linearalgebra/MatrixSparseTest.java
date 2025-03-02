@@ -1,6 +1,6 @@
 package com.wildbitsfoundry.etk4j.math.linearalgebra;
 
-import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
+import com.wildbitsfoundry.etk4j.constant.ConstantsETK;
 import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 import org.junit.Test;
 

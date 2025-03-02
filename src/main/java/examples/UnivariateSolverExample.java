@@ -1,7 +1,7 @@
 package examples;
 
-import com.wildbitsfoundry.etk4j.math.optimize.solvers.NewtonRaphson;
-import com.wildbitsfoundry.etk4j.math.optimize.solvers.SolverResults;
+import com.wildbitsfoundry.etk4j.math.optimize.solver.NewtonRaphson;
+import com.wildbitsfoundry.etk4j.math.optimize.solver.SolverResults;
 
 public class UnivariateSolverExample {
 	public static void main(String[] args) {

@@ -193,7 +193,7 @@ public class ComplexLUDecompositionDense extends ComplexLUDecomposition<ComplexM
 			throw new IllegalArgumentException("Matrix row dimensions must agree.");
 		}
 		if (this.isSingular()) {
-			throw new RuntimeException("Matrix is singular.");
+			throw new SingularMatrixException("Matrix is singular.");
 		}
 
 		// Copy right hand side with pivoting

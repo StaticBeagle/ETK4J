@@ -1,7 +1,7 @@
 package com.wildbitsfoundry.etk4j.math.calculus.odesolvers;
 
-import com.wildbitsfoundry.etk4j.constants.ConstantsETK;
-import com.wildbitsfoundry.etk4j.math.functions.BivariateFunction;
+import com.wildbitsfoundry.etk4j.constant.ConstantsETK;
+import com.wildbitsfoundry.etk4j.math.function.BivariateFunction;
 import com.wildbitsfoundry.etk4j.util.DoubleArrays;
 import com.wildbitsfoundry.etk4j.util.Tuples;
 
