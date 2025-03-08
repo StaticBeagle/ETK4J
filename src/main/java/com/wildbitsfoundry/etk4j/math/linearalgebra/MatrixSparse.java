@@ -481,7 +481,6 @@ public class MatrixSparse extends Matrix {
         int nonzero = 0;
         int rows = array.length;
         int cols = array[0].length;
-        int N = rows * cols;
         for (double[] doubles : array) {
             for (int j = 0; j < cols; j++) {
                 if (doubles[j] != 0) {

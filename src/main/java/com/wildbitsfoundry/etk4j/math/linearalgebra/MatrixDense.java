@@ -1317,15 +1317,30 @@ public class MatrixDense extends Matrix {
     }
 
     public MatrixSparse toSparse(double tol) {
-        MatrixSparse matrixSparse = new MatrixSparse(rows, cols);
-        for(int i = 0; i < rows; i++) {
-            for(int j = 0; j < cols; j++) {
-                if(Math.abs(data[i * cols + j]) > tol) {
-                    matrixSparse.unsafeSet(i, j, data[i * cols + j]);
-                }
-            }
+        int nonzero = 0;;
+        int N = rows * cols;
+        for (int i = 0; i < N; i++) {
+            if (data[i] != 0)
+                nonzero++;
         }
-        return matrixSparse;
+
+        MatrixSparse dst = new MatrixSparse(rows, cols, nonzero);
+        dst.nz_length = 0;
+
+        dst.col_idx[0] = 0;
+        for (int col = 0; col < cols; col++) {
+            for (int row = 0; row < rows; row++) {
+                double value = data[row * cols + col];
+                if (Math.abs(value) <= tol)
+                    continue;
+
+                dst.nz_rows[dst.nz_length] = row;
+                dst.nz_values[dst.nz_length] = value;
+                dst.nz_length += 1;
+            }
+            dst.col_idx[col + 1] = dst.nz_length;
+        }
+        return dst;
     }
 
     public MatrixSparse toSparse() {
