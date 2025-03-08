@@ -1183,7 +1183,7 @@ public class MatrixDense extends Matrix {
         }
         double[] result = new double[rows];
         for (int i = 0; i < rows; ++i) {
-            result[i] = data[i * rows + col];
+            result[i] = data[i * cols + col];
         }
         return result;
     }
