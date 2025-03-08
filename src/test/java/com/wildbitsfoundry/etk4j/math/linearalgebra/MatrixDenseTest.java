@@ -10,6 +10,18 @@ import com.wildbitsfoundry.etk4j.constant.ConstantsETK;
 public class MatrixDenseTest {
 
     @Test
+    public void testToSparse() {
+        double[][] matrix = {
+                {1, 4, 7},
+                {2, 5, 8},
+                {3, 6, 10},
+        };
+        double[] expected = {1, 4, 7, 2, 5, 8, 3, 6, 10};
+        MatrixSparse sparseCSC = MatrixDense.from2DArray(matrix).toSparse();
+        assertArrayEquals(expected, sparseCSC.getArrayDense(), 1e-12);
+    }
+
+    @Test
     public void testMagic() {
 
         MatrixDense sol = new MatrixDense(1, 1, 1);

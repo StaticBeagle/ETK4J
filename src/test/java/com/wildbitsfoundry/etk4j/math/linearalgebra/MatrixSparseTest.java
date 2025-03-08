@@ -32,6 +32,53 @@ public class MatrixSparseTest {
     }
 
     @Test
+    public void testFrom2DArraySquareMatrix() {
+        double[][] matrix = {
+                {1, 4, 7},
+                {2, 5, 8},
+                {3, 6, 10},
+        };
+        double[] expected = {1, 4, 7, 2, 5, 8, 3, 6, 10};
+        MatrixSparse sparseCSC = MatrixSparse.from2DArray(matrix, ConstantsETK.DOUBLE_EPS);
+        assertArrayEquals(expected, sparseCSC.getArrayDense(), 1e-12);
+    }
+
+    @Test
+    public void testFrom2DArrayTallMatrix() {
+        double[][] matrix = {
+                {1, 4},
+                {2, 5},
+                {3, 6},
+        };
+        double[] expected = {1, 4, 2, 5, 3, 6};
+        MatrixSparse sparseCSC = MatrixSparse.from2DArray(matrix, ConstantsETK.DOUBLE_EPS);
+        assertArrayEquals(expected, sparseCSC.getArrayDense(), 1e-12);
+    }
+
+    @Test
+    public void testFrom2DArrayWideMatrix() {
+        double[][] matrix = {
+                {1, 4, 7},
+                {2, 5, 8}
+        };
+        double[] expected = {1, 4, 7, 2, 5, 8};
+        MatrixSparse sparseCSC = MatrixSparse.from2DArray(matrix, ConstantsETK.DOUBLE_EPS);
+        assertArrayEquals(expected, sparseCSC.getArrayDense(), 1e-12);
+    }
+
+    @Test
+    public void testFrom2DArrayIdentityMatrix() {
+        double[][] matrix = {
+                {1, 0, 0},
+                {0, 1, 0},
+                {0, 0, 1},
+        };
+        double[] expected = {1, 0, 0, 0, 1, 0, 0, 0, 1};
+        MatrixSparse sparseCSC = MatrixSparse.from2DArray(matrix, ConstantsETK.DOUBLE_EPS);
+        assertArrayEquals(expected, sparseCSC.getArrayDense(), 1e-12);
+    }
+
+    @Test
     public void testAdd() {
         double[][] matrixA = {
                 {1, 4, 7},

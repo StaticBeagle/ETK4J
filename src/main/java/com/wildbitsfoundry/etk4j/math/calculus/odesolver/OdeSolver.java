@@ -1,4 +1,4 @@
-package com.wildbitsfoundry.etk4j.math.calculus.odesolvers;
+package com.wildbitsfoundry.etk4j.math.calculus.odesolver;
 
 import com.wildbitsfoundry.etk4j.util.Tuples;
 

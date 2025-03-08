@@ -90,17 +90,4 @@ public class JacobiMethodSolver {
         return solverResults;
 
     }
-    public static void main(String[] args) {
-        double[][] A = {{2, -1, 0}, {-1, 2, -1}, {0, -1, 2}};
-        double[] b = {1, 0, 1};
-        double[] x = {0, 0, 0}; // Initial guess
-        int maxIterations = 100;
-        double tolerance = 0.0001;
-        double[] solution = new JacobiMethodSolver(new MatrixDense(A), b)
-                .initialGuess(x).iterationLimit(maxIterations).tolerance(tolerance).solve().getValue();
-        System.out.println("Solution:");
-        for (double val : solution) {
-            System.out.println(val);
-        }
-    }
 }

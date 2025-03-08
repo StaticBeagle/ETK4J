@@ -478,19 +478,34 @@ public class MatrixSparse extends Matrix {
     }
 
     public static MatrixSparse from2DArray(double[][] array, double tol) {
+        int nonzero = 0;
         int rows = array.length;
         int cols = array[0].length;
-
-        MatrixSparse matrixSparse = new MatrixSparse(rows, cols);
-
-        for(int i = 0; i < rows; i++) {
-            for(int j = 0; j < cols; j++) {
-                if(Math.abs(array[i][j]) > tol) {
-                    matrixSparse.unsafeSet(i, j, array[i][j]);
+        for (double[] doubles : array) {
+            for (int j = 0; j < cols; j++) {
+                if (doubles[j] != 0) {
+                    nonzero++;
                 }
             }
         }
-        return matrixSparse;
+
+        MatrixSparse dst = new MatrixSparse(rows, cols, nonzero);
+        dst.nz_length = 0;
+
+        dst.col_idx[0] = 0;
+        for (int col = 0; col < cols; col++) {
+            for (int row = 0; row < rows; row++) {
+                double value = array[row][col];
+                if (Math.abs(value) <= tol)
+                    continue;
+
+                dst.nz_rows[dst.nz_length] = row;
+                dst.nz_values[dst.nz_length] = value;
+                dst.nz_length += 1;
+            }
+            dst.col_idx[col + 1] = dst.nz_length;
+        }
+        return dst;
     }
 
     /**
