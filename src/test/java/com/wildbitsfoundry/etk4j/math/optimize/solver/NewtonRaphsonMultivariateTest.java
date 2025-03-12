@@ -110,4 +110,34 @@ public class NewtonRaphsonMultivariateTest {
         assertEquals(7.682979784690616E-10, nr.getError(), 1e-12);
         assertTrue(nr.hasConverged());
     }
+
+    @Test
+    public void testNewtonRaphsonMethodPreComputedJacobianDefaultConditionsCosineAndSine() {
+        // Define the system of equations
+        MultivariateFunction[] functions = {
+                x -> 3 * x[0] - Math.cos(x[1] * x[2]) - 3.0/2.0,
+                x -> 4 * x[0] * x[0] -625 * x[1] * x[1] + 2 * x[2] - 1,
+                x -> 20 * x[2] + Math.exp(-x[0] * x[1]) + 9
+        };
+        // Define Jacobian
+        MultivariateFunction[][] jacobian = {
+                {x -> 3, x -> x[2] * Math.sin(x[1] * x[2]), x -> x[1] * Math.sin(x[1] * x[2])},
+                {x -> 8 * x[0], x -> -1250 * x[1], x -> 2},
+                {x -> -x[1] * Math.exp(-x[0] * x[1]), x -> -x[0] * Math.exp(-x[0] * x[1]), x -> 20}
+        };
+        //Initial guess
+        double[] x0 = {1, 1, 1};
+
+        // Solve using the Newton-Raphson method
+        SolverResults<double[]> nr = new NewtonRaphsonMultivariate(functions, x0)
+                .jacobian(jacobian)
+                .solve();
+        double[] expected = {0.8332816138167236, 0.035334617159854045, -0.49854927776854513};
+        assertArrayEquals(expected, nr.getValue(), 1e-12);
+        assertEquals(8, nr.getNumberOfIterations());
+        assertEquals("Converged", nr.getSolverStatus());
+        assertEquals(OptimizerStatusType.CONVERGED, nr.getOptimizerStatusType());
+        assertEquals(4.498299174920495E-8, nr.getError(), 1e-12);
+        assertTrue(nr.hasConverged());
+    }
 }
